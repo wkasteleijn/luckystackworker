@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ij.io.OpenDialog;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.planetherapy.PlanetherapyContext;
 import nl.wilcokas.planetherapy.model.Profile;
 import nl.wilcokas.planetherapy.repository.ProfileRepository;
 import nl.wilcokas.planetherapy.service.ReferenceImageService;
@@ -27,7 +28,7 @@ import nl.wilcokas.planetherapy.util.Util;
 @RestController
 @RequestMapping("/api")
 @Slf4j
-public class SharpASController {
+public class PlanetherapyController {
 
 	@Autowired
 	private ProfileRepository profileRepository;
@@ -79,4 +80,10 @@ public class SharpASController {
 		referenceImageService.openReferenceImage(referenceImage, profile);
 		return profileName;
 	}
+
+	@PutMapping("/reference/apply")
+	public void applyProfile(@RequestBody Profile profile) {
+		PlanetherapyContext.updateWorkerForProfile(profile);
+	}
+
 }

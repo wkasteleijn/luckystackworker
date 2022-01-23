@@ -22,9 +22,15 @@ public class Settings {
 	@Column(name = "id")
 	private int id;
 
-	// TODO: Add global settings
-
 	@Column(name = "rootFolder")
 	private String rootFolder;
 
+	@Column(name = "extensions")
+	private String extensions;
+
+	@Column(name = "outputFormat")
+	private String outputFormat;
+
+	@Column(name = "defaultProfile")
+	private String defaultProfile;
 }

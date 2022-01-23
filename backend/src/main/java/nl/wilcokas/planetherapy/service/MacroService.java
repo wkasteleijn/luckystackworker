@@ -15,10 +15,12 @@ import org.apache.commons.text.StringSubstitutor;
 
 import ij.IJ;
 import ij.ImagePlus;
+import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.planetherapy.constants.Constants;
 import nl.wilcokas.planetherapy.model.Profile;
 import nl.wilcokas.planetherapy.util.Util;
 
+@Slf4j
 public class MacroService {
 
 	private Map<String, String> parameters;
@@ -39,7 +41,7 @@ public class MacroService {
 
 	public void runMacro(File file) {
 		String profile = getProfile(file);
-		Util.logInfo(
+		log.info(
 				String.format("Applying sharpen filter with profile '%s' to: %s", profile, file.getAbsolutePath()));
 
 		ImagePlus imp = IJ.openImage(file.getAbsolutePath());

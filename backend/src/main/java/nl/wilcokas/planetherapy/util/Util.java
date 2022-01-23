@@ -13,14 +13,6 @@ public class Util {
 		return file.getAbsolutePath().split("\\.");
 	}
 
-	public static void logInfo(String message) {
-		System.out.println("[INFO]: " + message);
-	}
-
-	public static void logError(Exception e) {
-		System.out.println("[ERROR]: " + e.getMessage());
-	}
-
 	@SuppressWarnings("static-access")
 	public static void pause(long waitDelay) throws InterruptedException {
 		Thread.currentThread().sleep(waitDelay);
