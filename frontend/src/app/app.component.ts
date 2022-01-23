@@ -28,7 +28,6 @@ export class AppComponent {
   radius: number;
   amount: number;
   iterations: number;
-  level: number;
   denoise: number;
   gamma: number;
   red: number;
@@ -136,7 +135,6 @@ export class AppComponent {
     this.radius = this.profile.radius;
     this.amount = this.profile.amount;
     this.iterations = this.profile.iterations;
-    this.level = this.profile.level;
     this.denoise = this.profile.denoise;
   }
 

@@ -16,12 +16,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
   .mat-slider-thumb {
-  background-color: lightgray !important;
+  background-color: rgb(168, 168, 168) !important;
   color: lightgray;
 }
 
  .mat-slider-track-background {
-  background-color: gray !important;
+  background-color: black !important;
 }
 
 .mat-slider {

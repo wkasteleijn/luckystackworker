@@ -11,10 +11,10 @@
     </button>
   </div>
 
-  <div class="dropdown">
+  <div>
     <mat-form-field appearance="fill">
       <mat-label class="dropdown_label">Select a profile :</mat-label>
-      <select matNativeControl [(ngModel)]="selectedProfile" name="profile" (change)="profileSelectionChanged($event)">
+      <select matNativeControl [(ngModel)]="selectedProfile" name="profile" (change)="profileSelectionChanged($event)" class="dropdown">
         <option *ngFor="let profile of profiles" [value]="profile.value">
           {{ profile.viewValue }}
         </option>
@@ -22,20 +22,9 @@
     </mat-form-field>
     <mat-form-field appearance="fill">
       <mat-label class="dropdown_label">Images root folder</mat-label>
-      <input matInput type="text" [(ngModel)]="rootFolder" (click)="selectRootFolder()">
+      <input matInput type="text" [(ngModel)]="rootFolder" (click)="selectRootFolder()" class="dropdown rootFolder">
     </mat-form-field>
   </div>
-
-  <div class="sliderRow strongTitle">
-    <span class="line"
-      >-------------------------------------------------------</span
-    >
-    Sharpen
-    <span class="line"
-      >--------------------------------------------------------</span
-    >
-  </div>
-
   <div class="sliderRow">
     <div class="sliderLabel">Radius</div>
     <div class="slider">
@@ -71,7 +60,7 @@
         thumbLabel
         tickInterval="1"
         step="1"
-        min="0"
+        min="1"
         max="10"
         (change)="iterationsChanged($event)"
         [(ngModel)]="iterations"
@@ -79,29 +68,20 @@
       <span class="sliderLabel">{{iterations}}</span>
     </div>
   </div>
-  <div class="sliderRow strongTitle">
-    <span class="line"
-      >------------------------------------------------------</span
-    >
-    Color & Light
-    <span class="line"
-      >---------------------------------------------------</span
-    >
-  </div>
   <div class="sliderRow">
-    <div class="sliderLabel">Exposure correction</div>
+    <div class="sliderLabel">Denoise</div>
     <div class="slider">
       <mat-slider
         thumbLabel
-        tickInterval="1"
-        step="1"
-        min="3"
-        max="10"
+        tickInterval="1000"
+        step="100"
+        min="0"
+        max="10000"
         color="ffffff"
-        (change)="levelChanged($event)"
-        [(ngModel)]="level"
+        (change)="denoiseChanged($event)"
+        [(ngModel)]="denoise"
       ></mat-slider>
-      <span class="sliderLabel">{{level}}</span>
+      <span class="sliderLabel">{{denoise}}</span>
     </div>
   </div>
   <div class="sliderRow">
@@ -166,27 +146,6 @@
         [(ngModel)]="blue"
       ></mat-slider>
       <span class="sliderLabel">{{blue}}</span>
-    </div>
-  </div>
-  <div class="sliderRow strongTitle">
-    <span class="line"
-      >--------------------------------------------------------------------------------------------------------------------------</span
-    >
-  </div>
-  <div class="sliderRow">
-    <div class="sliderLabel">Denoise</div>
-    <div class="slider">
-      <mat-slider
-        thumbLabel
-        tickInterval="1000"
-        step="100"
-        min="0"
-        max="10000"
-        color="ffffff"
-        (change)="denoiseChanged($event)"
-        [(ngModel)]="denoise"
-      ></mat-slider>
-      <span class="sliderLabel">{{denoise}}</span>
     </div>
   </div>
   <div class="button_container">

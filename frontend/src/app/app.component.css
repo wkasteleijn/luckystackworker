@@ -6,13 +6,13 @@
 }
 .sliderLabel {
   width: 160px;
-  color: lightgray;
+  color: rgb(168, 168, 168);
   margin-left: 16px;
 }
 
 .strongTitle {
   font-weight: bold;
-  color: lightgray;
+  color: gray;
 }
 .sliderRow {
   display: flex;
@@ -21,10 +21,15 @@
   align-items: baseline;
 }
 .dropdown {
-  color: lightgray;
+  color: rgb(168, 168, 168);
+  background-color: black;
+}
+
+.rootFolder {
+  width: 200px;
 }
 .dropdown_label {
-  color: lightgray;
+  color: rgb(168, 168, 168);
   margin-left: 16px;
   margin-right: 16px;
 }
@@ -39,19 +44,21 @@
 
 .button {
   border: 2px;
-  border-color: lightgray;
+  border-color: gray;
   border-style: ridge;
   margin-right: 16px;
   font-weight: bold;
-  color: lightgray;
-  background-color: blue;
+  color: rgb(168, 168, 168);
+  background-color: black;
   padding: 4px;
   padding-left: 12px;
   padding-right: 12px;
   border-radius: 8px;
+  margin-right: 80px;
 }
 
 .line {
-  color: gray;
+  color: black;
   margin-top: 16px;
+  margin-left: 8px;
 }
