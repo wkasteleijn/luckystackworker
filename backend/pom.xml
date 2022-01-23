@@ -10,10 +10,10 @@
 	</parent>
 
 	<groupId>nl.wilcokas</groupId>
-	<artifactId>sharpas</artifactId>
+	<artifactId>planetherapy</artifactId>
 	<version>0.5.0-SNAPSHOT</version>
 	<name>sharpas</name>
-	<description>SharpAs application</description>
+	<description>Planetherapy application</description>
 
 	<properties>
 		<java.version>11</java.version>
