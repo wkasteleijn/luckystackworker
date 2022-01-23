@@ -1,0 +1,57 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(43, 43, 43);
+  margin-left: 16px;
+}
+.sliderLabel {
+  width: 160px;
+  color: lightgray;
+  margin-left: 16px;
+}
+
+.strongTitle {
+  font-weight: bold;
+  color: lightgray;
+}
+.sliderRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: baseline;
+}
+.dropdown {
+  color: lightgray;
+}
+.dropdown_label {
+  color: lightgray;
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.button_container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  margin-bottom: 16px;
+  margin-top: 20px;
+}
+
+.button {
+  border: 2px;
+  border-color: lightgray;
+  border-style: ridge;
+  margin-right: 16px;
+  font-weight: bold;
+  color: lightgray;
+  background-color: blue;
+  padding: 4px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 8px;
+}
+
+.line {
+  color: gray;
+  margin-top: 16px;
+}

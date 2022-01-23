@@ -1,0 +1,30 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.page {
+  background-color: rgb(43, 43, 43);
+}
+
+ .mat-slider-track-fill {
+  background-color: blue !important;
+}
+
+ .mat-slider-thumb-label {
+  background-color: rgb(65, 65, 65) !important;
+}
+
+  .mat-slider-thumb {
+  background-color: lightgray !important;
+  color: lightgray;
+}
+
+ .mat-slider-track-background {
+  background-color: gray !important;
+}
+
+.mat-slider {
+  width: 392px;
+}
+

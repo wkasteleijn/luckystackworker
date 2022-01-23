@@ -1,0 +1,221 @@
+<div class="container">
+  <div class="button_container">
+    <button
+      id="basic"
+      type="button"
+      mat-button
+      (click)="openReferenceImage()"
+      class="button"
+    >
+      Open Reference Image
+    </button>
+  </div>
+
+  <div class="dropdown">
+    <mat-form-field appearance="fill">
+      <mat-label class="dropdown_label">Select a profile :</mat-label>
+      <select matNativeControl [(ngModel)]="selectedProfile" name="profile" (change)="profileSelectionChanged($event)">
+        <option *ngFor="let profile of profiles" [value]="profile.value">
+          {{ profile.viewValue }}
+        </option>
+      </select>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label class="dropdown_label">Images root folder</mat-label>
+      <input matInput type="text" [(ngModel)]="rootFolder" (click)="selectRootFolder()">
+    </mat-form-field>
+  </div>
+
+  <div class="sliderRow strongTitle">
+    <span class="line"
+      >-------------------------------------------------------</span
+    >
+    Sharpen
+    <span class="line"
+      >--------------------------------------------------------</span
+    >
+  </div>
+
+  <div class="sliderRow">
+    <div class="sliderLabel">Radius</div>
+    <div class="slider">
+      <mat-slider
+        thumbLabel
+        step="0.1"
+        min="0.5"
+        max="4"
+        (change)="radiusChanged($event)"
+        [(ngModel)]="radius"
+      ></mat-slider>
+      <span class="sliderLabel">{{radius}}</span>
+    </div>
+  </div>
+  <div class="sliderRow">
+    <div class="sliderLabel">Amount</div>
+    <div class="slider">
+      <mat-slider
+        thumbLabel
+        step="10"
+        min="7000"
+        max="9999"
+        (change)="amountChanged($event)"
+        [(ngModel)]="amount"
+      ></mat-slider>
+      <span class="sliderLabel">{{amount}}</span>
+    </div>
+  </div>
+  <div class="sliderRow">
+    <div class="sliderLabel">Iterations</div>
+    <div class="slider">
+      <mat-slider
+        thumbLabel
+        tickInterval="1"
+        step="1"
+        min="0"
+        max="10"
+        (change)="iterationsChanged($event)"
+        [(ngModel)]="iterations"
+      ></mat-slider>
+      <span class="sliderLabel">{{iterations}}</span>
+    </div>
+  </div>
+  <div class="sliderRow strongTitle">
+    <span class="line"
+      >------------------------------------------------------</span
+    >
+    Color & Light
+    <span class="line"
+      >---------------------------------------------------</span
+    >
+  </div>
+  <div class="sliderRow">
+    <div class="sliderLabel">Exposure correction</div>
+    <div class="slider">
+      <mat-slider
+        thumbLabel
+        tickInterval="1"
+        step="1"
+        min="3"
+        max="10"
+        color="ffffff"
+        (change)="levelChanged($event)"
+        [(ngModel)]="level"
+      ></mat-slider>
+      <span class="sliderLabel">{{level}}</span>
+    </div>
+  </div>
+  <div class="sliderRow">
+    <div class="sliderLabel">Gamma</div>
+    <div class="slider">
+      <mat-slider
+        thumbLabel
+        tickInterval="0.01"
+        step="0.01"
+        min="0.9"
+        max="1.1"
+        color="ffffff"
+        (change)="gammaChanged($event)"
+        [(ngModel)]="gamma"
+      ></mat-slider>
+      <span class="sliderLabel">{{gamma}}</span>
+    </div>
+  </div>
+  <div class="sliderRow">
+    <div class="sliderLabel">Reduce Red</div>
+    <div class="slider">
+      <mat-slider
+        thumbLabel
+        tickInterval="1"
+        step="1"
+        min="0"
+        max="255"
+        color="ffffff"
+        (change)="redChanged($event)"
+        [(ngModel)]="red"
+      ></mat-slider>
+      <span class="sliderLabel">{{red}}</span>
+    </div>
+  </div>
+  <div class="sliderRow">
+    <div class="sliderLabel">Reduce Green</div>
+    <div class="slider">
+      <mat-slider
+        thumbLabel
+        tickInterval="1"
+        step="1"
+        min="0"
+        max="255"
+        color="ffffff"
+        (change)="greenChanged($event)"
+        [(ngModel)]="green"
+      ></mat-slider>
+      <span class="sliderLabel">{{green}}</span>
+    </div>
+  </div>
+  <div class="sliderRow">
+    <div class="sliderLabel">Reduce Blue</div>
+    <div class="slider">
+      <mat-slider
+        thumbLabel
+        tickInterval="1"
+        step="1"
+        min="0"
+        max="255"
+        color="ffffff"
+        (change)="blueChanged($event)"
+        [(ngModel)]="blue"
+      ></mat-slider>
+      <span class="sliderLabel">{{blue}}</span>
+    </div>
+  </div>
+  <div class="sliderRow strongTitle">
+    <span class="line"
+      >--------------------------------------------------------------------------------------------------------------------------</span
+    >
+  </div>
+  <div class="sliderRow">
+    <div class="sliderLabel">Denoise</div>
+    <div class="slider">
+      <mat-slider
+        thumbLabel
+        tickInterval="1000"
+        step="100"
+        min="0"
+        max="10000"
+        color="ffffff"
+        (change)="denoiseChanged($event)"
+        [(ngModel)]="denoise"
+      ></mat-slider>
+      <span class="sliderLabel">{{denoise}}</span>
+    </div>
+  </div>
+  <div class="button_container">
+    <button
+      id="basic"
+      type="button"
+      mat-button
+      (click)="openReferenceImage()"
+      class="button"
+    >
+      Save Profile
+    </button>
+    <button
+      id="basic"
+      type="button"
+      mat-button
+      (click)="openReferenceImage()"
+      class="button"
+    >
+      Save Reference Image
+    </button>
+    <button
+      id="basic"
+      type="button"
+      mat-button
+      (click)="exit()"
+      class="button"
+    >
+      Exit
+    </button>
+  </div>
+</div>
