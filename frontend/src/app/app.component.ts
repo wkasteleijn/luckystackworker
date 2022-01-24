@@ -47,6 +47,23 @@ export class AppComponent {
     );
   }
 
+  saveReferenceImage() {
+    console.log('saveReferenceImage called');
+    this.planetherapyService.saveReferenceImage(this.rootFolder).subscribe(
+      (data) => console.log(data),
+      (error) => console.log(error)
+    );
+  }
+
+  saveProfile() {
+    console.log('saveProfile called');
+    this.planetherapyService.saveProfile(this.profile).subscribe(
+      (data) => console.log(data),
+      (error) => console.log(error)
+    );
+    alert("Profile saved!");
+  }
+
   radiusChanged(event: any) {
     this.profile.radius = event.value;
     this.profile.operation = "radius";

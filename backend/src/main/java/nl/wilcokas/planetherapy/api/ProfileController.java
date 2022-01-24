@@ -16,19 +16,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ij.io.OpenDialog;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.planetherapy.PlanetherapyContext;
 import nl.wilcokas.planetherapy.model.Profile;
 import nl.wilcokas.planetherapy.repository.ProfileRepository;
 import nl.wilcokas.planetherapy.service.ReferenceImageService;
-import nl.wilcokas.planetherapy.util.Util;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/profiles")
 @Slf4j
-public class PlanetherapyController {
+public class ProfileController {
 
 	@Autowired
 	private ProfileRepository profileRepository;
@@ -36,21 +34,21 @@ public class PlanetherapyController {
 	@Autowired
 	private ReferenceImageService referenceImageService;
 
-	@GetMapping("/profiles")
+	@GetMapping
 	public List<Profile> getProfiles() {
 		log.info("getProfiles called");
 		return StreamSupport.stream(profileRepository.findAll().spliterator(), false)
 				.collect(Collectors.toList());
 	}
 
-	@GetMapping("/profiles/{profile}")
+	@GetMapping("/{profile}")
 	public Profile getProfile(@PathVariable(value = "profile") String profile) {
 		log.info("getProfile called with profile {}", profile);
 		return profileRepository.findByName(profile)
 				.orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profile)));
 	}
 
-	@PutMapping("/profiles")
+	@PutMapping
 	public ResponseEntity<String> updateProfile(@RequestBody Profile profile) {
 		log.info("updateProfile called with profile {}", profile);
 		Profile result = profileRepository.findByName(profile.getName())
@@ -66,24 +64,8 @@ public class PlanetherapyController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@PutMapping("/reference/open")
-	public String openReferenceImage(@RequestBody String path) {
-		OpenDialog od = new OpenDialog("Open Image", null);
-		String referenceImage = od.getDirectory() + od.getFileName();
-		log.info("Image selected {} ", referenceImage);
-		String profileName = Util.deriveProfileFromImageName(referenceImage);
-		Profile profile = null;
-		if (profileName != null) {
-			profile = profileRepository.findByName(profileName)
-					.orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
-		}
-		referenceImageService.openReferenceImage(referenceImage, profile);
-		return profileName;
-	}
-
-	@PutMapping("/reference/apply")
+	@PutMapping("/apply")
 	public void applyProfile(@RequestBody Profile profile) {
 		PlanetherapyContext.updateWorkerForProfile(profile);
 	}
-
 }

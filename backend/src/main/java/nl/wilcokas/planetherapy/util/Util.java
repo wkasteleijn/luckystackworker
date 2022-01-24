@@ -22,9 +22,9 @@ public class Util {
 		return path.replaceAll("\\\\", "/");
 	}
 
-	public static String getTempFile(String path) {
-		String[] pathSep = path.split("\\.");
-		return pathSep[0] + "_tmp.png";
+	public static String getProcessedFileName(String path) {
+		String[] pathSep = getImageName(path).split("\\.");
+		return pathSep[0] + "_planetherapy";
 	}
 
 	public static String deriveProfileFromImageName(String path) {
@@ -49,7 +49,12 @@ public class Util {
 		return null;
 	}
 
-	private static String getImageName(String path) {
+	public static String getFileDirectory(String path) {
+		String ijFormatPath = getIJFileFormat(path);
+		return ijFormatPath.substring(0, ijFormatPath.lastIndexOf("/"));
+	}
+
+	public static String getImageName(String path) {
 		return path.substring(path.lastIndexOf("/") + 1);
 	}
 

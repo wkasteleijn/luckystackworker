@@ -20,8 +20,15 @@ export class PlanetherapyService {
     return this.http.put(`${this.baseUrl}/profiles`, profile);
   }
 
+  saveProfile(profile: Profile): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/profiles/apply`, profile);
+  }
+
   openReferenceImage(rootFolder: string): Observable<Object> {
     return this.http.put(`${this.baseUrl}/reference/open`,rootFolder);
   }
 
+  saveReferenceImage(rootFolder: string): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/reference/save`,rootFolder);
+  }
 }

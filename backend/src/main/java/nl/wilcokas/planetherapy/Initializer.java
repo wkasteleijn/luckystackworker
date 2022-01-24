@@ -26,6 +26,6 @@ public class Initializer {
 		PlanetherapyContext.loadWorkerProperties(profileRepository.findAll().iterator(),
 				settingsRepository.findAll().iterator().next());
 
-		PlanetherapyContext.getWorker().start();
+		// PlanetherapyContext.getWorker().start();
 	}
 }

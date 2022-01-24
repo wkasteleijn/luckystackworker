@@ -70,7 +70,7 @@ public class MacroService {
 	}
 
 	private void fillParameters(Profile profile, String inputFilePath, boolean isStack) {
-		parameters.put("outputFile", Util.getTempFile(inputFilePath));
+		parameters.put("outputFile", Util.getProcessedFileName(inputFilePath));
 		parameters.put("inputFile", Util.getIJFileFormat(inputFilePath));
 		parameters.put("radius", profile.getRadius().toPlainString());
 		parameters.put("amount", profile.getAmount().divide(new BigDecimal(10000)).toPlainString());
