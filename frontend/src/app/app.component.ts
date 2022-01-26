@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Profile } from './model/profile';
 import { PlanetherapyService } from './planetherapy.service';
 
@@ -37,7 +38,9 @@ export class AppComponent {
   selectedProfile: string;
   rootFolder: string = 'C:\\';
 
-  constructor(private planetherapyService: PlanetherapyService) {}
+  constructor(
+    private planetherapyService: PlanetherapyService,
+    private _snackBar: MatSnackBar) {}
 
   openReferenceImage() {
     console.log('openReferenceImage called');
@@ -61,7 +64,9 @@ export class AppComponent {
       (data) => console.log(data),
       (error) => console.log(error)
     );
-    alert("Profile saved!");
+    this._snackBar.open("Profile saved!","OK",{
+      duration: 3000
+    });
   }
 
   radiusChanged(event: any) {
@@ -153,6 +158,10 @@ export class AppComponent {
     this.amount = this.profile.amount;
     this.iterations = this.profile.iterations;
     this.denoise = this.profile.denoise;
+    this.gamma = this.profile.gamma;
+    this.red = this.profile.red;
+    this.green = this.profile.green;
+    this.blue = this.profile.blue;
   }
 
   private updateProfile() {

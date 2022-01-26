@@ -5,6 +5,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .page {
   background-color: rgb(43, 43, 43);
+  font-size: 12px;
 }
 
  .mat-slider-track-fill {
@@ -25,6 +26,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .mat-slider {
-  width: 392px;
+  width: 428px;
 }
 

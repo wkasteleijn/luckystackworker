@@ -42,10 +42,11 @@ public class ProfileController {
 	}
 
 	@GetMapping("/{profile}")
-	public Profile getProfile(@PathVariable(value = "profile") String profile) {
-		log.info("getProfile called with profile {}", profile);
-		return profileRepository.findByName(profile)
-				.orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profile)));
+	public Profile getProfile(@PathVariable(value = "profile") String profileName) {
+		log.info("getProfile called with profile {}", profileName);
+		Profile profile = profileRepository.findByName(profileName)
+				.orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
+		return profile;
 	}
 
 	@PutMapping
@@ -59,6 +60,10 @@ public class ProfileController {
 		result.setIterations(profile.getIterations());
 		result.setLevel(profile.getLevel());
 		result.setDenoise(profile.getDenoise());
+		result.setGamma(profile.getGamma());
+		result.setRed(profile.getRed());
+		result.setGreen(profile.getGreen());
+		result.setBlue(profile.getBlue());
 		profileRepository.save(result);
 		referenceImageService.updateProcessing(profile);
 		return new ResponseEntity<>(HttpStatus.OK);
