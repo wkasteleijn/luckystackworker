@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.io.SaveDialog;
 import ij.process.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.planetherapy.model.OperationEnum;
@@ -31,23 +30,25 @@ public class ReferenceImageService {
 
 	public void openReferenceImage(String filePath, Profile profile) {
 		referenceImage = IJ.openImage(Util.getIJFileFormat(filePath));
-		IJ.run(referenceImage, "32-bit", "");
-		IJ.run(referenceImage, "Gamma...", "value=0.95"); // Apply initial gamma to correct imagej overexposure issue
-		log.info("Opened reference image with id {}", referenceImage.getID());
-		referenceImage.show(filePath);
+		if (referenceImage != null) {
+			IJ.run(referenceImage, "32-bit", "");
+			IJ.run(referenceImage, "Gamma...", "value=0.95"); // Apply initial gamma to correct imagej overexposure issue
+			log.info("Opened reference image with id {}", referenceImage.getID());
+			referenceImage.show(filePath);
 
-		processedImage = referenceImage.duplicate();
-		log.info("Opened duplicate image with id {}", processedImage.getID());
-		processedImage.show();
+			processedImage = referenceImage.duplicate();
+			log.info("Opened duplicate image with id {}", processedImage.getID());
+			processedImage.show();
 
-		finalResultImage = processedImage.duplicate();
-		finalResultImage.show();
-		log.info("Showing 2nd duplicate image with id {}", finalResultImage.getID());
-		referenceImage.getWindow().setVisible(false);
-		processedImage.getWindow().setVisible(false);
-		updateProcessing(profile);
+			finalResultImage = processedImage.duplicate();
+			finalResultImage.show();
+			log.info("Showing 2nd duplicate image with id {}", finalResultImage.getID());
+			referenceImage.getWindow().setVisible(false);
+			processedImage.getWindow().setVisible(false);
+			updateProcessing(profile);
 
-		this.filePath = filePath;
+			this.filePath = filePath;
+		}
 	}
 
 	public void updateProcessing(Profile profile) {
@@ -80,17 +81,11 @@ public class ReferenceImageService {
 		}
 	}
 
-	public void saveReferenceImage() {
+	public void saveReferenceImage(String path) {
 		String dir = Util.getFileDirectory(filePath);
 		log.info("Saving image to folder {}", dir);
-		SaveDialog saveDialog = new SaveDialog("Save reference file", dir, null, null);
-		if (saveDialog.getFileName() != null && saveDialog.getDirectory() != null) {
-			String path = saveDialog.getDirectory() + saveDialog.getFileName();
-			IJ.save(finalResultImage, path);
-			log.info("Saved file to {}", path);
-		} else {
-			log.info("Saving file was cancelled");
-		}
+		IJ.save(finalResultImage, path);
+		log.info("Saved file to {}", path);
 	}
 
 	private void copyInto(final ImagePlus origin, final ImagePlus destination) {
