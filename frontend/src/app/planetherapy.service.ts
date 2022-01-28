@@ -24,8 +24,8 @@ export class PlanetherapyService {
     return this.http.put(`${this.baseUrl}/profiles/apply`, profile);
   }
 
-  openReferenceImage(rootFolder: string): Observable<Object> {
-    return this.http.put(`${this.baseUrl}/reference/open`,rootFolder);
+  openReferenceImage(rootFolder: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/reference/open?path=${rootFolder}`);
   }
 
   saveReferenceImage(rootFolder: string): Observable<Object> {

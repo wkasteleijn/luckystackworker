@@ -1,6 +1,7 @@
 package nl.wilcokas.planetherapy.api;
 
 import java.io.File;
+import java.util.Base64;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -8,9 +9,11 @@ import javax.swing.JFrame;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,10 +34,11 @@ public class ReferenceController {
 	@Autowired
 	private ReferenceImageService referenceImageService;
 
-	@PutMapping("/open")
-	public String openReferenceImage(@RequestBody String path) {
+	@GetMapping("/open")
+	public Profile openReferenceImage(@RequestParam String path) {
 		JFrame frame = getParentFrame();
-		JFileChooser jfc = getJFileChooser(path);
+		final String base64DecodedPath = new String(Base64.getDecoder().decode(path));
+		JFileChooser jfc = getJFileChooser(base64DecodedPath);
 		int returnValue = jfc.showOpenDialog(frame);
 		frame.dispose();
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -48,7 +52,7 @@ public class ReferenceController {
 						() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
 			}
 			referenceImageService.openReferenceImage(referenceImage, profile);
-			return profileName;
+			return profile;
 		}
 		return null;
 	}

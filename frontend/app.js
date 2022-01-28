@@ -7,8 +7,8 @@ const {app, BrowserWindow} = require('electron')
     function createWindow () {
       mainWindow = new BrowserWindow({
         autoHideMenuBar: true,
-        width: 692,
-        height: 750,
+        width: 690,
+        height: 850,
         webPreferences: {
           nodeIntegration: true
         }

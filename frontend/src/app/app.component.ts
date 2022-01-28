@@ -37,6 +37,7 @@ export class AppComponent {
   profile: Profile;
   selectedProfile: string;
   rootFolder: string = 'C:\\';
+  workerStatus:string = "Idle";
 
   constructor(
     private planetherapyService: PlanetherapyService,
@@ -44,10 +45,17 @@ export class AppComponent {
 
   openReferenceImage() {
     console.log('openReferenceImage called');
-    this.planetherapyService.openReferenceImage(this.rootFolder).subscribe(
-      (data) => console.log(data),
+    const base64EncodedPath = btoa(this.rootFolder);
+    this.planetherapyService.openReferenceImage(base64EncodedPath).subscribe(
+      (data) => {
+        console.log(data);
+        this.profile = data;
+        this.selectedProfile = data.name;
+        this.updateProfileSettings();
+      },
       (error) => console.log(error)
     );
+
   }
 
   saveReferenceImage() {

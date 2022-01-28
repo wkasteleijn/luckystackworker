@@ -29,3 +29,17 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   width: 428px;
 }
 
+.card {
+  max-width: 600px;
+  margin-top: 20px;
+  background-color: rgb(25, 25, 25);
+  color: rgb(168, 168, 168);
+}
+
+.mat-card-title {
+  font-size: 14px !important;
+}
+
+.mat-card-content {
+  font-size: 12px;
+}
