@@ -66,9 +66,9 @@ export class AppComponent {
     );
   }
 
-  saveProfile() {
-    console.log('saveProfile called');
-    this.planetherapyService.saveProfile(this.profile).subscribe(
+  applyProfile() {
+    console.log('applyProfile called');
+    this.planetherapyService.applyProfile(this.profile).subscribe(
       (data) => console.log(data),
       (error) => console.log(error)
     );

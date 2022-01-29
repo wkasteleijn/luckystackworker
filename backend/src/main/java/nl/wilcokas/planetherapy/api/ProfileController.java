@@ -72,5 +72,6 @@ public class ProfileController {
 	@PutMapping("/apply")
 	public void applyProfile(@RequestBody Profile profile) {
 		PlanetherapyContext.updateWorkerForProfile(profile);
+		PlanetherapyContext.setActiveProfile(profile.getName());
 	}
 }

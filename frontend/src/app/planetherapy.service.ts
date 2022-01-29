@@ -20,7 +20,7 @@ export class PlanetherapyService {
     return this.http.put(`${this.baseUrl}/profiles`, profile);
   }
 
-  saveProfile(profile: Profile): Observable<Object> {
+  applyProfile(profile: Profile): Observable<Object> {
     return this.http.put(`${this.baseUrl}/profiles/apply`, profile);
   }
 

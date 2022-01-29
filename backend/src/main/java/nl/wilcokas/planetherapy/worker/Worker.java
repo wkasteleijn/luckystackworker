@@ -42,12 +42,21 @@ public class Worker extends Thread {
 		log.info("===== AutostakkertSharpenAutomator =====");
 		try {
 			while (running) {
-				log.info("Waiting for files to arrive from AutoStakkert...");
-				Collection<Path> folders = Files.list(Paths.get(inputFolder)).collect(Collectors.toList());
-				for (Path folder : folders) {
-					if (Constants.KNOWN_PROFILES.contains(folder.getFileName().toString().toLowerCase())) {
-						processFiles(folder);
+				String activeProfile = PlanetherapyContext.getActiveProfile();
+				if (activeProfile != null) {
+					log.info("Applying profile {}", activeProfile);
+					boolean filesProcessed = false;
+					Collection<Path> folders = Files.list(Paths.get(inputFolder)).collect(Collectors.toList());
+					for (Path folder : folders) {
+						if (Constants.KNOWN_PROFILES.contains(folder.getFileName().toString().toLowerCase())) {
+							filesProcessed = filesProcessed | processFiles(folder);
+						}
 					}
+					if (filesProcessed) {
+						PlanetherapyContext.inactivateProfile();
+					}
+				} else {
+					log.info("Waiting for a profile to be applied...");
 				}
 				Util.pause(WAIT_DELAY);
 			}
@@ -60,21 +69,22 @@ public class Worker extends Thread {
 		running = false;
 	}
 
-	private void processFiles(Path folder) {
+	private boolean processFiles(Path folder) {
 		String[] extensions = PlanetherapyContext.getWorkerProperties().get("extensions").split(",");
 		Collection<File> files = FileUtils.listFiles(folder.toFile(), extensions, true);
+		boolean filesProcessed = false;
 		for (File file : files) {
 			if (!skipFolder(file)) {
 				String[] filename = Util.getFilename(file);
 				String name = filename[0];
 				String extension = filename[filename.length - 1];
 				if (!name.contains(Constants.CONV_MARKER) && name.contains(Constants.AS_MARKER)
-						&& !name.endsWith(Constants.OUTPUT_POSTFIX) && Arrays.asList(extensions).contains(extension)
-						&& !Util.fileExists(name + Constants.OUTPUT_POSTFIX + "." + outputFormat)) {
-					workerService.applyProfile(file, outputFormat);
+						&& !name.endsWith(Constants.OUTPUT_POSTFIX) && Arrays.asList(extensions).contains(extension)) {
+					filesProcessed = filesProcessed | workerService.processFile(file, outputFormat);
 				}
 			}
 		}
+		return filesProcessed;
 	}
 
 	private boolean skipFolder(File file) {

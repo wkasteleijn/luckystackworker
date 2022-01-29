@@ -7,6 +7,7 @@ import java.util.Map;
 import ij.IJ;
 import ij.ImagePlus;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.planetherapy.PlanetherapyContext;
 import nl.wilcokas.planetherapy.constants.Constants;
 import nl.wilcokas.planetherapy.util.Operations;
 import nl.wilcokas.planetherapy.util.Util;
@@ -20,14 +21,22 @@ public class WorkerService {
 		this.properties = properties;
 	}
 
-	public void applyProfile(final File file, final String outputFormat) {
+	public boolean processFile(final File file, final String outputFormat) {
 		String profile = getProfile(file);
-		log.info("Applying sharpen filter with profile '{}' to: {}", profile, file.getAbsolutePath());
+		if (profile.equals(PlanetherapyContext.getActiveProfile())) {
+			try {
+				log.info("Applying profile '{}' to: {}", profile, file.getAbsolutePath());
 
-		ImagePlus imp = IJ.openImage(file.getAbsolutePath());
-		Operations.applyInitialSettings(imp);
-		Operations.applyAllOperations(imp, properties, profile);
-		IJ.save(imp, getOutputFile(file, outputFormat));
+				ImagePlus imp = IJ.openImage(file.getAbsolutePath());
+				Operations.applyInitialSettings(imp);
+				Operations.applyAllOperations(imp, properties, profile);
+				IJ.save(imp, getOutputFile(file, outputFormat));
+				return true;
+			} catch (Exception e) {
+				log.error("Error processing file: ", e);
+			}
+		}
+		return false;
 	}
 
 	private String getProfile(File file) {

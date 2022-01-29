@@ -13,6 +13,7 @@ import nl.wilcokas.planetherapy.worker.WorkerException;
 public class PlanetherapyContext {
 	private static Worker worker;
 	private static Map<String, String> workerProperties;
+	private static String activeProfile;
 
 	private PlanetherapyContext() {
 	}
@@ -55,5 +56,17 @@ public class PlanetherapyContext {
 		workerProperties.put(name + ".red", String.valueOf(profile.getRed()));
 		workerProperties.put(name + ".green", String.valueOf(profile.getGreen()));
 		workerProperties.put(name + ".blue", String.valueOf(profile.getBlue()));
+	}
+
+	public static String getActiveProfile() {
+		return activeProfile;
+	}
+
+	public static void setActiveProfile(String profile) {
+		activeProfile = profile;
+	}
+
+	public static void inactivateProfile() {
+		activeProfile = null;
 	}
 }
