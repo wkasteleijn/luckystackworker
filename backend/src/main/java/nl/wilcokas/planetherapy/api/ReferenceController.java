@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.planetherapy.PlanetherapyContext;
 import nl.wilcokas.planetherapy.model.Profile;
+import nl.wilcokas.planetherapy.model.Settings;
 import nl.wilcokas.planetherapy.repository.ProfileRepository;
+import nl.wilcokas.planetherapy.repository.SettingsRepository;
 import nl.wilcokas.planetherapy.service.ReferenceImageService;
 import nl.wilcokas.planetherapy.util.Util;
 
@@ -33,6 +36,8 @@ public class ReferenceController {
 
 	@Autowired
 	private ReferenceImageService referenceImageService;
+	@Autowired
+	private SettingsRepository settingsRepository;
 
 	@GetMapping("/open")
 	public Profile openReferenceImage(@RequestParam String path) {
@@ -52,6 +57,7 @@ public class ReferenceController {
 						() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
 			}
 			referenceImageService.openReferenceImage(referenceImage, profile);
+			updateSettings(referenceImage);
 			return profile;
 		}
 		return null;
@@ -82,6 +88,15 @@ public class ReferenceController {
 		frame.setLocationRelativeTo(null);
 		frame.requestFocus();
 		return frame;
+	}
+
+	private void updateSettings(String filePath) {
+		final String rootFolder = Util.getFileDirectory(filePath);
+		log.info("Setting the root folder to {}", rootFolder);
+		Settings settings = settingsRepository.findAll().iterator().next();
+		settings.setRootFolder(rootFolder);
+		settingsRepository.save(settings);
+		PlanetherapyContext.updateWorkerForRootFolder(rootFolder);
 	}
 
 }

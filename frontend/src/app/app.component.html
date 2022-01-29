@@ -26,6 +26,7 @@
         </option>
       </select>
     </mat-form-field>
+    <!--
     <mat-form-field appearance="fill">
       <mat-label class="dropdown_label">Images root folder</mat-label>
       <input
@@ -36,6 +37,7 @@
         class="dropdown rootFolder"
       />
     </mat-form-field>
+    -->
   </div>
   <mat-card class="card">
     <mat-card-header>
@@ -182,16 +184,15 @@
       <span class="sliderLabel">{{ workerStatus }}</span>
       <mat-progress-bar
         [color]="blue"
-        [value]="50"
+        [value]="workerProgress"
         mode="determinate"
         [bufferValue]="100"
       >
       </mat-progress-bar>
     </mat-card-content>
   </mat-card>
-  <div class="button_container">
+  <div class="button_container" *ngIf="buttonBarEnabled()">
     <button
-      id="basic"
       type="button"
       mat-button
       (click)="applyProfile()"
@@ -200,7 +201,6 @@
       Apply Profile
     </button>
     <button
-      id="basic"
       type="button"
       mat-button
       (click)="saveReferenceImage()"
@@ -208,7 +208,28 @@
     >
       Save Reference Image
     </button>
-    <button id="basic" type="button" mat-button (click)="exit()" class="button">
+    <button type="button" mat-button (click)="exit()" class="button">
+      Exit
+    </button>
+  </div>
+  <div class="button_container" *ngIf="!buttonBarEnabled()">
+    <button
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled"
+    >
+      Apply Profile
+    </button>
+    <button
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled"
+    >
+      Save Reference Image
+    </button>
+    <button type="button" mat-button disabled class="button_disabled">
       Exit
     </button>
   </div>

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import nl.wilcokas.planetherapy.constants.Constants;
+import nl.wilcokas.planetherapy.dto.StatusUpdate;
 import nl.wilcokas.planetherapy.model.Profile;
 import nl.wilcokas.planetherapy.model.Settings;
 import nl.wilcokas.planetherapy.worker.Worker;
@@ -14,6 +16,9 @@ public class PlanetherapyContext {
 	private static Worker worker;
 	private static Map<String, String> workerProperties;
 	private static String activeProfile;
+	private static String status = Constants.STATUS_WORKING;
+	private static int filesProcessedCount = 0;
+	private static int totalfilesCount = 0;
 
 	private PlanetherapyContext() {
 	}
@@ -58,6 +63,10 @@ public class PlanetherapyContext {
 		workerProperties.put(name + ".blue", String.valueOf(profile.getBlue()));
 	}
 
+	public static void updateWorkerForRootFolder(String rootFolder) {
+		workerProperties.put("inputFolder", rootFolder);
+	}
+
 	public static String getActiveProfile() {
 		return activeProfile;
 	}
@@ -68,5 +77,22 @@ public class PlanetherapyContext {
 
 	public static void inactivateProfile() {
 		activeProfile = null;
+	}
+
+	public static void statusUpdate(String message) {
+		status = message;
+	}
+
+	public static void setFilesProcessedCount(int aFilesProcessedCount) {
+		filesProcessedCount = aFilesProcessedCount;
+	}
+
+	public static void setTotalfilesCount(int aTotalfilesCount) {
+		totalfilesCount = aTotalfilesCount;
+	}
+
+	public static StatusUpdate getStatus() {
+		return StatusUpdate.builder().message(status).filesProcessedCount(filesProcessedCount)
+				.totalfilesCount(totalfilesCount).build();
 	}
 }

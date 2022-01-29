@@ -21,24 +21,26 @@ public class ReferenceImageService {
 	private String filePath;
 
 	public void openReferenceImage(String filePath, Profile profile) {
-		referenceImage = IJ.openImage(Util.getIJFileFormat(filePath));
-		if (referenceImage != null) {
-			Operations.applyInitialSettings(referenceImage);
-			log.info("Opened reference image with id {}", referenceImage.getID());
-			referenceImage.show(filePath);
+		finalResultImage = IJ.openImage(Util.getIJFileFormat(filePath));
+		if (finalResultImage != null) {
+			Operations.applyInitialSettings(finalResultImage);
+			log.info("Opened final result image image with id {}", finalResultImage.getID());
+			finalResultImage.show(filePath);
 
-			processedImage = referenceImage.duplicate();
+			processedImage = finalResultImage.duplicate();
 			log.info("Opened duplicate image with id {}", processedImage.getID());
 			processedImage.show();
 
-			finalResultImage = processedImage.duplicate();
-			finalResultImage.show();
-			log.info("Showing 2nd duplicate image with id {}", finalResultImage.getID());
+			referenceImage = processedImage.duplicate();
+			referenceImage.show();
+			log.info("Opened reference image image with id {}", referenceImage.getID());
+
 			referenceImage.getWindow().setVisible(false);
 			processedImage.getWindow().setVisible(false);
 			updateProcessing(profile);
 
 			this.filePath = filePath;
+			finalResultImage.setTitle(filePath);
 		}
 	}
 
@@ -70,6 +72,7 @@ public class ReferenceImageService {
 		} else if (OperationEnum.BLUE == operation) {
 			Operations.applyBlue(finalResultImage, profile);
 		}
+		finalResultImage.setTitle(filePath);
 	}
 
 	public void saveReferenceImage(String path) {
@@ -82,6 +85,7 @@ public class ReferenceImageService {
 	private void copyInto(final ImagePlus origin, final ImagePlus destination) {
 		log.info("Copying image {} into image {}", origin.getID(), destination.getID());
 		destination.setImage(origin);
+		destination.setTitle("PROCESSING");
 	}
 
 }

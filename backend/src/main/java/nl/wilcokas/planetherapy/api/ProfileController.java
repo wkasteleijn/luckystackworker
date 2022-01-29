@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.planetherapy.PlanetherapyContext;
+import nl.wilcokas.planetherapy.constants.Constants;
+import nl.wilcokas.planetherapy.dto.StatusUpdate;
 import nl.wilcokas.planetherapy.model.Profile;
 import nl.wilcokas.planetherapy.repository.ProfileRepository;
 import nl.wilcokas.planetherapy.service.ReferenceImageService;
@@ -71,7 +73,15 @@ public class ProfileController {
 
 	@PutMapping("/apply")
 	public void applyProfile(@RequestBody Profile profile) {
+		PlanetherapyContext.statusUpdate(Constants.STATUS_WORKING);
 		PlanetherapyContext.updateWorkerForProfile(profile);
 		PlanetherapyContext.setActiveProfile(profile.getName());
 	}
+
+	@GetMapping("/status")
+	public StatusUpdate getStatus() {
+		log.info("getStatus called");
+		return PlanetherapyContext.getStatus();
+	}
+
 }

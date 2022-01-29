@@ -3,6 +3,7 @@ package nl.wilcokas.planetherapy.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 import ij.IJ;
 import ij.ImagePlus;
@@ -22,12 +23,19 @@ public class WorkerService {
 	}
 
 	public boolean processFile(final File file, final String outputFormat) {
-		String profile = getProfile(file);
+		final String filePath = file.getAbsolutePath();
+		Optional<String> profileOpt = getProfile(file);
+		if (!profileOpt.isPresent()) {
+			log.info("Could not determine a profile for file {}", filePath);
+			return false;
+		}
+		String profile = profileOpt.get();
 		if (profile.equals(PlanetherapyContext.getActiveProfile())) {
 			try {
-				log.info("Applying profile '{}' to: {}", profile, file.getAbsolutePath());
-
-				ImagePlus imp = IJ.openImage(file.getAbsolutePath());
+				final String filename = Util.getImageName(Util.getIJFileFormat(filePath));
+				log.info("Applying profile '{}' to: {}", profile, filename);
+				PlanetherapyContext.statusUpdate("Processing : " + filename);
+				ImagePlus imp = IJ.openImage(filePath);
 				Operations.applyInitialSettings(imp);
 				Operations.applyAllOperations(imp, properties, profile);
 				IJ.save(imp, getOutputFile(file, outputFormat));
@@ -39,16 +47,16 @@ public class WorkerService {
 		return false;
 	}
 
-	private String getProfile(File file) {
+	private Optional<String> getProfile(File file) {
 		String filename[] = file.getName().toString().split("_");
-		String profile = null;
+		Optional<String> profile = Optional.empty();
 		if (filename.length > 0) {
 			String profilePart = filename[0].toLowerCase();
 			if (Constants.KNOWN_PROFILES.contains(profilePart)) {
-				profile = profilePart.toLowerCase();
+				profile = Optional.ofNullable(profilePart.toLowerCase());
 			}
 		}
-		return profile == null ? properties.get("default.profile").toLowerCase() : profile;
+		return profile;
 	}
 
 	private String getOutputFile(final File file, final String outputFormat) {

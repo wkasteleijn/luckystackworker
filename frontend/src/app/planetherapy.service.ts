@@ -16,6 +16,10 @@ export class PlanetherapyService {
     return this.http.get(`${this.baseUrl}/profiles/${profile}`);
   }
 
+  getStatus(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/profiles/status`);
+  }
+
   updateProfile(profile: Profile): Observable<Object> {
     return this.http.put(`${this.baseUrl}/profiles`, profile);
   }

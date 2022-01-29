@@ -37,11 +37,10 @@ export class AppComponent {
   profile: Profile;
   selectedProfile: string;
   rootFolder: string = 'C:\\';
-  workerStatus:string = "Idle";
+  workerStatus: string = 'Idle';
+  workerProgress: number;
 
-  constructor(
-    private planetherapyService: PlanetherapyService,
-    private _snackBar: MatSnackBar) {}
+  constructor(private planetherapyService: PlanetherapyService) {}
 
   openReferenceImage() {
     console.log('openReferenceImage called');
@@ -55,7 +54,6 @@ export class AppComponent {
       },
       (error) => console.log(error)
     );
-
   }
 
   saveReferenceImage() {
@@ -69,73 +67,75 @@ export class AppComponent {
   applyProfile() {
     console.log('applyProfile called');
     this.planetherapyService.applyProfile(this.profile).subscribe(
-      (data) => console.log(data),
+      (data) => {
+        console.log(data);
+        this.waitForWorker();
+      },
       (error) => console.log(error)
     );
-    this._snackBar.open("Profile saved!","OK",{
-      duration: 3000
-    });
+    this.workerStatus = "Working";
+    this.workerProgress = 0;
   }
 
   radiusChanged(event: any) {
     this.profile.radius = event.value;
-    this.profile.operation = "radius";
+    this.profile.operation = 'radius';
     console.log('radiusChanged called: ' + this.profile.radius);
     this.updateProfile();
   }
 
   amountChanged(event: any) {
     this.profile.amount = event.value;
-    this.profile.operation = "amount";
+    this.profile.operation = 'amount';
     console.log('amountChanged called: ' + this.profile.amount);
     this.updateProfile();
   }
 
   iterationsChanged(event: any) {
     this.profile.iterations = event.value;
-    this.profile.operation = "iterations";
+    this.profile.operation = 'iterations';
     console.log('iterationsChanged called: ' + this.profile.iterations);
     this.updateProfile();
   }
 
   levelChanged(event: any) {
     this.profile.level = event.value;
-    this.profile.operation = "level";
+    this.profile.operation = 'level';
     console.log('levelChanged called: ' + this.profile.level);
     this.updateProfile();
   }
 
   denoiseChanged(event: any) {
     this.profile.denoise = event.value;
-    this.profile.operation = "denoise";
+    this.profile.operation = 'denoise';
     console.log('denoiseChanged called: ' + this.profile.denoise);
     this.updateProfile();
   }
 
   gammaChanged(event: any) {
     this.profile.gamma = event.value;
-    this.profile.operation = "gamma";
+    this.profile.operation = 'gamma';
     console.log('gammaChanged called: ' + this.profile.gamma);
     this.updateProfile();
   }
 
   greenChanged(event: any) {
     this.profile.green = event.value;
-    this.profile.operation = "green";
+    this.profile.operation = 'green';
     console.log('greenChanged called: ' + this.profile.green);
     this.updateProfile();
   }
 
   redChanged(event: any) {
     this.profile.red = event.value;
-    this.profile.operation = "red";
+    this.profile.operation = 'red';
     console.log('redChanged called: ' + this.profile.red);
     this.updateProfile();
   }
 
   blueChanged(event: any) {
     this.profile.blue = event.value;
-    this.profile.operation = "blue";
+    this.profile.operation = 'blue';
     console.log('blueChanged called: ' + this.profile.blue);
     this.updateProfile();
   }
@@ -177,5 +177,31 @@ export class AppComponent {
       (data) => console.log(data),
       (error) => console.log(error)
     );
+  }
+
+  private waitForWorker() {
+    this.getStatusUpdate();
+    if ("Idle" !== this.workerStatus) {
+      console.log(this.workerStatus);
+      setTimeout(() => this.waitForWorker(), 500);
+    } else {
+      console.log("Worker is done!");
+    }
+  }
+
+  private getStatusUpdate() {
+    this.planetherapyService.getStatus().subscribe(
+      (data) => {
+        console.log(data);
+        this.workerStatus = data.message;
+        this.workerProgress =
+          Math.round((data.filesProcessedCount / data.totalfilesCount) * 100);
+      },
+      (error) => console.log(error)
+    );
+  }
+
+  buttonBarEnabled() {
+    return ("Idle" === this.workerStatus);
   }
 }

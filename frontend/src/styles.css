@@ -43,3 +43,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-card-content {
   font-size: 12px;
 }
+
+.mat-progress-bar-element {
+  background-color: black;
+}
