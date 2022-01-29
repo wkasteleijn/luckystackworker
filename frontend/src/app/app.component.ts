@@ -39,6 +39,7 @@ export class AppComponent {
   rootFolder: string = 'C:\\';
   workerStatus: string = 'Idle';
   workerProgress: number;
+  refImageSelected: boolean = false;
 
   constructor(private planetherapyService: PlanetherapyService) {}
 
@@ -51,6 +52,7 @@ export class AppComponent {
         this.profile = data;
         this.selectedProfile = data.name;
         this.updateProfileSettings();
+        this.refImageSelected = true;
       },
       (error) => console.log(error)
     );
@@ -202,6 +204,10 @@ export class AppComponent {
   }
 
   buttonBarEnabled() {
+    return ("Idle" === this.workerStatus && this.refImageSelected);
+  }
+
+  openRefImageEnabled() {
     return ("Idle" === this.workerStatus);
   }
 }

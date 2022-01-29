@@ -23,6 +23,22 @@
 .dropdown {
   color: rgb(168, 168, 168);
   background-color: black;
+  border-color: blue;
+  border-width: 2px;
+  padding: 2px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 8px;
+}
+
+.dropdown_disabled {
+  background-color: black;
+  border-color: black;
+  border-width: 2px;
+  padding: 2px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 8px;
 }
 
 .rootFolder {
