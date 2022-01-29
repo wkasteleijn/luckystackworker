@@ -1,8 +1,9 @@
 package nl.wilcokas.planetherapy;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Properties;
+import java.util.Map;
 
 import nl.wilcokas.planetherapy.model.Profile;
 import nl.wilcokas.planetherapy.model.Settings;
@@ -11,7 +12,7 @@ import nl.wilcokas.planetherapy.worker.WorkerException;
 
 public class PlanetherapyContext {
 	private static Worker worker;
-	private static Properties workerProperties;
+	private static Map<String, String> workerProperties;
 
 	private PlanetherapyContext() {
 	}
@@ -23,7 +24,7 @@ public class PlanetherapyContext {
 		return worker;
 	}
 
-	public static Properties getWorkerProperties() {
+	public static Map<String, String> getWorkerProperties() {
 		if (workerProperties == null) {
 			throw new WorkerException("Properties not loaded");
 		}
@@ -32,27 +33,27 @@ public class PlanetherapyContext {
 
 	public static void loadWorkerProperties(Iterator<Profile> profiles, Settings settings) {
 		if (workerProperties == null) {
-			workerProperties = new Properties();
+			workerProperties = new HashMap<String, String>();
 		}
 		while (profiles.hasNext()) {
 			Profile profile = profiles.next();
 			updateWorkerForProfile(profile);
 		}
-		workerProperties.setProperty("inputFolder", settings.getRootFolder());
-		workerProperties.setProperty("extensions", settings.getExtensions());
-		workerProperties.setProperty("outputFormat", settings.getOutputFormat());
-		workerProperties.setProperty("defaultProfile", settings.getDefaultProfile());
+		workerProperties.put("inputFolder", settings.getRootFolder());
+		workerProperties.put("extensions", settings.getExtensions());
+		workerProperties.put("outputFormat", settings.getOutputFormat());
+		workerProperties.put("defaultProfile", settings.getDefaultProfile());
 	}
 
 	public static void updateWorkerForProfile(Profile profile) {
 		String name = profile.getName();
-		workerProperties.setProperty(name + ".radius=", String.valueOf(profile.getRadius()));
-		workerProperties.setProperty(name + ".amount=", String.valueOf(profile.getAmount()));
-		workerProperties.setProperty(name + ".iterations=", String.valueOf(profile.getIterations()));
-		workerProperties.setProperty(name + ".denoise=", String.valueOf(profile.getDenoise()));
-		workerProperties.setProperty(name + ".gamma=", String.valueOf(profile.getGamma()));
-		workerProperties.setProperty(name + ".red=", String.valueOf(profile.getRed()));
-		workerProperties.setProperty(name + ".green=", String.valueOf(profile.getGreen()));
-		workerProperties.setProperty(name + ".blue=", String.valueOf(profile.getBlue()));
+		workerProperties.put(name + ".radius", String.valueOf(profile.getRadius()));
+		workerProperties.put(name + ".amount", String.valueOf(profile.getAmount()));
+		workerProperties.put(name + ".iterations", String.valueOf(profile.getIterations()));
+		workerProperties.put(name + ".denoise", String.valueOf(profile.getDenoise()));
+		workerProperties.put(name + ".gamma", String.valueOf(profile.getGamma()));
+		workerProperties.put(name + ".red", String.valueOf(profile.getRed()));
+		workerProperties.put(name + ".green", String.valueOf(profile.getGreen()));
+		workerProperties.put(name + ".blue", String.valueOf(profile.getBlue()));
 	}
 }

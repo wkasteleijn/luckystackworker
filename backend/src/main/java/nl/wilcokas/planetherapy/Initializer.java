@@ -25,7 +25,6 @@ public class Initializer {
 	public void init() throws IOException {
 		PlanetherapyContext.loadWorkerProperties(profileRepository.findAll().iterator(),
 				settingsRepository.findAll().iterator().next());
-
-		// PlanetherapyContext.getWorker().start();
+		PlanetherapyContext.getWorker().start();
 	}
 }

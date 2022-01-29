@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Properties;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -15,7 +15,7 @@ import org.apache.commons.io.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.planetherapy.PlanetherapyContext;
 import nl.wilcokas.planetherapy.constants.Constants;
-import nl.wilcokas.planetherapy.service.MacroService;
+import nl.wilcokas.planetherapy.service.WorkerService;
 import nl.wilcokas.planetherapy.util.Util;
 
 @Slf4j
@@ -26,14 +26,14 @@ public class Worker extends Thread {
 
 	private String inputFolder;
 	private String outputFormat;
-	private MacroService macro;
+	private WorkerService workerService;
 
 	private boolean running = true;
 
-	public Worker(Properties properties) throws IOException {
-		this.inputFolder = properties.getProperty("inputFolder");
-		this.outputFormat = properties.getProperty("outputFormat");
-		this.macro = new MacroService(properties);
+	public Worker(Map<String, String> properties) throws IOException {
+		this.inputFolder = properties.get("inputFolder");
+		this.outputFormat = properties.get("outputFormat");
+		this.workerService = new WorkerService(properties);
 
 	}
 
@@ -61,7 +61,7 @@ public class Worker extends Thread {
 	}
 
 	private void processFiles(Path folder) {
-		String[] extensions = PlanetherapyContext.getWorkerProperties().getProperty("extensions").split(",");
+		String[] extensions = PlanetherapyContext.getWorkerProperties().get("extensions").split(",");
 		Collection<File> files = FileUtils.listFiles(folder.toFile(), extensions, true);
 		for (File file : files) {
 			if (!skipFolder(file)) {
@@ -71,7 +71,7 @@ public class Worker extends Thread {
 				if (!name.contains(Constants.CONV_MARKER) && name.contains(Constants.AS_MARKER)
 						&& !name.endsWith(Constants.OUTPUT_POSTFIX) && Arrays.asList(extensions).contains(extension)
 						&& !Util.fileExists(name + Constants.OUTPUT_POSTFIX + "." + outputFormat)) {
-					macro.runMacro(file);
+					workerService.applyProfile(file, outputFormat);
 				}
 			}
 		}
