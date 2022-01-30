@@ -14,6 +14,8 @@ const {app, BrowserWindow} = require('electron')
         }
       })
 
+      // var child = require('child_process').spawn(app.getAppPath()+'\\pleunus-worker.bat');
+
       mainWindow.loadURL(
         url.format({
           pathname: path.join(__dirname, `/dist/planetherapy/index.html`),

@@ -18,6 +18,7 @@ export class AppComponent {
     { value: 'mer', viewValue: 'Mercury' },
     { value: 'ven', viewValue: 'Venus' },
     { value: 'moon', viewValue: 'Moon' },
+    { value: 'sun', viewValue: 'Sun' },
     { value: 'mars', viewValue: 'Mars' },
     { value: 'jup', viewValue: 'Jupiter' },
     { value: 'sat', viewValue: 'Saturn' },
@@ -49,10 +50,12 @@ export class AppComponent {
     this.planetherapyService.openReferenceImage(base64EncodedPath).subscribe(
       (data) => {
         console.log(data);
-        this.profile = data;
-        this.selectedProfile = data.name;
-        this.updateProfileSettings();
         this.refImageSelected = true;
+        if (data) {
+          this.profile = data;
+          this.selectedProfile = data.name;
+          this.updateProfileSettings();
+        }
       },
       (error) => console.log(error)
     );
@@ -75,7 +78,7 @@ export class AppComponent {
       },
       (error) => console.log(error)
     );
-    this.workerStatus = "Working";
+    this.workerStatus = 'Working';
     this.workerProgress = 0;
   }
 
@@ -160,6 +163,12 @@ export class AppComponent {
 
   exit() {
     console.log('exit called');
+    this.planetherapyService.exit().subscribe(
+      (data) => {
+        console.log('Response');
+      },
+      (error) => console.log(error)
+    );
     window.close();
   }
 
@@ -183,11 +192,11 @@ export class AppComponent {
 
   private waitForWorker() {
     this.getStatusUpdate();
-    if ("Idle" !== this.workerStatus) {
+    if ('Idle' !== this.workerStatus) {
       console.log(this.workerStatus);
       setTimeout(() => this.waitForWorker(), 500);
     } else {
-      console.log("Worker is done!");
+      console.log('Worker is done!');
     }
   }
 
@@ -196,18 +205,19 @@ export class AppComponent {
       (data) => {
         console.log(data);
         this.workerStatus = data.message;
-        this.workerProgress =
-          Math.round((data.filesProcessedCount / data.totalfilesCount) * 100);
+        this.workerProgress = Math.round(
+          (data.filesProcessedCount / data.totalfilesCount) * 100
+        );
       },
       (error) => console.log(error)
     );
   }
 
   buttonBarEnabled() {
-    return ("Idle" === this.workerStatus && this.refImageSelected);
+    return 'Idle' === this.workerStatus && this.refImageSelected;
   }
 
   openRefImageEnabled() {
-    return ("Idle" === this.workerStatus);
+    return 'Idle' === this.workerStatus;
   }
 }

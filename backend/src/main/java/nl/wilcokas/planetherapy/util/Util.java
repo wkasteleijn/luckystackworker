@@ -14,7 +14,11 @@ public class Util {
 	}
 
 	public static String[] getFilename(File file) {
-		return file.getAbsolutePath().split("\\.");
+		return getFilename(file.getAbsolutePath());
+	}
+
+	public static String[] getFilename(String path) {
+		return path.split("\\.");
 	}
 
 	@SuppressWarnings("static-access")
@@ -49,6 +53,8 @@ public class Util {
 			return "uranus";
 		} else if (name.startsWith("neptune")) {
 			return "neptune";
+		} else if (name.startsWith("sun")) {
+			return "sun";
 		}
 		return null;
 	}

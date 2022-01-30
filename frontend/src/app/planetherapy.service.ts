@@ -28,6 +28,10 @@ export class PlanetherapyService {
     return this.http.put(`${this.baseUrl}/profiles/apply`, profile);
   }
 
+  exit(): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/profiles/exit`,null);
+  }
+
   openReferenceImage(rootFolder: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/reference/open?path=${rootFolder}`);
   }

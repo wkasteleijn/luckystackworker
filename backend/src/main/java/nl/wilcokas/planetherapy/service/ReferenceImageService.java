@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ij.IJ;
 import ij.ImagePlus;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.planetherapy.constants.Constants;
 import nl.wilcokas.planetherapy.model.OperationEnum;
 import nl.wilcokas.planetherapy.model.Profile;
 import nl.wilcokas.planetherapy.util.Operations;
@@ -37,7 +38,10 @@ public class ReferenceImageService {
 
 			referenceImage.getWindow().setVisible(false);
 			processedImage.getWindow().setVisible(false);
-			updateProcessing(profile);
+
+			if (profile != null) {
+				updateProcessing(profile);
+			}
 
 			this.filePath = filePath;
 			finalResultImage.setTitle(filePath);
@@ -78,8 +82,9 @@ public class ReferenceImageService {
 	public void saveReferenceImage(String path) {
 		String dir = Util.getFileDirectory(filePath);
 		log.info("Saving image to folder {}", dir);
-		IJ.save(finalResultImage, path);
-		log.info("Saved file to {}", path);
+		String finalPath = Util.getFilename(path)[0] + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
+		IJ.save(finalResultImage, finalPath);
+		log.info("Saved file to {}", finalPath);
 	}
 
 	private void copyInto(final ImagePlus origin, final ImagePlus destination) {

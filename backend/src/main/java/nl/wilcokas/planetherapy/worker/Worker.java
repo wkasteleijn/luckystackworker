@@ -32,7 +32,7 @@ public class Worker extends Thread {
 
 	@Override
 	public void run() {
-		log.info("Planetherapy Worker started");
+		log.info("PleunusWorker started");
 		try {
 			while (running) {
 				String activeProfile = PlanetherapyContext.getActiveProfile();
@@ -49,7 +49,7 @@ public class Worker extends Thread {
 						PlanetherapyContext.setTotalfilesCount(0);
 					}
 				} else {
-					log.info("Waiting for a profile to be applied...");
+					log.debug("Waiting for a profile to be applied...");
 				}
 				Util.pause(WAIT_DELAY);
 			}

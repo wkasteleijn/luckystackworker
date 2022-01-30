@@ -5,6 +5,7 @@ import java.util.Base64;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +67,10 @@ public class ReferenceController {
 	@PutMapping("/save")
 	public void saveReferenceImage(@RequestBody String path) {
 		JFrame frame = getParentFrame();
-		JFileChooser jfc = getJFileChooser(path);
+		// Ignoring path received from frontend as it isn't used.
+		String realPath = PlanetherapyContext.getWorkerProperties().get("inputFolder");
+		JFileChooser jfc = getJFileChooser(realPath);
+		jfc.setFileFilter(new FileNameExtensionFilter("Png", "png"));
 		int returnValue = jfc.showDialog(frame, "Save reference image");
 		frame.dispose();
 		if (returnValue == JFileChooser.APPROVE_OPTION) {

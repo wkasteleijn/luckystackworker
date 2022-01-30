@@ -1,6 +1,6 @@
 {
-  "name": "planetherapy",
-  "productName": "Planetherapy",
+  "name": "pleunusworker",
+  "productName": "PleunusWorker",
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {

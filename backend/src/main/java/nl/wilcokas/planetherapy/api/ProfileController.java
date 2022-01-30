@@ -84,4 +84,9 @@ public class ProfileController {
 		return PlanetherapyContext.getStatus();
 	}
 
+	@PutMapping("/exit")
+	public void exit() {
+		log.info("Exit called, ending application");
+		System.exit(0);
+	}
 }
