@@ -46,7 +46,6 @@
 }
 .dropdown_label {
   color: rgb(168, 168, 168);
-  margin-left: 16px;
   margin-right: 16px;
 }
 
@@ -54,7 +53,6 @@
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  margin-bottom: 16px;
   margin-top: 20px;
 }
 
@@ -71,7 +69,6 @@
   padding-left: 12px;
   padding-right: 12px;
   border-radius: 8px;
-  margin-right: 80px;
 }
 
 .button_disabled {
@@ -87,7 +84,14 @@
   padding-left: 12px;
   padding-right: 12px;
   border-radius: 8px;
-  margin-right: 80px;
+}
+
+.button_exit {
+  margin-left: 294px;
+}
+
+.button_about {
+  margin-left: 248px;
 }
 
 .line {

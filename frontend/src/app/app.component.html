@@ -1,6 +1,7 @@
 <div class="container">
   <div class="button_container">
-    <button *ngIf="openRefImageEnabled()"
+    <button
+      *ngIf="openRefImageEnabled()"
       type="button"
       mat-button
       (click)="openReferenceImage()"
@@ -8,7 +9,8 @@
     >
       Open Reference Image
     </button>
-    <button *ngIf="!openRefImageEnabled()"
+    <button
+      *ngIf="!openRefImageEnabled()"
       type="button"
       mat-button
       disabled
@@ -16,19 +18,20 @@
     >
       Open Reference Image
     </button>
-  </div>
-
-  <div>
     <mat-form-field appearance="fill">
-      <mat-label class="dropdown_label">Select a profile :</mat-label>
       <select
         matNativeControl
         [disabled]="!refImageSelected || !openRefImageEnabled()"
         [(ngModel)]="selectedProfile"
         name="profile"
         (change)="profileSelectionChanged($event)"
-        class="{{!refImageSelected || !openRefImageEnabled() ?  'dropdown_disabled':'dropdown'}}"
+        class="{{
+          !refImageSelected || !openRefImageEnabled()
+            ? 'dropdown_disabled'
+            : 'dropdown'
+        }}"
       >
+      <option selected="true">Select an Object</option>
         <option *ngFor="let profile of profiles" [value]="profile.value">
           {{ profile.viewValue }}
         </option>
@@ -46,7 +49,25 @@
       />
     </mat-form-field>
     -->
+    <button
+      *ngIf="openRefImageEnabled()"
+      type="button"
+      mat-button
+      class="button_about button"
+    >
+      About
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled()"
+      type="button"
+      mat-button
+      disabled
+      class="button_about button_disabled"
+    >
+      About
+    </button>
   </div>
+
   <mat-card class="card">
     <mat-card-header>
       <mat-card-title>Sharpen</mat-card-title>
@@ -219,7 +240,7 @@
     >
       Save Reference Image
     </button>
-    <button type="button" mat-button (click)="exit()" class="button">
+    <button type="button_exit" mat-button (click)="exit()" class="button_exit button">
       Exit
     </button>
   </div>
@@ -230,7 +251,7 @@
     <button type="button" mat-button disabled class="button_disabled">
       Save Reference Image
     </button>
-    <button type="button" mat-button disabled class="button_disabled">
+    <button type="button" mat-button disabled class="button_exit button_disabled">
       Exit
     </button>
   </div>
