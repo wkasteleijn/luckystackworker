@@ -7,14 +7,14 @@ const {app, BrowserWindow} = require('electron')
     function createWindow () {
       mainWindow = new BrowserWindow({
         autoHideMenuBar: true,
-        width: 682,
+        width: 698,
         height: 808,
         webPreferences: {
           nodeIntegration: true
         }
       })
 
-      // var child = require('child_process').spawn(app.getAppPath()+'\\pleunus-worker.bat');
+      var child = require('child_process').spawn(app.getAppPath()+'\\pleunus-worker.bat');
 
       mainWindow.loadURL(
         url.format({
