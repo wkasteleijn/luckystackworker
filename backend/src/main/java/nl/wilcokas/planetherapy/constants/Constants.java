@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Constants {
-	public static final String OUTPUT_POSTFIX = "_PW";
+	public static final String OUTPUT_POSTFIX = "_LSW";
 	public static final String STATUS_IDLE = "Idle";
 	public static final String STATUS_WORKING = "Working";
 	public static final List<String> KNOWN_PROFILES = Arrays

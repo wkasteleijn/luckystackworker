@@ -1,1 +1,1 @@
-npx electron-packager . --platform=win32 --icon ./planetherapy_icon.ico
+npx electron-packager . --platform=win32 --icon ./lsw_icon.ico
