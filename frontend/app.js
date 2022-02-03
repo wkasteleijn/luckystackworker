@@ -6,6 +6,7 @@ const {app, BrowserWindow} = require('electron')
 
     function createWindow () {
       mainWindow = new BrowserWindow({
+        resizable: false,
         autoHideMenuBar: true,
         width: 698,
         height: 808,
@@ -14,7 +15,7 @@ const {app, BrowserWindow} = require('electron')
         }
       })
 
-      var child = require('child_process').spawn(app.getAppPath()+'\\lsworker.bat');
+//      var child = require('child_process').spawn(app.getAppPath()+'\\lsworker.bat');
 
       mainWindow.loadURL(
         url.format({

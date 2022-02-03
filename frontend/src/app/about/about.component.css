@@ -1,0 +1,28 @@
+.title {
+  text-align: center;
+  font-weight: bold;
+}
+
+.subtitle {
+  text-align: center;
+  font-weight: bold;
+}
+.icon {
+  width: 128px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.buttonAboutpanel {
+  position: absolute;
+  left: 50%;
+}
+
+.aboutText {
+  margin-left: 32px;
+}
+
+.aboutLink {
+  color: lightblue;
+}

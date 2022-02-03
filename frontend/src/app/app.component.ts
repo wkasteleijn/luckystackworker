@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AboutComponent } from './about/about.component';
 import { Profile } from './model/profile';
 import { PlanetherapyService } from './planetherapy.service';
 
@@ -42,7 +43,7 @@ export class AppComponent {
   workerProgress: number;
   refImageSelected: boolean = false;
 
-  constructor(private planetherapyService: PlanetherapyService) {}
+  constructor(private planetherapyService: PlanetherapyService, private aboutSnackbar: MatSnackBar) {}
 
   openReferenceImage() {
     console.log('openReferenceImage called');
@@ -170,6 +171,10 @@ export class AppComponent {
       (error) => console.log(error)
     );
     window.close();
+  }
+
+  openAbout() {
+    this.aboutSnackbar.openFromComponent(AboutComponent,{horizontalPosition: "center", verticalPosition: "top"});
   }
 
   private updateProfileSettings() {
