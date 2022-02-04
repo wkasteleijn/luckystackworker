@@ -56,5 +56,6 @@ public class Profile {
 	@Column(name = "blue")
 	private BigDecimal blue;
 
-	private transient String operation;
+	private String operation;
+	private String rootFolder;
 }

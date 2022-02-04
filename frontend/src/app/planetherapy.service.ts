@@ -4,13 +4,12 @@ import { Observable } from 'rxjs';
 import { Profile } from './model/profile';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PlanetherapyService {
-
   private baseUrl = 'http://localhost:8080/api';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getProfile(profile: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/profiles/${profile}`);
@@ -29,14 +28,18 @@ export class PlanetherapyService {
   }
 
   exit(): Observable<Object> {
-    return this.http.put(`${this.baseUrl}/profiles/exit`,null);
+    return this.http.put(`${this.baseUrl}/profiles/exit`, null);
   }
 
   openReferenceImage(rootFolder: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/reference/open?path=${rootFolder}`);
   }
 
+  selectRootFolder(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/reference/rootfolder`);
+  }
+
   saveReferenceImage(rootFolder: string): Observable<Object> {
-    return this.http.put(`${this.baseUrl}/reference/save`,rootFolder);
+    return this.http.put(`${this.baseUrl}/reference/save`, rootFolder);
   }
 }

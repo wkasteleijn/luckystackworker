@@ -39,7 +39,7 @@ public class Worker extends Thread {
 				if (activeProfile != null) {
 					log.info("Applying profile {}", activeProfile);
 					Collection<File> files = FileUtils.listFiles(Paths.get(getInputFolder()).toFile(), getExtensions(),
-							false);
+							true);
 					PlanetherapyContext.setTotalfilesCount(files.size());
 					PlanetherapyContext.setFilesProcessedCount(0);
 					if (processFiles(files)) {

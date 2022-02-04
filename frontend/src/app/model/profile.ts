@@ -10,4 +10,5 @@ export class Profile {
   green: number;
   blue: number;
   operation: string;
+  rootFolder: string;
 }

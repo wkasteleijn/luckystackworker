@@ -42,11 +42,16 @@
 }
 
 .rootFolder {
-  width: 200px;
+  width: 536px;
+  border-style: solid;
 }
 .dropdown_label {
   color: rgb(168, 168, 168);
   margin-right: 16px;
+}
+
+.rootFolder_label {
+  margin-left: 4px;
 }
 
 .button_container {
@@ -57,7 +62,7 @@
 }
 
 .button_disabled {
-  border: 2px;
+  border: 3px;
   border-color: rgb(43, 43, 43);
   border-style: ridge;
   margin-right: 16px;
@@ -65,18 +70,18 @@
   font-size: 12px;
   color: rgb(43, 43, 43);
   background-color: black;
-  padding: 4px;
+  padding: 3px;
   padding-left: 12px;
   padding-right: 12px;
   border-radius: 8px;
 }
 
 .button_exit {
-  margin-left: 310px;
+  margin-left: 306px;
 }
 
 .button_about {
-  margin-left: 264px;
+  margin-left: 260px;
 }
 
 .line {

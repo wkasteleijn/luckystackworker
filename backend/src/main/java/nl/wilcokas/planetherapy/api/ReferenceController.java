@@ -58,10 +58,28 @@ public class ReferenceController {
 						() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
 			}
 			referenceImageService.openReferenceImage(referenceImage, profile);
-			updateSettings(referenceImage);
+			final String rootFolder = Util.getFileDirectory(referenceImage);
+			updateSettings(rootFolder, profile);
 			return profile;
 		}
-		throw new ResourceNotFoundException("File not opened");
+		return new Profile();
+	}
+
+	@GetMapping("/rootfolder")
+	public Profile selectRootFolder() {
+		JFrame frame = getParentFrame();
+		JFileChooser jfc = getJFileChooser(PlanetherapyContext.getWorkerProperties().get("inputFolder"));
+		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		int returnValue = jfc.showOpenDialog(frame);
+		frame.dispose();
+		Profile profile = new Profile();
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
+			File selectedFolder = jfc.getSelectedFile();
+			String rootFolder = selectedFolder.getAbsolutePath();
+			log.info("RootFolder selected {} ", rootFolder);
+			updateSettings(rootFolder, profile);
+		}
+		return profile;
 	}
 
 	@PutMapping("/save")
@@ -94,13 +112,12 @@ public class ReferenceController {
 		return frame;
 	}
 
-	private void updateSettings(String filePath) {
-		final String rootFolder = Util.getFileDirectory(filePath);
+	private void updateSettings(String rootFolder, Profile profile) {
 		log.info("Setting the root folder to {}", rootFolder);
 		Settings settings = settingsRepository.findAll().iterator().next();
 		settings.setRootFolder(rootFolder);
 		settingsRepository.save(settings);
 		PlanetherapyContext.updateWorkerForRootFolder(rootFolder);
+		profile.setRootFolder(rootFolder);
 	}
-
 }

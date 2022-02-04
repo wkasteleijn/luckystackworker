@@ -46,18 +46,6 @@
         </option>
       </select>
     </mat-form-field>
-    <!--
-    <mat-form-field appearance="fill">
-      <mat-label class="dropdown_label">Images root folder</mat-label>
-      <input
-        matInput
-        type="text"
-        [(ngModel)]="rootFolder"
-        (click)="selectRootFolder()"
-        class="dropdown rootFolder"
-      />
-    </mat-form-field>
-    -->
     <button
       *ngIf="openRefImageEnabled()"
       type="button"
@@ -76,6 +64,23 @@
     >
       About
     </button>
+  </div>
+  <div class="button_container">
+    <mat-form-field appearance="fill">
+      <mat-label class="dropdown_label rootFolder_label">Root folder :</mat-label>
+      <input
+        matInput
+        type="text"
+        [disabled]="!refImageSelected || !openRefImageEnabled()"
+        [(ngModel)]="rootFolder"
+        (click)="selectRootFolder()"
+        class="{{
+          !refImageSelected || !openRefImageEnabled()
+            ? 'dropdown_disabled rootFolder'
+            : 'dropdown rootFolder'
+        }}"
+      />
+    </mat-form-field>
   </div>
 
   <mat-card class="card">

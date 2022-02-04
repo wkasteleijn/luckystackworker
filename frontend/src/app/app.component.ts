@@ -59,6 +59,7 @@ export class AppComponent {
         if (data) {
           this.profile = data;
           this.selectedProfile = data.name;
+          this.rootFolder = data.rootFolder;
           this.updateProfileSettings();
           this.hideSpinner();
         }
@@ -178,7 +179,21 @@ export class AppComponent {
   }
 
   selectRootFolder() {
-    console.log('selectRootFolder called: ');
+    console.log('selectRootFolder called');
+    this.showSpinner()
+    this.planetherapyService.selectRootFolder().subscribe(
+      (data) => {
+        console.log(data);
+        if (data) {
+          this.rootFolder = data.rootFolder;
+          this.hideSpinner();
+        }
+      },
+      (error) => {
+        console.log(error);
+        this.hideSpinner();
+      }
+    );
   }
 
   exit() {
