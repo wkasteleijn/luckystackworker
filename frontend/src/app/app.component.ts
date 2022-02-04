@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ThemePalette } from '@angular/material/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AboutComponent } from './about/about.component';
 import { Profile } from './model/profile';
@@ -42,12 +43,15 @@ export class AppComponent {
   workerStatus: string = 'Idle';
   workerProgress: number;
   refImageSelected: boolean = false;
+  spinnerColor: ThemePalette = 'warn';
+  _showSpinner = false;
 
   constructor(private planetherapyService: PlanetherapyService, private aboutSnackbar: MatSnackBar) {}
 
   openReferenceImage() {
     console.log('openReferenceImage called');
     const base64EncodedPath = btoa(this.rootFolder);
+    this.showSpinner()
     this.planetherapyService.openReferenceImage(base64EncodedPath).subscribe(
       (data) => {
         console.log(data);
@@ -56,28 +60,43 @@ export class AppComponent {
           this.profile = data;
           this.selectedProfile = data.name;
           this.updateProfileSettings();
+          this.hideSpinner();
         }
       },
-      (error) => console.log(error)
+      (error) => {
+        console.log(error);
+        this.hideSpinner();
+      }
     );
   }
 
   saveReferenceImage() {
     console.log('saveReferenceImage called');
+    this.showSpinner();
     this.planetherapyService.saveReferenceImage(this.rootFolder).subscribe(
-      (data) => console.log(data),
-      (error) => console.log(error)
+      (data) => {
+        this.hideSpinner();
+        console.log(data);
+      },
+      (error) => {
+        this.hideSpinner();
+        console.log(error)
+      }
     );
   }
 
   applyProfile() {
     console.log('applyProfile called');
+    this.showSpinner();
     this.planetherapyService.applyProfile(this.profile).subscribe(
       (data) => {
         console.log(data);
         this.waitForWorker();
       },
-      (error) => console.log(error)
+      (error) => {
+        console.log(error);
+        this.hideSpinner();
+      }
     );
     this.workerStatus = 'Working';
     this.workerProgress = 0;
@@ -202,6 +221,7 @@ export class AppComponent {
       setTimeout(() => this.waitForWorker(), 500);
     } else {
       console.log('Worker is done!');
+      this.hideSpinner();
     }
   }
 
@@ -219,10 +239,22 @@ export class AppComponent {
   }
 
   buttonBarEnabled() {
-    return 'Idle' === this.workerStatus && this.refImageSelected;
+    return 'Idle' === this.workerStatus && this.refImageSelected && !this._showSpinner;
   }
 
   openRefImageEnabled() {
-    return 'Idle' === this.workerStatus;
+    return 'Idle' === this.workerStatus && !this._showSpinner;
+  }
+
+  private showSpinner() {
+    this._showSpinner = true;
+  }
+
+  private hideSpinner() {
+    this._showSpinner = false;
+  }
+
+  shouldShowSpinner(): boolean {
+    return this._showSpinner;
   }
 }

@@ -1,3 +1,12 @@
+<div *ngIf="shouldShowSpinner()">
+  <mat-progress-spinner
+    class="spinner"
+    mode="indeterminate"
+    diameter="120"
+    [color]="spinnerColor"
+  >
+  </mat-progress-spinner>
+</div>
 <div class="container">
   <div class="button_container">
     <button
@@ -31,7 +40,7 @@
             : 'dropdown'
         }}"
       >
-      <option selected="true">Select an Object</option>
+        <option selected="true">Select an Object</option>
         <option *ngFor="let profile of profiles" [value]="profile.value">
           {{ profile.viewValue }}
         </option>
@@ -241,7 +250,12 @@
     >
       Save Reference Image
     </button>
-    <button type="button_exit" mat-button (click)="exit()" class="button_exit button">
+    <button
+      type="button_exit"
+      mat-button
+      (click)="exit()"
+      class="button_exit button"
+    >
       Exit
     </button>
   </div>
@@ -252,7 +266,12 @@
     <button type="button" mat-button disabled class="button_disabled">
       Save Reference Image
     </button>
-    <button type="button" mat-button disabled class="button_exit button_disabled">
+    <button
+      type="button"
+      mat-button
+      disabled
+      class="button_exit button_disabled"
+    >
       Exit
     </button>
   </div>

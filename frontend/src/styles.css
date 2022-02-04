@@ -64,8 +64,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .mat-snack-bar-container {
-  height: 600px !important;
-  min-width: 600px !important;
+  height: 558px !important;
+  min-width: 512px !important;
   border: 2px !important;
-  margin-top: 128px !important;
+  margin-top: 104px !important;
 }

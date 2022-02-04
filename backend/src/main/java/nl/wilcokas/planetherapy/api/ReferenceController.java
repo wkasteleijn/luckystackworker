@@ -61,7 +61,7 @@ public class ReferenceController {
 			updateSettings(referenceImage);
 			return profile;
 		}
-		return null;
+		throw new ResourceNotFoundException("File not opened");
 	}
 
 	@PutMapping("/save")
