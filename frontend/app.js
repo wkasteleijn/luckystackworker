@@ -1,7 +1,7 @@
 const { app, BrowserWindow } = require("electron");
 const url = require("url");
 const path = require("path");
-var kill = require("tree-kill");
+//var kill = require("tree-kill");
 
 let mainWindow;
 
@@ -11,29 +11,29 @@ function createWindow() {
     autoHideMenuBar: true,
     width: 690,
     height: 840,
-    x: 50,
-    y: 50,
+    x: 20,
+    y: 20,
     webPreferences: {
       nodeIntegration: true,
     },
   });
 
-  // var child = require("child_process").spawn(
-  //   app.getAppPath() + "\\lsworker.bat"
-  // );
+  var child = require("child_process").spawn(
+    app.getAppPath() + "\\lsworker.bat"
+  );
 
   mainWindow.loadURL(
     url.format({
-      pathname: path.join(__dirname, `/dist/planetherapy/index.html`),
+      pathname: path.join(__dirname, `/dist/luckystackworker/index.html`),
       protocol: "file:",
       slashes: true,
     })
   );
 
-  mainWindow.on("closed", function () {
-    kill(child.pid);
-    mainWindow = null;
-  });
+  // mainWindow.on("closed", function () {
+  //   kill(child.pid);
+  //   mainWindow = null;
+  // });
 }
 
 app.on("ready", createWindow);

@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "planetherapy": {
+    "luckystackworker": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/planetherapy",
+            "outputPath": "dist/luckystackworker",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -63,18 +63,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "planetherapy:build"
+            "browserTarget": "luckystackworker:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "planetherapy:build:production"
+              "browserTarget": "luckystackworker:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "planetherapy:build"
+            "browserTarget": "luckystackworker:build"
           }
         },
         "test": {
@@ -112,18 +112,18 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "planetherapy:serve"
+            "devServerTarget": "luckystackworker:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "planetherapy:serve:production"
+              "devServerTarget": "luckystackworker:serve:production"
             }
           }
         }
       }
     }
   },
-  "defaultProject": "planetherapy",
+  "defaultProject": "luckystackworker",
   "cli": {
     "analytics": "7761699d-592f-4419-b084-ce8aed4170bd"
   }
