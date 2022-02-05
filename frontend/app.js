@@ -30,10 +30,6 @@ function createWindow() {
     })
   );
 
-  // mainWindow.on("closed", function () {
-  //   kill(child.pid);
-  //   mainWindow = null;
-  // });
 }
 
 app.on("ready", createWindow);

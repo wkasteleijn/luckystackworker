@@ -51,13 +51,17 @@ public class ReferenceController {
 			File selectedFile = jfc.getSelectedFile();
 			String referenceImage = selectedFile.getAbsolutePath();
 			log.info("Image selected {} ", referenceImage);
+
 			String profileName = Util.deriveProfileFromImageName(referenceImage);
-			Profile profile = null;
-			if (profileName != null) {
-				profile = profileRepository.findByName(profileName).orElseThrow(
-						() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
+			if (profileName == null) {
+				log.info("Profile not found for reference image, taking the default, {}", profileName);
+				profileName = getSettings().getDefaultProfile();
 			}
+
+			Profile profile = profileRepository.findByName(profileName)
+					.orElseThrow(() -> new ResourceNotFoundException("Unknown profile!"));
 			referenceImageService.openReferenceImage(referenceImage, profile);
+
 			final String rootFolder = Util.getFileDirectory(referenceImage);
 			updateSettings(rootFolder, profile);
 			return profile;
@@ -114,10 +118,14 @@ public class ReferenceController {
 
 	private void updateSettings(String rootFolder, Profile profile) {
 		log.info("Setting the root folder to {}", rootFolder);
-		Settings settings = settingsRepository.findAll().iterator().next();
+		Settings settings = getSettings();
 		settings.setRootFolder(rootFolder);
 		settingsRepository.save(settings);
 		LuckyStackWorkerContext.updateWorkerForRootFolder(rootFolder);
 		profile.setRootFolder(rootFolder);
+	}
+
+	private Settings getSettings() {
+		return settingsRepository.findAll().iterator().next();
 	}
 }

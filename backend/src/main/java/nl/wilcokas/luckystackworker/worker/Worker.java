@@ -33,8 +33,8 @@ public class Worker extends Thread {
 	@Override
 	public void run() {
 		log.info("Worker started");
-		try {
-			while (running) {
+		while (running) {
+			try {
 				String activeProfile = LuckyStackWorkerContext.getActiveProfile();
 				if (activeProfile != null) {
 					log.info("Applying profile {}", activeProfile);
@@ -42,19 +42,26 @@ public class Worker extends Thread {
 							true);
 					LuckyStackWorkerContext.setTotalfilesCount(files.size());
 					LuckyStackWorkerContext.setFilesProcessedCount(0);
-					if (processFiles(files)) {
-						LuckyStackWorkerContext.inactivateProfile();
-						LuckyStackWorkerContext.statusUpdate(Constants.STATUS_IDLE);
-						LuckyStackWorkerContext.setFilesProcessedCount(0);
-						LuckyStackWorkerContext.setTotalfilesCount(0);
+					if (!processFiles(files)) {
+						log.warn(
+								"Worker did not process any file from {}, active profile {} not matching with any files",
+								getInputFolder(), activeProfile);
 					}
+					LuckyStackWorkerContext.inactivateProfile();
+					LuckyStackWorkerContext.statusUpdate(Constants.STATUS_IDLE);
+					LuckyStackWorkerContext.setFilesProcessedCount(0);
+					LuckyStackWorkerContext.setTotalfilesCount(0);
 				} else {
 					log.debug("Waiting for a profile to be applied...");
 				}
 				Util.pause(WAIT_DELAY);
+			} catch (Exception e) {
+				log.error("Error:", e);
+				LuckyStackWorkerContext.inactivateProfile();
+				LuckyStackWorkerContext.statusUpdate(Constants.STATUS_IDLE);
+				LuckyStackWorkerContext.setFilesProcessedCount(0);
+				LuckyStackWorkerContext.setTotalfilesCount(0);
 			}
-		} catch (InterruptedException e) {
-			log.error("Error:", e);
 		}
 	}
 
