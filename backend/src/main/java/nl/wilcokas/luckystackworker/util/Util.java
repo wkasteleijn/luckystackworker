@@ -1,4 +1,4 @@
-package nl.wilcokas.planetherapy.util;
+package nl.wilcokas.luckystackworker.util;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
-import nl.wilcokas.planetherapy.model.Profile;
+import nl.wilcokas.luckystackworker.model.Profile;
 
 public class Util {
 	public static boolean fileExists(String path) {
@@ -28,11 +28,6 @@ public class Util {
 
 	public static String getIJFileFormat(String path) {
 		return path.replaceAll("\\\\", "/");
-	}
-
-	public static String getProcessedFileName(String path) {
-		String[] pathSep = getImageName(path).split("\\.");
-		return pathSep[0] + "_planetherapy";
 	}
 
 	public static String deriveProfileFromImageName(String path) {

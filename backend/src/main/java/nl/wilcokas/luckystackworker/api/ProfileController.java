@@ -1,4 +1,4 @@
-package nl.wilcokas.planetherapy.api;
+package nl.wilcokas.luckystackworker.api;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.planetherapy.PlanetherapyContext;
-import nl.wilcokas.planetherapy.constants.Constants;
-import nl.wilcokas.planetherapy.dto.StatusUpdate;
-import nl.wilcokas.planetherapy.model.Profile;
-import nl.wilcokas.planetherapy.repository.ProfileRepository;
-import nl.wilcokas.planetherapy.service.ReferenceImageService;
+import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
+import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.dto.StatusUpdate;
+import nl.wilcokas.luckystackworker.model.Profile;
+import nl.wilcokas.luckystackworker.repository.ProfileRepository;
+import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -73,15 +73,15 @@ public class ProfileController {
 
 	@PutMapping("/apply")
 	public void applyProfile(@RequestBody Profile profile) {
-		PlanetherapyContext.statusUpdate(Constants.STATUS_WORKING);
-		PlanetherapyContext.updateWorkerForProfile(profile);
-		PlanetherapyContext.setActiveProfile(profile.getName());
+		LuckyStackWorkerContext.statusUpdate(Constants.STATUS_WORKING);
+		LuckyStackWorkerContext.updateWorkerForProfile(profile);
+		LuckyStackWorkerContext.setActiveProfile(profile.getName());
 	}
 
 	@GetMapping("/status")
 	public StatusUpdate getStatus() {
 		log.info("getStatus called");
-		return PlanetherapyContext.getStatus();
+		return LuckyStackWorkerContext.getStatus();
 	}
 
 	@PutMapping("/exit")

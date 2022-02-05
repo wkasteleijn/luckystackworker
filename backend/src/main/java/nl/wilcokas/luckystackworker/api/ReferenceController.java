@@ -1,4 +1,4 @@
-package nl.wilcokas.planetherapy.api;
+package nl.wilcokas.luckystackworker.api;
 
 import java.io.File;
 import java.util.Base64;
@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.planetherapy.PlanetherapyContext;
-import nl.wilcokas.planetherapy.model.Profile;
-import nl.wilcokas.planetherapy.model.Settings;
-import nl.wilcokas.planetherapy.repository.ProfileRepository;
-import nl.wilcokas.planetherapy.repository.SettingsRepository;
-import nl.wilcokas.planetherapy.service.ReferenceImageService;
-import nl.wilcokas.planetherapy.util.Util;
+import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
+import nl.wilcokas.luckystackworker.model.Profile;
+import nl.wilcokas.luckystackworker.model.Settings;
+import nl.wilcokas.luckystackworker.repository.ProfileRepository;
+import nl.wilcokas.luckystackworker.repository.SettingsRepository;
+import nl.wilcokas.luckystackworker.service.ReferenceImageService;
+import nl.wilcokas.luckystackworker.util.Util;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -68,7 +68,7 @@ public class ReferenceController {
 	@GetMapping("/rootfolder")
 	public Profile selectRootFolder() {
 		JFrame frame = getParentFrame();
-		JFileChooser jfc = getJFileChooser(PlanetherapyContext.getWorkerProperties().get("inputFolder"));
+		JFileChooser jfc = getJFileChooser(LuckyStackWorkerContext.getWorkerProperties().get("inputFolder"));
 		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		int returnValue = jfc.showOpenDialog(frame);
 		frame.dispose();
@@ -86,7 +86,7 @@ public class ReferenceController {
 	public void saveReferenceImage(@RequestBody String path) {
 		JFrame frame = getParentFrame();
 		// Ignoring path received from frontend as it isn't used.
-		String realPath = PlanetherapyContext.getWorkerProperties().get("inputFolder");
+		String realPath = LuckyStackWorkerContext.getWorkerProperties().get("inputFolder");
 		JFileChooser jfc = getJFileChooser(realPath);
 		jfc.setFileFilter(new FileNameExtensionFilter("Png", "png"));
 		int returnValue = jfc.showDialog(frame, "Save reference image");
@@ -117,7 +117,7 @@ public class ReferenceController {
 		Settings settings = settingsRepository.findAll().iterator().next();
 		settings.setRootFolder(rootFolder);
 		settingsRepository.save(settings);
-		PlanetherapyContext.updateWorkerForRootFolder(rootFolder);
+		LuckyStackWorkerContext.updateWorkerForRootFolder(rootFolder);
 		profile.setRootFolder(rootFolder);
 	}
 }

@@ -1,4 +1,4 @@
-package nl.wilcokas.planetherapy.worker;
+package nl.wilcokas.luckystackworker.worker;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,10 +10,10 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.planetherapy.PlanetherapyContext;
-import nl.wilcokas.planetherapy.constants.Constants;
-import nl.wilcokas.planetherapy.service.WorkerService;
-import nl.wilcokas.planetherapy.util.Util;
+import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
+import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.service.WorkerService;
+import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
 public class Worker extends Thread {
@@ -32,21 +32,21 @@ public class Worker extends Thread {
 
 	@Override
 	public void run() {
-		log.info("PleunusWorker started");
+		log.info("Worker started");
 		try {
 			while (running) {
-				String activeProfile = PlanetherapyContext.getActiveProfile();
+				String activeProfile = LuckyStackWorkerContext.getActiveProfile();
 				if (activeProfile != null) {
 					log.info("Applying profile {}", activeProfile);
 					Collection<File> files = FileUtils.listFiles(Paths.get(getInputFolder()).toFile(), getExtensions(),
 							true);
-					PlanetherapyContext.setTotalfilesCount(files.size());
-					PlanetherapyContext.setFilesProcessedCount(0);
+					LuckyStackWorkerContext.setTotalfilesCount(files.size());
+					LuckyStackWorkerContext.setFilesProcessedCount(0);
 					if (processFiles(files)) {
-						PlanetherapyContext.inactivateProfile();
-						PlanetherapyContext.statusUpdate(Constants.STATUS_IDLE);
-						PlanetherapyContext.setFilesProcessedCount(0);
-						PlanetherapyContext.setTotalfilesCount(0);
+						LuckyStackWorkerContext.inactivateProfile();
+						LuckyStackWorkerContext.statusUpdate(Constants.STATUS_IDLE);
+						LuckyStackWorkerContext.setFilesProcessedCount(0);
+						LuckyStackWorkerContext.setTotalfilesCount(0);
 					}
 				} else {
 					log.debug("Waiting for a profile to be applied...");
@@ -72,7 +72,7 @@ public class Worker extends Thread {
 			if (!name.endsWith(Constants.OUTPUT_POSTFIX) && Arrays.asList(getExtensions()).contains(extension)) {
 				filesProcessed = filesProcessed | workerService.processFile(file, getOutputFormat());
 			}
-			PlanetherapyContext.setFilesProcessedCount(++count);
+			LuckyStackWorkerContext.setFilesProcessedCount(++count);
 		}
 		return filesProcessed;
 	}

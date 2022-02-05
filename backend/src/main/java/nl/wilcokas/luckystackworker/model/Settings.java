@@ -1,4 +1,4 @@
-package nl.wilcokas.planetherapy.model;
+package nl.wilcokas.luckystackworker.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

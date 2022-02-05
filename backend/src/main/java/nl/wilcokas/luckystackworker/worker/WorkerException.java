@@ -1,4 +1,4 @@
-package nl.wilcokas.planetherapy.worker;
+package nl.wilcokas.luckystackworker.worker;
 
 public class WorkerException extends RuntimeException {
 

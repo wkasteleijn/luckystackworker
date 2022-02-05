@@ -6,7 +6,7 @@ import { Profile } from './model/profile';
 @Injectable({
   providedIn: 'root',
 })
-export class PlanetherapyService {
+export class LuckyStackWorkerService {
   private baseUrl = 'http://localhost:8080/api';
 
   constructor(private http: HttpClient) {}

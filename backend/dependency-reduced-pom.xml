@@ -8,10 +8,10 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>nl.wilcokas</groupId>
-  <artifactId>pleunus-worker</artifactId>
-  <name>PleunusWorker</name>
+  <artifactId>luckystackworker</artifactId>
+  <name>LuckystackWorker</name>
   <version>1.0.0</version>
-  <description>PleunusWorker Application</description>
+  <description>LuckystackWorker Application</description>
   <build>
     <plugins>
       <plugin>
@@ -47,7 +47,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>libs/</classpathPrefix>
-              <mainClass>nl.wilcokas.planetherapy.PlanetherapyApplication</mainClass>
+              <mainClass>nl.wilcokas.luckystackworker.LuckyStackWorkerApplication</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -63,7 +63,7 @@
             <configuration>
               <archive>
                 <manifest>
-                  <mainClass>nl.wilcokas.planetherapy.PlanetherapyApplication</mainClass>
+                  <mainClass>nl.wilcokas.luckystackworker.LuckyStackWorkerApplication</mainClass>
                 </manifest>
               </archive>
               <descriptorRefs>
@@ -85,7 +85,7 @@
               <shadedArtifactAttached>true</shadedArtifactAttached>
               <transformers>
                 <transformer>
-                  <mainClass>nl.wilcokas.planetherapy.PlanetherapyApplication</mainClass>
+                  <mainClass>nl.wilcokas.luckystackworker.LuckystackWorkerApplication</mainClass>
                 </transformer>
               </transformers>
             </configuration>

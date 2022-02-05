@@ -1,18 +1,18 @@
-package nl.wilcokas.planetherapy;
+package nl.wilcokas.luckystackworker;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import nl.wilcokas.planetherapy.constants.Constants;
-import nl.wilcokas.planetherapy.dto.StatusUpdate;
-import nl.wilcokas.planetherapy.model.Profile;
-import nl.wilcokas.planetherapy.model.Settings;
-import nl.wilcokas.planetherapy.worker.Worker;
-import nl.wilcokas.planetherapy.worker.WorkerException;
+import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.dto.StatusUpdate;
+import nl.wilcokas.luckystackworker.model.Profile;
+import nl.wilcokas.luckystackworker.model.Settings;
+import nl.wilcokas.luckystackworker.worker.Worker;
+import nl.wilcokas.luckystackworker.worker.WorkerException;
 
-public class PlanetherapyContext {
+public class LuckyStackWorkerContext {
 	private static Worker worker;
 	private static Map<String, String> workerProperties;
 	private static String activeProfile;
@@ -20,7 +20,7 @@ public class PlanetherapyContext {
 	private static int filesProcessedCount = 0;
 	private static int totalfilesCount = 0;
 
-	private PlanetherapyContext() {
+	private LuckyStackWorkerContext() {
 	}
 
 	public static Worker getWorker() throws IOException {

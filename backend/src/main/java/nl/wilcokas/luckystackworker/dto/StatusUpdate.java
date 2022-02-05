@@ -1,4 +1,4 @@
-package nl.wilcokas.planetherapy.dto;
+package nl.wilcokas.luckystackworker.dto;
 
 import lombok.Builder;
 import lombok.Data;

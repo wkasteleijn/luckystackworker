@@ -93,6 +93,6 @@
 .spinner {
   position: absolute;
   z-index: 100;
-  top: 100px;
-  left: 260px;
+  top: 310px;
+  left: 280px;
 }

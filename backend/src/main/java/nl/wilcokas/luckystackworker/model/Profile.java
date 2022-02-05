@@ -1,4 +1,4 @@
-package nl.wilcokas.planetherapy.model;
+package nl.wilcokas.luckystackworker.model;
 
 import java.math.BigDecimal;
 

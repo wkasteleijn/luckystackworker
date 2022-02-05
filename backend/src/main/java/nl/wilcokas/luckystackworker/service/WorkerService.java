@@ -1,4 +1,4 @@
-package nl.wilcokas.planetherapy.service;
+package nl.wilcokas.luckystackworker.service;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,10 +8,10 @@ import java.util.Optional;
 import ij.IJ;
 import ij.ImagePlus;
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.planetherapy.PlanetherapyContext;
-import nl.wilcokas.planetherapy.constants.Constants;
-import nl.wilcokas.planetherapy.util.Operations;
-import nl.wilcokas.planetherapy.util.Util;
+import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
+import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.util.Operations;
+import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
 public class WorkerService {
@@ -30,11 +30,11 @@ public class WorkerService {
 			return false;
 		}
 		String profile = profileOpt.get();
-		if (profile.equals(PlanetherapyContext.getActiveProfile())) {
+		if (profile.equals(LuckyStackWorkerContext.getActiveProfile())) {
 			try {
 				final String filename = Util.getImageName(Util.getIJFileFormat(filePath));
 				log.info("Applying profile '{}' to: {}", profile, filename);
-				PlanetherapyContext.statusUpdate("Processing : " + filename);
+				LuckyStackWorkerContext.statusUpdate("Processing : " + filename);
 				ImagePlus imp = IJ.openImage(filePath);
 				Operations.applyInitialSettings(imp);
 				Operations.applyAllOperations(imp, properties, profile);

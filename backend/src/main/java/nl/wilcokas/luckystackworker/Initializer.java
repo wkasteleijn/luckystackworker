@@ -1,4 +1,4 @@
-package nl.wilcokas.planetherapy;
+package nl.wilcokas.luckystackworker;
 
 import java.io.IOException;
 
@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.planetherapy.repository.ProfileRepository;
-import nl.wilcokas.planetherapy.repository.SettingsRepository;
+import nl.wilcokas.luckystackworker.repository.ProfileRepository;
+import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 
 @Slf4j
 @Component
@@ -23,8 +23,8 @@ public class Initializer {
 
 	@PostConstruct
 	public void init() throws IOException {
-		PlanetherapyContext.loadWorkerProperties(profileRepository.findAll().iterator(),
+		LuckyStackWorkerContext.loadWorkerProperties(profileRepository.findAll().iterator(),
 				settingsRepository.findAll().iterator().next());
-		PlanetherapyContext.getWorker().start();
+		LuckyStackWorkerContext.getWorker().start();
 	}
 }

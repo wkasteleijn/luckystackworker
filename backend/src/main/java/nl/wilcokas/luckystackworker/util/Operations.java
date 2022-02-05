@@ -1,4 +1,4 @@
-package nl.wilcokas.planetherapy.util;
+package nl.wilcokas.luckystackworker.util;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -9,8 +9,8 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.planetherapy.model.OperationEnum;
-import nl.wilcokas.planetherapy.model.Profile;
+import nl.wilcokas.luckystackworker.model.OperationEnum;
+import nl.wilcokas.luckystackworker.model.Profile;
 
 @Slf4j
 public final class Operations {

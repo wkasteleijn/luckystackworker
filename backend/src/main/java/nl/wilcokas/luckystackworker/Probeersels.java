@@ -1,4 +1,4 @@
-package nl.wilcokas.planetherapy;
+package nl.wilcokas.luckystackworker;
 
 import ij.IJ;
 import ij.ImagePlus;

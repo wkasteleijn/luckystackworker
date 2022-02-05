@@ -1,15 +1,15 @@
-package nl.wilcokas.planetherapy.service;
+package nl.wilcokas.luckystackworker.service;
 
 import org.springframework.stereotype.Service;
 
 import ij.IJ;
 import ij.ImagePlus;
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.planetherapy.constants.Constants;
-import nl.wilcokas.planetherapy.model.OperationEnum;
-import nl.wilcokas.planetherapy.model.Profile;
-import nl.wilcokas.planetherapy.util.Operations;
-import nl.wilcokas.planetherapy.util.Util;
+import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.model.OperationEnum;
+import nl.wilcokas.luckystackworker.model.Profile;
+import nl.wilcokas.luckystackworker.util.Operations;
+import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
 @Service

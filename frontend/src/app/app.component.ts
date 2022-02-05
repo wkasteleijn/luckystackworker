@@ -3,7 +3,7 @@ import { ThemePalette } from '@angular/material/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AboutComponent } from './about/about.component';
 import { Profile } from './model/profile';
-import { PlanetherapyService } from './planetherapy.service';
+import { LuckyStackWorkerService } from './luckystackworker.service';
 
 interface ProfileSelection {
   value: string;
@@ -28,7 +28,7 @@ export class AppComponent {
     { value: 'neptune', viewValue: 'Neptune' },
   ];
 
-  title = 'planetherapy';
+  title = 'LuckyStackWorker';
   radius: number;
   amount: number;
   iterations: number;
@@ -43,16 +43,16 @@ export class AppComponent {
   workerStatus: string = 'Idle';
   workerProgress: number;
   refImageSelected: boolean = false;
-  spinnerColor: ThemePalette = 'warn';
+  spinnerColor: ThemePalette = 'primary';
   _showSpinner = false;
 
-  constructor(private planetherapyService: PlanetherapyService, private aboutSnackbar: MatSnackBar) {}
+  constructor(private luckyStackWorkerService: LuckyStackWorkerService, private aboutSnackbar: MatSnackBar) {}
 
   openReferenceImage() {
     console.log('openReferenceImage called');
     const base64EncodedPath = btoa(this.rootFolder);
     this.showSpinner()
-    this.planetherapyService.openReferenceImage(base64EncodedPath).subscribe(
+    this.luckyStackWorkerService.openReferenceImage(base64EncodedPath).subscribe(
       (data) => {
         console.log(data);
         this.refImageSelected = true;
@@ -74,7 +74,7 @@ export class AppComponent {
   saveReferenceImage() {
     console.log('saveReferenceImage called');
     this.showSpinner();
-    this.planetherapyService.saveReferenceImage(this.rootFolder).subscribe(
+    this.luckyStackWorkerService.saveReferenceImage(this.rootFolder).subscribe(
       (data) => {
         this.hideSpinner();
         console.log(data);
@@ -89,7 +89,7 @@ export class AppComponent {
   applyProfile() {
     console.log('applyProfile called');
     this.showSpinner();
-    this.planetherapyService.applyProfile(this.profile).subscribe(
+    this.luckyStackWorkerService.applyProfile(this.profile).subscribe(
       (data) => {
         console.log(data);
         this.waitForWorker();
@@ -168,7 +168,7 @@ export class AppComponent {
 
   profileSelectionChanged(event: any) {
     console.log('profileChanged called: ' + this.selectedProfile);
-    this.planetherapyService.getProfile(this.selectedProfile).subscribe(
+    this.luckyStackWorkerService.getProfile(this.selectedProfile).subscribe(
       (data) => {
         console.log(data);
         this.profile = data;
@@ -181,7 +181,7 @@ export class AppComponent {
   selectRootFolder() {
     console.log('selectRootFolder called');
     this.showSpinner()
-    this.planetherapyService.selectRootFolder().subscribe(
+    this.luckyStackWorkerService.selectRootFolder().subscribe(
       (data) => {
         console.log(data);
         if (data) {
@@ -198,7 +198,7 @@ export class AppComponent {
 
   exit() {
     console.log('exit called');
-    this.planetherapyService.exit().subscribe(
+    this.luckyStackWorkerService.exit().subscribe(
       (data) => {
         console.log('Response');
       },
@@ -223,7 +223,7 @@ export class AppComponent {
   }
 
   private updateProfile() {
-    this.planetherapyService.updateProfile(this.profile).subscribe(
+    this.luckyStackWorkerService.updateProfile(this.profile).subscribe(
       (data) => console.log(data),
       (error) => console.log(error)
     );
@@ -241,7 +241,7 @@ export class AppComponent {
   }
 
   private getStatusUpdate() {
-    this.planetherapyService.getStatus().subscribe(
+    this.luckyStackWorkerService.getStatus().subscribe(
       (data) => {
         console.log(data);
         this.workerStatus = data.message;

@@ -1,4 +1,4 @@
-package nl.wilcokas.planetherapy.constants;
+package nl.wilcokas.luckystackworker.constants;
 
 import java.util.Arrays;
 import java.util.List;
