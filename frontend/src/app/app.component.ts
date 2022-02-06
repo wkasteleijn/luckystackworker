@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AboutComponent } from './about/about.component';
@@ -15,7 +15,7 @@ interface ProfileSelection {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit  {
   profiles: ProfileSelection[] = [
     { value: 'mer', viewValue: 'Mercury' },
     { value: 'ven', viewValue: 'Venus' },
@@ -47,6 +47,11 @@ export class AppComponent {
   _showSpinner = false;
 
   constructor(private luckyStackWorkerService: LuckyStackWorkerService, private aboutSnackbar: MatSnackBar) {}
+
+  ngOnInit(): void {
+    this.showSpinner();
+    this.pollSelectedProfile();
+  }
 
   openReferenceImage() {
     console.log('openReferenceImage called');
@@ -180,7 +185,7 @@ export class AppComponent {
 
   selectRootFolder() {
     console.log('selectRootFolder called');
-    this.showSpinner()
+    this.showSpinner();
     this.luckyStackWorkerService.selectRootFolder().subscribe(
       (data) => {
         console.log(data);
@@ -198,12 +203,17 @@ export class AppComponent {
 
   exit() {
     console.log('exit called');
+    this.showSpinner();
     this.luckyStackWorkerService.exit().subscribe(
       (data) => {
         console.log('Response');
       },
       (error) => console.log(error)
     );
+    setTimeout(() => this.shutdown(), 8000);
+  }
+
+  private shutdown() {
     window.close();
   }
 
@@ -250,6 +260,29 @@ export class AppComponent {
         );
       },
       (error) => console.log(error)
+    );
+  }
+
+  private pollSelectedProfile() {
+    this.luckyStackWorkerService.getSelectedProfile().subscribe(
+      (data) => {
+        console.log(data);
+        this.refImageSelected = true;
+        if (data) {
+          this.profile = data;
+          this.selectedProfile = data.name;
+          this.rootFolder = data.rootFolder;
+          this.updateProfileSettings();
+          this.hideSpinner();
+        } else {
+          console.log("Profile was not yet selected");
+          setTimeout(() => this.pollSelectedProfile(), 500);
+        }
+      },
+      (error) => {
+        console.log("Profile was not yet selected");
+        setTimeout(() => this.pollSelectedProfile(), 500);
+      }
     );
   }
 

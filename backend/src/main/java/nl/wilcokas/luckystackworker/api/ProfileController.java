@@ -43,6 +43,18 @@ public class ProfileController {
 				.collect(Collectors.toList());
 	}
 
+	@GetMapping("/selected")
+	public Profile getSelectedProfile() {
+		log.info("getSelectedProfile called");
+		Profile profile = new Profile();
+		String profileName = LuckyStackWorkerContext.getSelectedProfile();
+		if (profileName != null) {
+			profile = profileRepository.findByName(profileName)
+					.orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
+		}
+		return profile;
+	}
+
 	@GetMapping("/{profile}")
 	public Profile getProfile(@PathVariable(value = "profile") String profileName) {
 		log.info("getProfile called with profile {}", profileName);
@@ -73,9 +85,15 @@ public class ProfileController {
 
 	@PutMapping("/apply")
 	public void applyProfile(@RequestBody Profile profile) {
-		LuckyStackWorkerContext.statusUpdate(Constants.STATUS_WORKING);
-		LuckyStackWorkerContext.updateWorkerForProfile(profile);
-		LuckyStackWorkerContext.setActiveProfile(profile.getName());
+		String profileName = profile.getName();
+		if (profileName != null) {
+			LuckyStackWorkerContext.statusUpdate(Constants.STATUS_WORKING);
+			LuckyStackWorkerContext.updateWorkerForProfile(profile);
+			LuckyStackWorkerContext.setActiveProfile(profileName);
+		} else {
+			log.warn("Attempt to apply profile while nothing was selected");
+			LuckyStackWorkerContext.statusUpdate(Constants.STATUS_IDLE);
+		}
 	}
 
 	@GetMapping("/status")

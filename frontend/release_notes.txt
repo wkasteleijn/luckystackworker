@@ -1,0 +1,8 @@
+LuckyStackWorker - RELEASE NOTES
+================================
+
+6/2/2022 revision 1.0.1
+- Fixed issues with starting up and shutting down the app.
+
+5/2/2022 release 1.0.0
+First official release

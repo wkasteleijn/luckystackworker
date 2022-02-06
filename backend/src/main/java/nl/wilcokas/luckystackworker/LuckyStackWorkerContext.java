@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.dto.StatusUpdate;
 import nl.wilcokas.luckystackworker.model.Profile;
@@ -12,6 +13,7 @@ import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.worker.Worker;
 import nl.wilcokas.luckystackworker.worker.WorkerException;
 
+@Slf4j
 public class LuckyStackWorkerContext {
 	private static Worker worker;
 	private static Map<String, String> workerProperties;
@@ -61,6 +63,21 @@ public class LuckyStackWorkerContext {
 		workerProperties.put(name + ".red", String.valueOf(profile.getRed()));
 		workerProperties.put(name + ".green", String.valueOf(profile.getGreen()));
 		workerProperties.put(name + ".blue", String.valueOf(profile.getBlue()));
+	}
+
+	public static String getSelectedProfile() {
+		String profileName = workerProperties.get("selectedProfile");
+		if (profileName == null) {
+			log.info("Getting selected profile, no profile has been selected yet");
+		} else {
+			log.info("Getting selected profile, profile {} has been selected", profileName);
+		}
+		return profileName;
+	}
+
+	public static void setSelectedProfile(String profileName) {
+		log.info("Setting selected profile to {}", profileName);
+		workerProperties.put("selectedProfile", profileName);
 	}
 
 	public static void updateWorkerForRootFolder(String rootFolder) {
