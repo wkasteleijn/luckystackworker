@@ -1,6 +1,6 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatSnackBarRef, MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
-import {shell} from "electron";
+import { Component, OnInit } from '@angular/core';
+import { MatSnackBarRef } from '@angular/material/snack-bar';
+import { version } from '../../../package.json';
 
 @Component({
   selector: 'app-about',
@@ -15,7 +15,8 @@ export class AboutComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  openSite() {
-    // shell.openExternal('https://www.vk.nl')
+  getVersion() {
+    return version;
   }
+
 }

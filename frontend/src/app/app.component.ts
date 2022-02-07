@@ -210,7 +210,9 @@ export class AppComponent implements OnInit  {
       },
       (error) => console.log(error)
     );
-    setTimeout(() => this.shutdown(), 8000);
+    // Wait for the background to shutdown gracefully, it takes about 8 seconds
+    // but that is too long. Assuming that the user won't immediately re-open.
+    setTimeout(() => this.shutdown(), 4000);
   }
 
   private shutdown() {

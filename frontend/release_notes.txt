@@ -1,6 +1,10 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
 
+7/2/2022 revision 1.0.2
+- Fixed root folder not showing after selecting the reference image
+- Decreased shutdown wait delay to 4 seconds
+
 6/2/2022 revision 1.0.1
 - Fixed issues with starting up and shutting down the app.
 
