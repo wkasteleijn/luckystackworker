@@ -46,6 +46,46 @@
         </option>
       </select>
     </mat-form-field>
+
+    <span class="dropdown_label zoomLabel">Zoom :</span>
+    <button
+      *ngIf="openRefImageEnabled()"
+      type="button"
+      mat-button
+      (click)="zoomIn()"
+      class="button zoom"
+    >
+      +
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled()"
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled zoom"
+    >
+      +
+    </button>
+
+    <button
+      *ngIf="openRefImageEnabled()"
+      type="button"
+      mat-button
+      (click)="zoomOut()"
+      class="button zoom"
+    >
+      -
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled()"
+      type="button zoom"
+      mat-button
+      disabled
+      class="button_disabled"
+    >
+      -
+    </button>
+
     <button
       *ngIf="openRefImageEnabled()"
       type="button"

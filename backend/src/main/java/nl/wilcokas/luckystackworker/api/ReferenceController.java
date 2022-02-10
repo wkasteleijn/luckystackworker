@@ -72,4 +72,14 @@ public class ReferenceController {
 			referenceImageService.saveReferenceImage(selectedFile.getAbsolutePath());
 		}
 	}
+
+	@PutMapping("/zoomin")
+	public void zoomIn() {
+		referenceImageService.zoomIn();
+	}
+
+	@PutMapping("/zoomout")
+	public void zoomOut() {
+		referenceImageService.zoomOut();
+	}
 }

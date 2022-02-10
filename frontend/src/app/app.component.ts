@@ -296,6 +296,26 @@ export class AppComponent implements OnInit  {
     return 'Idle' === this.workerStatus && !this._showSpinner;
   }
 
+  zoomIn() {
+    console.log('zoomIn called');
+    this.luckyStackWorkerService.zoomIn().subscribe(
+      (data) => {
+        console.log('Response');
+      },
+      (error) => console.log(error)
+    );
+  }
+
+  zoomOut() {
+    console.log('zoomOut called');
+    this.luckyStackWorkerService.zoomOut().subscribe(
+      (data) => {
+        console.log('Response');
+      },
+      (error) => console.log(error)
+    );
+  }
+
   private showSpinner() {
     this._showSpinner = true;
   }

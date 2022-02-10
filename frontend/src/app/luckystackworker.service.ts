@@ -46,4 +46,12 @@ export class LuckyStackWorkerService {
   saveReferenceImage(rootFolder: string): Observable<Object> {
     return this.http.put(`${this.baseUrl}/reference/save`, rootFolder);
   }
+
+  zoomIn(): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/reference/zoomin`,null);
+  }
+
+  zoomOut(): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/reference/zoomout`, null);
+  }
 }

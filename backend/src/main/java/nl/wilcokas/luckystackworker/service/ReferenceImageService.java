@@ -73,6 +73,9 @@ public class ReferenceImageService {
 			Operations.applyInitialSettings(finalResultImage);
 			log.info("Opened final result image image with id {}", finalResultImage.getID());
 			finalResultImage.show(filePath);
+			if (finalResultImage.getWidth() > 1280) {
+				zoomOut();
+			}
 
 			processedImage = finalResultImage.duplicate();
 			log.info("Opened duplicate image with id {}", processedImage.getID());
@@ -159,6 +162,14 @@ public class ReferenceImageService {
 		if (selectedProfile != null) {
 			LuckyStackWorkerContext.setSelectedProfile(selectedProfile);
 		}
+	}
+
+	public void zoomIn() {
+		IJ.run(finalResultImage, "In [+]", null);
+	}
+
+	public void zoomOut() {
+		IJ.run(finalResultImage, "Out [-]", null);
 	}
 
 	public Settings getSettings() {

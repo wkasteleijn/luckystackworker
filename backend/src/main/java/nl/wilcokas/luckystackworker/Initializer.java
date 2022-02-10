@@ -30,7 +30,6 @@ public class Initializer {
 		LuckyStackWorkerContext.loadWorkerProperties(profileRepository.findAll().iterator(),
 				settingsRepository.findAll().iterator().next());
 		LuckyStackWorkerContext.getWorker().start();
-
 		referenceImageService.selectReferenceImage(LuckyStackWorkerContext.getWorkerProperties().get("inputFolder"));
 	}
 }

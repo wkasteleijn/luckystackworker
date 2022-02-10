@@ -29,6 +29,7 @@
   padding-left: 12px;
   padding-right: 12px;
   border-radius: 8px;
+  margin-right: 24px;
 }
 
 .dropdown_disabled {
@@ -39,6 +40,7 @@
   padding-left: 12px;
   padding-right: 12px;
   border-radius: 8px;
+  margin-right: 24px;
 }
 
 .rootFolder {
@@ -52,6 +54,11 @@
 
 .rootFolder_label {
   margin-left: 4px;
+}
+
+.zoomLabel {
+  margin-left: 4px;
+  margin-top: 2px;
 }
 
 .button_container {
@@ -81,7 +88,7 @@
 }
 
 .button_about {
-  margin-left: 260px;
+  margin-left: 76px;
 }
 
 .line {
@@ -95,4 +102,9 @@
   z-index: 100;
   top: 310px;
   left: 280px;
+}
+
+.zoom {
+  font-size: 12px;
+  font-weight:bolder;
 }
