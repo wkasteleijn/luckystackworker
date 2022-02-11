@@ -3,6 +3,8 @@ package nl.wilcokas.luckystackworker;
 import java.io.IOException;
 
 import javax.annotation.PostConstruct;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,10 +28,12 @@ public class Initializer {
 	private ReferenceImageService referenceImageService;
 
 	@PostConstruct
-	public void init() throws IOException {
+	public void init() throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
+			UnsupportedLookAndFeelException {
 		LuckyStackWorkerContext.loadWorkerProperties(profileRepository.findAll().iterator(),
 				settingsRepository.findAll().iterator().next());
 		LuckyStackWorkerContext.getWorker().start();
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		referenceImageService.selectReferenceImage(LuckyStackWorkerContext.getWorkerProperties().get("inputFolder"));
 	}
 }

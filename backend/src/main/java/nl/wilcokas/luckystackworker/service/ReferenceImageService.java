@@ -1,9 +1,12 @@
 package nl.wilcokas.luckystackworker.service;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.HeadlessException;
+import java.awt.Image;
 import java.io.File;
 
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.gui.ImageWindow;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
@@ -34,6 +38,8 @@ public class ReferenceImageService {
 	private ImagePlus finalResultImage;
 	private OperationEnum previousOperation;
 	private String filePath;
+
+	private Image iconImage = new ImageIcon(getClass().getResource("/luckystackworker_icon.png")).getImage();
 
 	@Autowired
 	private ProfileRepository profileRepository;
@@ -68,14 +74,12 @@ public class ReferenceImageService {
 	}
 
 	public void openReferenceImage(String filePath, Profile profile) {
+		this.filePath = filePath;
 		finalResultImage = IJ.openImage(Util.getIJFileFormat(filePath));
 		if (finalResultImage != null) {
 			Operations.applyInitialSettings(finalResultImage);
 			log.info("Opened final result image image with id {}", finalResultImage.getID());
-			finalResultImage.show(filePath);
-			if (finalResultImage.getWidth() > 1280) {
-				zoomOut();
-			}
+			setDefaultLayoutSettings(finalResultImage);
 
 			processedImage = finalResultImage.duplicate();
 			log.info("Opened duplicate image with id {}", processedImage.getID());
@@ -92,7 +96,6 @@ public class ReferenceImageService {
 				updateProcessing(profile);
 			}
 
-			this.filePath = filePath;
 			finalResultImage.setTitle(filePath);
 		}
 	}
@@ -148,6 +151,7 @@ public class ReferenceImageService {
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.requestFocus();
+		frame.setIconImage(iconImage);
 		return frame;
 	}
 
@@ -182,6 +186,18 @@ public class ReferenceImageService {
 		destination.setTitle("PROCESSING");
 	}
 
+	private void setDefaultLayoutSettings(ImagePlus image) {
+		image.setBorderColor(Color.BLACK);
+		image.getStack().setSliceLabel(null, 1);
+		image.show(filePath);
+		ImageWindow window = image.getWindow();
+		window.setIconImage(iconImage);
+		window.setLocation(750, 64);
+		if (image.getWidth() > 1280) {
+			zoomOut();
+		}
+	}
+
 	final class MyFileChooser extends JFileChooser {
 
 		MyFileChooser(String path) {
@@ -191,7 +207,7 @@ public class ReferenceImageService {
 		@Override
 		protected JDialog createDialog(Component parent) throws HeadlessException {
 			JDialog dlg = super.createDialog(parent);
-			dlg.setLocation(110, 255);
+			dlg.setLocation(64, 255);
 			return dlg;
 		}
 	}

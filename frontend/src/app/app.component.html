@@ -27,6 +27,7 @@
     >
       Open Reference Image
     </button>
+    <span class="buttonDivider">&nbsp;</span>
     <mat-form-field appearance="fill">
       <select
         matNativeControl
@@ -53,18 +54,18 @@
       type="button"
       mat-button
       (click)="zoomIn()"
-      class="button zoom"
+      class="buttonZoom"
     >
-      +
+    &nbsp;&nbsp;+&nbsp;&nbsp;
     </button>
     <button
       *ngIf="!openRefImageEnabled()"
       type="button"
       mat-button
       disabled
-      class="button_disabled zoom"
+      class="buttonDisabledZoom"
     >
-      +
+    &nbsp;&nbsp;+&nbsp;&nbsp;
     </button>
 
     <button
@@ -72,18 +73,18 @@
       type="button"
       mat-button
       (click)="zoomOut()"
-      class="button zoom"
+      class="buttonZoom"
     >
-      -
+      &nbsp;&nbsp;-&nbsp;&nbsp;
     </button>
     <button
       *ngIf="!openRefImageEnabled()"
-      type="button zoom"
+      type="button"
       mat-button
       disabled
-      class="button_disabled"
+      class="buttonDisabledZoom"
     >
-      -
+    &nbsp;&nbsp;-&nbsp;&nbsp;
     </button>
 
     <button
@@ -224,7 +225,7 @@
             tickInterval="1"
             step="1"
             min="0"
-            max="255"
+            max="127"
             color="ffffff"
             (change)="redChanged($event)"
             [(ngModel)]="red"
@@ -241,7 +242,7 @@
             tickInterval="1"
             step="1"
             min="0"
-            max="255"
+            max="127"
             color="ffffff"
             (change)="greenChanged($event)"
             [(ngModel)]="green"
@@ -258,7 +259,7 @@
             tickInterval="1"
             step="1"
             min="0"
-            max="255"
+            max="127"
             color="ffffff"
             (change)="blueChanged($event)"
             [(ngModel)]="blue"
@@ -287,6 +288,7 @@
     <button type="button" mat-button (click)="applyProfile()" class="button">
       Apply Profile
     </button>
+    <span class="buttonDivider">&nbsp;</span>
     <button
       type="button"
       mat-button
@@ -308,14 +310,16 @@
     <button type="button" mat-button disabled class="button_disabled">
       Apply Profile
     </button>
+    <span class="buttonDivider">&nbsp;</span>
     <button type="button" mat-button disabled class="button_disabled">
       Save Reference Image
     </button>
+    <span class="buttonDivider">&nbsp;</span>
     <button
       type="button"
       mat-button
       disabled
-      class="button_exit button_disabled"
+      class="button_exit_disabled button_disabled"
     >
       Exit
     </button>

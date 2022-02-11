@@ -15,13 +15,19 @@ public class Probeersels {
 		// depth of 23 bit again in the end..
 		IJ.run(img, "32-bit", "");
 
-		img.setBorderColor(Color.gray);
+		img.setBorderColor(Color.BLACK);
+		IJ.setForegroundColor(25, 25, 25);
 
 		img.show();
+		img.getWindow().setLocation(20, 20);
+		img.setActiveChannels("111");
+		img.setDisplayMode(IJ.COMPOSITE);
+		img.setHideOverlay(true);
 
 		// gamma to correct overexposure effect on 8-bit monitors
 		ImageProcessor proc = img.getProcessor();
 		ImageStack stack = img.getStack();
+		stack.setSliceLabel(null, 1);
 		//		for (int i = 1; i <= stack.getSize(); i++) {
 		//			stack.getProcessor(i).gamma(0.96);
 		//		}
@@ -38,6 +44,8 @@ public class Probeersels {
 		//		enh.stretchHistogram(stack.getProcessor(3), factor);
 
 		Thread.currentThread().sleep(2000);
+
+		img.getWindow().setLocation(500, 500);
 
 		// Resizing
 		//		double newWidth = img.getWidth() * 0.75;

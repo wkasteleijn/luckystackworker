@@ -9,10 +9,10 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     resizable: false,
     autoHideMenuBar: true,
-    width: 698,
-    height: 840,
-    x: 20,
-    y: 20,
+    width: 694,
+    height: 850,
+    x: 64,
+    y: 64,
     webPreferences: {
       nodeIntegration: true,
     },

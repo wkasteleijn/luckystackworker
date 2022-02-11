@@ -24,27 +24,28 @@
   color: rgb(168, 168, 168);
   background-color: black;
   border-color: blue;
-  border-width: 2px;
-  padding: 2px;
+  border-width: 3px;
   padding-left: 12px;
   padding-right: 12px;
+  padding: 3px;
   border-radius: 8px;
   margin-right: 24px;
 }
 
 .dropdown_disabled {
+  color: rgb(168, 168, 168);
   background-color: black;
   border-color: black;
-  border-width: 2px;
-  padding: 2px;
+  border-width: 3px;
   padding-left: 12px;
   padding-right: 12px;
+  padding: 3px;
   border-radius: 8px;
   margin-right: 24px;
 }
 
 .rootFolder {
-  width: 536px;
+  width: 550px;
   border-style: solid;
 }
 .dropdown_label {
@@ -58,7 +59,7 @@
 
 .zoomLabel {
   margin-left: 4px;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .button_container {
@@ -71,11 +72,10 @@
 .button_disabled {
   border: 3px;
   border-color: rgb(43, 43, 43);
-  border-style: ridge;
-  margin-right: 16px;
+  border-style: solid;
   font-weight: bold;
   font-size: 12px;
-  color: rgb(43, 43, 43);
+  color: rgb(168, 168, 168);
   background-color: black;
   padding: 3px;
   padding-left: 12px;
@@ -83,12 +83,18 @@
   border-radius: 8px;
 }
 
+.buttonDivider {
+  margin-left: 16px;
+}
 .button_exit {
-  margin-left: 306px;
+  margin-left: 314px;
+}
+.button_exit_disabled {
+  margin-left: 296px;
 }
 
 .button_about {
-  margin-left: 76px;
+  margin-left: 66px;
 }
 
 .line {
@@ -104,7 +110,28 @@
   left: 280px;
 }
 
-.zoom {
-  font-size: 12px;
-  font-weight:bolder;
+.buttonZoom {
+  font-size: 18px;
+  font-weight: bolder;
+  border: 3px;
+  border-color: blue;
+  border-style: solid;
+  margin-right: 16px;
+  font-weight: bold;
+  color: rgb(168, 168, 168);
+  background-color: black;
+  border-radius: 8px;
+}
+
+.buttonDisabledZoom {
+  font-size: 18px;
+  font-weight: bolder;
+  border: 3px;
+  border-color: rgb(43, 43, 43);
+  border-style: ridge;
+  margin-right: 16px;
+  font-weight: bold;
+  color: rgb(43, 43, 43);
+  background-color: black;
+  border-radius: 8px;
 }

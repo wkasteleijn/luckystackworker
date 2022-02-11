@@ -11,8 +11,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .button {
   border: 3px;
   border-color: blue;
-  border-style: ridge;
-  margin-right: 16px;
+  border-style:solid;
   font-weight: bold;
   font-size: 12px;
   color: rgb(168, 168, 168);
@@ -64,7 +63,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .mat-snack-bar-container {
-  height: 590px !important;
+  height: 608px !important;
   min-width: 512px !important;
   margin-top: 134px !important;
 }
