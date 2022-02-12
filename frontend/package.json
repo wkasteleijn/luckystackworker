@@ -51,5 +51,14 @@
     "tslint": "~6.1.0",
     "typescript": "~4.0.2",
     "zone.js": "~0.10.2"
+  },
+  "build": {
+    "appId": "LuckyStackWorker",
+    "win": {
+      "asar": false,
+      "icon": "lsw_icon.ico",
+      "legalTrademarks": "(C) 2022 Wilco Kasteleijn",
+      "publisherName": "Wilco Kasteleijn"
+    }
   }
 }

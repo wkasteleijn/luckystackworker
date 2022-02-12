@@ -207,7 +207,7 @@ public class ReferenceImageService {
 		@Override
 		protected JDialog createDialog(Component parent) throws HeadlessException {
 			JDialog dlg = super.createDialog(parent);
-			dlg.setLocation(64, 255);
+			dlg.setLocation(108, 255);
 			return dlg;
 		}
 	}

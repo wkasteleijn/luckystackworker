@@ -128,7 +128,7 @@
   font-weight: bolder;
   border: 3px;
   border-color: rgb(43, 43, 43);
-  border-style: ridge;
+  border-style: solid;
   margin-right: 16px;
   font-weight: bold;
   color: rgb(43, 43, 43);
