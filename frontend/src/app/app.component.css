@@ -1,9 +1,17 @@
 .container {
   display: flex;
   flex-direction: column;
-  background-color: rgb(43, 43, 43);
   margin-left: 16px;
 }
+
+.containerColor {
+  background-color: rgb(43, 43, 43);
+}
+
+.containerColorNight {
+  background-color: rgb(0, 0, 0);
+}
+
 .sliderLabel {
   width: 108px;
   color: rgb(168, 168, 168);
@@ -23,7 +31,6 @@
 .dropdown {
   color: rgb(168, 168, 168);
   background-color: black;
-  border-color: blue;
   border-width: 3px;
   padding-left: 12px;
   padding-right: 12px;
@@ -45,7 +52,7 @@
 }
 
 .rootFolder {
-  width: 550px;
+  width: 404px;
   border-style: solid;
 }
 .dropdown_label {
@@ -114,7 +121,6 @@
   font-size: 18px;
   font-weight: bolder;
   border: 3px;
-  border-color: blue;
   border-style: solid;
   margin-right: 16px;
   font-weight: bold;

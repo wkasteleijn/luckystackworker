@@ -1,10 +1,13 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
 
+12/2/2022 revision release 1.1.4:
+- Fixed layout rendering issue happening on some machines.
+
 11/2/2022 revision release 1.1.3:
-- Added icon to image window and file picker
-- File picker with native look and feel
-- Several layout improvements
+- Added icon to image window and file picker.
+- File picker with native look and feel.
+- Several layout improvements.
 
 10/2/2022 minor release 1.1.2:
 - Added zoom in/out function.

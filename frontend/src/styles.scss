@@ -1,4 +1,11 @@
-/* You can add global styles to this file, and also import other style files */
+@import '~@angular/material/theming';
+@include mat-core();
+
+$my-app-primary: mat-palette($mat-blue, A700);
+$my-app-accent: mat-palette($mat-pink, 500, 900, A100);
+$my-app-warn: mat-palette($mat-deep-orange, A700);
+$my-app-theme: mat-light-theme($my-app-primary, $my-app-accent, $my-app-warn);
+@include angular-material-theme($my-app-theme);
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
@@ -8,9 +15,16 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   font-size: 12px;
 }
 
+.activeColor {
+  border-color: blue !important;
+}
+
+.activeColorNight {
+  border-color: #dd2c00 !important;
+}
+
 .button {
   border: 3px;
-  border-color: blue;
   border-style:solid;
   font-weight: bold;
   font-size: 12px;
@@ -22,15 +36,17 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   border-radius: 8px;
 }
 
- .mat-slider-track-fill {
-  background-color: blue !important;
-}
-
  .mat-slider-thumb-label {
   background-color: rgb(65, 65, 65) !important;
 }
 
   .mat-slider-thumb {
+  background-color: rgb(168, 168, 168) !important;
+  color: lightgray;
+}
+
+
+.mat-slide-toggle-thumb {
   background-color: rgb(168, 168, 168) !important;
   color: lightgray;
 }
@@ -46,8 +62,15 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .card {
   max-width: 616px;
   margin-top: 20px;
-  background-color: rgb(25, 25, 25);
   color: rgb(168, 168, 168);
+}
+
+.cardColor {
+  background-color: rgb(25, 25, 25);
+}
+
+.cardColorNight {
+  background-color: rgb(49, 13, 13);
 }
 
 .mat-card-title {
@@ -59,7 +82,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .mat-progress-bar-element {
-  background-color: black;
+  background-color: black !important;
 }
 
 .mat-snack-bar-container {

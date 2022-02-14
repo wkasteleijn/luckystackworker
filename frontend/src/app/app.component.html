@@ -3,18 +3,18 @@
     class="spinner"
     mode="indeterminate"
     diameter="120"
-    [color]="spinnerColor"
+    [color]="colorTheme()"
   >
   </mat-progress-spinner>
 </div>
-<div class="container">
+<div class="{{nightModeEnabled() ? 'container containerColorNight':'container containerColor'}}">
   <div class="button_container">
     <button
       *ngIf="openRefImageEnabled()"
       type="button"
       mat-button
       (click)="openReferenceImage()"
-      class="button"
+      class="{{nightModeEnabled() ? 'activeColorNight button':'activeColor button'}}"
     >
       Open Reference Image
     </button>
@@ -38,7 +38,7 @@
         class="{{
           !refImageSelected || !openRefImageEnabled()
             ? 'dropdown_disabled'
-            : 'dropdown'
+            : nightModeEnabled() ? 'dropdown activeColorNight':'dropdown activeColor'
         }}"
       >
         <option selected="true">Select an Object</option>
@@ -48,13 +48,13 @@
       </select>
     </mat-form-field>
 
-    <span class="dropdown_label zoomLabel">Zoom :</span>
+    <span class="dropdown_label zoomLabel">Zoom</span>
     <button
       *ngIf="openRefImageEnabled()"
       type="button"
       mat-button
       (click)="zoomIn()"
-      class="buttonZoom"
+      class="{{nightModeEnabled() ? 'buttonZoom activeColorNight' : 'buttonZoom activeColor'}}"
     >
     &nbsp;&nbsp;+&nbsp;&nbsp;
     </button>
@@ -73,7 +73,7 @@
       type="button"
       mat-button
       (click)="zoomOut()"
-      class="buttonZoom"
+      class="{{nightModeEnabled() ? 'buttonZoom activeColorNight' : 'buttonZoom activeColor'}}"
     >
       &nbsp;&nbsp;-&nbsp;&nbsp;
     </button>
@@ -91,7 +91,7 @@
       *ngIf="openRefImageEnabled()"
       type="button"
       mat-button
-      class="button_about button"
+      class="button_about button  {{nightModeEnabled() ? 'activeColorNight':'activeColor'}}"
       (click)="openAbout()"
     >
       About
@@ -106,9 +106,10 @@
       About
     </button>
   </div>
+
   <div class="button_container">
     <mat-form-field appearance="fill">
-      <mat-label class="dropdown_label rootFolder_label">Root folder :</mat-label>
+      <mat-label class="dropdown_label rootFolder_label">Root folder</mat-label>
       <input
         matInput
         type="text"
@@ -118,13 +119,16 @@
         class="{{
           !refImageSelected || !openRefImageEnabled()
             ? 'dropdown_disabled rootFolder'
-            : 'dropdown rootFolder'
+            : nightModeEnabled() ? ' activeColorNight dropdown rootFolder':'activeColor dropdown rootFolder'
         }}"
       />
     </mat-form-field>
+
+    <mat-slide-toggle [(ngModel)]="nightMode" [color]="colorTheme()"><span class="sliderLabel">Night mode</span></mat-slide-toggle>
+
   </div>
 
-  <mat-card class="card">
+  <mat-card class="{{nightModeEnabled() ? 'card cardColorNight': 'card cardColor'}}">
     <mat-card-header>
       <mat-card-title>Sharpen</mat-card-title>
     </mat-card-header>
@@ -140,6 +144,7 @@
             max="4"
             (change)="radiusChanged($event)"
             [(ngModel)]="radius"
+            [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ radius }}</span>
         </div>
@@ -155,6 +160,7 @@
             max="9999"
             (change)="amountChanged($event)"
             [(ngModel)]="amount"
+            [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ amount }}</span>
         </div>
@@ -171,6 +177,7 @@
             max="10"
             (change)="iterationsChanged($event)"
             [(ngModel)]="iterations"
+            [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ iterations }}</span>
         </div>
@@ -185,16 +192,16 @@
             step="100"
             min="0"
             max="10000"
-            color="ffffff"
             (change)="denoiseChanged($event)"
             [(ngModel)]="denoise"
+            [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ denoise }}</span>
         </div>
       </div>
     </mat-card-content>
   </mat-card>
-  <mat-card class="card">
+  <mat-card class="{{nightModeEnabled() ? 'card cardColorNight': 'card cardColor'}}">
     <mat-card-header>
       <mat-card-title>Light & Color</mat-card-title>
     </mat-card-header>
@@ -209,9 +216,9 @@
             step="0.01"
             min="0.9"
             max="1.1"
-            color="ffffff"
             (change)="gammaChanged($event)"
             [(ngModel)]="gamma"
+            [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ gamma }}</span>
         </div>
@@ -226,9 +233,9 @@
             step="1"
             min="0"
             max="127"
-            color="ffffff"
             (change)="redChanged($event)"
             [(ngModel)]="red"
+            [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ red }}</span>
         </div>
@@ -243,9 +250,9 @@
             step="1"
             min="0"
             max="127"
-            color="ffffff"
             (change)="greenChanged($event)"
             [(ngModel)]="green"
+            [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ green }}</span>
         </div>
@@ -260,32 +267,34 @@
             step="1"
             min="0"
             max="127"
-            color="ffffff"
             (change)="blueChanged($event)"
             [(ngModel)]="blue"
+            [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ blue }}</span>
         </div>
       </div>
     </mat-card-content>
   </mat-card>
-  <mat-card class="card">
+
+  <mat-card class="{{nightModeEnabled() ? 'card cardColorNight': 'card cardColor'}}">
     <mat-card-header>
       <mat-card-title>Worker</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <span class="sliderLabel">{{ workerStatus }}</span>
       <mat-progress-bar
-        [color]="blue"
+        [color]="colorTheme()"
         [value]="workerProgress"
         mode="determinate"
         [bufferValue]="100"
-      >
+        >
       </mat-progress-bar>
     </mat-card-content>
   </mat-card>
+
   <div class="button_container" *ngIf="buttonBarEnabled()">
-    <button type="button" mat-button (click)="applyProfile()" class="button">
+    <button type="button" mat-button (click)="applyProfile()" class="button {{nightModeEnabled() ? 'activeColorNight':'activeColor'}}">
       Apply Profile
     </button>
     <span class="buttonDivider">&nbsp;</span>
@@ -293,7 +302,7 @@
       type="button"
       mat-button
       (click)="saveReferenceImage()"
-      class="button"
+      class="button {{nightModeEnabled() ? 'activeColorNight':'activeColor'}}"
     >
       Save Reference Image
     </button>
@@ -301,7 +310,7 @@
       type="button_exit"
       mat-button
       (click)="exit()"
-      class="button_exit button"
+      class="button_exit button {{nightModeEnabled() ? 'activeColorNight':'activeColor'}}"
     >
       Exit
     </button>

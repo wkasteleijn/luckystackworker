@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AboutComponent } from './about/about.component';
-import { Profile } from './model/profile';
 import { LuckyStackWorkerService } from './luckystackworker.service';
+import { Profile } from './model/profile';
 
 interface ProfileSelection {
   value: string;
@@ -15,7 +15,7 @@ interface ProfileSelection {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit  {
+export class AppComponent implements OnInit {
   profiles: ProfileSelection[] = [
     { value: 'mer', viewValue: 'Mercury' },
     { value: 'ven', viewValue: 'Venus' },
@@ -38,15 +38,22 @@ export class AppComponent implements OnInit  {
   green: number;
   blue: number;
   profile: Profile;
+
   selectedProfile: string;
   rootFolder: string = 'C:\\';
   workerStatus: string = 'Idle';
   workerProgress: number;
   refImageSelected: boolean = false;
-  spinnerColor: ThemePalette = 'primary';
+  nightMode: boolean = false;
   _showSpinner = false;
 
-  constructor(private luckyStackWorkerService: LuckyStackWorkerService, private aboutSnackbar: MatSnackBar) {}
+  componentColor: ThemePalette = 'primary';
+  componentColorNight: ThemePalette = 'warn';
+
+  constructor(
+    private luckyStackWorkerService: LuckyStackWorkerService,
+    private aboutSnackbar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this.showSpinner();
@@ -56,24 +63,26 @@ export class AppComponent implements OnInit  {
   openReferenceImage() {
     console.log('openReferenceImage called');
     const base64EncodedPath = btoa(this.rootFolder);
-    this.showSpinner()
-    this.luckyStackWorkerService.openReferenceImage(base64EncodedPath).subscribe(
-      (data) => {
-        console.log(data);
-        this.refImageSelected = true;
-        if (data) {
-          this.profile = data;
-          this.selectedProfile = data.name;
-          this.rootFolder = data.rootFolder;
-          this.updateProfileSettings();
+    this.showSpinner();
+    this.luckyStackWorkerService
+      .openReferenceImage(base64EncodedPath)
+      .subscribe(
+        (data) => {
+          console.log(data);
+          this.refImageSelected = true;
+          if (data) {
+            this.profile = data;
+            this.selectedProfile = data.name;
+            this.rootFolder = data.rootFolder;
+            this.updateProfileSettings();
+            this.hideSpinner();
+          }
+        },
+        (error) => {
+          console.log(error);
           this.hideSpinner();
         }
-      },
-      (error) => {
-        console.log(error);
-        this.hideSpinner();
-      }
-    );
+      );
   }
 
   saveReferenceImage() {
@@ -86,7 +95,7 @@ export class AppComponent implements OnInit  {
       },
       (error) => {
         this.hideSpinner();
-        console.log(error)
+        console.log(error);
       }
     );
   }
@@ -220,7 +229,10 @@ export class AppComponent implements OnInit  {
   }
 
   openAbout() {
-    this.aboutSnackbar.openFromComponent(AboutComponent,{horizontalPosition: "center", verticalPosition: "top"});
+    this.aboutSnackbar.openFromComponent(AboutComponent, {
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+    });
   }
 
   private updateProfileSettings() {
@@ -277,19 +289,23 @@ export class AppComponent implements OnInit  {
           this.updateProfileSettings();
           this.hideSpinner();
         } else {
-          console.log("Profile was not yet selected");
+          console.log('Profile was not yet selected');
           setTimeout(() => this.pollSelectedProfile(), 500);
         }
       },
       (error) => {
-        console.log("Profile was not yet selected");
+        console.log('Profile was not yet selected');
         setTimeout(() => this.pollSelectedProfile(), 500);
       }
     );
   }
 
   buttonBarEnabled() {
-    return 'Idle' === this.workerStatus && this.refImageSelected && !this._showSpinner;
+    return (
+      'Idle' === this.workerStatus &&
+      this.refImageSelected &&
+      !this._showSpinner
+    );
   }
 
   openRefImageEnabled() {
@@ -314,6 +330,19 @@ export class AppComponent implements OnInit  {
       },
       (error) => console.log(error)
     );
+  }
+
+  nightModeEnabled(): boolean {
+    if (this.nightMode) {
+      document.body.style.backgroundColor = '#000000';
+    } else {
+      document.body.style.backgroundColor = 'rgb(43,43,43)';
+    }
+    return this.nightMode;
+  }
+
+  colorTheme() {
+    return this.nightMode ? this.componentColorNight : this.componentColor;
   }
 
   private showSpinner() {
