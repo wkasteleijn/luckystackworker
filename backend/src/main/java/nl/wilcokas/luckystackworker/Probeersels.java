@@ -9,7 +9,7 @@ import ij.process.ImageProcessor;
 
 public class Probeersels {
 	public static void main(String[] args) throws InterruptedException {
-		ImagePlus img = IJ.openImage("C:/Jup/250921/Jup_225635_AS_P19_lapl5_ap39.tif");
+		ImagePlus img = IJ.openImage("C:/Jup/testsession/testsigma.png");
 
 		// Always convert to 32-bit, saving to PNG will result anyway in the same bit
 		// depth of 23 bit again in the end..
@@ -32,6 +32,8 @@ public class Probeersels {
 		//			stack.getProcessor(i).gamma(0.96);
 		//		}
 		IJ.run(img, "Gamma...", "value=0.97");
+
+		IJ.run(img, "AutoGamma...", "isXauto=true isYauto=true");
 
 		//		ContrastEnhancer enh = new ContrastEnhancer();
 		//		enh.equalize(img);

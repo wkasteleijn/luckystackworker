@@ -192,7 +192,7 @@ public class ReferenceImageService {
 		image.show(filePath);
 		ImageWindow window = image.getWindow();
 		window.setIconImage(iconImage);
-		window.setLocation(750, 64);
+		window.setLocation(742, 64);
 		if (image.getWidth() > 1280) {
 			zoomOut();
 		}
