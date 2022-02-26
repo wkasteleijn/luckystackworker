@@ -1,12 +1,18 @@
 package nl.wilcokas.luckystackworker.util;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.text.StringSubstitutor;
+
 import ij.IJ;
 import ij.ImagePlus;
+import ij.WindowManager;
+import ij.macro.Interpreter;
 import ij.process.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
@@ -17,10 +23,17 @@ public final class Operations {
 	private static final int STACK_POSITION_RED = 1;
 	private static final int STACK_POSITION_GREEN = 2;
 	private static final int STACK_POSITION_BLUE = 3;
+	private static final int DEFAULT_EXP_CORRECTION_LEVEL = 3;
 
-	public static void applyInitialSettings(ImagePlus image) {
-		IJ.run(image, "32-bit", "");
-		IJ.run(image, "Gamma...", "value=0.95"); // Apply initial gamma to correct imagej overexposure issue
+	public static void applyInitialSettings(ImagePlus image) throws IOException {
+		String macro = Util.readFromInputStream(Operations.class.getResourceAsStream("/correct_exposure.ijm"));
+		boolean isStack = image.getStack() != null && image.getStack().size() > 1;
+		StringSubstitutor stringSubstitutor = new StringSubstitutor(
+				Map.of("level", DEFAULT_EXP_CORRECTION_LEVEL, "isStack", isStack));
+		String result = stringSubstitutor.replace(macro);
+		WindowManager.setTempCurrentImage(image);
+		Interpreter interpreter = new Interpreter();
+		interpreter.run(result);
 	}
 
 	public static boolean isSharpenOperation(final OperationEnum operation) {
@@ -77,15 +90,19 @@ public final class Operations {
 
 	public static void applyDenoise(final ImagePlus image, final Profile profile) {
 		if (profile.getDenoise() != null && (profile.getDenoise().compareTo(BigDecimal.ZERO) > 0)) {
-			log.info("Applying denoise with theta {} to image {}", profile.getDenoise(), image.getID());
-			IJ.run(image, "ROF Denoise...", String.format("theta=%s", profile.getDenoise()));
+			log.info("Applying denoise with value {} to image {}", profile.getDenoise(), image.getID());
+			// IJ.run(image, "ROF Denoise...", String.format("theta=%s",
+			BigDecimal factor = profile.getDenoise().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100)
+					: profile.getDenoise();
+			BigDecimal minimum = factor.divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
+			IJ.run(image, "SigmaFilterPlus...", String.format("radius=2 use=2 minimum=%s outlier", minimum));
 		}
 	}
 
 	public static void applyGamma(final ImagePlus image, final Profile profile) {
 		if (profile.getGamma() != null && (profile.getGamma().compareTo(BigDecimal.ONE) != 0)) {
 			log.info("Applying gamma correction with value {} to image {}", profile.getGamma(), image.getID());
-			IJ.run(image, "Gamma...", String.format("value=%s", profile.getGamma()));
+			IJ.run(image, "Gamma...", String.format("value=%s", 2 - profile.getGamma().doubleValue()));
 		}
 	}
 
@@ -130,7 +147,7 @@ public final class Operations {
 	}
 
 	private static float getGammaColorValue(BigDecimal colorValue) {
-		float value = 1.0F - (colorValue.divide(new BigDecimal("1000"))).floatValue();
+		float value = 1.0F + (colorValue.divide(new BigDecimal("255"), 3, RoundingMode.HALF_EVEN)).floatValue();
 		return value;
 	}
 

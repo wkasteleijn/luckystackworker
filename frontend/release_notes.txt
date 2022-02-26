@@ -1,6 +1,11 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
 
+18/2/2022 minor release 1.2.0
+- Added night mode
+- Changed website link
+- Minor UI improvements
+
 12/2/2022 revision release 1.1.4:
 - Fixed layout rendering issue happening on some machines.
 

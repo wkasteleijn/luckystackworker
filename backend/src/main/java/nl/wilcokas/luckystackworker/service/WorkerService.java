@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
@@ -35,7 +36,7 @@ public class WorkerService {
 				final String filename = Util.getImageName(Util.getIJFileFormat(filePath));
 				log.info("Applying profile '{}' to: {}", profile, filename);
 				LuckyStackWorkerContext.statusUpdate("Processing : " + filename);
-				ImagePlus imp = IJ.openImage(filePath);
+				ImagePlus imp = new Opener().openImage(filePath);
 				Operations.applyInitialSettings(imp);
 				Operations.applyAllOperations(imp, properties, profile);
 				IJ.save(imp, getOutputFile(file, outputFormat));

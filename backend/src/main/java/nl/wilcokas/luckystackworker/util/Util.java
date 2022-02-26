@@ -1,6 +1,10 @@
 package nl.wilcokas.luckystackworker.util;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -72,6 +76,17 @@ public class Util {
 				.red(new BigDecimal(getSetting(props, "red", profileName))) //
 				.green(new BigDecimal(getSetting(props, "green", profileName))) //
 				.blue(new BigDecimal(getSetting(props, "blue", profileName))).name(profileName).build();
+	}
+
+	public static String readFromInputStream(InputStream inputStream) throws IOException {
+		StringBuilder resultStringBuilder = new StringBuilder();
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				resultStringBuilder.append(line).append("\n");
+			}
+		}
+		return resultStringBuilder.toString();
 	}
 
 	private static String getSetting(Map<String, String> props, String setting, String name) {

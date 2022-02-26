@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.HeadlessException;
 import java.awt.Image;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
+import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
@@ -46,7 +48,7 @@ public class ReferenceImageService {
 	@Autowired
 	private SettingsRepository settingsRepository;
 
-	public Profile selectReferenceImage(String filePath) {
+	public Profile selectReferenceImage(String filePath) throws IOException {
 		JFrame frame = getParentFrame();
 		JFileChooser jfc = getJFileChooser(filePath);
 		int returnValue = jfc.showOpenDialog(frame);
@@ -71,33 +73,6 @@ public class ReferenceImageService {
 			return profile;
 		}
 		return new Profile();
-	}
-
-	public void openReferenceImage(String filePath, Profile profile) {
-		this.filePath = filePath;
-		finalResultImage = IJ.openImage(Util.getIJFileFormat(filePath));
-		if (finalResultImage != null) {
-			Operations.applyInitialSettings(finalResultImage);
-			log.info("Opened final result image image with id {}", finalResultImage.getID());
-			setDefaultLayoutSettings(finalResultImage);
-
-			processedImage = finalResultImage.duplicate();
-			log.info("Opened duplicate image with id {}", processedImage.getID());
-			processedImage.show();
-
-			referenceImage = processedImage.duplicate();
-			referenceImage.show();
-			log.info("Opened reference image image with id {}", referenceImage.getID());
-
-			referenceImage.getWindow().setVisible(false);
-			processedImage.getWindow().setVisible(false);
-
-			if (profile != null) {
-				updateProcessing(profile);
-			}
-
-			finalResultImage.setTitle(filePath);
-		}
 	}
 
 	public void updateProcessing(Profile profile) {
@@ -180,6 +155,33 @@ public class ReferenceImageService {
 		return settingsRepository.findAll().iterator().next();
 	}
 
+	private void openReferenceImage(String filePath, Profile profile) throws IOException {
+		this.filePath = filePath;
+		finalResultImage = new Opener().openImage(Util.getIJFileFormat(filePath));
+		if (finalResultImage != null) {
+			Operations.applyInitialSettings(finalResultImage);
+			log.info("Opened final result image image with id {}", finalResultImage.getID());
+			setDefaultLayoutSettings(finalResultImage);
+
+			processedImage = finalResultImage.duplicate();
+			log.info("Opened duplicate image with id {}", processedImage.getID());
+			processedImage.show();
+
+			referenceImage = processedImage.duplicate();
+			referenceImage.show();
+			log.info("Opened reference image image with id {}", referenceImage.getID());
+
+			referenceImage.getWindow().setVisible(false);
+			processedImage.getWindow().setVisible(false);
+
+			if (profile != null) {
+				updateProcessing(profile);
+			}
+
+			finalResultImage.setTitle(filePath);
+		}
+	}
+
 	private void copyInto(final ImagePlus origin, final ImagePlus destination) {
 		log.info("Copying image {} into image {}", origin.getID(), destination.getID());
 		destination.setImage(origin);
@@ -187,7 +189,7 @@ public class ReferenceImageService {
 	}
 
 	private void setDefaultLayoutSettings(ImagePlus image) {
-		image.setBorderColor(Color.BLACK);
+		image.setColor(Color.BLACK);
 		image.getStack().setSliceLabel(null, 1);
 		image.show(filePath);
 		ImageWindow window = image.getWindow();
