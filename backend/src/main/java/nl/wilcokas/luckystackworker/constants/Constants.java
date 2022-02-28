@@ -9,5 +9,5 @@ public class Constants {
 	public static final String STATUS_WORKING = "Working";
 	public static final List<String> KNOWN_PROFILES = Arrays
 			.asList("sun", "moon", "mer", "ven", "mars", "jup", "sat", "uranus", "neptune");
-	public static final String SUPPORTED_OUTPUT_FORMAT = "png";
+	public static final String SUPPORTED_OUTPUT_FORMAT = "tif";
 }

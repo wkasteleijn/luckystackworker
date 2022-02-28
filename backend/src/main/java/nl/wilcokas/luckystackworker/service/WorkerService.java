@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
-import ij.IJ;
 import ij.ImagePlus;
 import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +22,8 @@ public class WorkerService {
 		this.properties = properties;
 	}
 
-	public boolean processFile(final File file, final String outputFormat) {
-		final String filePath = file.getAbsolutePath();
+	public boolean processFile(final File file) {
+		String filePath = file.getAbsolutePath();
 		Optional<String> profileOpt = getProfile(file);
 		if (!profileOpt.isPresent()) {
 			log.info("Could not determine a profile for file {}", filePath);
@@ -36,10 +35,24 @@ public class WorkerService {
 				final String filename = Util.getImageName(Util.getIJFileFormat(filePath));
 				log.info("Applying profile '{}' to: {}", profile, filename);
 				LuckyStackWorkerContext.statusUpdate("Processing : " + filename);
+
+				// TODO: test if it works
+				boolean isTempFile = false;
+				if (filePath.toLowerCase().endsWith(".png")) {
+					filePath = Util.convertPngToTiff(filePath);
+					isTempFile = true;
+				}
+
 				ImagePlus imp = new Opener().openImage(filePath);
+
 				Operations.applyInitialSettings(imp);
 				Operations.applyAllOperations(imp, properties, profile);
-				IJ.save(imp, getOutputFile(file, outputFormat));
+				if (isTempFile) {
+					Util.deleteFile(filePath);
+				}
+				// TODO: save as 16-bit PNG or TIFF
+				// IJ.save(imp, getOutputFile(file, outputFormat));
+				Util.saveImage(imp, getOutputFile(file));
 				return true;
 			} catch (Exception e) {
 				log.error("Error processing file: ", e);
@@ -60,8 +73,8 @@ public class WorkerService {
 		return profile;
 	}
 
-	private String getOutputFile(final File file, final String outputFormat) {
+	private String getOutputFile(final File file) {
 		String[] filename = Util.getFilename(file);
-		return filename[0] + Constants.OUTPUT_POSTFIX + "." + outputFormat;
+		return filename[0] + Constants.OUTPUT_POSTFIX + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
 	}
 }

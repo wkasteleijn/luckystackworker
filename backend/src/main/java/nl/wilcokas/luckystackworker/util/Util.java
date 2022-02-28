@@ -10,8 +10,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import ij.ImagePlus;
+import ij.io.FileSaver;
+import lombok.extern.slf4j.Slf4j;
+import net.imagej.ImageJ;
 import nl.wilcokas.luckystackworker.model.Profile;
 
+@Slf4j
 public class Util {
 	public static boolean fileExists(String path) {
 		return Files.exists(Paths.get(path));
@@ -78,15 +83,38 @@ public class Util {
 				.blue(new BigDecimal(getSetting(props, "blue", profileName))).name(profileName).build();
 	}
 
-	public static String readFromInputStream(InputStream inputStream) throws IOException {
-		StringBuilder resultStringBuilder = new StringBuilder();
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
-			String line;
-			while ((line = br.readLine()) != null) {
-				resultStringBuilder.append(line).append("\n");
+	public static String readFromInputStream(InputStream inputStream) {
+		try {
+			StringBuilder resultStringBuilder = new StringBuilder();
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+				String line;
+				while ((line = br.readLine()) != null) {
+					resultStringBuilder.append(line).append("\n");
+				}
 			}
+			return resultStringBuilder.toString();
+		} catch (IOException e) {
+			log.error("Error reading from inputStream: ", e);
 		}
-		return resultStringBuilder.toString();
+		return null;
+	}
+
+	public static String convertPngToTiff(final String filePath) throws IOException {
+		final String tiffPath = getFilename(filePath)[0] + "_tmp.tif";
+		ImageJ ij = new ImageJ();
+		ij.io().save(ij.io().open(filePath), tiffPath);
+		return tiffPath;
+	}
+
+	public static void deleteFile(String path) throws IOException {
+		Files.delete(Paths.get(path));
+	}
+
+	public static void saveImage(ImagePlus image, String path) throws IOException {
+		image.setActiveChannels("111");
+		image.setC(1);
+		image.setZ(1);
+		new FileSaver(image).saveAsTiff(path);
 	}
 
 	private static String getSetting(Map<String, String> props, String setting, String name) {

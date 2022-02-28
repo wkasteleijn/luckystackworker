@@ -25,15 +25,16 @@ public final class Operations {
 	private static final int STACK_POSITION_BLUE = 3;
 	private static final int DEFAULT_EXP_CORRECTION_LEVEL = 3;
 
+	private static final String CORRECT_EXPOSURE_MACRO = Util
+			.readFromInputStream(Operations.class.getResourceAsStream("/correct_exposure.ijm"));
+
 	public static void applyInitialSettings(ImagePlus image) throws IOException {
-		String macro = Util.readFromInputStream(Operations.class.getResourceAsStream("/correct_exposure.ijm"));
+		WindowManager.setTempCurrentImage(image);
 		boolean isStack = image.getStack() != null && image.getStack().size() > 1;
 		StringSubstitutor stringSubstitutor = new StringSubstitutor(
 				Map.of("level", DEFAULT_EXP_CORRECTION_LEVEL, "isStack", isStack));
-		String result = stringSubstitutor.replace(macro);
-		WindowManager.setTempCurrentImage(image);
-		Interpreter interpreter = new Interpreter();
-		interpreter.run(result);
+		String result = stringSubstitutor.replace(CORRECT_EXPOSURE_MACRO);
+		new Interpreter().run(result);
 	}
 
 	public static boolean isSharpenOperation(final OperationEnum operation) {

@@ -60,12 +60,12 @@ public class ReferenceController {
 	}
 
 	@PutMapping("/save")
-	public void saveReferenceImage(@RequestBody String path) {
+	public void saveReferenceImage(@RequestBody String path) throws IOException {
 		JFrame frame = referenceImageService.getParentFrame();
 		// Ignoring path received from frontend as it isn't used.
 		String realPath = LuckyStackWorkerContext.getWorkerProperties().get("inputFolder");
 		JFileChooser jfc = referenceImageService.getJFileChooser(realPath);
-		jfc.setFileFilter(new FileNameExtensionFilter("Png", "png"));
+		jfc.setFileFilter(new FileNameExtensionFilter("Tif", "tif"));
 		int returnValue = jfc.showDialog(frame, "Save reference image");
 		frame.dispose();
 		if (returnValue == JFileChooser.APPROVE_OPTION) {

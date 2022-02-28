@@ -106,11 +106,12 @@ public class ReferenceImageService {
 		finalResultImage.setTitle(filePath);
 	}
 
-	public void saveReferenceImage(String path) {
+	public void saveReferenceImage(String path) throws IOException {
 		String dir = Util.getFileDirectory(filePath);
 		log.info("Saving image to folder {}", dir);
 		String finalPath = Util.getFilename(path)[0] + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
-		IJ.save(finalResultImage, finalPath);
+		// IJ.save(finalResultImage, finalPath);
+		Util.saveImage(finalResultImage, finalPath);
 		log.info("Saved file to {}", finalPath);
 	}
 
@@ -156,8 +157,14 @@ public class ReferenceImageService {
 	}
 
 	private void openReferenceImage(String filePath, Profile profile) throws IOException {
-		this.filePath = filePath;
-		finalResultImage = new Opener().openImage(Util.getIJFileFormat(filePath));
+		boolean isTempFile = false;
+		if (filePath.toLowerCase().endsWith(".png")) {
+			this.filePath = Util.convertPngToTiff(filePath);
+			isTempFile = true;
+		} else {
+			this.filePath = filePath;
+		}
+		finalResultImage = new Opener().openImage(Util.getIJFileFormat(this.filePath));
 		if (finalResultImage != null) {
 			Operations.applyInitialSettings(finalResultImage);
 			log.info("Opened final result image image with id {}", finalResultImage.getID());
@@ -178,7 +185,11 @@ public class ReferenceImageService {
 				updateProcessing(profile);
 			}
 
-			finalResultImage.setTitle(filePath);
+			finalResultImage.setTitle(this.filePath);
+
+			if (isTempFile) {
+				Util.deleteFile(this.filePath);
+			}
 		}
 	}
 
@@ -190,7 +201,7 @@ public class ReferenceImageService {
 
 	private void setDefaultLayoutSettings(ImagePlus image) {
 		image.setColor(Color.BLACK);
-		image.getStack().setSliceLabel(null, 1);
+		// image.getStack().setSliceLabel(null, 1);
 		image.show(filePath);
 		ImageWindow window = image.getWindow();
 		window.setIconImage(iconImage);

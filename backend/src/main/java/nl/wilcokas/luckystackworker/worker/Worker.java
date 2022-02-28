@@ -77,7 +77,7 @@ public class Worker extends Thread {
 			String name = filename[0];
 			String extension = filename[filename.length - 1];
 			if (!name.endsWith(Constants.OUTPUT_POSTFIX) && Arrays.asList(getExtensions()).contains(extension)) {
-				filesProcessed = filesProcessed | workerService.processFile(file, getOutputFormat());
+				filesProcessed = filesProcessed | workerService.processFile(file);
 			}
 			LuckyStackWorkerContext.setFilesProcessedCount(++count);
 		}
@@ -90,9 +90,5 @@ public class Worker extends Thread {
 
 	private String[] getExtensions() {
 		return properties.get("extensions").split(",");
-	}
-
-	private String getOutputFormat() {
-		return properties.get("outputFormat");
 	}
 }
