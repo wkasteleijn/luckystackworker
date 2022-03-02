@@ -36,22 +36,10 @@ public class WorkerService {
 				log.info("Applying profile '{}' to: {}", profile, filename);
 				LuckyStackWorkerContext.statusUpdate("Processing : " + filename);
 
-				// TODO: test if it works
-				boolean isTempFile = false;
-				if (filePath.toLowerCase().endsWith(".png")) {
-					filePath = Util.convertPngToTiff(filePath);
-					isTempFile = true;
-				}
-
 				ImagePlus imp = new Opener().openImage(filePath);
 
-				Operations.applyInitialSettings(imp);
+				Operations.correctExposure(imp);
 				Operations.applyAllOperations(imp, properties, profile);
-				if (isTempFile) {
-					Util.deleteFile(filePath);
-				}
-				// TODO: save as 16-bit PNG or TIFF
-				// IJ.save(imp, getOutputFile(file, outputFormat));
 				Util.saveImage(imp, getOutputFile(file));
 				return true;
 			} catch (Exception e) {

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.HeadlessException;
 import java.awt.Image;
+import java.awt.image.ColorModel;
 import java.io.File;
 import java.io.IOException;
 
@@ -16,6 +17,7 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ij.CompositeImage;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
@@ -157,16 +159,14 @@ public class ReferenceImageService {
 	}
 
 	private void openReferenceImage(String filePath, Profile profile) throws IOException {
-		boolean isTempFile = false;
-		if (filePath.toLowerCase().endsWith(".png")) {
-			this.filePath = Util.convertPngToTiff(filePath);
-			isTempFile = true;
-		} else {
-			this.filePath = filePath;
-		}
+		this.filePath = filePath;
 		finalResultImage = new Opener().openImage(Util.getIJFileFormat(this.filePath));
 		if (finalResultImage != null) {
-			Operations.applyInitialSettings(finalResultImage);
+			if (filePath.toLowerCase().endsWith(".png")) {
+				log.warn("Opening unsupported PNG file {}", filePath);
+				finalResultImage = fixNonTiffOpeningSettings(finalResultImage);
+			}
+			Operations.correctExposure(finalResultImage);
 			log.info("Opened final result image image with id {}", finalResultImage.getID());
 			setDefaultLayoutSettings(finalResultImage);
 
@@ -186,10 +186,6 @@ public class ReferenceImageService {
 			}
 
 			finalResultImage.setTitle(this.filePath);
-
-			if (isTempFile) {
-				Util.deleteFile(this.filePath);
-			}
 		}
 	}
 
@@ -201,7 +197,7 @@ public class ReferenceImageService {
 
 	private void setDefaultLayoutSettings(ImagePlus image) {
 		image.setColor(Color.BLACK);
-		// image.getStack().setSliceLabel(null, 1);
+		image.setBorderColor(Color.BLACK);
 		image.show(filePath);
 		ImageWindow window = image.getWindow();
 		window.setIconImage(iconImage);
@@ -209,6 +205,20 @@ public class ReferenceImageService {
 		if (image.getWidth() > 1280) {
 			zoomOut();
 		}
+	}
+
+	private ImagePlus fixNonTiffOpeningSettings(ImagePlus image) {
+		ImagePlus result = new CompositeImage(image, IJ.COMPOSITE);
+		result.getStack().setSliceLabel("red", 1);
+		result.getStack().setSliceLabel("green", 2);
+		result.getStack().setSliceLabel("blue", 3);
+		result.getStack().setColorModel(ColorModel.getRGBdefault());
+		result.setActiveChannels("111");
+		result.setC(1);
+		result.setZ(1);
+		result.setDisplayMode(IJ.COMPOSITE);
+		result.setOpenAsHyperStack(true);
+		return result;
 	}
 
 	final class MyFileChooser extends JFileChooser {

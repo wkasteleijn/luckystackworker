@@ -13,7 +13,6 @@ import java.util.Map;
 import ij.ImagePlus;
 import ij.io.FileSaver;
 import lombok.extern.slf4j.Slf4j;
-import net.imagej.ImageJ;
 import nl.wilcokas.luckystackworker.model.Profile;
 
 @Slf4j
@@ -97,13 +96,6 @@ public class Util {
 			log.error("Error reading from inputStream: ", e);
 		}
 		return null;
-	}
-
-	public static String convertPngToTiff(final String filePath) throws IOException {
-		final String tiffPath = getFilename(filePath)[0] + "_tmp.tif";
-		ImageJ ij = new ImageJ();
-		ij.io().save(ij.io().open(filePath), tiffPath);
-		return tiffPath;
 	}
 
 	public static void deleteFile(String path) throws IOException {

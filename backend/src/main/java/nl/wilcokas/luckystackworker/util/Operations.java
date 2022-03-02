@@ -28,12 +28,12 @@ public final class Operations {
 	private static final String CORRECT_EXPOSURE_MACRO = Util
 			.readFromInputStream(Operations.class.getResourceAsStream("/correct_exposure.ijm"));
 
-	public static void applyInitialSettings(ImagePlus image) throws IOException {
-		WindowManager.setTempCurrentImage(image);
+	public static void correctExposure(ImagePlus image) throws IOException {
 		boolean isStack = image.getStack() != null && image.getStack().size() > 1;
 		StringSubstitutor stringSubstitutor = new StringSubstitutor(
 				Map.of("level", DEFAULT_EXP_CORRECTION_LEVEL, "isStack", isStack));
 		String result = stringSubstitutor.replace(CORRECT_EXPOSURE_MACRO);
+		WindowManager.setTempCurrentImage(image);
 		new Interpreter().run(result);
 	}
 
