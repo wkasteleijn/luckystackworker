@@ -2,9 +2,7 @@ package nl.wilcokas.luckystackworker;
 
 import java.io.IOException;
 
-import ij.IJ;
 import ij.ImagePlus;
-import ij.io.FileSaver;
 import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,24 +10,24 @@ import lombok.extern.slf4j.Slf4j;
 public class Probeersels {
 	public static void main(String[] args) throws InterruptedException, IOException {
 
-		// ImageJ ij = new net.imagej.ImageJ();
-		// Object imagePng =
-		// ij.io().open("C:\\Jup\\040921\\pipp_20210905_163919\\Jup_232158_pipp_AS_P13_lapl7_ap20.png");
-		// ij.ui().show(imagePng);
-		ImagePlus image = new Opener().openImage("C:/Jup/testsession/Jup_224759_AS_P30_lapl5_ap44.tif");
+		ImagePlus image = new Opener()
+				.openImage("C:/Jup/040921/pipp_20210905_163919/Jup_232158_pipp_AS_P9_lapl6_ap28.tif");
+		int[] histogram = image.getProcessor().getHistogram();
+		int maxVal = 0;
+		for (int i = histogram.length - 1; i >= 0; i--) {
+			if (histogram[i] > 0) {
+				maxVal = i;
+				break;
+			}
+		}
+		int percentage = (maxVal * 100) / 65536;
+		System.out.println("maxVal = " + maxVal);
+		System.out.println("percentage = " + percentage);
 
-		IJ.run(image, "Unsharp Mask...", "radius=2.0 mask=0.97");
-		IJ.run(image, "SigmaFilterPlus...", "radius=2 use=2 minimum=1 outlier");
+		// IJ.run(image, "Unsharp Mask...", "radius=2.0 mask=0.97");
+		// IJ.run(image, "SigmaFilterPlus...", "radius=2 use=2 minimum=1 outlier");
 
-		//		Img converted = ImageJFunctions.wrap(img);
-		//		new ImgSaver().saveImg("C:\\Jup\\040921\\pipp_20210905_163919\\image.tif", converted);
-		// ij.context().service(LegacyService.class).runLegacyCommand("Unsharp Mask",
-		// "radius=2.0 mask=0.97");
-		image.setActiveChannels("111");
-		image.setC(1);
-		image.setZ(1);
-		FileSaver saver = new FileSaver(image);
-		saver.saveAsTiffStack("C:/Jup/testsession/Jup_224759_AS_P30_lapl5_ap44_2.tif");
+		// Thread.currentThread().sleep(2000);
 		System.exit(0);
 	}
 }

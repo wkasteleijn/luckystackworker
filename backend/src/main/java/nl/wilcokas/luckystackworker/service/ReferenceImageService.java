@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.HeadlessException;
 import java.awt.Image;
-import java.awt.image.ColorModel;
 import java.io.File;
 import java.io.IOException;
 
@@ -17,7 +16,6 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ij.CompositeImage;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
@@ -112,8 +110,7 @@ public class ReferenceImageService {
 		String dir = Util.getFileDirectory(filePath);
 		log.info("Saving image to folder {}", dir);
 		String finalPath = Util.getFilename(path)[0] + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
-		// IJ.save(finalResultImage, finalPath);
-		Util.saveImage(finalResultImage, finalPath);
+		Util.saveImage(finalResultImage, finalPath, this.filePath.toLowerCase().endsWith(".png"));
 		log.info("Saved file to {}", finalPath);
 	}
 
@@ -163,8 +160,7 @@ public class ReferenceImageService {
 		finalResultImage = new Opener().openImage(Util.getIJFileFormat(this.filePath));
 		if (finalResultImage != null) {
 			if (filePath.toLowerCase().endsWith(".png")) {
-				log.warn("Opening unsupported PNG file {}", filePath);
-				finalResultImage = fixNonTiffOpeningSettings(finalResultImage);
+				finalResultImage = Util.fixNonTiffOpeningSettings(finalResultImage);
 			}
 			Operations.correctExposure(finalResultImage);
 			log.info("Opened final result image image with id {}", finalResultImage.getID());
@@ -205,20 +201,6 @@ public class ReferenceImageService {
 		if (image.getWidth() > 1280) {
 			zoomOut();
 		}
-	}
-
-	private ImagePlus fixNonTiffOpeningSettings(ImagePlus image) {
-		ImagePlus result = new CompositeImage(image, IJ.COMPOSITE);
-		result.getStack().setSliceLabel("red", 1);
-		result.getStack().setSliceLabel("green", 2);
-		result.getStack().setSliceLabel("blue", 3);
-		result.getStack().setColorModel(ColorModel.getRGBdefault());
-		result.setActiveChannels("111");
-		result.setC(1);
-		result.setZ(1);
-		result.setDisplayMode(IJ.COMPOSITE);
-		result.setOpenAsHyperStack(true);
-		return result;
 	}
 
 	final class MyFileChooser extends JFileChooser {

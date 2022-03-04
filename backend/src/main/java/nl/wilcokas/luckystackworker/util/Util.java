@@ -1,16 +1,23 @@
 package nl.wilcokas.luckystackworker.util;
 
+import java.awt.image.ColorModel;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import org.springframework.util.ReflectionUtils;
+
+import ij.CompositeImage;
+import ij.IJ;
 import ij.ImagePlus;
+import ij.io.FileInfo;
 import ij.io.FileSaver;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.model.Profile;
@@ -102,15 +109,55 @@ public class Util {
 		Files.delete(Paths.get(path));
 	}
 
-	public static void saveImage(ImagePlus image, String path) throws IOException {
+	public static void saveImage(ImagePlus image, String path, boolean isPng) throws IOException {
 		image.setActiveChannels("111");
 		image.setC(1);
 		image.setZ(1);
-		new FileSaver(image).saveAsTiff(path);
+		FileSaver saver = new FileSaver(image);
+		if (isPng) {
+			hackIncorrectPngFileInfo(saver);
+		}
+		saver.saveAsTiff(path);
+	}
+
+	public static ImagePlus fixNonTiffOpeningSettings(ImagePlus image) {
+		ImagePlus result = new CompositeImage(image, IJ.COMPOSITE);
+		result.getStack().setSliceLabel("red", 1);
+		result.getStack().setSliceLabel("green", 2);
+		result.getStack().setSliceLabel("blue", 3);
+		result.getStack().setColorModel(ColorModel.getRGBdefault());
+		result.setActiveChannels("111");
+		result.setC(1);
+		result.setZ(1);
+		result.setDisplayMode(IJ.COMPOSITE);
+		result.setOpenAsHyperStack(true);
+		result.getFileInfo().fileType = FileInfo.RGB48;
+		return result;
+	}
+
+	public static int getMaxHistogramPercentage(ImagePlus image) {
+		int[] histogram = image.getProcessor().getHistogram();
+		int maxVal = 0;
+		for (int i = histogram.length - 1; i >= 0; i--) {
+			if (histogram[i] > 0) {
+				maxVal = i;
+				break;
+			}
+		}
+		return (maxVal * 100) / 65536;
 	}
 
 	private static String getSetting(Map<String, String> props, String setting, String name) {
 		return props.get(name + "." + setting);
+	}
+
+	private static void hackIncorrectPngFileInfo(FileSaver saver) {
+		Field field = ReflectionUtils.findField(FileSaver.class, "fi");
+		ReflectionUtils.makeAccessible(field);
+		FileInfo fileInfo = (FileInfo) ReflectionUtils.getField(field, saver);
+		Field fileType = ReflectionUtils.findField(FileInfo.class, "fileType");
+		ReflectionUtils.makeAccessible(fileType);
+		ReflectionUtils.setField(fileType, fileInfo, FileInfo.RGB48);
 	}
 
 }
