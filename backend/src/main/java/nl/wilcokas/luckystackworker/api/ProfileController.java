@@ -1,5 +1,6 @@
 package nl.wilcokas.luckystackworker.api;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -65,7 +66,7 @@ public class ProfileController {
 	}
 
 	@PutMapping
-	public ResponseEntity<String> updateProfile(@RequestBody Profile profile) {
+	public ResponseEntity<String> updateProfile(@RequestBody Profile profile) throws IOException {
 		log.info("updateProfile called with profile {}", profile);
 		Profile result = profileRepository.findByName(profile.getName())
 				.orElseThrow(

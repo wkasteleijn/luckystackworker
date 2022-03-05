@@ -1,13 +1,13 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
 
-1/3/2022 minor release 1.3.0
+4/3/2022 minor release 1.3.0
 - Replaced ROF denoise with Sigma Filter Plus denoise
 - Removed internal conversion to 32-bit depth that sometimes caused issues with color shifting
 - Improved gamma & color controls
 - Improved initial exposure correction
-- Fixed broken PNG file reading
-- Save files in 24-bit depth TIFF format
+- Fixed broken PNG file opening and saving
+- Save files in 48-bit RGB TIFF format
 
 18/2/2022 minor release 1.2.0
 - Added night mode

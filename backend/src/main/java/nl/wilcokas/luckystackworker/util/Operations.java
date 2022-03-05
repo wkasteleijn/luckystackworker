@@ -7,13 +7,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.text.StringSubstitutor;
-
 import ij.IJ;
 import ij.ImagePlus;
-import ij.WindowManager;
-import ij.macro.Interpreter;
 import ij.process.ImageProcessor;
+import ij.process.LUT;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
@@ -40,13 +37,33 @@ public final class Operations {
 		}
 		log.info("Correcting exposure with factor {}", correctionFactor);
 
-		StringSubstitutor stringSubstitutor = new StringSubstitutor(
-				Map.of("level", correctionFactor, "isStack", isStack));
+		ImageProcessor processor = image.getProcessor();
+		image.setSlice(1);
+		int total1 = 48984 + (correctionFactor * 4000);
+		int total2 = 0 - (correctionFactor * 1000);
+		LUT lut = new LUT(processor.getLut().getColorModel(), total2, total1);
+		image.setLut(lut);
+		image.updateAndDraw();
 
+		if (isStack) {
+			image.setSlice(2);
+			processor = image.getProcessor();
+			lut = new LUT(processor.getLut().getColorModel(), total2, total1);
+			image.setLut(lut);
+			image.updateAndDraw();
 
-		String result = stringSubstitutor.replace(CORRECT_EXPOSURE_MACRO);
-		WindowManager.setTempCurrentImage(image);
-		new Interpreter().run(result);
+			image.setSlice(3);
+			processor = image.getProcessor();
+			lut = new LUT(processor.getLut().getColorModel(), total2, total1);
+			image.setLut(lut);
+			image.updateAndDraw();
+		}
+
+		//		StringSubstitutor stringSubstitutor = new StringSubstitutor(
+		//				Map.of("level", correctionFactor, "isStack", isStack));
+		//		String result = stringSubstitutor.replace(CORRECT_EXPOSURE_MACRO);
+		//		WindowManager.setTempCurrentImage(image);
+		//		new Interpreter().run(result);
 	}
 
 	public static boolean isSharpenOperation(final OperationEnum operation) {
@@ -104,7 +121,6 @@ public final class Operations {
 	public static void applyDenoise(final ImagePlus image, final Profile profile) {
 		if (profile.getDenoise() != null && (profile.getDenoise().compareTo(BigDecimal.ZERO) > 0)) {
 			log.info("Applying denoise with value {} to image {}", profile.getDenoise(), image.getID());
-			// IJ.run(image, "ROF Denoise...", String.format("theta=%s",
 			BigDecimal factor = profile.getDenoise().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100)
 					: profile.getDenoise();
 			BigDecimal minimum = factor.divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
