@@ -65,7 +65,7 @@ public class ReferenceController {
 		// Ignoring path received from frontend as it isn't used.
 		String realPath = LuckyStackWorkerContext.getWorkerProperties().get("inputFolder");
 		JFileChooser jfc = referenceImageService.getJFileChooser(realPath);
-		jfc.setFileFilter(new FileNameExtensionFilter("Tif", "tif"));
+		jfc.setFileFilter(new FileNameExtensionFilter("TIFF", "tif"));
 		int returnValue = jfc.showDialog(frame, "Save reference image");
 		frame.dispose();
 		if (returnValue == JFileChooser.APPROVE_OPTION) {

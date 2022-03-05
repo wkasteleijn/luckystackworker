@@ -11,6 +11,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,21 +58,23 @@ public class ReferenceImageService {
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
 			File selectedFile = jfc.getSelectedFile();
 			String selectedFilePath = selectedFile.getAbsolutePath();
-			log.info("Image selected {} ", selectedFilePath);
+			if (validateSelectedFile(selectedFilePath)) {
+				log.info("Image selected {} ", selectedFilePath);
 
-			String profileName = Util.deriveProfileFromImageName(selectedFilePath);
-			if (profileName == null) {
-				log.info("Profile not found for reference image, taking the default, {}", profileName);
-				profileName = getSettings().getDefaultProfile();
+				String profileName = Util.deriveProfileFromImageName(selectedFilePath);
+				if (profileName == null) {
+					log.info("Profile not found for reference image, taking the default, {}", profileName);
+					profileName = getSettings().getDefaultProfile();
+				}
+
+				Profile profile = profileRepository.findByName(profileName)
+						.orElseThrow(() -> new ResourceNotFoundException("Unknown profile!"));
+				openReferenceImage(selectedFilePath, profile);
+
+				final String rootFolder = Util.getFileDirectory(selectedFilePath);
+				updateSettings(rootFolder, profile);
+				return profile;
 			}
-
-			Profile profile = profileRepository.findByName(profileName)
-					.orElseThrow(() -> new ResourceNotFoundException("Unknown profile!"));
-			openReferenceImage(selectedFilePath, profile);
-
-			final String rootFolder = Util.getFileDirectory(selectedFilePath);
-			updateSettings(rootFolder, profile);
-			return profile;
 		}
 		return new Profile();
 	}
@@ -116,6 +120,8 @@ public class ReferenceImageService {
 
 	public MyFileChooser getJFileChooser(String path) {
 		MyFileChooser jfc = new MyFileChooser(path);
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "png");
+		jfc.setFileFilter(filter);
 		jfc.requestFocus();
 		return jfc;
 	}
@@ -201,6 +207,18 @@ public class ReferenceImageService {
 		if (image.getWidth() > 1280) {
 			zoomOut();
 		}
+	}
+
+	private boolean validateSelectedFile(String path) {
+		String extension = Util.getFilename(path)[1].toLowerCase();
+		if (!getSettings().getExtensions().contains(extension)) {
+			JOptionPane.showMessageDialog(getParentFrame(),
+					String.format(
+							"The selected file with extension %s is not supported. %nYou can only open 16-bit RGB and Gray PNG and TIFF images.",
+							extension));
+			return false;
+		}
+		return true;
 	}
 
 	final class MyFileChooser extends JFileChooser {
