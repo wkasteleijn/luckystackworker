@@ -109,18 +109,21 @@ public class Util {
 		Files.delete(Paths.get(path));
 	}
 
-	public static void saveImage(ImagePlus image, String path, boolean isPng) throws IOException {
-		image.setActiveChannels("111");
-		image.setC(1);
-		image.setZ(1);
+	public static void saveImage(ImagePlus image, String path, boolean isPngRgbStack) throws IOException {
+		if (isPngRgbStack) {
+			image.setActiveChannels("111");
+			image.setC(1);
+			image.setZ(1);
+		}
 		FileSaver saver = new FileSaver(image);
-		if (isPng) {
+		if (isPngRgbStack) {
 			hackIncorrectPngFileInfo(saver);
 		}
 		saver.saveAsTiff(path);
 	}
 
 	public static ImagePlus fixNonTiffOpeningSettings(ImagePlus image) {
+		log.info("Applying workaround for correctly opening PNG RGB stack");
 		ImagePlus result = new CompositeImage(image, IJ.COMPOSITE);
 		result.getStack().setSliceLabel("red", 1);
 		result.getStack().setSliceLabel("green", 2);
@@ -145,6 +148,10 @@ public class Util {
 			}
 		}
 		return (maxVal * 100) / 65536;
+	}
+
+	public static boolean isPngRgbStack(ImagePlus image, String filePath) {
+		return filePath.toLowerCase().endsWith(".png") && image.isStack() && image.getStack().getSize() > 1;
 	}
 
 	private static String getSetting(Map<String, String> props, String setting, String name) {

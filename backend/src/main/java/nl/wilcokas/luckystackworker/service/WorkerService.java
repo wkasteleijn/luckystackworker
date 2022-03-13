@@ -37,12 +37,12 @@ public class WorkerService {
 				LuckyStackWorkerContext.statusUpdate("Processing : " + filename);
 
 				ImagePlus imp = new Opener().openImage(filePath);
-				if (filePath.toLowerCase().endsWith(".png")) {
+				if (Util.isPngRgbStack(imp, filePath)) {
 					imp = Util.fixNonTiffOpeningSettings(imp);
 				}
 				Operations.correctExposure(imp);
 				Operations.applyAllOperations(imp, properties, profile);
-				Util.saveImage(imp, getOutputFile(file), filePath.toLowerCase().endsWith(".png"));
+				Util.saveImage(imp, getOutputFile(file), Util.isPngRgbStack(imp, filePath));
 				return true;
 			} catch (Exception e) {
 				log.error("Error processing file: ", e);

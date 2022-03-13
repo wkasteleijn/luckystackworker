@@ -53,6 +53,8 @@ public class ReferenceImageService {
 	public Profile selectReferenceImage(String filePath) throws IOException {
 		JFrame frame = getParentFrame();
 		JFileChooser jfc = getJFileChooser(filePath);
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "png");
+		jfc.setFileFilter(filter);
 		int returnValue = jfc.showOpenDialog(frame);
 		frame.dispose();
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -114,14 +116,12 @@ public class ReferenceImageService {
 		String dir = Util.getFileDirectory(filePath);
 		log.info("Saving image to folder {}", dir);
 		String finalPath = Util.getFilename(path)[0] + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
-		Util.saveImage(finalResultImage, finalPath, this.filePath.toLowerCase().endsWith(".png"));
+		Util.saveImage(finalResultImage, finalPath, Util.isPngRgbStack(finalResultImage, filePath));
 		log.info("Saved file to {}", finalPath);
 	}
 
 	public MyFileChooser getJFileChooser(String path) {
 		MyFileChooser jfc = new MyFileChooser(path);
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "png");
-		jfc.setFileFilter(filter);
 		jfc.requestFocus();
 		return jfc;
 	}
@@ -165,7 +165,7 @@ public class ReferenceImageService {
 		this.filePath = filePath;
 		finalResultImage = new Opener().openImage(Util.getIJFileFormat(this.filePath));
 		if (finalResultImage != null) {
-			if (filePath.toLowerCase().endsWith(".png")) {
+			if (Util.isPngRgbStack(finalResultImage, filePath)) {
 				finalResultImage = Util.fixNonTiffOpeningSettings(finalResultImage);
 			}
 			Operations.correctExposure(finalResultImage);
@@ -175,13 +175,13 @@ public class ReferenceImageService {
 			processedImage = finalResultImage.duplicate();
 			log.info("Opened duplicate image with id {}", processedImage.getID());
 			processedImage.show();
+			processedImage.getWindow().setVisible(false);
 
 			referenceImage = processedImage.duplicate();
 			referenceImage.show();
+			referenceImage.getWindow().setVisible(false);
 			log.info("Opened reference image image with id {}", referenceImage.getID());
 
-			referenceImage.getWindow().setVisible(false);
-			processedImage.getWindow().setVisible(false);
 
 			if (profile != null) {
 				updateProcessing(profile);

@@ -1,7 +1,16 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
 
-1/3/2022 minor release 1.3.0
+13/3/2022 revision release 1.3.2:
+- Fixed non working grayscale PNG file opening.
+
+12/3/2022 revision release 1.3.1:
+- Decreased the sharpen slider lowest possible value to 5000
+- Some textual changes in the about panel
+- Minor improvements in opening file
+- Fixed bug when cancelling open reference file it would reset all the sliders.
+
+1/3/2022 minor release 1.3.0:
 - Replaced ROF denoise with Sigma Filter Plus denoise
 - Removed internal conversion to 32-bit depth that sometimes caused issues with color shifting
 - Improved gamma & color controls
@@ -9,7 +18,7 @@ LuckyStackWorker - RELEASE NOTES
 - Fixed broken PNG file reading
 - Save files in 24-bit depth TIFF format
 
-18/2/2022 minor release 1.2.0
+18/2/2022 minor release 1.2.0:
 - Added night mode
 - Changed website link
 - Minor UI improvements

@@ -70,13 +70,13 @@ export class AppComponent implements OnInit {
         (data) => {
           console.log(data);
           this.refImageSelected = true;
-          if (data) {
+          if (data && data.amount > 0) {
             this.profile = data;
             this.selectedProfile = data.name;
             this.rootFolder = data.rootFolder;
             this.updateProfileSettings();
-            this.hideSpinner();
           }
+          this.hideSpinner();
         },
         (error) => {
           console.log(error);
