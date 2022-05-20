@@ -24,7 +24,7 @@ public class WorkerService {
 
 	public boolean processFile(final File file) {
 		String filePath = file.getAbsolutePath();
-		Optional<String> profileOpt = getProfile(file);
+		Optional<String> profileOpt = Optional.ofNullable(Util.deriveProfileFromImageName(file.getAbsolutePath()));
 		if (!profileOpt.isPresent()) {
 			log.info("Could not determine a profile for file {}", filePath);
 			return false;
@@ -49,18 +49,6 @@ public class WorkerService {
 			}
 		}
 		return false;
-	}
-
-	private Optional<String> getProfile(File file) {
-		String filename[] = file.getName().toString().split("_");
-		Optional<String> profile = Optional.empty();
-		if (filename.length > 0) {
-			String profilePart = filename[0].toLowerCase();
-			if (Constants.KNOWN_PROFILES.contains(profilePart)) {
-				profile = Optional.ofNullable(profilePart.toLowerCase());
-			}
-		}
-		return profile;
 	}
 
 	private String getOutputFile(final File file) {

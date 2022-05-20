@@ -1,6 +1,9 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
 
+26/3/2022 revision release 1.3.3:
+- Fixed worker not processing file stacks orgininating from recordings using older versions of Firecapture that used a different profile prefix.
+
 13/3/2022 revision release 1.3.2:
 - Fixed non working grayscale PNG file opening.
 
