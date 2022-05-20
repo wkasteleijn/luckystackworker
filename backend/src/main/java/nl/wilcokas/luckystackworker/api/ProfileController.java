@@ -1,5 +1,6 @@
 package nl.wilcokas.luckystackworker.api;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -64,6 +65,12 @@ public class ProfileController {
 		return profile;
 	}
 
+	@GetMapping("/load")
+	public Profile loadProfile() {
+		// TODO: file chooser to pick yaml file and load it..
+		return null;
+	}
+
 	@PutMapping
 	public ResponseEntity<String> updateProfile(@RequestBody Profile profile) {
 		log.info("updateProfile called with profile {}", profile);
@@ -85,12 +92,13 @@ public class ProfileController {
 	}
 
 	@PutMapping("/apply")
-	public void applyProfile(@RequestBody Profile profile) {
+	public void applyProfile(@RequestBody Profile profile) throws IOException {
 		String profileName = profile.getName();
 		if (profileName != null) {
 			LuckyStackWorkerContext.statusUpdate(Constants.STATUS_WORKING);
 			LuckyStackWorkerContext.updateWorkerForProfile(profile);
 			LuckyStackWorkerContext.setActiveProfile(profileName);
+			referenceImageService.writeProfile();
 		} else {
 			log.warn("Attempt to apply profile while nothing was selected");
 			LuckyStackWorkerContext.statusUpdate(Constants.STATUS_IDLE);

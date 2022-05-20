@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
+import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
+import nl.wilcokas.luckystackworker.util.Util;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -66,6 +68,9 @@ public class ReferenceController {
 		String realPath = LuckyStackWorkerContext.getWorkerProperties().get("inputFolder");
 		JFileChooser jfc = referenceImageService.getJFileChooser(realPath);
 		jfc.setFileFilter(new FileNameExtensionFilter("TIFF", "tif"));
+		String fileNameNoExt = Util.getFilename(referenceImageService.getFilePath())[0];
+		jfc.setSelectedFile(
+				new File(fileNameNoExt + Constants.OUTPUT_POSTFIX + "." + Constants.SUPPORTED_OUTPUT_FORMAT));
 		int returnValue = jfc.showDialog(frame, "Save reference image");
 		frame.dispose();
 		if (returnValue == JFileChooser.APPROVE_OPTION) {

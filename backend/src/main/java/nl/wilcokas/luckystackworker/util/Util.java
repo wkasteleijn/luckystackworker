@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import org.springframework.util.ReflectionUtils;
+import org.yaml.snakeyaml.Yaml;
 
 import ij.CompositeImage;
 import ij.IJ;
@@ -152,6 +153,23 @@ public class Util {
 
 	public static boolean isPngRgbStack(ImagePlus image, String filePath) {
 		return filePath.toLowerCase().endsWith(".png") && image.isStack() && image.getStack().getSize() > 1;
+	}
+
+	public static void writeProfile(Profile profile, String path) throws IOException {
+		Files.writeString(Paths.get(path + ".yaml"), new Yaml().dump(profile));
+	}
+
+	public static Profile readProfile(String filePath) {
+		String profileStr = null;
+		try {
+			profileStr = Files.readString(Paths.get(filePath + ".yaml"));
+		} catch (IOException e) {
+			log.info("No profile file found for {}", filePath);
+		}
+		if (profileStr != null) {
+			return new Yaml().load(profileStr);
+		}
+		return null;
 	}
 
 	private static String getSetting(Map<String, String> props, String setting, String name) {

@@ -62,15 +62,19 @@ public class ReferenceImageService {
 			String selectedFilePath = selectedFile.getAbsolutePath();
 			if (validateSelectedFile(selectedFilePath)) {
 				log.info("Image selected {} ", selectedFilePath);
-
-				String profileName = Util.deriveProfileFromImageName(selectedFilePath);
-				if (profileName == null) {
-					log.info("Profile not found for reference image, taking the default, {}", profileName);
-					profileName = getSettings().getDefaultProfile();
+				String fileNameNoExt = Util.getFilename(selectedFilePath)[0];
+				Profile profile = Util.readProfile(fileNameNoExt);
+				if (profile == null) {
+					String profileName = Util.deriveProfileFromImageName(selectedFilePath);
+					if (profileName == null) {
+						log.info("Profile not found for reference image, taking the default, {}", profileName);
+						profileName = getSettings().getDefaultProfile();
+					}
+					profile = profileRepository.findByName(profileName)
+							.orElseThrow(() -> new ResourceNotFoundException("Unknown profile!"));
+				} else {
+					log.info("Profile file found, profile was loaded from there.");
 				}
-
-				Profile profile = profileRepository.findByName(profileName)
-						.orElseThrow(() -> new ResourceNotFoundException("Unknown profile!"));
 				openReferenceImage(selectedFilePath, profile);
 
 				final String rootFolder = Util.getFileDirectory(selectedFilePath);
@@ -115,9 +119,11 @@ public class ReferenceImageService {
 	public void saveReferenceImage(String path) throws IOException {
 		String dir = Util.getFileDirectory(filePath);
 		log.info("Saving image to folder {}", dir);
-		String finalPath = Util.getFilename(path)[0] + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
+		String fileNameNoExt = Util.getFilename(path)[0];
+		String finalPath = fileNameNoExt + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
 		Util.saveImage(finalResultImage, finalPath, Util.isPngRgbStack(finalResultImage, filePath));
 		log.info("Saved file to {}", finalPath);
+		writeProfile(fileNameNoExt);
 	}
 
 	public MyFileChooser getJFileChooser(String path) {
@@ -159,6 +165,26 @@ public class ReferenceImageService {
 
 	public Settings getSettings() {
 		return settingsRepository.findAll().iterator().next();
+	}
+
+	public void writeProfile() throws IOException {
+		String fileNameNoExt = Util.getFilename(filePath)[0];
+		writeProfile(fileNameNoExt);
+	}
+
+	public void writeProfile(String fileNameNoExt) throws IOException {
+		String profileName = LuckyStackWorkerContext.getSelectedProfile();
+		if (profileName != null) {
+			Profile profile = profileRepository.findByName(profileName)
+					.orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
+			Util.writeProfile(profile, fileNameNoExt);
+		} else {
+			log.warn("Profile not saved, could not find the selected profile for file {}", fileNameNoExt);
+		}
+	}
+
+	public String getFilePath() {
+		return filePath;
 	}
 
 	private void openReferenceImage(String filePath, Profile profile) throws IOException {
