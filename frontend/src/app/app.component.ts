@@ -239,9 +239,11 @@ export class AppComponent implements OnInit {
     console.log('loadProfile called:');
     this.luckyStackWorkerService.loadProfile().subscribe(
       (data) => {
-        console.log(data);
-        this.profile = data;
-        this.updateProfileSettings();
+        if (data) {
+          console.log(data);
+          this.profile = data;
+          this.updateProfileSettings();
+        }
       },
       (error) => console.log(error)
     );
