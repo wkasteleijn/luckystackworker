@@ -1,9 +1,14 @@
 package nl.wilcokas.luckystackworker.api;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +29,7 @@ import nl.wilcokas.luckystackworker.dto.StatusUpdate;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
+import nl.wilcokas.luckystackworker.util.Util;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -67,7 +73,24 @@ public class ProfileController {
 
 	@GetMapping("/load")
 	public Profile loadProfile() {
-		// TODO: file chooser to pick yaml file and load it..
+		log.info("loadProfile called");
+		JFrame frame = referenceImageService.getParentFrame();
+		JFileChooser jfc = referenceImageService
+				.getJFileChooser(LuckyStackWorkerContext.getWorkerProperties().get("inputFolder"));
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("YAML", "yaml");
+		jfc.setFileFilter(filter);
+		int returnValue = jfc.showOpenDialog(frame);
+		frame.dispose();
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
+			File selectedFile = jfc.getSelectedFile();
+			String selectedFilePath = selectedFile.getAbsolutePath();
+			String fileNameNoExt = Util.getFilename(selectedFilePath)[0];
+			Profile profile = Util.readProfile(fileNameNoExt);
+			if (profile != null) {
+				updateProfile(profile);
+				return profile;
+			}
+		}
 		return null;
 	}
 

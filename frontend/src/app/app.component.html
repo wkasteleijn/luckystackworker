@@ -48,6 +48,25 @@
       </select>
     </mat-form-field>
 
+    <button
+      *ngIf="openRefImageEnabled()"
+      type="button"
+      mat-button
+      class="button {{nightModeEnabled() ? 'activeColorNight':'activeColor'}}"
+      (click)="loadProfile()"
+    >
+      Load Profile
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled()"
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled"
+    >
+    Load Profile
+    </button>
+
     <span class="dropdown_label zoomLabel">Zoom</span>
     <button
       *ngIf="openRefImageEnabled()"
@@ -73,7 +92,7 @@
       type="button"
       mat-button
       (click)="zoomOut()"
-      class="{{nightModeEnabled() ? 'buttonZoom activeColorNight' : 'buttonZoom activeColor'}}"
+      class="{{nightModeEnabled() ? 'buttonZoom buttonZoomSpace activeColorNight' : 'buttonZoom buttonZoomSpace activeColor'}}"
     >
       &nbsp;&nbsp;-&nbsp;&nbsp;
     </button>
@@ -87,29 +106,11 @@
     &nbsp;&nbsp;-&nbsp;&nbsp;
     </button>
 
-    <button
-      *ngIf="openRefImageEnabled()"
-      type="button"
-      mat-button
-      class="button_about button  {{nightModeEnabled() ? 'activeColorNight':'activeColor'}}"
-      (click)="openAbout()"
-    >
-      About
-    </button>
-    <button
-      *ngIf="!openRefImageEnabled()"
-      type="button"
-      mat-button
-      disabled
-      class="button_about button_disabled"
-    >
-      About
-    </button>
   </div>
 
   <div class="button_container">
     <mat-form-field appearance="fill">
-      <mat-label class="dropdown_label rootFolder_label">Root folder</mat-label>
+      <mat-label class="dropdown_label rootFolder_label">Root Folder</mat-label>
       <input
         matInput
         type="text"
@@ -124,7 +125,7 @@
       />
     </mat-form-field>
 
-    <mat-slide-toggle [(ngModel)]="nightMode" [color]="colorTheme()"><span class="sliderLabel">Night mode</span></mat-slide-toggle>
+    <mat-slide-toggle [(ngModel)]="nightMode" [color]="colorTheme()"><span class="sliderLabel">Night Mode</span></mat-slide-toggle>
 
   </div>
 
@@ -305,6 +306,24 @@
       class="button {{nightModeEnabled() ? 'activeColorNight':'activeColor'}}"
     >
       Save Reference Image
+    </button>
+    <button
+      *ngIf="openRefImageEnabled()"
+      type="button"
+      mat-button
+      class="button_about button  {{nightModeEnabled() ? 'activeColorNight':'activeColor'}}"
+      (click)="openAbout()"
+    >
+      About
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled()"
+      type="button"
+      mat-button
+      disabled
+      class="button_about button_disabled"
+    >
+      About
     </button>
     <button
       type="button_exit"

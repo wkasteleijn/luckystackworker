@@ -235,6 +235,18 @@ export class AppComponent implements OnInit {
     });
   }
 
+  loadProfile() {
+    console.log('loadProfile called:');
+    this.luckyStackWorkerService.loadProfile().subscribe(
+      (data) => {
+        console.log(data);
+        this.profile = data;
+        this.updateProfileSettings();
+      },
+      (error) => console.log(error)
+    );
+  }
+
   private updateProfileSettings() {
     this.radius = this.profile.radius;
     this.amount = this.profile.amount;

@@ -65,7 +65,7 @@
 }
 
 .zoomLabel {
-  margin-left: 4px;
+  margin-left: 56px;
   margin-top: 4px;
 }
 
@@ -94,14 +94,14 @@
   margin-left: 16px;
 }
 .button_exit {
-  margin-left: 314px;
+  margin-left: 20px;
 }
 .button_exit_disabled {
   margin-left: 296px;
 }
 
 .button_about {
-  margin-left: 66px;
+  margin-left: 230px;
 }
 
 .line {
@@ -122,11 +122,13 @@
   font-weight: bolder;
   border: 3px;
   border-style: solid;
-  margin-right: 16px;
   font-weight: bold;
   color: rgb(168, 168, 168);
   background-color: black;
   border-radius: 8px;
+}
+.buttonZoomSpace {
+  margin-left: 16px;
 }
 
 .buttonDisabledZoom {

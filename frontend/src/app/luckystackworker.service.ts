@@ -15,6 +15,10 @@ export class LuckyStackWorkerService {
     return this.http.get(`${this.baseUrl}/profiles/${profile}`);
   }
 
+  loadProfile(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/profiles/load`);
+  }
+
   getSelectedProfile(): Observable<any> {
     return this.http.get(`${this.baseUrl}/profiles/selected`);
   }

@@ -163,11 +163,11 @@ public class Util {
 		String profileStr = null;
 		try {
 			profileStr = Files.readString(Paths.get(filePath + ".yaml"));
-		} catch (IOException e) {
-			log.info("No profile file found for {}", filePath);
-		}
-		if (profileStr != null) {
-			return new Yaml().load(profileStr);
+			if (profileStr != null) {
+				return new Yaml().load(profileStr);
+			}
+		} catch (Exception e) {
+			log.warn("No profile file found or profile file is corrupt for {}", filePath);
 		}
 		return null;
 	}
