@@ -1,6 +1,12 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
 
+21/5/2022 minor release 1.4.0:
+- Added profile saving in a yaml file along with the TIF whenever profile is applied.
+- Profile is saved to a yaml file also for every reference image that is saved.
+- Profile is now loaded first from yaml file if found. If not it will load it from the database.
+- Added a Load Profile button to allow selecting the profile from earlier saved yaml file.
+
 26/3/2022 revision release 1.3.3:
 - Fixed worker not processing file stacks orgininating from recordings using older versions of Firecapture that used a different profile prefix.
 
