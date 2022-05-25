@@ -101,7 +101,7 @@
       type="button"
       mat-button
       disabled
-      class="buttonDisabledZoom"
+      class="buttonDisabledZoom buttonZoomSpace"
     >
     &nbsp;&nbsp;-&nbsp;&nbsp;
     </button>
@@ -317,15 +317,6 @@
       About
     </button>
     <button
-      *ngIf="!openRefImageEnabled()"
-      type="button"
-      mat-button
-      disabled
-      class="button_about button_disabled"
-    >
-      About
-    </button>
-    <button
       type="button_exit"
       mat-button
       (click)="exit()"
@@ -342,12 +333,20 @@
     <button type="button" mat-button disabled class="button_disabled">
       Save Reference Image
     </button>
-    <span class="buttonDivider">&nbsp;</span>
+    <button
+      *ngIf="!openRefImageEnabled()"
+      type="button"
+      mat-button
+      disabled
+      class="button_about button_disabled"
+    >
+      About
+    </button>
     <button
       type="button"
       mat-button
       disabled
-      class="button_exit_disabled button_disabled"
+      class="button_exit button_disabled"
     >
       Exit
     </button>

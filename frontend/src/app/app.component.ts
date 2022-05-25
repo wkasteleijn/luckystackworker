@@ -200,8 +200,8 @@ export class AppComponent implements OnInit {
         console.log(data);
         if (data) {
           this.rootFolder = data.rootFolder;
-          this.hideSpinner();
         }
+        this.hideSpinner();
       },
       (error) => {
         console.log(error);
@@ -237,6 +237,7 @@ export class AppComponent implements OnInit {
 
   loadProfile() {
     console.log('loadProfile called:');
+    this.showSpinner();
     this.luckyStackWorkerService.loadProfile().subscribe(
       (data) => {
         if (data) {
@@ -244,6 +245,7 @@ export class AppComponent implements OnInit {
           this.profile = data;
           this.updateProfileSettings();
         }
+        this.hideSpinner();
       },
       (error) => console.log(error)
     );

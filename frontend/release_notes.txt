@@ -1,6 +1,9 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
 
+25/5/2022 revision release 1.4.1:
+- Fixed some minor layout issues.
+
 21/5/2022 minor release 1.4.0:
 - Added profile saving in a yaml file along with the TIF whenever profile is applied.
 - Profile is saved to a yaml file also for every reference image that is saved.

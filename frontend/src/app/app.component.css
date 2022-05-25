@@ -96,9 +96,6 @@
 .button_exit {
   margin-left: 20px;
 }
-.button_exit_disabled {
-  margin-left: 296px;
-}
 
 .button_about {
   margin-left: 230px;
@@ -137,7 +134,6 @@
   border: 3px;
   border-color: rgb(43, 43, 43);
   border-style: solid;
-  margin-right: 16px;
   font-weight: bold;
   color: rgb(43, 43, 43);
   background-color: black;
