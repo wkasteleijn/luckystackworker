@@ -91,7 +91,8 @@ public class ReferenceImageService {
 		if (previousOperation == null || previousOperation != operation) {
 			copyInto(referenceImage, processedImage);
 			if (Operations.isSharpenOperation(operation)) {
-				Operations.applyAllOperationsExcept(processedImage, profile, operation, OperationEnum.DENOISE);
+				Operations.applyAllOperationsExcept(processedImage, profile, operation, OperationEnum.DENOISEAMOUNT,
+						OperationEnum.DENOISERADIUS, OperationEnum.DENOISESIGMA);
 			} else {
 				Operations.applyAllOperationsExcept(processedImage, profile, operation);
 			}
@@ -102,7 +103,7 @@ public class ReferenceImageService {
 		if (Operations.isSharpenOperation(operation)) {
 			Operations.applySharpen(finalResultImage, profile);
 			Operations.applyDenoise(finalResultImage, profile);
-		} else if (OperationEnum.DENOISE == operation) {
+		} else if (Operations.isDenoiseOperation(operation)) {
 			Operations.applyDenoise(finalResultImage, profile);
 		} else if (OperationEnum.GAMMA == operation) {
 			Operations.applyGamma(finalResultImage, profile);

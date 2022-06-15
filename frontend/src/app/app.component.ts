@@ -32,7 +32,9 @@ export class AppComponent implements OnInit {
   radius: number;
   amount: number;
   iterations: number;
-  denoise: number;
+  denoiseAmount: number;
+  denoiseSigma: number;
+  denoiseRadius: number;
   gamma: number;
   red: number;
   green: number;
@@ -145,10 +147,22 @@ export class AppComponent implements OnInit {
     this.updateProfile();
   }
 
-  denoiseChanged(event: any) {
-    this.profile.denoise = event.value;
-    this.profile.operation = 'denoise';
-    console.log('denoiseChanged called: ' + this.profile.denoise);
+  denoiseAmountChanged(event: any) {
+    this.profile.denoiseAmount = event.value;
+    this.profile.operation = 'denoiseAmount';
+    console.log('denoiseAmountChanged called: ' + this.profile.denoiseAmount);
+    this.updateProfile();
+  }
+  denoiseSigmaChanged(event: any) {
+    this.profile.denoiseSigma = event.value;
+    this.profile.operation = 'denoiseSigma';
+    console.log('denoiseSigmaChanged called: ' + this.profile.denoiseSigma);
+    this.updateProfile();
+  }
+  denoiseRadiusChanged(event: any) {
+    this.profile.denoiseRadius = event.value;
+    this.profile.operation = 'denoiseRadius';
+    console.log('denoiseRadiusChanged called: ' + this.profile.denoiseRadius);
     this.updateProfile();
   }
 
@@ -255,7 +269,9 @@ export class AppComponent implements OnInit {
     this.radius = this.profile.radius;
     this.amount = this.profile.amount;
     this.iterations = this.profile.iterations;
-    this.denoise = this.profile.denoise;
+    this.denoiseAmount = this.profile.denoiseAmount;
+    this.denoiseSigma = this.profile.denoiseSigma;
+    this.denoiseRadius = this.profile.denoiseRadius;
     this.gamma = this.profile.gamma;
     this.red = this.profile.red;
     this.green = this.profile.green;

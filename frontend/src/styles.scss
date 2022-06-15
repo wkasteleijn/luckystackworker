@@ -61,8 +61,14 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .card {
   max-width: 616px;
-  margin-top: 20px;
+  max-height: 144px;
+  margin-top: 8px;
   color: rgb(168, 168, 168);
+}
+
+.cardTitle {
+  margin-top: 0px !important;
+  max-height: 16px;
 }
 
 .cardColor {
@@ -88,5 +94,5 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-snack-bar-container {
   height: 608px !important;
   min-width: 512px !important;
-  margin-top: 134px !important;
+  margin-top: 84px !important;
 }

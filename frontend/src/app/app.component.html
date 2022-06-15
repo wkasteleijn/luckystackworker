@@ -108,7 +108,7 @@
 
   </div>
 
-  <div class="button_container">
+  <div class="button_container_top button_container">
     <mat-form-field appearance="fill">
       <mat-label class="dropdown_label rootFolder_label">Root Folder</mat-label>
       <input
@@ -129,8 +129,9 @@
 
   </div>
 
+  <!-- Sharpen panel -->
   <mat-card class="{{nightModeEnabled() ? 'card cardColorNight': 'card cardColor'}}">
-    <mat-card-header>
+    <mat-card-header class="cardTitle">
       <mat-card-title>Sharpen</mat-card-title>
     </mat-card-header>
     <mat-card-content>
@@ -183,8 +184,53 @@
           <span class="sliderLabel">{{ iterations }}</span>
         </div>
       </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Denoise panel -->
+  <mat-card class="{{nightModeEnabled() ? 'card cardColorNight': 'card cardColor'}}">
+    <mat-card-header class="cardTitle">
+      <mat-card-title>Denoise</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
       <div class="sliderRow">
-        <div class="sliderLabel">Denoise</div>
+        <div class="sliderLabel">Radius</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="!refImageSelected"
+            thumbLabel
+            tickInterval="1000"
+            step="0.1"
+            min="0.5"
+            max="4"
+            (change)="denoiseRadiusChanged($event)"
+            [(ngModel)]="denoiseRadius"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ denoiseRadius }}</span>
+        </div>
+      </div>
+
+      <div class="sliderRow">
+        <div class="sliderLabel">Sigma</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="!refImageSelected"
+            thumbLabel
+            tickInterval="1000"
+            step="0.1"
+            min="1"
+            max="6"
+            (change)="denoiseSigmaChanged($event)"
+            [(ngModel)]="denoiseSigma"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ denoiseSigma }}</span>
+        </div>
+      </div>
+
+      <div class="sliderRow">
+        <div class="sliderLabel">Amount</div>
         <div class="slider">
           <mat-slider
             [disabled]="!refImageSelected"
@@ -193,27 +239,29 @@
             step="1"
             min="0"
             max="100"
-            (change)="denoiseChanged($event)"
-            [(ngModel)]="denoise"
+            (change)="denoiseAmountChanged($event)"
+            [(ngModel)]="denoiseAmount"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ denoise }}</span>
+          <span class="sliderLabel">{{ denoiseAmount }}</span>
         </div>
       </div>
     </mat-card-content>
   </mat-card>
+
+  <!-- Light & Color panel -->
   <mat-card class="{{nightModeEnabled() ? 'card cardColorNight': 'card cardColor'}}">
-    <mat-card-header>
+    <mat-card-header class="cardTitle">
       <mat-card-title>Light & Color</mat-card-title>
     </mat-card-header>
     <mat-card-content>
+
       <div class="sliderRow">
         <div class="sliderLabel">Gamma</div>
         <div class="slider">
           <mat-slider
             [disabled]="!refImageSelected"
             thumbLabel
-            tickInterval="0.01"
             step="0.01"
             min="0.0"
             max="2.0"
@@ -224,13 +272,13 @@
           <span class="sliderLabel">{{ gamma }}</span>
         </div>
       </div>
+
       <div class="sliderRow">
         <div class="sliderLabel">Reduce Red</div>
         <div class="slider">
           <mat-slider
             [disabled]="!refImageSelected"
             thumbLabel
-            tickInterval="1"
             step="1"
             min="0"
             max="255"
@@ -247,7 +295,6 @@
           <mat-slider
             [disabled]="!refImageSelected"
             thumbLabel
-            tickInterval="1"
             step="1"
             min="0"
             max="255"
@@ -264,7 +311,6 @@
           <mat-slider
             [disabled]="!refImageSelected"
             thumbLabel
-            tickInterval="1"
             step="1"
             min="0"
             max="255"
@@ -278,12 +324,10 @@
     </mat-card-content>
   </mat-card>
 
+  <!-- Worker panel -->
   <mat-card class="{{nightModeEnabled() ? 'card cardColorNight': 'card cardColor'}}">
-    <mat-card-header>
-      <mat-card-title>Worker</mat-card-title>
-    </mat-card-header>
     <mat-card-content>
-      <span class="sliderLabel">{{ workerStatus }}</span>
+      <span class="sliderLabel">Worker Status: {{ workerStatus }}</span>
       <mat-progress-bar
         [color]="colorTheme()"
         [value]="workerProgress"

@@ -83,7 +83,9 @@ public class Util {
 		return Profile.builder().amount(new BigDecimal(getSetting(props, "amount", profileName))) //
 				.radius(new BigDecimal(getSetting(props, "radius", profileName))) //
 				.iterations(Integer.valueOf(getSetting(props, "iterations", profileName))) //
-				.denoise(new BigDecimal(getSetting(props, "denoise", profileName))) //
+				.denoiseAmount(new BigDecimal(getSetting(props, "denoiseAmount", profileName))) //
+				.denoiseSigma(new BigDecimal(getSetting(props, "denoiseSigma", profileName))) //
+				.denoiseRadius(new BigDecimal(getSetting(props, "denoiseRadius", profileName))) //
 				.gamma(new BigDecimal(getSetting(props, "gamma", profileName))) //
 				.red(new BigDecimal(getSetting(props, "red", profileName))) //
 				.green(new BigDecimal(getSetting(props, "green", profileName))) //

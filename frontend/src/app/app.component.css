@@ -27,6 +27,7 @@
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: baseline;
+  max-height: 32px;
 }
 .dropdown {
   color: rgb(168, 168, 168);
@@ -67,6 +68,10 @@
 .zoomLabel {
   margin-left: 56px;
   margin-top: 4px;
+}
+
+.button_container_top {
+  margin-bottom: 12px;
 }
 
 .button_container {

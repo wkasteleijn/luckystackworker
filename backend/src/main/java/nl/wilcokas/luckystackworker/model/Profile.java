@@ -42,7 +42,13 @@ public class Profile {
 	private int level;
 
 	@Column(name = "denoise")
-	private BigDecimal denoise;
+	private BigDecimal denoiseAmount;
+
+	@Column(name = "denoise_sigma")
+	private BigDecimal denoiseSigma;
+
+	@Column(name = "denoise_radius")
+	private BigDecimal denoiseRadius;
 
 	@Column(name = "gamma")
 	private BigDecimal gamma;

@@ -104,7 +104,9 @@ public class ProfileController {
 		result.setAmount(profile.getAmount());
 		result.setIterations(profile.getIterations());
 		result.setLevel(profile.getLevel());
-		result.setDenoise(profile.getDenoise());
+		result.setDenoiseAmount(profile.getDenoiseAmount());
+		result.setDenoiseSigma(profile.getDenoiseSigma());
+		result.setDenoiseRadius(profile.getDenoiseRadius());
 		result.setGamma(profile.getGamma());
 		result.setRed(profile.getRed());
 		result.setGreen(profile.getGreen());
