@@ -1,6 +1,12 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
 
+16/6/2022: minor version 1.5.0
+- Create a seperate panel for denoising. Added 2 new sliders for controlling the sigma and radius of the sigma filter denoising.
+- More compact UI layout design
+- Added hover on buttons
+- Replaced slider thumbs with immediate indicator value on the right
+
 25/5/2022 revision release 1.4.1:
 - Fixed some minor layout issues.
 
