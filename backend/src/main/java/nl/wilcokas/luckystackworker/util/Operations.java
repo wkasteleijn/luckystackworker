@@ -114,8 +114,10 @@ public final class Operations {
 			BigDecimal factor = profile.getDenoiseAmount().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100)
 					: profile.getDenoiseAmount();
 			BigDecimal minimum = factor.divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
-			IJ.run(image, "SigmaFilterPlus...", String.format("radius=%s use=%s minimum=%s outlier",
-					profile.getDenoiseRadius(), profile.getDenoiseSigma(), minimum));
+			String parameters = String.format("radius=%s use=%s minimum=%s outlier", profile.getDenoiseRadius(),
+					profile.getDenoiseSigma(),
+					minimum);
+			IJ.run(image, "SigmaFilterPlus...", parameters);
 		}
 	}
 

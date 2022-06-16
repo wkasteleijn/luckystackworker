@@ -36,7 +36,22 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   border-radius: 8px;
 }
 
- .mat-slider-thumb-label {
+button:hover {
+   color: rgb(210, 210, 210);
+   border-color:rgb(80, 80, 255) !important;
+  }
+
+input:hover {
+  color: rgb(210, 210, 210) !important;
+  border-color:rgb(80, 80, 255) !important;
+}
+
+select:hover {
+  color: rgb(210, 210, 210) !important;
+  border-color:rgb(80, 80, 255) !important;
+}
+
+.mat-slider-thumb-label {
   background-color: rgb(65, 65, 65) !important;
 }
 
@@ -94,5 +109,5 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-snack-bar-container {
   height: 608px !important;
   min-width: 512px !important;
-  margin-top: 84px !important;
+  margin-top: 64px !important;
 }

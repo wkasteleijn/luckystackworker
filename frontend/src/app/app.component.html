@@ -140,11 +140,11 @@
         <div class="slider">
           <mat-slider
             [disabled]="!refImageSelected"
-            thumbLabel
             step="0.1"
             min="0.5"
             max="4"
-            (change)="radiusChanged($event)"
+            (input)="radiusChanged($event, false)"
+            (change)="radiusChanged($event, true)"
             [(ngModel)]="radius"
             [color]="colorTheme()"
           ></mat-slider>
@@ -156,11 +156,11 @@
         <div class="slider">
           <mat-slider
             [disabled]="!refImageSelected"
-            thumbLabel
             step="10"
             min="5000"
             max="9999"
-            (change)="amountChanged($event)"
+            (input)="amountChanged($event, false)"
+            (change)="amountChanged($event,true)"
             [(ngModel)]="amount"
             [color]="colorTheme()"
           ></mat-slider>
@@ -172,12 +172,12 @@
         <div class="slider">
           <mat-slider
             [disabled]="!refImageSelected"
-            thumbLabel
             tickInterval="1"
             step="1"
             min="1"
             max="10"
-            (change)="iterationsChanged($event)"
+            (input)="iterationsChanged($event, false)"
+            (change)="iterationsChanged($event,true)"
             [(ngModel)]="iterations"
             [color]="colorTheme()"
           ></mat-slider>
@@ -198,12 +198,12 @@
         <div class="slider">
           <mat-slider
             [disabled]="!refImageSelected"
-            thumbLabel
             tickInterval="1000"
             step="0.1"
             min="0.5"
             max="4"
-            (change)="denoiseRadiusChanged($event)"
+            (input)="denoiseRadiusChanged($event, false)"
+            (change)="denoiseRadiusChanged($event,true)"
             [(ngModel)]="denoiseRadius"
             [color]="colorTheme()"
           ></mat-slider>
@@ -216,12 +216,12 @@
         <div class="slider">
           <mat-slider
             [disabled]="!refImageSelected"
-            thumbLabel
             tickInterval="1000"
             step="0.1"
             min="1"
             max="6"
-            (change)="denoiseSigmaChanged($event)"
+            (input)="denoiseSigmaChanged($event, false)"
+            (change)="denoiseSigmaChanged($event,true)"
             [(ngModel)]="denoiseSigma"
             [color]="colorTheme()"
           ></mat-slider>
@@ -234,12 +234,12 @@
         <div class="slider">
           <mat-slider
             [disabled]="!refImageSelected"
-            thumbLabel
             tickInterval="1000"
             step="1"
             min="0"
             max="100"
-            (change)="denoiseAmountChanged($event)"
+            (input)="denoiseAmountChanged($event, false)"
+            (change)="denoiseAmountChanged($event,true)"
             [(ngModel)]="denoiseAmount"
             [color]="colorTheme()"
           ></mat-slider>
@@ -261,11 +261,11 @@
         <div class="slider">
           <mat-slider
             [disabled]="!refImageSelected"
-            thumbLabel
             step="0.01"
             min="0.0"
             max="2.0"
-            (change)="gammaChanged($event)"
+            (input)="gammaChanged($event, false)"
+            (change)="gammaChanged($event,true)"
             [(ngModel)]="gamma"
             [color]="colorTheme()"
           ></mat-slider>
@@ -278,11 +278,11 @@
         <div class="slider">
           <mat-slider
             [disabled]="!refImageSelected"
-            thumbLabel
             step="1"
             min="0"
             max="255"
-            (change)="redChanged($event)"
+            (input)="redChanged($event, false)"
+            (change)="redChanged($event,true)"
             [(ngModel)]="red"
             [color]="colorTheme()"
           ></mat-slider>
@@ -294,11 +294,11 @@
         <div class="slider">
           <mat-slider
             [disabled]="!refImageSelected"
-            thumbLabel
             step="1"
             min="0"
             max="255"
-            (change)="greenChanged($event)"
+            (input)="greenChanged($event, false)"
+            (change)="greenChanged($event,true)"
             [(ngModel)]="green"
             [color]="colorTheme()"
           ></mat-slider>
@@ -310,11 +310,11 @@
         <div class="slider">
           <mat-slider
             [disabled]="!refImageSelected"
-            thumbLabel
             step="1"
             min="0"
             max="255"
-            (change)="blueChanged($event)"
+            (input)="blueChanged($event, false)"
+            (change)="blueChanged($event,true)"
             [(ngModel)]="blue"
             [color]="colorTheme()"
           ></mat-slider>

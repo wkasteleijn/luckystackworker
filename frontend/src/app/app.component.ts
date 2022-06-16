@@ -119,79 +119,104 @@ export class AppComponent implements OnInit {
     this.workerProgress = 0;
   }
 
-  radiusChanged(event: any) {
+  radiusChanged(event: any, update: boolean) {
     this.profile.radius = event.value;
+    this.radius = event.value;
     this.profile.operation = 'radius';
     console.log('radiusChanged called: ' + this.profile.radius);
-    this.updateProfile();
+    if (update) {
+      this.updateProfile();
+    }
   }
 
-  amountChanged(event: any) {
+  amountChanged(event: any, update: boolean) {
     this.profile.amount = event.value;
+    this.amount = event.value;
     this.profile.operation = 'amount';
     console.log('amountChanged called: ' + this.profile.amount);
-    this.updateProfile();
+    if (update) {
+      this.updateProfile();
+    }
   }
 
-  iterationsChanged(event: any) {
+  iterationsChanged(event: any, update: boolean) {
     this.profile.iterations = event.value;
+    this.iterations = event.value;
     this.profile.operation = 'iterations';
     console.log('iterationsChanged called: ' + this.profile.iterations);
-    this.updateProfile();
+    if (update) {
+      this.updateProfile();
+    }
   }
 
-  levelChanged(event: any) {
-    this.profile.level = event.value;
-    this.profile.operation = 'level';
-    console.log('levelChanged called: ' + this.profile.level);
-    this.updateProfile();
-  }
-
-  denoiseAmountChanged(event: any) {
+  denoiseAmountChanged(event: any, update: boolean) {
     this.profile.denoiseAmount = event.value;
+    this.denoiseAmount = event.value;
     this.profile.operation = 'denoiseAmount';
     console.log('denoiseAmountChanged called: ' + this.profile.denoiseAmount);
-    this.updateProfile();
+    if (update) {
+      this.updateProfile();
+    }
   }
-  denoiseSigmaChanged(event: any) {
+
+  denoiseSigmaChanged(event: any, update: boolean) {
     this.profile.denoiseSigma = event.value;
+    this.denoiseSigma = event.value;
     this.profile.operation = 'denoiseSigma';
     console.log('denoiseSigmaChanged called: ' + this.profile.denoiseSigma);
-    this.updateProfile();
+    if (update) {
+      this.updateProfile();
+    }
   }
-  denoiseRadiusChanged(event: any) {
+
+  denoiseRadiusChanged(event: any, update: boolean) {
     this.profile.denoiseRadius = event.value;
+    this.denoiseRadius = event.value;
     this.profile.operation = 'denoiseRadius';
     console.log('denoiseRadiusChanged called: ' + this.profile.denoiseRadius);
-    this.updateProfile();
+    if (update) {
+      this.updateProfile();
+    }
   }
 
-  gammaChanged(event: any) {
+  gammaChanged(event: any, update: boolean) {
     this.profile.gamma = event.value;
+    this.gamma = event.value;
     this.profile.operation = 'gamma';
     console.log('gammaChanged called: ' + this.profile.gamma);
-    this.updateProfile();
+    if (update) {
+      this.updateProfile();
+    }
   }
 
-  greenChanged(event: any) {
+  greenChanged(event: any, update: boolean) {
     this.profile.green = event.value;
+    this.green = event.value;
     this.profile.operation = 'green';
     console.log('greenChanged called: ' + this.profile.green);
-    this.updateProfile();
+    if (update) {
+      this.updateProfile();
+    }
   }
 
-  redChanged(event: any) {
+  redChanged(event: any, update: boolean) {
     this.profile.red = event.value;
+    this.red = event.value;
     this.profile.operation = 'red';
     console.log('redChanged called: ' + this.profile.red);
-    this.updateProfile();
+    if (update) {
+      this.updateProfile();
+    }
   }
 
-  blueChanged(event: any) {
+  blueChanged(event: any, update: boolean) {
     this.profile.blue = event.value;
     this.profile.operation = 'blue';
+    this.blue = event.value;
     console.log('blueChanged called: ' + this.profile.blue);
-    this.updateProfile();
+    if (update) {
+      this.updateProfile();
+    }
   }
 
   profileSelectionChanged(event: any) {
