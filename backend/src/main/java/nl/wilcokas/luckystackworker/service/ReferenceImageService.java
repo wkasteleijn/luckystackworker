@@ -200,11 +200,13 @@ public class ReferenceImageService {
 			setDefaultLayoutSettings(finalResultImage);
 
 			processedImage = finalResultImage.duplicate();
+			processedImage.setRoi(finalResultImage.getRoi());
 			log.info("Opened duplicate image with id {}", processedImage.getID());
 			processedImage.show();
 			processedImage.getWindow().setVisible(false);
 
 			referenceImage = processedImage.duplicate();
+			processedImage.setRoi(processedImage.getRoi());
 			referenceImage.show();
 			referenceImage.getWindow().setVisible(false);
 			log.info("Opened reference image image with id {}", referenceImage.getID());
@@ -231,9 +233,22 @@ public class ReferenceImageService {
 		ImageWindow window = image.getWindow();
 		window.setIconImage(iconImage);
 		window.setLocation(742, 64);
-		if (image.getWidth() > 1280) {
+		if (image.getWidth() > Constants.MAX_WINDOW_SIZE) {
+			setRoi(image);
 			zoomOut();
 		}
+	}
+
+	private void setRoi(ImagePlus image) {
+		int x = (image.getWidth() - Constants.MAX_ROI_X) / 2;
+		int y = 0;
+		int yRoi = image.getHeight();
+		if (image.getHeight() > Constants.MAX_ROI_Y) {
+			y = (image.getHeight() - Constants.MAX_ROI_Y) / 2;
+			yRoi = Constants.MAX_ROI_Y;
+		}
+		image.setRoi(x, y, Constants.MAX_ROI_X, yRoi);
+		image.saveRoi();
 	}
 
 	private boolean validateSelectedFile(String path) {

@@ -58,7 +58,7 @@ public class LuckyStackWorkerContext {
 		workerProperties.put(name + ".radius", String.valueOf(profile.getRadius()));
 		workerProperties.put(name + ".amount", String.valueOf(profile.getAmount()));
 		workerProperties.put(name + ".iterations", String.valueOf(profile.getIterations()));
-		workerProperties.put(name + ".denoiseAmount", String.valueOf(profile.getDenoiseAmount()));
+		workerProperties.put(name + ".denoise", String.valueOf(profile.getDenoise()));
 		workerProperties.put(name + ".denoiseSigma", String.valueOf(profile.getDenoiseSigma()));
 		workerProperties.put(name + ".denoiseRadius", String.valueOf(profile.getDenoiseRadius()));
 		workerProperties.put(name + ".gamma", String.valueOf(profile.getGamma()));

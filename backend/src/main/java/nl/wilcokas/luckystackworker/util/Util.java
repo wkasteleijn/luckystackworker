@@ -21,6 +21,7 @@ import ij.ImagePlus;
 import ij.io.FileInfo;
 import ij.io.FileSaver;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.model.Profile;
 
 @Slf4j
@@ -83,7 +84,7 @@ public class Util {
 		return Profile.builder().amount(new BigDecimal(getSetting(props, "amount", profileName))) //
 				.radius(new BigDecimal(getSetting(props, "radius", profileName))) //
 				.iterations(Integer.valueOf(getSetting(props, "iterations", profileName))) //
-				.denoiseAmount(new BigDecimal(getSetting(props, "denoiseAmount", profileName))) //
+				.denoise(new BigDecimal(getSetting(props, "denoise", profileName))) //
 				.denoiseSigma(new BigDecimal(getSetting(props, "denoiseSigma", profileName))) //
 				.denoiseRadius(new BigDecimal(getSetting(props, "denoiseRadius", profileName))) //
 				.gamma(new BigDecimal(getSetting(props, "gamma", profileName))) //
@@ -166,7 +167,13 @@ public class Util {
 		try {
 			profileStr = Files.readString(Paths.get(filePath + ".yaml"));
 			if (profileStr != null) {
-				return new Yaml().load(profileStr);
+				Profile profile = new Yaml().load(profileStr);
+				if (profile.getDenoiseRadius() == null) {
+					// Added since v1.5.0, so older version written yaml needs to stay compatible.
+					profile.setDenoiseRadius(Constants.DEFAULT_DENOISE_RADIUS);
+					profile.setDenoiseSigma(Constants.DEFAULT_DENOISE_SIGMA);
+				}
+				return profile;
 			}
 		} catch (Exception e) {
 			log.warn("No profile file found or profile file is corrupt for {}", filePath);

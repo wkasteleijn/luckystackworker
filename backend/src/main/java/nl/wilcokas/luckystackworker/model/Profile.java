@@ -42,7 +42,7 @@ public class Profile {
 	private int level;
 
 	@Column(name = "denoise")
-	private BigDecimal denoiseAmount;
+	private BigDecimal denoise;
 
 	@Column(name = "denoise_sigma")
 	private BigDecimal denoiseSigma;
@@ -62,6 +62,7 @@ public class Profile {
 	@Column(name = "blue")
 	private BigDecimal blue;
 
+	// Non persisted setting properties that are passed to the frontend.
 	private String operation;
 	private String rootFolder;
 }

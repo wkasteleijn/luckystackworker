@@ -4,7 +4,7 @@ export class Profile {
   amount: number;
   level: number;
   iterations: number;
-  denoiseAmount: number;
+  denoise: number;
   denoiseSigma: number;
   denoiseRadius: number;
   gamma: number;

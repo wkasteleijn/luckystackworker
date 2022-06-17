@@ -150,10 +150,10 @@ export class AppComponent implements OnInit {
   }
 
   denoiseAmountChanged(event: any, update: boolean) {
-    this.profile.denoiseAmount = event.value;
+    this.profile.denoise = event.value;
     this.denoiseAmount = event.value;
     this.profile.operation = 'denoiseAmount';
-    console.log('denoiseAmountChanged called: ' + this.profile.denoiseAmount);
+    console.log('denoiseAmountChanged called: ' + this.profile.denoise);
     if (update) {
       this.updateProfile();
     }
@@ -294,7 +294,7 @@ export class AppComponent implements OnInit {
     this.radius = this.profile.radius;
     this.amount = this.profile.amount;
     this.iterations = this.profile.iterations;
-    this.denoiseAmount = this.profile.denoiseAmount;
+    this.denoiseAmount = this.profile.denoise;
     this.denoiseSigma = this.profile.denoiseSigma;
     this.denoiseRadius = this.profile.denoiseRadius;
     this.gamma = this.profile.gamma;

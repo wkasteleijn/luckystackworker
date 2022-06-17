@@ -109,10 +109,10 @@ public final class Operations {
 	}
 
 	public static void applyDenoise(final ImagePlus image, final Profile profile) {
-		if (profile.getDenoiseAmount() != null && (profile.getDenoiseAmount().compareTo(BigDecimal.ZERO) > 0)) {
-			log.info("Applying denoise with value {} to image {}", profile.getDenoiseAmount(), image.getID());
-			BigDecimal factor = profile.getDenoiseAmount().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100)
-					: profile.getDenoiseAmount();
+		if (profile.getDenoise() != null && (profile.getDenoise().compareTo(BigDecimal.ZERO) > 0)) {
+			log.info("Applying denoise with value {} to image {}", profile.getDenoise(), image.getID());
+			BigDecimal factor = profile.getDenoise().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100)
+					: profile.getDenoise();
 			BigDecimal minimum = factor.divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
 			String parameters = String.format("radius=%s use=%s minimum=%s outlier", profile.getDenoiseRadius(),
 					profile.getDenoiseSigma(),
