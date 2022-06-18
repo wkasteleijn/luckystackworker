@@ -15,4 +15,5 @@ public class Constants {
 	public static final String VERSION_URL = "https://www.wilcokas.com/luckystackworker/version";
 	public static final String VERSION_URL_MARKER = "{lswVersion:";
 	public static final String VERSION_URL_ENDMARKER = "}";
+	public static final int VERSION_REQUEST_TIMEOUT = 5; // seconds
 }

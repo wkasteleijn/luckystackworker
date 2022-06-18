@@ -194,17 +194,25 @@ public class ReferenceImageService {
 	}
 
 	public String updateLatestVersion() {
-		// return "1.6.1";
-		HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+		String result = sendHttpRequest(HttpClient.Version.HTTP_1_1);
+		if (result == null) {
+			log.warn("HTTP1.1 request for latest version failed, trying HTTP/2..");
+			result = sendHttpRequest(HttpClient.Version.HTTP_2);
+		}
+		return saveLatestVersion(result);
+	}
+
+	private String sendHttpRequest(HttpClient.Version httpVersion) {
+		HttpClient client = HttpClient.newBuilder()
+				.connectTimeout(Duration.ofSeconds(Constants.VERSION_REQUEST_TIMEOUT)).build();
 		HttpRequest request = HttpRequest.newBuilder(URI.create(Constants.VERSION_URL))
-				.version(HttpClient.Version.HTTP_1_1).build();
+				.version(httpVersion).build();
 		HttpResponse<String> response = null;
 		try {
-			// TODO: also try HTTP/2 if 1.1 fails, in case google switches to HTTP/2 in the
-			// future.
 			response = client.send(request, HttpResponse.BodyHandlers.ofString());
 			if (response.statusCode() == 200) {
-				return saveLatestVersion(response.body());
+				log.info("HTTP request for new version successful");
+				return response.body();
 			} else {
 				log.warn("Unable to determine latest version, got the following response code from server: {}",
 						response.statusCode());
@@ -214,6 +222,7 @@ public class ReferenceImageService {
 					response == null ? null : response.statusCode());
 		}
 		return null;
+
 	}
 
 	private String saveLatestVersion(String htmlResponse) {

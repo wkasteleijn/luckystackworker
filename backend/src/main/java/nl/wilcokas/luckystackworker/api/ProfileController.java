@@ -142,10 +142,7 @@ public class ProfileController {
 		log.info("getLatestVersion called");
 		String latestKnowVersion = referenceImageService.getSettings().getLatestKnownVersion();
 		String latestVersionFromSite = referenceImageService.updateLatestVersion();
-		String currentVersion = getClass().getPackage().getImplementationVersion();
 		if (latestVersionFromSite != null && !latestVersionFromSite.equals(latestKnowVersion)) {
-			// TODO: toon popup alleen als er een nieuwe versie is tov de reeds bekende
-			// nieuwe versie uit de DB.
 			return Version.builder().latestVersion(latestVersionFromSite).isNewVersion(true).build();
 		}
 		return Version.builder().latestVersion(latestKnowVersion)

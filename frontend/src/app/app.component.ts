@@ -5,6 +5,7 @@ import { AboutComponent } from './about/about.component';
 import { LuckyStackWorkerService } from './luckystackworker.service';
 import { Profile } from './model/profile';
 import { NewVersionComponent } from './new_version/newversion.component';
+import { version } from '../../package.json';
 
 interface ProfileSelection {
   value: string;
@@ -49,7 +50,7 @@ export class AppComponent implements OnInit {
   refImageSelected: boolean = false;
   nightMode: boolean = false;
   _showSpinner = false;
-  newVersionOut = false;
+  latestKnownVersion = version;
 
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
@@ -418,11 +419,23 @@ export class AppComponent implements OnInit {
     return this._showSpinner;
   }
 
+  public getCurrentVersion() {
+    return version;
+  }
+
+  public getLatestKnownVersion() {
+    return this.latestKnownVersion;
+  }
+
+  public showVersionButton(): boolean {
+    return version !== this.latestKnownVersion;
+  }
+
   private checkLatestVersion() {
     this.luckyStackWorkerService.getLatestVersion().subscribe(
       (data) => {
-         if (data.newVersion) {
-          this.newVersionOut = true;
+        this.latestKnownVersion = data.latestVersion;
+        if (data.newVersion) {
           this.newVersionSnackbar.openFromComponent(NewVersionComponent, {
             horizontalPosition: 'center',
             verticalPosition: 'top',
