@@ -58,4 +58,9 @@ export class LuckyStackWorkerService {
   zoomOut(): Observable<Object> {
     return this.http.put(`${this.baseUrl}/reference/zoomout`, null);
   }
+
+  getLatestVersion(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/profiles/version`);
+  }
+
 }

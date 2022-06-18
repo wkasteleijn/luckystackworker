@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AboutComponent } from './about/about.component';
 import { LuckyStackWorkerService } from './luckystackworker.service';
 import { Profile } from './model/profile';
+import { NewVersionComponent } from './new_version/newversion.component';
 
 interface ProfileSelection {
   value: string;
@@ -48,13 +49,15 @@ export class AppComponent implements OnInit {
   refImageSelected: boolean = false;
   nightMode: boolean = false;
   _showSpinner = false;
+  newVersionOut = false;
 
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
-    private aboutSnackbar: MatSnackBar
+    private aboutSnackbar: MatSnackBar,
+    private newVersionSnackbar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -345,6 +348,7 @@ export class AppComponent implements OnInit {
           this.rootFolder = data.rootFolder;
           this.updateProfileSettings();
           this.hideSpinner();
+          this.checkLatestVersion();
         } else {
           console.log('Profile was not yet selected');
           setTimeout(() => this.pollSelectedProfile(), 500);
@@ -412,5 +416,20 @@ export class AppComponent implements OnInit {
 
   shouldShowSpinner(): boolean {
     return this._showSpinner;
+  }
+
+  private checkLatestVersion() {
+    this.luckyStackWorkerService.getLatestVersion().subscribe(
+      (data) => {
+         if (data.newVersion) {
+          this.newVersionOut = true;
+          this.newVersionSnackbar.openFromComponent(NewVersionComponent, {
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+          });
+         }
+      },
+      (error) => console.log(error)
+    );
   }
 }

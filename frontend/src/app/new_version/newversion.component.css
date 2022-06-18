@@ -1,0 +1,29 @@
+.subtitle {
+  text-align: center;
+  font-weight: bold;
+}
+.icon {
+  width: 128px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.buttonNewVersionpanel {
+  position: absolute;
+  margin-top: 24px;
+  left: 43%;
+}
+
+.newVersionText {
+  text-align: center;
+}
+
+.newVersionLink {
+  text-align: center;
+  color: lightblue;
+}
+
+.newVersionPanel {
+  margin-top: 128px;
+}

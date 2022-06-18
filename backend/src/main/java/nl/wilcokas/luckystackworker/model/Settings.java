@@ -33,4 +33,7 @@ public class Settings {
 
 	@Column(name = "defaultProfile")
 	private String defaultProfile;
+
+	@Column(name = "latestKnownVersion")
+	private String latestKnownVersion;
 }

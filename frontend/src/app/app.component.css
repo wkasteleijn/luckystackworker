@@ -103,7 +103,11 @@
 }
 
 .button_about {
-  margin-left: 230px;
+  margin-left: 34px;
+}
+
+.spanNoNewVersion {
+  margin-left: 196px;
 }
 
 .line {
@@ -143,4 +147,12 @@
   color: rgb(43, 43, 43);
   background-color: black;
   border-radius: 8px;
+}
+
+.activeColorNewversion {
+  color: orange;
+}
+
+.buttonNewVersion {
+  margin-left: 20px;
 }

@@ -352,6 +352,14 @@
       Save Reference Image
     </button>
     <button
+      *ngIf="newVersionOut"
+      type="button"
+      mat-button
+      class="buttonNewVersion button  {{nightModeEnabled() ? 'activeColorNight':'activeColor'}}">
+      <a class="newVersionLink" target="_blank" href="https://www.wilcokas.com/luckystackworker/download">Download newer version!</a>
+    </button>
+    <span *ngIf="!newVersionOut" class="spanNoNewVersion"></span>
+    <button
       *ngIf="openRefImageEnabled()"
       type="button"
       mat-button

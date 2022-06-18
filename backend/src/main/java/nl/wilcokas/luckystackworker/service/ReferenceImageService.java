@@ -6,6 +6,11 @@ import java.awt.HeadlessException;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -186,6 +191,44 @@ public class ReferenceImageService {
 
 	public String getFilePath() {
 		return filePath;
+	}
+
+	public String updateLatestVersion() {
+		// return "1.6.1";
+		HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+		HttpRequest request = HttpRequest.newBuilder(URI.create(Constants.VERSION_URL))
+				.version(HttpClient.Version.HTTP_1_1).build();
+		HttpResponse<String> response = null;
+		try {
+			// TODO: also try HTTP/2 if 1.1 fails, in case google switches to HTTP/2 in the
+			// future.
+			response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			if (response.statusCode() == 200) {
+				return saveLatestVersion(response.body());
+			} else {
+				log.warn("Unable to determine latest version, got the following response code from server: {}",
+						response.statusCode());
+			}
+		} catch (IOException | InterruptedException e) {
+			log.warn("Unable to determine latest version, got the following response code from server: {}",
+					response == null ? null : response.statusCode());
+		}
+		return null;
+	}
+
+	private String saveLatestVersion(String htmlResponse) {
+		int start = htmlResponse.indexOf(Constants.VERSION_URL_MARKER);
+		if (start > 0) {
+			int startVersionPos = start + Constants.VERSION_URL_MARKER.length();
+			int endMarkerPos = htmlResponse.indexOf(Constants.VERSION_URL_ENDMARKER, startVersionPos);
+			String version = htmlResponse.substring(startVersionPos, endMarkerPos);
+			Settings settings = getSettings();
+			settings.setLatestKnownVersion(version);
+			settingsRepository.save(settings);
+			return version;
+		}
+		log.warn("Could not read the version from the request to {}", Constants.VERSION_URL);
+		return null;
 	}
 
 	private void openReferenceImage(String filePath, Profile profile) throws IOException {

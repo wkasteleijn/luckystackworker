@@ -26,12 +26,13 @@ import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.dto.StatusUpdate;
+import nl.wilcokas.luckystackworker.dto.Version;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.util.Util;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = { "http://localhost:4200", "https://www.wilcokas.com" })
 @RestController
 @RequestMapping("/api/profiles")
 @Slf4j
@@ -134,6 +135,21 @@ public class ProfileController {
 	public StatusUpdate getStatus() {
 		log.info("getStatus called");
 		return LuckyStackWorkerContext.getStatus();
+	}
+
+	@GetMapping("/version")
+	public Version getLatestVersion() {
+		log.info("getLatestVersion called");
+		String latestKnowVersion = referenceImageService.getSettings().getLatestKnownVersion();
+		String latestVersionFromSite = referenceImageService.updateLatestVersion();
+		String currentVersion = getClass().getPackage().getImplementationVersion();
+		if (latestVersionFromSite != null && !latestVersionFromSite.equals(latestKnowVersion)) {
+			// TODO: toon popup alleen als er een nieuwe versie is tov de reeds bekende
+			// nieuwe versie uit de DB.
+			return Version.builder().latestVersion(latestVersionFromSite).isNewVersion(true).build();
+		}
+		return Version.builder().latestVersion(latestKnowVersion)
+				.isNewVersion(false).build();
 	}
 
 	@PutMapping("/exit")
