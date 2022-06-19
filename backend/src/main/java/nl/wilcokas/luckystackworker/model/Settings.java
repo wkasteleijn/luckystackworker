@@ -1,5 +1,7 @@
 package nl.wilcokas.luckystackworker.model;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -36,4 +38,7 @@ public class Settings {
 
 	@Column(name = "latestKnownVersion")
 	private String latestKnownVersion;
+
+	@Column(name = "latestKnownVersionChecked")
+	private LocalDateTime latestKnownVersionChecked;
 }

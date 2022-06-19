@@ -4,7 +4,6 @@ LuckyStackWorker - RELEASE NOTES
 16/6/2022: minor version 1.5.0
 - Create a seperate panel for denoising. Added 2 new sliders for controlling the sigma and radius of the sigma filter denoising.
 - Added an automatic new version notification
-- A ROI is now automatically selected when the image size is wider than 1280 pixels
 - More compact UI layout design
 - Added hover on buttons
 - Replaced slider thumbs with immediate indicator value on the right

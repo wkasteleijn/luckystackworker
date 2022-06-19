@@ -11,6 +11,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -199,7 +200,7 @@ public class ReferenceImageService {
 			log.warn("HTTP1.1 request for latest version failed, trying HTTP/2..");
 			result = sendHttpRequest(HttpClient.Version.HTTP_2);
 		}
-		return saveLatestVersion(result);
+		return result == null ? null : saveLatestVersion(result);
 	}
 
 	private String sendHttpRequest(HttpClient.Version httpVersion) {
@@ -233,6 +234,7 @@ public class ReferenceImageService {
 			String version = htmlResponse.substring(startVersionPos, endMarkerPos);
 			Settings settings = getSettings();
 			settings.setLatestKnownVersion(version);
+			settings.setLatestKnownVersionChecked(LocalDateTime.now());
 			settingsRepository.save(settings);
 			return version;
 		}
@@ -252,13 +254,13 @@ public class ReferenceImageService {
 			setDefaultLayoutSettings(finalResultImage);
 
 			processedImage = finalResultImage.duplicate();
-			processedImage.setRoi(finalResultImage.getRoi());
+			// processedImage.setRoi(finalResultImage.getRoi());
 			log.info("Opened duplicate image with id {}", processedImage.getID());
 			processedImage.show();
 			processedImage.getWindow().setVisible(false);
 
 			referenceImage = processedImage.duplicate();
-			processedImage.setRoi(processedImage.getRoi());
+			// processedImage.setRoi(processedImage.getRoi());
 			referenceImage.show();
 			referenceImage.getWindow().setVisible(false);
 			log.info("Opened reference image image with id {}", referenceImage.getID());
@@ -286,11 +288,12 @@ public class ReferenceImageService {
 		window.setIconImage(iconImage);
 		window.setLocation(742, 64);
 		if (image.getWidth() > Constants.MAX_WINDOW_SIZE) {
-			setRoi(image);
+			// setRoi(image);
 			zoomOut();
 		}
 	}
 
+	// TODO: not working properly, fix problem with selection not being undone.
 	private void setRoi(ImagePlus image) {
 		int x = (image.getWidth() - Constants.MAX_ROI_X) / 2;
 		int y = 0;

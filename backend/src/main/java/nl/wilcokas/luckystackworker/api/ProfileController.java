@@ -2,6 +2,7 @@ package nl.wilcokas.luckystackworker.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -28,6 +29,7 @@ import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.dto.StatusUpdate;
 import nl.wilcokas.luckystackworker.dto.Version;
 import nl.wilcokas.luckystackworker.model.Profile;
+import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.util.Util;
@@ -140,10 +142,14 @@ public class ProfileController {
 	@GetMapping("/version")
 	public Version getLatestVersion() {
 		log.info("getLatestVersion called");
-		String latestKnowVersion = referenceImageService.getSettings().getLatestKnownVersion();
-		String latestVersionFromSite = referenceImageService.updateLatestVersion();
-		if (latestVersionFromSite != null && !latestVersionFromSite.equals(latestKnowVersion)) {
-			return Version.builder().latestVersion(latestVersionFromSite).isNewVersion(true).build();
+		Settings settings = referenceImageService.getSettings();
+		String latestKnowVersion = settings.getLatestKnownVersion();
+		if (settings.getLatestKnownVersionChecked() == null || LocalDateTime.now()
+				.isAfter(settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
+			String latestVersionFromSite = referenceImageService.updateLatestVersion();
+			if (latestVersionFromSite != null && !latestVersionFromSite.equals(latestKnowVersion)) {
+				return Version.builder().latestVersion(latestVersionFromSite).isNewVersion(true).build();
+			}
 		}
 		return Version.builder().latestVersion(latestKnowVersion)
 				.isNewVersion(false).build();

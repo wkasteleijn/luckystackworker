@@ -7,5 +7,6 @@ update profiles set denoise_radius=1;
 update profiles set denoise_sigma=2;
 select * from profiles;
 update settings set latest_known_version='1.5.0';
+update settings set latest_known_version_checked=null;
 update settings set root_folder='C:/';
 select * from settings;
