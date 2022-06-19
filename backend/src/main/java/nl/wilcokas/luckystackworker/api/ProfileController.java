@@ -32,7 +32,7 @@ import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.util.Util;
 
-@CrossOrigin(origins = { "http://localhost:4200", "https://www.wilcokas.com" })
+@CrossOrigin(origins = { "http://localhost:4200" })
 @RestController
 @RequestMapping("/api/profiles")
 @Slf4j
