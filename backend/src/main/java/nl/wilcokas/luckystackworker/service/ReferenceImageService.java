@@ -6,11 +6,7 @@ import java.awt.HeadlessException;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 import javax.swing.ImageIcon;
@@ -31,6 +27,7 @@ import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.dto.Version;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
@@ -55,6 +52,8 @@ public class ReferenceImageService {
 	private ProfileRepository profileRepository;
 	@Autowired
 	private SettingsRepository settingsRepository;
+	@Autowired
+	private HttpService httpService;
 
 	public Profile selectReferenceImage(String filePath) throws IOException {
 		JFrame frame = getParentFrame();
@@ -194,52 +193,75 @@ public class ReferenceImageService {
 		return filePath;
 	}
 
-	public String updateLatestVersion() {
-		String result = sendHttpRequest(HttpClient.Version.HTTP_1_1);
+	// TODO: write a unit test for all this!
+	public Version getLatestVersion() {
+		Settings settings = getSettings();
+		String latestKnowVersion = settings.getLatestKnownVersion();
+		if (settings.getLatestKnownVersionChecked() == null || LocalDateTime.now()
+				.isAfter(settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
+			String latestVersionFromSite = requestLatestVersion();
+			if (latestVersionFromSite != null) {
+				settings.setLatestKnownVersion(latestVersionFromSite);
+			}
+			settings.setLatestKnownVersionChecked(LocalDateTime.now());
+			settingsRepository.save(settings);
+
+			if (latestVersionFromSite != null && !latestVersionFromSite.equals(latestKnowVersion)) {
+				return Version.builder().latestVersion(latestVersionFromSite).isNewVersion(true).build();
+			}
+		}
+		return Version.builder().latestVersion(latestKnowVersion).isNewVersion(false).build();
+	}
+
+	private String requestLatestVersion() {
+
+		// Retrieve version document
+		String result = httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, Constants.VERSION_URL,
+				Constants.VERSION_REQUEST_TIMEOUT);
 		if (result == null) {
 			log.warn("HTTP1.1 request for latest version failed, trying HTTP/2..");
-			result = sendHttpRequest(HttpClient.Version.HTTP_2);
-		}
-		return result == null ? null : saveLatestVersion(result);
-	}
-
-	private String sendHttpRequest(HttpClient.Version httpVersion) {
-		HttpClient client = HttpClient.newBuilder()
-				.connectTimeout(Duration.ofSeconds(Constants.VERSION_REQUEST_TIMEOUT)).build();
-		HttpRequest request = HttpRequest.newBuilder(URI.create(Constants.VERSION_URL))
-				.version(httpVersion).build();
-		HttpResponse<String> response = null;
-		try {
-			response = client.send(request, HttpResponse.BodyHandlers.ofString());
-			if (response.statusCode() == 200) {
-				log.info("HTTP request for new version successful");
-				return response.body();
-			} else {
-				log.warn("Unable to determine latest version, got the following response code from server: {}",
-						response.statusCode());
+			result = httpService.sendHttpGetRequest(HttpClient.Version.HTTP_2, Constants.VERSION_URL,
+					Constants.VERSION_REQUEST_TIMEOUT);
+			if (result == null) {
+				log.warn("HTTP/2 request for latest version failed as well");
 			}
-		} catch (IOException | InterruptedException e) {
-			log.warn("Unable to determine latest version, got the following response code from server: {}",
-					response == null ? null : response.statusCode());
 		}
-		return null;
 
+		// Extract version
+		String version = null;
+		if (result != null) {
+			version = getLatestVersion(result);
+		}
+		return version;
 	}
 
-	private String saveLatestVersion(String htmlResponse) {
+	private String getLatestVersion(String htmlResponse) {
 		int start = htmlResponse.indexOf(Constants.VERSION_URL_MARKER);
 		if (start > 0) {
 			int startVersionPos = start + Constants.VERSION_URL_MARKER.length();
 			int endMarkerPos = htmlResponse.indexOf(Constants.VERSION_URL_ENDMARKER, startVersionPos);
 			String version = htmlResponse.substring(startVersionPos, endMarkerPos);
-			Settings settings = getSettings();
-			settings.setLatestKnownVersion(version);
-			settings.setLatestKnownVersionChecked(LocalDateTime.now());
-			settingsRepository.save(settings);
-			return version;
+			if (validateVersion(version)) {
+				log.info("Received valid version from server : {}", version);
+				return version;
+			} else {
+				log.warn("Received an invalid version from the server");
+			}
 		}
-		log.warn("Could not read the version from the request to {}", Constants.VERSION_URL);
+		log.warn("Could not read the version from the server response to {}", Constants.VERSION_URL);
 		return null;
+	}
+
+	private boolean validateVersion(String version) {
+		if (version == null || version.length() == 0) {
+			log.warn("Received an empty version from server : {}", version);
+			return false;
+		}
+		if (version.length() > 10) { // 10.100.100 will never be reached :)
+			log.warn("Received an invalid version nr from server : {}", version);
+			return false;
+		}
+		return true;
 	}
 
 	private void openReferenceImage(String filePath, Profile profile) throws IOException {
