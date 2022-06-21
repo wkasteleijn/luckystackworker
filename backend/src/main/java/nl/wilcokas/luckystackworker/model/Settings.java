@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "settings")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Settings {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

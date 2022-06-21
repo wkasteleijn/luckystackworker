@@ -193,17 +193,16 @@ public class ReferenceImageService {
 		return filePath;
 	}
 
-	// TODO: write a unit test for all this!
-	public Version getLatestVersion() {
+	public Version getLatestVersion(LocalDateTime currentDate) {
 		Settings settings = getSettings();
 		String latestKnowVersion = settings.getLatestKnownVersion();
-		if (settings.getLatestKnownVersionChecked() == null || LocalDateTime.now()
+		if (settings.getLatestKnownVersionChecked() == null || currentDate
 				.isAfter(settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
 			String latestVersionFromSite = requestLatestVersion();
 			if (latestVersionFromSite != null) {
 				settings.setLatestKnownVersion(latestVersionFromSite);
 			}
-			settings.setLatestKnownVersionChecked(LocalDateTime.now());
+			settings.setLatestKnownVersionChecked(currentDate);
 			settingsRepository.save(settings);
 
 			if (latestVersionFromSite != null && !latestVersionFromSite.equals(latestKnowVersion)) {
@@ -240,6 +239,8 @@ public class ReferenceImageService {
 		if (start > 0) {
 			int startVersionPos = start + Constants.VERSION_URL_MARKER.length();
 			int endMarkerPos = htmlResponse.indexOf(Constants.VERSION_URL_ENDMARKER, startVersionPos);
+			endMarkerPos = endMarkerPos < 0 ? startVersionPos : endMarkerPos; // robustness, don't fail if end marker
+																				// was missing
 			String version = htmlResponse.substring(startVersionPos, endMarkerPos);
 			if (validateVersion(version)) {
 				log.info("Received valid version from server : {}", version);

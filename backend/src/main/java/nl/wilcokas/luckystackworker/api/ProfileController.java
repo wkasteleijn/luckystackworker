@@ -2,6 +2,7 @@ package nl.wilcokas.luckystackworker.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -140,7 +141,7 @@ public class ProfileController {
 	@GetMapping("/version")
 	public Version getLatestVersion() {
 		log.info("getLatestVersion called");
-		return referenceImageService.getLatestVersion();
+		return referenceImageService.getLatestVersion(LocalDateTime.now());
 	}
 
 	@PutMapping("/exit")
