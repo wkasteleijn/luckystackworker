@@ -97,7 +97,7 @@ public class ReferenceImageService {
 			copyInto(referenceImage, processedImage);
 			if (Operations.isSharpenOperation(operation)) {
 				Operations.applyAllOperationsExcept(processedImage, profile, operation, OperationEnum.DENOISEAMOUNT,
-						OperationEnum.DENOISERADIUS, OperationEnum.DENOISESIGMA);
+						OperationEnum.DENOISERADIUS, OperationEnum.DENOISESIGMA, OperationEnum.DENOISEITERATIONS);
 			} else {
 				Operations.applyAllOperationsExcept(processedImage, profile, operation);
 			}
@@ -240,7 +240,7 @@ public class ReferenceImageService {
 			int startVersionPos = start + Constants.VERSION_URL_MARKER.length();
 			int endMarkerPos = htmlResponse.indexOf(Constants.VERSION_URL_ENDMARKER, startVersionPos);
 			endMarkerPos = endMarkerPos < 0 ? startVersionPos : endMarkerPos; // robustness, don't fail if end marker
-																				// was missing
+			// was missing
 			String version = htmlResponse.substring(startVersionPos, endMarkerPos);
 			if (validateVersion(version)) {
 				log.info("Received valid version from server : {}", version);

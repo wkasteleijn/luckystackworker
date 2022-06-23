@@ -37,6 +37,7 @@ export class AppComponent implements OnInit {
   denoiseAmount: number;
   denoiseSigma: number;
   denoiseRadius: number;
+  denoiseIterations: number;
   gamma: number;
   red: number;
   green: number;
@@ -178,6 +179,16 @@ export class AppComponent implements OnInit {
     this.denoiseRadius = event.value;
     this.profile.operation = 'denoiseRadius';
     console.log('denoiseRadiusChanged called: ' + this.profile.denoiseRadius);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  denoiseIterationsChanged(event: any, update: boolean) {
+    this.profile.denoiseIterations = event.value;
+    this.denoiseIterations = event.value;
+    this.profile.operation = 'denoiseIterations';
+    console.log('denoiseIterationsChanged called: ' + this.profile.denoiseRadius);
     if (update) {
       this.updateProfile();
     }

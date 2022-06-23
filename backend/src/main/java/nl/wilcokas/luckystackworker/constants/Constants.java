@@ -12,6 +12,7 @@ public class Constants {
 	public static final int MAX_WINDOW_SIZE = 1280;
 	public static final BigDecimal DEFAULT_DENOISE_RADIUS = BigDecimal.valueOf(1);
 	public static final BigDecimal DEFAULT_DENOISE_SIGMA = BigDecimal.valueOf(2);
+	public static final int DEFAULT_DENOISE_ITERATIONS = 1;
 	public static final String VERSION_URL = "https://www.wilcokas.com/luckystackworker/version";
 	public static final String VERSION_URL_MARKER = "{lswVersion:";
 	public static final String VERSION_URL_ENDMARKER = "}";

@@ -87,6 +87,7 @@ public class Util {
 				.denoise(new BigDecimal(getSetting(props, "denoise", profileName))) //
 				.denoiseSigma(new BigDecimal(getSetting(props, "denoiseSigma", profileName))) //
 				.denoiseRadius(new BigDecimal(getSetting(props, "denoiseRadius", profileName))) //
+				.denoiseIterations(Integer.valueOf(getSetting(props, "denoiseIterations", profileName))) //
 				.gamma(new BigDecimal(getSetting(props, "gamma", profileName))) //
 				.red(new BigDecimal(getSetting(props, "red", profileName))) //
 				.green(new BigDecimal(getSetting(props, "green", profileName))) //
@@ -172,6 +173,7 @@ public class Util {
 					// Added since v1.5.0, so older version written yaml needs to stay compatible.
 					profile.setDenoiseRadius(Constants.DEFAULT_DENOISE_RADIUS);
 					profile.setDenoiseSigma(Constants.DEFAULT_DENOISE_SIGMA);
+					profile.setDenoiseIterations(Constants.DEFAULT_DENOISE_ITERATIONS);
 				}
 				return profile;
 			}

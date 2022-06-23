@@ -7,6 +7,7 @@ export class Profile {
   denoise: number;
   denoiseSigma: number;
   denoiseRadius: number;
+  denoiseIterations: number;
   gamma: number;
   red: number;
   green: number;

@@ -50,6 +50,9 @@ public class Profile {
 	@Column(name = "denoise_radius")
 	private BigDecimal denoiseRadius;
 
+	@Column(name = "denoise_iterations")
+	private int denoiseIterations;
+
 	@Column(name = "gamma")
 	private BigDecimal gamma;
 
