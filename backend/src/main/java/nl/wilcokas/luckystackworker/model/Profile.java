@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -68,4 +69,6 @@ public class Profile {
 	// Non persisted setting properties that are passed to the frontend.
 	private String operation;
 	private String rootFolder;
+	@Transient
+	private boolean isLargeImage;
 }

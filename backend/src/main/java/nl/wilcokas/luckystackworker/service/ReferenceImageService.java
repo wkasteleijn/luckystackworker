@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
+import ij.gui.Toolbar;
 import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
@@ -80,10 +81,11 @@ public class ReferenceImageService {
 				} else {
 					log.info("Profile file found, profile was loaded from there.");
 				}
-				openReferenceImage(selectedFilePath, profile);
+				boolean isLargeImage = openReferenceImage(selectedFilePath, profile);
 
 				final String rootFolder = Util.getFileDirectory(selectedFilePath);
 				updateSettings(rootFolder, profile);
+				profile.setLargeImage(isLargeImage);
 				return profile;
 			}
 		}
@@ -265,16 +267,17 @@ public class ReferenceImageService {
 		return true;
 	}
 
-	private void openReferenceImage(String filePath, Profile profile) throws IOException {
+	private boolean openReferenceImage(String filePath, Profile profile) throws IOException {
 		this.filePath = filePath;
 		finalResultImage = new Opener().openImage(Util.getIJFileFormat(this.filePath));
+		boolean isLargeImage = false;
 		if (finalResultImage != null) {
 			if (Util.isPngRgbStack(finalResultImage, filePath)) {
 				finalResultImage = Util.fixNonTiffOpeningSettings(finalResultImage);
 			}
 			Operations.correctExposure(finalResultImage);
 			log.info("Opened final result image image with id {}", finalResultImage.getID());
-			setDefaultLayoutSettings(finalResultImage);
+			isLargeImage = setDefaultLayoutSettings(finalResultImage);
 
 			processedImage = finalResultImage.duplicate();
 			// processedImage.setRoi(finalResultImage.getRoi());
@@ -295,6 +298,7 @@ public class ReferenceImageService {
 
 			finalResultImage.setTitle(this.filePath);
 		}
+		return isLargeImage;
 	}
 
 	private void copyInto(final ImagePlus origin, final ImagePlus destination) {
@@ -303,17 +307,20 @@ public class ReferenceImageService {
 		destination.setTitle("PROCESSING");
 	}
 
-	private void setDefaultLayoutSettings(ImagePlus image) {
+	private boolean setDefaultLayoutSettings(ImagePlus image) {
 		image.setColor(Color.BLACK);
 		image.setBorderColor(Color.BLACK);
 		image.show(filePath);
 		ImageWindow window = image.getWindow();
 		window.setIconImage(iconImage);
 		window.setLocation(742, 64);
+		new Toolbar().setTool(Toolbar.HAND);
 		if (image.getWidth() > Constants.MAX_WINDOW_SIZE) {
 			// setRoi(image);
 			zoomOut();
+			return true;
 		}
+		return false;
 	}
 
 	// TODO: not working properly, fix problem with selection not being undone.

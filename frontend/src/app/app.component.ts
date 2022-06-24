@@ -312,6 +312,7 @@ export class AppComponent implements OnInit {
     this.denoiseAmount = this.profile.denoise;
     this.denoiseSigma = this.profile.denoiseSigma;
     this.denoiseRadius = this.profile.denoiseRadius;
+    this.denoiseIterations = this.profile.denoiseIterations;
     this.gamma = this.profile.gamma;
     this.red = this.profile.red;
     this.green = this.profile.green;
@@ -319,9 +320,22 @@ export class AppComponent implements OnInit {
   }
 
   private updateProfile() {
+    if (this.profile.largeImage) {
+      this.showSpinner();
+    }
     this.luckyStackWorkerService.updateProfile(this.profile).subscribe(
-      (data) => console.log(data),
-      (error) => console.log(error)
+      (data) => {
+        console.log(data);
+        if (this.profile.largeImage) {
+          this.hideSpinner();
+        }
+      },
+      (error) => {
+        console.log(error)
+        if (this.profile.largeImage) {
+          this.hideSpinner();
+        }
+      }
     );
   }
 

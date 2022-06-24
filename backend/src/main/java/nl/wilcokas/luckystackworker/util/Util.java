@@ -173,6 +173,9 @@ public class Util {
 					// Added since v1.5.0, so older version written yaml needs to stay compatible.
 					profile.setDenoiseRadius(Constants.DEFAULT_DENOISE_RADIUS);
 					profile.setDenoiseSigma(Constants.DEFAULT_DENOISE_SIGMA);
+				}
+				if (profile.getDenoiseIterations() == 0) {
+					// Added since v1.5.1, so older version written yaml needs to stay compatible.
 					profile.setDenoiseIterations(Constants.DEFAULT_DENOISE_ITERATIONS);
 				}
 				return profile;

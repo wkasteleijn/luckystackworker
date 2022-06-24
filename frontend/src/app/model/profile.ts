@@ -14,4 +14,5 @@ export class Profile {
   blue: number;
   operation: string;
   rootFolder: string;
+  largeImage: boolean;
 }
