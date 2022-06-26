@@ -41,7 +41,10 @@ public class WorkerService {
 					imp = Util.fixNonTiffOpeningSettings(imp);
 				}
 				Operations.correctExposure(imp);
-				Operations.applyAllOperations(imp, properties, profile);
+				ImagePlus duplicatedImage = Operations.applyAllOperations(imp, properties, profile);
+				if (duplicatedImage != null) {
+					imp = duplicatedImage;
+				}
 				Util.saveImage(imp, getOutputFile(file), Util.isPngRgbStack(imp, filePath));
 				return true;
 			} catch (Exception e) {

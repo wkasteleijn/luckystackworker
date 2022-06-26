@@ -66,6 +66,9 @@ public class Profile {
 	@Column(name = "blue")
 	private BigDecimal blue;
 
+	@Column(name = "saturation")
+	private BigDecimal saturation;
+
 	// Non persisted setting properties that are passed to the frontend.
 	private String operation;
 	private String rootFolder;

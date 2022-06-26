@@ -1,6 +1,9 @@
 package nl.wilcokas.luckystackworker;
 
 import java.io.IOException;
+import java.util.Map;
+
+import org.apache.commons.text.StringSubstitutor;
 
 import ij.ImagePlus;
 import ij.WindowManager;
@@ -16,6 +19,7 @@ public class Probeersels {
 
 		ImagePlus image = new Opener()
 				.openImage("D:/Jup/testsession/Jup_224759_AS_P30_lapl5_ap44_LSW.tif");
+		image.show();
 		//		int[] histogram = image.getProcessor().getHistogram();
 		//		int maxVal = 0;
 		//		for (int i = histogram.length - 1; i >= 0; i--) {
@@ -71,11 +75,16 @@ public class Probeersels {
 
 		// Saturation
 		log.info("Start saturation");
-		String result = Util.readFromInputStream(Operations.class.getResourceAsStream("/saturation.ijm"));
-		WindowManager.setTempCurrentImage(image);
+		String macro = Util.readFromInputStream(Operations.class.getResourceAsStream("/saturation.ijm"));
+		StringSubstitutor stringSubstitutor = new StringSubstitutor(Map.of("factor", 3.5));
+		String result = stringSubstitutor.replace(macro);
+		ImagePlus image2 = image.duplicate();
+		image.close();
+		WindowManager.setTempCurrentImage(image2);
 		new Interpreter().run(result);
-		image.show();
+		image2.show();
 		log.info("End saturation");
+		// Util.saveImage(image, "D:/Jup/testsession/saturation_test.tif", false);
 
 		Thread.currentThread().sleep(5000);
 		System.exit(0);

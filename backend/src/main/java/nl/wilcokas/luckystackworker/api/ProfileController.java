@@ -114,6 +114,7 @@ public class ProfileController {
 		result.setRed(profile.getRed());
 		result.setGreen(profile.getGreen());
 		result.setBlue(profile.getBlue());
+		result.setSaturation(profile.getSaturation());
 		profileRepository.save(result);
 		referenceImageService.updateProcessing(profile);
 		return new ResponseEntity<>(HttpStatus.OK);

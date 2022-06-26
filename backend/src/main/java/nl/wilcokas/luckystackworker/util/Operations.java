@@ -86,7 +86,7 @@ public final class Operations {
 		}
 	}
 
-	public static void applyAllOperations(final ImagePlus image, final Map<String, String> profileSettings,
+	public static ImagePlus applyAllOperations(ImagePlus image, final Map<String, String> profileSettings,
 			String profileName) {
 		final Profile profile = Util.toProfile(profileSettings, profileName);
 		applySharpen(image, profile);
@@ -95,6 +95,7 @@ public final class Operations {
 		applyRed(image, profile);
 		applyGreen(image, profile);
 		applyBlue(image, profile);
+		return applySaturation(image, profile);
 	}
 
 	public static void applySharpen(final ImagePlus image, Profile profile) {
@@ -166,6 +167,25 @@ public final class Operations {
 				log.warn("Attemping to apply blue reduction to a non RGB image {}", image.getFileInfo());
 			}
 		}
+	}
+
+	public static ImagePlus applySaturation(final ImagePlus image, final Profile profile) {
+		if (profile.getSaturation() != null && (profile.getSaturation().compareTo(BigDecimal.ONE) > 0)) {
+			if (validateRGBStack(image)) {
+				log.info("Applying saturation increase with factor {} to image {}", profile.getSaturation(),
+						image.getID());
+				String macro = Util.readFromInputStream(Operations.class.getResourceAsStream("/saturation.ijm"));
+				StringSubstitutor stringSubstitutor = new StringSubstitutor(Map.of("factor", profile.getSaturation()));
+				String result = stringSubstitutor.replace(macro);
+				ImagePlus image2 = image.duplicate();
+				WindowManager.setTempCurrentImage(image2);
+				new Interpreter().run(result);
+				return image2;
+			} else {
+				log.warn("Attemping to apply saturation increase to a non RGB image {}", image.getFileInfo());
+			}
+		}
+		return null;
 	}
 
 	private static ImageProcessor getImageStackProcessor(final ImagePlus img, final int stackPosition) {

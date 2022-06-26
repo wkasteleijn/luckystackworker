@@ -91,7 +91,9 @@ public class Util {
 				.gamma(new BigDecimal(getSetting(props, "gamma", profileName))) //
 				.red(new BigDecimal(getSetting(props, "red", profileName))) //
 				.green(new BigDecimal(getSetting(props, "green", profileName))) //
-				.blue(new BigDecimal(getSetting(props, "blue", profileName))).name(profileName).build();
+				.blue(new BigDecimal(getSetting(props, "blue", profileName))) //
+				.saturation(new BigDecimal(getSetting(props, "saturation", profileName))) //
+				.name(profileName).build();
 	}
 
 	public static String readFromInputStream(InputStream inputStream) {
@@ -169,15 +171,19 @@ public class Util {
 			profileStr = Files.readString(Paths.get(filePath + ".yaml"));
 			if (profileStr != null) {
 				Profile profile = new Yaml().load(profileStr);
+
+				// Added since v1.5.0, so older version written yaml needs to stay compatible.
 				if (profile.getDenoiseRadius() == null) {
-					// Added since v1.5.0, so older version written yaml needs to stay compatible.
 					profile.setDenoiseRadius(Constants.DEFAULT_DENOISE_RADIUS);
 					profile.setDenoiseSigma(Constants.DEFAULT_DENOISE_SIGMA);
 				}
 				if (profile.getDenoiseIterations() == 0) {
-					// Added since v1.5.1, so older version written yaml needs to stay compatible.
 					profile.setDenoiseIterations(Constants.DEFAULT_DENOISE_ITERATIONS);
 				}
+				if (profile.getSaturation() == null) {
+					profile.setSaturation(BigDecimal.valueOf(1));
+				}
+
 				return profile;
 			}
 		} catch (Exception e) {

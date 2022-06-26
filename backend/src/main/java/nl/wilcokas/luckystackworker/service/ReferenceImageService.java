@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.HeadlessException;
 import java.awt.Image;
+import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
@@ -121,6 +122,18 @@ public class ReferenceImageService {
 		} else if (OperationEnum.BLUE == operation) {
 			Operations.applyBlue(finalResultImage, profile);
 		}
+
+		// Exception for saturation, always apply it as last as it will convert to RGB
+		// color.
+		ImagePlus duplicatedImage = Operations.applySaturation(finalResultImage, profile);
+		if (duplicatedImage != null) {
+			duplicatedImage.show();
+			Point location = finalResultImage.getWindow().getLocation();
+			finalResultImage.close();
+			finalResultImage = duplicatedImage;
+			setDefaultLayoutSettings(finalResultImage, location);
+		}
+
 		finalResultImage.setTitle(filePath);
 	}
 
@@ -277,7 +290,7 @@ public class ReferenceImageService {
 			}
 			Operations.correctExposure(finalResultImage);
 			log.info("Opened final result image image with id {}", finalResultImage.getID());
-			isLargeImage = setDefaultLayoutSettings(finalResultImage);
+			isLargeImage = setDefaultLayoutSettings(finalResultImage, null);
 
 			processedImage = finalResultImage.duplicate();
 			// processedImage.setRoi(finalResultImage.getRoi());
@@ -307,13 +320,17 @@ public class ReferenceImageService {
 		destination.setTitle("PROCESSING");
 	}
 
-	private boolean setDefaultLayoutSettings(ImagePlus image) {
+	private boolean setDefaultLayoutSettings(ImagePlus image, Point location) {
 		image.setColor(Color.BLACK);
 		image.setBorderColor(Color.BLACK);
 		image.show(filePath);
 		ImageWindow window = image.getWindow();
 		window.setIconImage(iconImage);
-		window.setLocation(742, 64);
+		if (location == null) {
+			window.setLocation(742, 64);
+		} else {
+			window.setLocation(location);
+		}
 		new Toolbar().setTool(Toolbar.HAND);
 		if (image.getWidth() > Constants.MAX_WINDOW_SIZE) {
 			// setRoi(image);

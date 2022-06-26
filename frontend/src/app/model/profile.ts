@@ -12,6 +12,7 @@ export class Profile {
   red: number;
   green: number;
   blue: number;
+  saturation: number;
   operation: string;
   rootFolder: string;
   largeImage: boolean;

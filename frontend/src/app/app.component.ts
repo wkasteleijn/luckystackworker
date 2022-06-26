@@ -39,6 +39,7 @@ export class AppComponent implements OnInit {
   denoiseRadius: number;
   denoiseIterations: number;
   gamma: number;
+  saturation: number;
   red: number;
   green: number;
   blue: number;
@@ -199,6 +200,16 @@ export class AppComponent implements OnInit {
     this.gamma = event.value;
     this.profile.operation = 'gamma';
     console.log('gammaChanged called: ' + this.profile.gamma);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  saturationChanged(event: any, update: boolean) {
+    this.profile.saturation = event.value;
+    this.saturation = event.value;
+    this.profile.operation = 'saturation';
+    console.log('saturationChanged called: ' + this.profile.saturation);
     if (update) {
       this.updateProfile();
     }

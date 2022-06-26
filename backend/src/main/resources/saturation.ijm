@@ -1,5 +1,5 @@
 run("RGB Color");
 run("HSB Stack");
 run("Next Slice [>]");
-run("Multiply...", "value=2 slice");
+run("Multiply...", "value=${factor} slice");
 run("RGB Color");
