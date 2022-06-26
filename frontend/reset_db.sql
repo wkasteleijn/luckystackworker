@@ -5,6 +5,7 @@ update profiles set gamma=1;
 update profiles set denoise=0;
 update profiles set denoise_radius=1;
 update profiles set denoise_sigma=2;
+update profiles set saturation=1;
 select * from profiles;
 update settings set latest_known_version='1.5.0';
 update settings set latest_known_version_checked=null;

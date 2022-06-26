@@ -243,7 +243,7 @@
             [(ngModel)]="denoiseAmount"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ denoiseAmount }}</span>
+          <span class="sliderLabel">{{ denoiseAmount }} {{ denoiseAmount == 0 ? "(Off)":""}}</span>
         </div>
       </div>
 
@@ -287,11 +287,11 @@
             [(ngModel)]="gamma"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ gamma }}</span>
+          <span class="sliderLabel">{{ gamma }} {{ gamma == 1 ? "(Off)":""}}</span>
         </div>
       </div>
 
-      <div class="sliderRow">
+      <div class="sliderRow" title="Usage of Saturation will convert the image to sRGB. Only use this when no further processing is needed outside of LuckyStackWorker.">
         <div class="sliderLabel">Saturation</div>
         <div class="slider">
           <mat-slider
@@ -304,7 +304,7 @@
             [(ngModel)]="saturation"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ saturation }}</span>
+          <span class="sliderLabel">{{ saturation }} {{ saturation == 1 ? "(Off)":""}}</span>
         </div>
       </div>
 

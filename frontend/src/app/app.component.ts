@@ -324,6 +324,7 @@ export class AppComponent implements OnInit {
     this.denoiseSigma = this.profile.denoiseSigma;
     this.denoiseRadius = this.profile.denoiseRadius;
     this.denoiseIterations = this.profile.denoiseIterations;
+    this.saturation = this.profile.saturation;
     this.gamma = this.profile.gamma;
     this.red = this.profile.red;
     this.green = this.profile.green;

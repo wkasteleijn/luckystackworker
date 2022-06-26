@@ -45,6 +45,7 @@ public class ReferenceImageService {
 	private ImagePlus referenceImage;
 	private ImagePlus processedImage;
 	private ImagePlus finalResultImage;
+	private ImagePlus finalSaturatedImage;
 	private OperationEnum previousOperation;
 	private String filePath;
 
@@ -129,6 +130,7 @@ public class ReferenceImageService {
 		if (duplicatedImage != null) {
 			duplicatedImage.show();
 			Point location = finalResultImage.getWindow().getLocation();
+			finalResultImage.getWindow().setVisible(false);
 			finalResultImage.close();
 			finalResultImage = duplicatedImage;
 			setDefaultLayoutSettings(finalResultImage, location);

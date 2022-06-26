@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.commons.text.StringSubstitutor;
 
+import ij.IJ;
 import ij.ImagePlus;
 import ij.WindowManager;
 import ij.io.Opener;
@@ -19,6 +20,7 @@ public class Probeersels {
 
 		ImagePlus image = new Opener()
 				.openImage("D:/Jup/testsession/Jup_224759_AS_P30_lapl5_ap44_LSW.tif");
+		IJ.run(image, "RGB Color", null);
 		image.show();
 		//		int[] histogram = image.getProcessor().getHistogram();
 		//		int maxVal = 0;
@@ -78,11 +80,11 @@ public class Probeersels {
 		String macro = Util.readFromInputStream(Operations.class.getResourceAsStream("/saturation.ijm"));
 		StringSubstitutor stringSubstitutor = new StringSubstitutor(Map.of("factor", 3.5));
 		String result = stringSubstitutor.replace(macro);
-		ImagePlus image2 = image.duplicate();
-		image.close();
-		WindowManager.setTempCurrentImage(image2);
+		// ImagePlus image2 = image.duplicate();
+		// image.close();
+		WindowManager.setTempCurrentImage(image);
 		new Interpreter().run(result);
-		image2.show();
+		// image2.show();
 		log.info("End saturation");
 		// Util.saveImage(image, "D:/Jup/testsession/saturation_test.tif", false);
 
