@@ -84,9 +84,14 @@ public class Probeersels {
 		// image.close();
 		WindowManager.setTempCurrentImage(image);
 		new Interpreter().run(result);
+
+		// cropping
+		image.setRoi(128, 128, 640, 480);
+		ImagePlus crop = image.crop();
+
 		// image2.show();
 		log.info("End saturation");
-		// Util.saveImage(image, "D:/Jup/testsession/saturation_test.tif", false);
+		// Util.saveImage(crop, "D:/Jup/testsession/saturation_test.tif", false);
 
 		Thread.currentThread().sleep(5000);
 		System.exit(0);

@@ -59,6 +59,10 @@ export class LuckyStackWorkerService {
     return this.http.put(`${this.baseUrl}/reference/zoomout`, null);
   }
 
+  cropSelectionChanged(): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/reference/crop`, null);
+  }
+
   getLatestVersion(): Observable<any> {
     return this.http.get(`${this.baseUrl}/profiles/version`);
   }

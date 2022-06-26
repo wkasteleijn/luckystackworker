@@ -29,6 +29,7 @@ import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.dto.Crop;
 import nl.wilcokas.luckystackworker.dto.Version;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
@@ -48,6 +49,7 @@ public class ReferenceImageService {
 	private ImagePlus finalSaturatedImage;
 	private OperationEnum previousOperation;
 	private String filePath;
+	private Crop crop = null;
 
 	private Image iconImage = new ImageIcon(getClass().getResource("/luckystackworker_icon.png")).getImage();
 
@@ -144,7 +146,7 @@ public class ReferenceImageService {
 		log.info("Saving image to folder {}", dir);
 		String fileNameNoExt = Util.getFilename(path)[0];
 		String finalPath = fileNameNoExt + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
-		Util.saveImage(finalResultImage, finalPath, Util.isPngRgbStack(finalResultImage, filePath));
+		Util.saveImage(finalResultImage, finalPath, Util.isPngRgbStack(finalResultImage, filePath), crop != null);
 		log.info("Saved file to {}", finalPath);
 		writeProfile(fileNameNoExt);
 	}
@@ -184,6 +186,23 @@ public class ReferenceImageService {
 
 	public void zoomOut() {
 		IJ.run(finalResultImage, "Out [-]", null);
+	}
+
+	public void crop() {
+		if (crop == null) {
+			int width = finalResultImage.getWidth() / 2;
+			int height = finalResultImage.getHeight() / 2;
+			int x = (finalResultImage.getWidth() - width) / 2;
+			int y = (finalResultImage.getHeight() - height) / 2;
+			crop = new Crop(x, y, width, height);
+			finalResultImage.setRoi(x, y, width, height);
+			new Toolbar().setTool(Toolbar.CROSSHAIR);
+			LuckyStackWorkerContext.setCrop(crop);
+		} else {
+			crop = null;
+			finalResultImage.resetRoi();
+			new Toolbar().setTool(Toolbar.HAND);
+		}
 	}
 
 	public Settings getSettings() {
@@ -334,25 +353,13 @@ public class ReferenceImageService {
 			window.setLocation(location);
 		}
 		new Toolbar().setTool(Toolbar.HAND);
+		crop = null;
 		if (image.getWidth() > Constants.MAX_WINDOW_SIZE) {
 			// setRoi(image);
 			zoomOut();
 			return true;
 		}
 		return false;
-	}
-
-	// TODO: not working properly, fix problem with selection not being undone.
-	private void setRoi(ImagePlus image) {
-		int x = (image.getWidth() - Constants.MAX_ROI_X) / 2;
-		int y = 0;
-		int yRoi = image.getHeight();
-		if (image.getHeight() > Constants.MAX_ROI_Y) {
-			y = (image.getHeight() - Constants.MAX_ROI_Y) / 2;
-			yRoi = Constants.MAX_ROI_Y;
-		}
-		image.setRoi(x, y, Constants.MAX_ROI_X, yRoi);
-		image.saveRoi();
 	}
 
 	private boolean validateSelectedFile(String path) {

@@ -137,6 +137,14 @@
   margin-left: 16px;
 }
 
+.crop {
+  margin-left: 20px;
+}
+
+.plusZoom {
+  margin-left: 44px;
+}
+
 .buttonDisabledZoom {
   font-size: 18px;
   font-weight: bolder;

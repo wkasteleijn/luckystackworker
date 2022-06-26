@@ -51,6 +51,7 @@ export class AppComponent implements OnInit {
   workerProgress: number;
   refImageSelected: boolean = false;
   nightMode: boolean = false;
+  crop: boolean = false;
   _showSpinner = false;
   latestKnownVersion = version;
 
@@ -78,6 +79,7 @@ export class AppComponent implements OnInit {
         (data) => {
           console.log(data);
           this.refImageSelected = true;
+          this.crop = false;
           if (data && data.amount > 0) {
             this.profile = data;
             this.selectedProfile = data.name;
@@ -438,6 +440,16 @@ export class AppComponent implements OnInit {
       document.body.style.backgroundColor = 'rgb(43,43,43)';
     }
     return this.nightMode;
+  }
+
+  cropSelectionChanged() {
+    console.log('cropSelectionChanged called');
+    this.luckyStackWorkerService.cropSelectionChanged().subscribe(
+      (data) => {
+        console.log('Response');
+      },
+      (error) => console.log(error)
+    );
   }
 
   colorTheme() {

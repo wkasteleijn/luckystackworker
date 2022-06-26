@@ -45,7 +45,11 @@ public class WorkerService {
 				if (duplicatedImage != null) {
 					imp = duplicatedImage;
 				}
-				Util.saveImage(imp, getOutputFile(file), Util.isPngRgbStack(imp, filePath));
+				boolean isCropped = setCrop(imp);
+				if (isCropped) {
+					imp = imp.crop();
+				}
+				Util.saveImage(imp, getOutputFile(file), Util.isPngRgbStack(imp, filePath), isCropped);
 				return true;
 			} catch (Exception e) {
 				log.error("Error processing file: ", e);
@@ -57,5 +61,18 @@ public class WorkerService {
 	private String getOutputFile(final File file) {
 		String[] filename = Util.getFilename(file);
 		return filename[0] + Constants.OUTPUT_POSTFIX + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
+	}
+
+	private boolean setCrop(ImagePlus imp) {
+		Map<String, String> cropProps = LuckyStackWorkerContext.getWorkerProperties();
+		if (cropProps.get("crop_x") != null) {
+			int x = Integer.parseInt(cropProps.get("crop_x"));
+			int y = Integer.parseInt(cropProps.get("crop_x"));
+			int width = Integer.parseInt(cropProps.get("crop_x"));
+			int height = Integer.parseInt(cropProps.get("crop_x"));
+			imp.setRoi(x, y, width, height);
+			return true;
+		}
+		return false;
 	}
 }

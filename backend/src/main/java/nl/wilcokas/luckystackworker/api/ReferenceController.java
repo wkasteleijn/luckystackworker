@@ -88,4 +88,9 @@ public class ReferenceController {
 	public void zoomOut() {
 		referenceImageService.zoomOut();
 	}
+
+	@PutMapping("/crop")
+	public void crop() {
+		referenceImageService.crop();
+	}
 }

@@ -116,7 +116,10 @@ public class Util {
 		Files.delete(Paths.get(path));
 	}
 
-	public static void saveImage(ImagePlus image, String path, boolean isPngRgbStack) throws IOException {
+	public static void saveImage(ImagePlus image, String path, boolean isPngRgbStack, boolean crop) throws IOException {
+		if (crop) {
+			image = image.crop();
+		}
 		if (isPngRgbStack) {
 			image.setActiveChannels("111");
 			image.setC(1);

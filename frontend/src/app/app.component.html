@@ -41,7 +41,6 @@
             : nightModeEnabled() ? 'dropdown activeColorNight':'dropdown activeColor'
         }}"
       >
-        <option selected="true">Select an Object</option>
         <option *ngFor="let profile of profiles" [value]="profile.value">
           {{ profile.viewValue }}
         </option>
@@ -67,13 +66,15 @@
     Load Profile
     </button>
 
-    <span class="dropdown_label zoomLabel">Zoom</span>
+    <mat-slide-toggle class="crop" [(ngModel)]="crop" [color]="colorTheme()" (change)="cropSelectionChanged()"><span class="sliderLabel">Crop</span></mat-slide-toggle>
+
     <button
       *ngIf="openRefImageEnabled()"
       type="button"
       mat-button
       (click)="zoomIn()"
-      class="{{nightModeEnabled() ? 'buttonZoom activeColorNight' : 'buttonZoom activeColor'}}"
+      class="{{nightModeEnabled() ? 'plusZoom buttonZoom activeColorNight' : 'plusZoom buttonZoom activeColor'}}"
+      title="Zoom in"
     >
     &nbsp;&nbsp;+&nbsp;&nbsp;
     </button>
@@ -82,7 +83,7 @@
       type="button"
       mat-button
       disabled
-      class="buttonDisabledZoom"
+      class="plusZoom buttonDisabledZoom"
     >
     &nbsp;&nbsp;+&nbsp;&nbsp;
     </button>
@@ -93,6 +94,7 @@
       mat-button
       (click)="zoomOut()"
       class="{{nightModeEnabled() ? 'buttonZoom buttonZoomSpace activeColorNight' : 'buttonZoom buttonZoomSpace activeColor'}}"
+      title="Zoom out"
     >
       &nbsp;&nbsp;-&nbsp;&nbsp;
     </button>
