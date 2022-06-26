@@ -126,6 +126,7 @@ public class ProfileController {
 		if (profileName != null) {
 			LuckyStackWorkerContext.statusUpdate(Constants.STATUS_WORKING);
 			LuckyStackWorkerContext.updateWorkerForProfile(profile);
+			LuckyStackWorkerContext.setSelectedRoi(referenceImageService.getFinalResultImage().getRoi());
 			LuckyStackWorkerContext.setActiveProfile(profileName);
 			referenceImageService.writeProfile();
 		} else {

@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import ij.gui.Roi;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.dto.Crop;
 import nl.wilcokas.luckystackworker.dto.StatusUpdate;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
@@ -22,6 +24,10 @@ public class LuckyStackWorkerContext {
 	private static String status = Constants.STATUS_WORKING;
 	private static int filesProcessedCount = 0;
 	private static int totalfilesCount = 0;
+
+	@Getter
+	@Setter
+	private static Roi selectedRoi = null;
 
 	private LuckyStackWorkerContext() {
 	}
@@ -83,21 +89,6 @@ public class LuckyStackWorkerContext {
 	public static void setSelectedProfile(String profileName) {
 		log.info("Setting selected profile to {}", profileName);
 		workerProperties.put("selectedProfile", profileName);
-	}
-
-	public static void setCrop(Crop crop) {
-		log.info("Setting cropping");
-		if (crop == null) {
-			workerProperties.remove("crop_x");
-			workerProperties.remove("crop_y");
-			workerProperties.remove("crop_width");
-			workerProperties.remove("crop_height");
-		} else {
-			workerProperties.put("crop_x", String.valueOf(crop.getX()));
-			workerProperties.put("crop_y", String.valueOf(crop.getX()));
-			workerProperties.put("crop_width", String.valueOf(crop.getWidth()));
-			workerProperties.put("crop_height", String.valueOf(crop.getHeight()));
-		}
 	}
 
 	public static void updateWorkerForRootFolder(String rootFolder) {

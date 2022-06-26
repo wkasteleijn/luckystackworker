@@ -18,10 +18,12 @@ import org.yaml.snakeyaml.Yaml;
 import ij.CompositeImage;
 import ij.IJ;
 import ij.ImagePlus;
+import ij.gui.Roi;
 import ij.io.FileInfo;
 import ij.io.FileSaver;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.dto.Crop;
 import nl.wilcokas.luckystackworker.model.Profile;
 
 @Slf4j
@@ -193,6 +195,15 @@ public class Util {
 			log.warn("No profile file found or profile file is corrupt for {}", filePath);
 		}
 		return null;
+	}
+
+	public static Crop roiToCrop(Roi roi) {
+		return Crop.builder() //
+				.x(Double.valueOf(roi.getXBase()).intValue()) //
+				.y(Double.valueOf(roi.getYBase()).intValue()) //
+				.width(Double.valueOf(roi.getFloatWidth()).intValue()) //
+				.height(Double.valueOf(roi.getFloatHeight()).intValue()) //
+				.build();
 	}
 
 	private static String getSetting(Map<String, String> props, String setting, String name) {

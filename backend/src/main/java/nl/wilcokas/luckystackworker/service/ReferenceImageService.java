@@ -26,6 +26,7 @@ import ij.ImagePlus;
 import ij.gui.ImageWindow;
 import ij.gui.Toolbar;
 import ij.io.Opener;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
@@ -45,8 +46,10 @@ public class ReferenceImageService {
 
 	private ImagePlus referenceImage;
 	private ImagePlus processedImage;
+
+	@Getter
 	private ImagePlus finalResultImage;
-	private ImagePlus finalSaturatedImage;
+
 	private OperationEnum previousOperation;
 	private String filePath;
 	private Crop crop = null;
@@ -197,11 +200,12 @@ public class ReferenceImageService {
 			crop = new Crop(x, y, width, height);
 			finalResultImage.setRoi(x, y, width, height);
 			new Toolbar().setTool(Toolbar.CROSSHAIR);
-			LuckyStackWorkerContext.setCrop(crop);
+			LuckyStackWorkerContext.setSelectedRoi(finalResultImage.getRoi());
 		} else {
 			crop = null;
 			finalResultImage.resetRoi();
 			new Toolbar().setTool(Toolbar.HAND);
+			LuckyStackWorkerContext.setSelectedRoi(null);
 		}
 	}
 
