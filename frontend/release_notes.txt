@@ -2,7 +2,7 @@ LuckyStackWorker - RELEASE NOTES
 ================================
 
 30/6/2022: major version 2.0.0
-- Create a seperate panel for denoising. Added 3 new sliders for controlling the sigma, radius and number of iterations of the sigma filter denoising.
+- Added a new panel for denoising. Added 3 new sliders for controlling the sigma, radius and number of iterations of the sigma filter denoising.
 - Added saturation control slider
 - Added cropping function
 - Added Mouse hand control to scroll through images larger than the window size
