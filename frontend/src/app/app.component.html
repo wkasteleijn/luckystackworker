@@ -66,7 +66,8 @@
     Load Profile
     </button>
 
-    <mat-slide-toggle class="crop" [(ngModel)]="crop" [color]="colorTheme()" (change)="cropSelectionChanged()"><span class="sliderLabel">Crop</span></mat-slide-toggle>
+    <mat-slide-toggle *ngIf="openRefImageEnabled()" class="crop" [(ngModel)]="crop" [color]="colorTheme()" (change)="cropSelectionChanged()"><span class="sliderLabel">Crop</span></mat-slide-toggle>
+    <mat-slide-toggle *ngIf="!openRefImageEnabled()" class="crop" [(ngModel)]="crop" disabled [color]="colorTheme()" (change)="cropSelectionChanged()"><span class="sliderLabel">Crop</span></mat-slide-toggle>
 
     <button
       *ngIf="openRefImageEnabled()"
@@ -195,11 +196,49 @@
       <mat-card-title>Denoise</mat-card-title>
     </mat-card-header>
     <mat-card-content>
+
+      <div class="sliderRow">
+        <div class="sliderLabel">Sigma</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="!refImageSelected"
+            tickInterval="1000"
+            step="0.1"
+            min="0"
+            max="5"
+            (input)="denoiseSigmaChanged($event, false)"
+            (change)="denoiseSigmaChanged($event,true)"
+            [(ngModel)]="denoiseSigma"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ denoiseSigma }}</span>
+          <span *ngIf="refImageSelected"  class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{denoiseSigma === 0 ? "Off" : (denoiseSigma > 2 ? "Mode 2":"Mode 1")}}</span>
+        </div>
+      </div>
+
+      <div class="sliderRow">
+        <div class="sliderLabel">Amount</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="!refImageSelected || denoiseSigma === 0"
+            tickInterval="1000"
+            step="1"
+            min="0"
+            max="100"
+            (input)="denoiseAmountChanged($event, false)"
+            (change)="denoiseAmountChanged($event,true)"
+            [(ngModel)]="denoiseAmount"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ denoiseAmount }}</span>
+        </div>
+      </div>
+
       <div class="sliderRow">
         <div class="sliderLabel">Radius</div>
         <div class="slider">
           <mat-slider
-            [disabled]="!refImageSelected"
+            [disabled]="!refImageSelected || denoiseSigma === 0"
             tickInterval="1000"
             step="0.1"
             min="0.5"
@@ -214,46 +253,10 @@
       </div>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Sigma</div>
-        <div class="slider">
-          <mat-slider
-            [disabled]="!refImageSelected"
-            tickInterval="1000"
-            step="0.1"
-            min="1"
-            max="10"
-            (input)="denoiseSigmaChanged($event, false)"
-            (change)="denoiseSigmaChanged($event,true)"
-            [(ngModel)]="denoiseSigma"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span class="sliderLabel">{{ denoiseSigma }}</span>
-        </div>
-      </div>
-
-      <div class="sliderRow">
-        <div class="sliderLabel">Amount</div>
-        <div class="slider">
-          <mat-slider
-            [disabled]="!refImageSelected"
-            tickInterval="1000"
-            step="1"
-            min="0"
-            max="100"
-            (input)="denoiseAmountChanged($event, false)"
-            (change)="denoiseAmountChanged($event,true)"
-            [(ngModel)]="denoiseAmount"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span class="sliderLabel">{{ denoiseAmount }} {{ denoiseAmount == 0 ? "(Off)":""}}</span>
-        </div>
-      </div>
-
-      <div class="sliderRow">
         <div class="sliderLabel">Iterations</div>
         <div class="slider">
           <mat-slider
-            [disabled]="!refImageSelected"
+            [disabled]="!refImageSelected || denoiseSigma === 0"
             tickInterval="1"
             step="1"
             min="1"
@@ -289,7 +292,8 @@
             [(ngModel)]="gamma"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ gamma }} {{ gamma == 1 ? "(Off)":""}}</span>
+          <span class="sliderLabel">{{ gamma }}</span>
+          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ gamma == 1 ? "Off":""}}</span>
         </div>
       </div>
 
@@ -306,7 +310,8 @@
             [(ngModel)]="saturation"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ saturation }} {{ saturation == 1 ? "(Off)":""}}</span>
+          <span class="sliderLabel">{{ saturation }}</span>
+          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ saturation == 1 ? "Off":""}}</span>
         </div>
       </div>
 

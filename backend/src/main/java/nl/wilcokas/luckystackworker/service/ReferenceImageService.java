@@ -24,13 +24,13 @@ import org.springframework.stereotype.Service;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
+import ij.gui.Roi;
 import ij.gui.Toolbar;
 import ij.io.Opener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.dto.Crop;
 import nl.wilcokas.luckystackworker.dto.Version;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
@@ -52,7 +52,7 @@ public class ReferenceImageService {
 
 	private OperationEnum previousOperation;
 	private String filePath;
-	private Crop crop = null;
+	private Roi roi = null;
 
 	private Image iconImage = new ImageIcon(getClass().getResource("/luckystackworker_icon.png")).getImage();
 
@@ -113,6 +113,7 @@ public class ReferenceImageService {
 			previousOperation = operation;
 		}
 		copyInto(processedImage, finalResultImage);
+		setDefaultLayoutSettings(finalResultImage, finalResultImage.getWindow().getLocation());
 
 		if (Operations.isSharpenOperation(operation)) {
 			Operations.applySharpen(finalResultImage, profile);
@@ -133,6 +134,7 @@ public class ReferenceImageService {
 		// color.
 		ImagePlus duplicatedImage = Operations.applySaturation(finalResultImage, profile);
 		if (duplicatedImage != null) {
+			duplicatedImage.setRoi(finalResultImage.getRoi());
 			duplicatedImage.show();
 			Point location = finalResultImage.getWindow().getLocation();
 			finalResultImage.getWindow().setVisible(false);
@@ -149,7 +151,7 @@ public class ReferenceImageService {
 		log.info("Saving image to folder {}", dir);
 		String fileNameNoExt = Util.getFilename(path)[0];
 		String finalPath = fileNameNoExt + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
-		Util.saveImage(finalResultImage, finalPath, Util.isPngRgbStack(finalResultImage, filePath), crop != null);
+		Util.saveImage(finalResultImage, finalPath, Util.isPngRgbStack(finalResultImage, filePath), roi != null);
 		log.info("Saved file to {}", finalPath);
 		writeProfile(fileNameNoExt);
 	}
@@ -192,17 +194,17 @@ public class ReferenceImageService {
 	}
 
 	public void crop() {
-		if (crop == null) {
+		if (roi == null) {
 			int width = finalResultImage.getWidth() / 2;
 			int height = finalResultImage.getHeight() / 2;
 			int x = (finalResultImage.getWidth() - width) / 2;
 			int y = (finalResultImage.getHeight() - height) / 2;
-			crop = new Crop(x, y, width, height);
 			finalResultImage.setRoi(x, y, width, height);
-			new Toolbar().setTool(Toolbar.CROSSHAIR);
+			roi = finalResultImage.getRoi();
+			new Toolbar().setTool(Toolbar.POINT);
 			LuckyStackWorkerContext.setSelectedRoi(finalResultImage.getRoi());
 		} else {
-			crop = null;
+			roi = null;
 			finalResultImage.resetRoi();
 			new Toolbar().setTool(Toolbar.HAND);
 			LuckyStackWorkerContext.setSelectedRoi(null);
@@ -316,6 +318,7 @@ public class ReferenceImageService {
 			Operations.correctExposure(finalResultImage);
 			log.info("Opened final result image image with id {}", finalResultImage.getID());
 			isLargeImage = setDefaultLayoutSettings(finalResultImage, null);
+			roi = null;
 
 			processedImage = finalResultImage.duplicate();
 			// processedImage.setRoi(finalResultImage.getRoi());
@@ -343,6 +346,9 @@ public class ReferenceImageService {
 		log.info("Copying image {} into image {}", origin.getID(), destination.getID());
 		destination.setImage(origin);
 		destination.setTitle("PROCESSING");
+		if (roi != null) {
+			destination.setRoi(roi);
+		}
 	}
 
 	private boolean setDefaultLayoutSettings(ImagePlus image, Point location) {
@@ -357,7 +363,6 @@ public class ReferenceImageService {
 			window.setLocation(location);
 		}
 		new Toolbar().setTool(Toolbar.HAND);
-		crop = null;
 		if (image.getWidth() > Constants.MAX_WINDOW_SIZE) {
 			// setRoi(image);
 			zoomOut();

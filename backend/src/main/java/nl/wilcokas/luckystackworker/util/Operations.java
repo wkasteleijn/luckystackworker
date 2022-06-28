@@ -111,7 +111,7 @@ public final class Operations {
 	}
 
 	public static void applyDenoise(final ImagePlus image, final Profile profile) {
-		if (profile.getDenoise() != null && (profile.getDenoise().compareTo(BigDecimal.ZERO) > 0)) {
+		if (profile.getDenoiseSigma() != null && (profile.getDenoiseSigma().compareTo(BigDecimal.ZERO) > 0)) {
 			int iterations = profile.getDenoiseIterations() == 0 ? 1 : profile.getDenoiseIterations();
 			log.info("Applying denoise with value {} to image {}", profile.getDenoise(), image.getID());
 			BigDecimal factor = profile.getDenoise().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100)

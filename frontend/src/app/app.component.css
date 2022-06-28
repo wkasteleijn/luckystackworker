@@ -15,7 +15,19 @@
 .sliderLabel {
   width: 108px;
   color: rgb(168, 168, 168);
-  margin-left: 16px;
+  margin-left: 4px;
+}
+
+.modeLabel {
+  color: blue;
+  font-weight: bold;
+  margin-left: 8px;
+}
+
+.modeLabelNight {
+  color: red;
+  font-weight: bold;
+  margin-left: 8px;
 }
 
 .strongTitle {
