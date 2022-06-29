@@ -53,6 +53,7 @@ public class ReferenceImageService {
 	private OperationEnum previousOperation;
 	private String filePath;
 	private Roi roi = null;
+	private int zoomFactor = 0;
 
 	private Image iconImage = new ImageIcon(getClass().getResource("/luckystackworker_icon.png")).getImage();
 
@@ -135,12 +136,13 @@ public class ReferenceImageService {
 		ImagePlus duplicatedImage = Operations.applySaturation(finalResultImage, profile);
 		if (duplicatedImage != null) {
 			duplicatedImage.setRoi(finalResultImage.getRoi());
-			duplicatedImage.show();
 			Point location = finalResultImage.getWindow().getLocation();
 			finalResultImage.getWindow().setVisible(false);
 			finalResultImage.close();
 			finalResultImage = duplicatedImage;
+			finalResultImage.show(filePath);
 			setDefaultLayoutSettings(finalResultImage, location);
+			setZoom(finalResultImage, true);
 		}
 
 		finalResultImage.setTitle(filePath);
@@ -187,10 +189,12 @@ public class ReferenceImageService {
 
 	public void zoomIn() {
 		IJ.run(finalResultImage, "In [+]", null);
+		zoomFactor++;
 	}
 
 	public void zoomOut() {
 		IJ.run(finalResultImage, "Out [-]", null);
+		zoomFactor--;
 	}
 
 	public void crop() {
@@ -205,7 +209,7 @@ public class ReferenceImageService {
 			LuckyStackWorkerContext.setSelectedRoi(finalResultImage.getRoi());
 		} else {
 			roi = null;
-			finalResultImage.resetRoi();
+			finalResultImage.deleteRoi();
 			new Toolbar().setTool(Toolbar.HAND);
 			LuckyStackWorkerContext.setSelectedRoi(null);
 		}
@@ -317,8 +321,11 @@ public class ReferenceImageService {
 			}
 			Operations.correctExposure(finalResultImage);
 			log.info("Opened final result image image with id {}", finalResultImage.getID());
-			isLargeImage = setDefaultLayoutSettings(finalResultImage, null);
+			finalResultImage.show(filePath);
+			setDefaultLayoutSettings(finalResultImage, null);
+			isLargeImage = setZoom(finalResultImage, false);
 			roi = null;
+			zoomFactor = 0;
 
 			processedImage = finalResultImage.duplicate();
 			// processedImage.setRoi(finalResultImage.getRoi());
@@ -351,10 +358,9 @@ public class ReferenceImageService {
 		}
 	}
 
-	private boolean setDefaultLayoutSettings(ImagePlus image, Point location) {
+	private void setDefaultLayoutSettings(ImagePlus image, Point location) {
 		image.setColor(Color.BLACK);
 		image.setBorderColor(Color.BLACK);
-		image.show(filePath);
 		ImageWindow window = image.getWindow();
 		window.setIconImage(iconImage);
 		if (location == null) {
@@ -363,10 +369,23 @@ public class ReferenceImageService {
 			window.setLocation(location);
 		}
 		new Toolbar().setTool(Toolbar.HAND);
-		if (image.getWidth() > Constants.MAX_WINDOW_SIZE) {
-			// setRoi(image);
-			zoomOut();
+	}
+
+	private boolean setZoom(ImagePlus image, boolean isUpdate) {
+		if (!isUpdate && image.getWidth() > Constants.MAX_WINDOW_SIZE) {
+			// zoomOut(); // ImageJ already does some zoomout if window is too large, even
+			// though not enough.
 			return true;
+		} else if (isUpdate) {
+			if (zoomFactor < 0) {
+				for (int i = 0; i < Math.abs(zoomFactor); i++) {
+					IJ.run(finalResultImage, "Out [-]", null);
+				}
+			} else if (zoomFactor > 0) {
+				for (int i = 0; i < zoomFactor; i++) {
+					IJ.run(finalResultImage, "In [+]", null);
+				}
+			}
 		}
 		return false;
 	}
