@@ -30,6 +30,7 @@ import nl.wilcokas.luckystackworker.dto.StatusUpdate;
 import nl.wilcokas.luckystackworker.dto.Version;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
+import nl.wilcokas.luckystackworker.service.ProfileService;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.util.Util;
 
@@ -44,6 +45,9 @@ public class ProfileController {
 
 	@Autowired
 	private ReferenceImageService referenceImageService;
+
+	@Autowired
+	private ProfileService profileService;
 
 	@GetMapping
 	public List<Profile> getProfiles() {
@@ -98,24 +102,7 @@ public class ProfileController {
 
 	@PutMapping
 	public ResponseEntity<String> updateProfile(@RequestBody Profile profile) {
-		log.info("updateProfile called with profile {}", profile);
-		Profile result = profileRepository.findByName(profile.getName())
-				.orElseThrow(
-						() -> new ResourceNotFoundException(String.format("Unknown profile %s", profile.getName())));
-		result.setRadius(profile.getRadius());
-		result.setAmount(profile.getAmount());
-		result.setIterations(profile.getIterations());
-		result.setLevel(profile.getLevel());
-		result.setDenoise(profile.getDenoise());
-		result.setDenoiseSigma(profile.getDenoiseSigma());
-		result.setDenoiseRadius(profile.getDenoiseRadius());
-		result.setDenoiseIterations(profile.getDenoiseIterations());
-		result.setGamma(profile.getGamma());
-		result.setRed(profile.getRed());
-		result.setGreen(profile.getGreen());
-		result.setBlue(profile.getBlue());
-		result.setSaturation(profile.getSaturation());
-		profileRepository.save(result);
+		profileService.updateProfile(profile);
 		referenceImageService.updateProcessing(profile);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

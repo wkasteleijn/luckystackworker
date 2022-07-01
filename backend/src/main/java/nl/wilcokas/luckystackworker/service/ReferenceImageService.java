@@ -35,7 +35,6 @@ import nl.wilcokas.luckystackworker.dto.Version;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
-import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 import nl.wilcokas.luckystackworker.util.Operations;
 import nl.wilcokas.luckystackworker.util.Util;
@@ -58,11 +57,11 @@ public class ReferenceImageService {
 	private Image iconImage = new ImageIcon(getClass().getResource("/luckystackworker_icon.png")).getImage();
 
 	@Autowired
-	private ProfileRepository profileRepository;
-	@Autowired
 	private SettingsRepository settingsRepository;
 	@Autowired
 	private HttpService httpService;
+	@Autowired
+	private ProfileService profileService;
 
 	public Profile selectReferenceImage(String filePath) throws IOException {
 		JFrame frame = getParentFrame();
@@ -84,9 +83,10 @@ public class ReferenceImageService {
 						log.info("Profile not found for reference image, taking the default, {}", profileName);
 						profileName = getSettings().getDefaultProfile();
 					}
-					profile = profileRepository.findByName(profileName)
+					profile = profileService.findByName(profileName)
 							.orElseThrow(() -> new ResourceNotFoundException("Unknown profile!"));
 				} else {
+					profileService.updateProfile(profile);
 					log.info("Profile file found, profile was loaded from there.");
 				}
 				boolean isLargeImage = openReferenceImage(selectedFilePath, profile);
@@ -227,7 +227,7 @@ public class ReferenceImageService {
 	public void writeProfile(String fileNameNoExt) throws IOException {
 		String profileName = LuckyStackWorkerContext.getSelectedProfile();
 		if (profileName != null) {
-			Profile profile = profileRepository.findByName(profileName)
+			Profile profile = profileService.findByName(profileName)
 					.orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
 			Util.writeProfile(profile, fileNameNoExt);
 		} else {
@@ -328,13 +328,11 @@ public class ReferenceImageService {
 			zoomFactor = 0;
 
 			processedImage = finalResultImage.duplicate();
-			// processedImage.setRoi(finalResultImage.getRoi());
 			log.info("Opened duplicate image with id {}", processedImage.getID());
 			processedImage.show();
 			processedImage.getWindow().setVisible(false);
 
 			referenceImage = processedImage.duplicate();
-			// processedImage.setRoi(processedImage.getRoi());
 			referenceImage.show();
 			referenceImage.getWindow().setVisible(false);
 			log.info("Opened reference image image with id {}", referenceImage.getID());
