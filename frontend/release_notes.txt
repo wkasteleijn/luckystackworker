@@ -1,7 +1,11 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+1/7/2022: revision release 2.0.1
+- Fixed issue with cropping selection using the wrong mouse picker after deselecting the ROI.
+- Using 2 decimals for saturation
+- Fixed minor layout alignment issue.
 
-30/6/2022: major version 2.0.0
+30/6/2022: major release 2.0.0
 - Added a new panel for denoising. Added 3 new sliders for controlling the sigma, radius and number of iterations of the sigma filter denoising.
 - Added saturation control slider
 - Added cropping function

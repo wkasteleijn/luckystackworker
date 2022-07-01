@@ -205,7 +205,7 @@ public class ReferenceImageService {
 			int y = (finalResultImage.getHeight() - height) / 2;
 			finalResultImage.setRoi(x, y, width, height);
 			roi = finalResultImage.getRoi();
-			new Toolbar().setTool(Toolbar.POINT);
+			new Toolbar().setTool(Toolbar.RECTANGLE);
 			LuckyStackWorkerContext.setSelectedRoi(finalResultImage.getRoi());
 		} else {
 			roi = null;
