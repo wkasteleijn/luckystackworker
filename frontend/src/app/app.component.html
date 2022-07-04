@@ -142,7 +142,7 @@
         <div class="sliderLabel">Radius</div>
         <div class="slider">
           <mat-slider
-            [disabled]="!refImageSelected"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="0.1"
             min="0.5"
             max="4"
@@ -158,7 +158,7 @@
         <div class="sliderLabel">Amount</div>
         <div class="slider">
           <mat-slider
-            [disabled]="!refImageSelected"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="10"
             min="5000"
             max="9999"
@@ -174,7 +174,7 @@
         <div class="sliderLabel">Iterations</div>
         <div class="slider">
           <mat-slider
-            [disabled]="!refImageSelected"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             tickInterval="1"
             step="1"
             min="1"
@@ -201,7 +201,7 @@
         <div class="sliderLabel">Sigma</div>
         <div class="slider">
           <mat-slider
-            [disabled]="!refImageSelected"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             tickInterval="1000"
             step="0.1"
             min="0"
@@ -220,7 +220,7 @@
         <div class="sliderLabel">Amount</div>
         <div class="slider">
           <mat-slider
-            [disabled]="!refImageSelected || denoiseSigma === 0"
+            [disabled]="shouldShowSpinner() || !refImageSelected || denoiseSigma === 0"
             tickInterval="1000"
             step="1"
             min="0"
@@ -238,7 +238,7 @@
         <div class="sliderLabel">Radius</div>
         <div class="slider">
           <mat-slider
-            [disabled]="!refImageSelected || denoiseSigma === 0"
+            [disabled]="shouldShowSpinner() || !refImageSelected || denoiseSigma === 0"
             tickInterval="1000"
             step="0.1"
             min="0.5"
@@ -256,7 +256,7 @@
         <div class="sliderLabel">Iterations</div>
         <div class="slider">
           <mat-slider
-            [disabled]="!refImageSelected || denoiseSigma === 0"
+            [disabled]="shouldShowSpinner() || !refImageSelected || denoiseSigma === 0"
             tickInterval="1"
             step="1"
             min="1"
@@ -283,7 +283,7 @@
         <div class="sliderLabel">Gamma</div>
         <div class="slider">
           <mat-slider
-            [disabled]="!refImageSelected"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="0.01"
             min="0.0"
             max="2.0"
@@ -301,7 +301,7 @@
         <div class="sliderLabel">Saturation</div>
         <div class="slider">
           <mat-slider
-            [disabled]="!refImageSelected"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="0.01"
             min="1.00"
             max="5.00"
@@ -319,7 +319,7 @@
         <div class="sliderLabel">Reduce Red</div>
         <div class="slider">
           <mat-slider
-            [disabled]="!refImageSelected"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="0"
             max="255"
@@ -335,7 +335,7 @@
         <div class="sliderLabel">Reduce Green</div>
         <div class="slider">
           <mat-slider
-            [disabled]="!refImageSelected"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="0"
             max="255"
@@ -351,7 +351,7 @@
         <div class="sliderLabel">Reduce Blue</div>
         <div class="slider">
           <mat-slider
-            [disabled]="!refImageSelected"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="0"
             max="255"

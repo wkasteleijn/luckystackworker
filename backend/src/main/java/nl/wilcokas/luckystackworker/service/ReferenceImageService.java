@@ -45,6 +45,8 @@ public class ReferenceImageService {
 
 	private ImagePlus referenceImage;
 	private ImagePlus processedImage;
+	@Getter
+	private boolean isLargeImage = false;
 
 	@Getter
 	private ImagePlus finalResultImage;
@@ -89,11 +91,11 @@ public class ReferenceImageService {
 					profileService.updateProfile(profile);
 					log.info("Profile file found, profile was loaded from there.");
 				}
-				boolean isLargeImage = openReferenceImage(selectedFilePath, profile);
+				this.isLargeImage = openReferenceImage(selectedFilePath, profile);
 
 				final String rootFolder = Util.getFileDirectory(selectedFilePath);
 				updateSettings(rootFolder, profile);
-				profile.setLargeImage(isLargeImage);
+				profile.setLargeImage(this.isLargeImage);
 				return profile;
 			}
 		}
@@ -322,8 +324,9 @@ public class ReferenceImageService {
 			Operations.correctExposure(finalResultImage);
 			log.info("Opened final result image image with id {}", finalResultImage.getID());
 			finalResultImage.show(filePath);
-			setDefaultLayoutSettings(finalResultImage, null);
 			isLargeImage = setZoom(finalResultImage, false);
+			setDefaultLayoutSettings(finalResultImage,
+					new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y));
 			roi = null;
 			zoomFactor = 0;
 
@@ -361,19 +364,17 @@ public class ReferenceImageService {
 		image.setBorderColor(Color.BLACK);
 		ImageWindow window = image.getWindow();
 		window.setIconImage(iconImage);
-		if (location == null) {
-			window.setLocation(742, 64);
-		} else {
+		if (location != null) {
 			window.setLocation(location);
 		}
 		new Toolbar().setTool(Toolbar.HAND);
 	}
 
 	private boolean setZoom(ImagePlus image, boolean isUpdate) {
-		if (!isUpdate && image.getWidth() > Constants.MAX_WINDOW_SIZE) {
+		boolean isLargeImage = image.getWidth() > Constants.MAX_WINDOW_SIZE;
+		if (!isUpdate && isLargeImage) {
 			// zoomOut(); // ImageJ already does some zoomout if window is too large, even
 			// though not enough.
-			return true;
 		} else if (isUpdate) {
 			if (zoomFactor < 0) {
 				for (int i = 0; i < Math.abs(zoomFactor); i++) {
@@ -385,7 +386,7 @@ public class ReferenceImageService {
 				}
 			}
 		}
-		return false;
+		return isLargeImage;
 	}
 
 	private boolean validateSelectedFile(String path) {

@@ -65,7 +65,11 @@ public class ProfileController {
 			profile = profileRepository.findByName(profileName)
 					.orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
 		}
+
+		// This is not persisted, so get state from ref.service
 		profile.setRootFolder(referenceImageService.getSettings().getRootFolder());
+		profile.setLargeImage(referenceImageService.isLargeImage());
+
 		return profile;
 	}
 

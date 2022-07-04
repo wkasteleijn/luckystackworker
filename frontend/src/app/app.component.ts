@@ -54,6 +54,7 @@ export class AppComponent implements OnInit {
   crop: boolean = false;
   _showSpinner = false;
   latestKnownVersion = version;
+  private isLargeImage: boolean = false;
 
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
@@ -331,16 +332,17 @@ export class AppComponent implements OnInit {
     this.red = this.profile.red;
     this.green = this.profile.green;
     this.blue = this.profile.blue;
+    this.isLargeImage = this.profile.largeImage;
   }
 
   private updateProfile() {
-    if (this.profile.largeImage) {
+    if (this.isLargeImage) {
       this.showSpinner();
     }
     this.luckyStackWorkerService.updateProfile(this.profile).subscribe(
       (data) => {
         console.log(data);
-        if (this.profile.largeImage) {
+        if (this.isLargeImage) {
           this.hideSpinner();
         }
       },

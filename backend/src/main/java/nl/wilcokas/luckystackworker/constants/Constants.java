@@ -18,4 +18,6 @@ public class Constants {
 	public static final String VERSION_URL_ENDMARKER = "}";
 	public static final int VERSION_REQUEST_TIMEOUT = 5; // seconds
 	public static final int VERSION_REQUEST_FREQUENCY = 14; // days
+	public static final int DEFAULT_WINDOWS_POSITION_X = 742;
+	public static final int DEFAULT_WINDOWS_POSITION_Y = 64;
 }
