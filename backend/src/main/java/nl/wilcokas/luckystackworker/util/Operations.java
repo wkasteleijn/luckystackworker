@@ -23,30 +23,11 @@ public final class Operations {
 	private static final int STACK_POSITION_RED = 1;
 	private static final int STACK_POSITION_GREEN = 2;
 	private static final int STACK_POSITION_BLUE = 3;
-	private static final int DEFAULT_EXP_CORRECTION_FACTOR = 3;
-
-	private static final String CORRECT_EXPOSURE_MACRO = Util
-			.readFromInputStream(Operations.class.getResourceAsStream("/correct_exposure.ijm"));
 
 	public static void correctExposure(ImagePlus image) throws IOException {
-		boolean isStack = image.getStack() != null && image.getStack().size() > 1;
-		int maxHistogramVal = Util.getMaxHistogramPercentage(image);
-		log.info("Max histogram value is at {}%", maxHistogramVal);
-		int correctionFactor = DEFAULT_EXP_CORRECTION_FACTOR;
-		if (maxHistogramVal < 50) {
-			correctionFactor = 2;
-		} else if (maxHistogramVal > 60) {
-			correctionFactor = 4;
-		}
-		log.info("Correcting exposure with factor {}", correctionFactor);
-
-		StringSubstitutor stringSubstitutor = new StringSubstitutor(
-				Map.of("level", correctionFactor, "isStack", isStack));
-
-
-		String result = stringSubstitutor.replace(CORRECT_EXPOSURE_MACRO);
-		WindowManager.setTempCurrentImage(image);
-		new Interpreter().run(result);
+		image.setDefault16bitRange(16);
+		image.resetDisplayRange();
+		image.updateAndDraw();
 	}
 
 	public static boolean isSharpenOperation(final OperationEnum operation) {

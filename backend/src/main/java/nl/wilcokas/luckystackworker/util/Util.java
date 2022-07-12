@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.util.ReflectionUtils;
 import org.yaml.snakeyaml.Yaml;
 
@@ -51,23 +52,23 @@ public class Util {
 
 	public static String deriveProfileFromImageName(String path) {
 		String name = getImageName(getIJFileFormat(path)).toLowerCase();
-		if (name.startsWith("mer")) {
+		if (name.contains("mer")) {
 			return "mer";
-		} else if (name.startsWith("ven")) {
+		} else if (name.contains("ven")) {
 			return "ven";
-		} else if (name.startsWith("moon")) {
+		} else if (name.contains("moon")) {
 			return "moon";
-		} else if (name.startsWith("mars")) {
+		} else if (name.contains("mars")) {
 			return "mars";
-		} else if (name.startsWith("jup")) {
+		} else if (name.contains("jup")) {
 			return "jup";
-		} else if (name.startsWith("sat")) {
+		} else if (name.contains("sat")) {
 			return "sat";
-		} else if (name.startsWith("uranus")) {
+		} else if (name.contains("uranus")) {
 			return "uranus";
-		} else if (name.startsWith("neptune")) {
+		} else if (name.contains("neptune")) {
 			return "neptune";
-		} else if (name.startsWith("sun")) {
+		} else if (name.contains("sun")) {
 			return "sun";
 		}
 		return null;
@@ -151,6 +152,11 @@ public class Util {
 	}
 
 	public static int getMaxHistogramPercentage(ImagePlus image) {
+		Pair<Integer, Integer> maxHistogram = getMaxHistogram(image);
+		return (maxHistogram.getLeft() * 100) / maxHistogram.getRight();
+	}
+
+	public static Pair<Integer, Integer> getMaxHistogram(ImagePlus image) {
 		int[] histogram = image.getProcessor().getHistogram();
 		int maxVal = 0;
 		for (int i = histogram.length - 1; i >= 0; i--) {
@@ -159,7 +165,24 @@ public class Util {
 				break;
 			}
 		}
-		return (maxVal * 100) / 65536;
+		return Pair.of(maxVal, histogram.length);
+	}
+
+	public static int getMinHistogramPercentage(ImagePlus image) {
+		Pair<Integer, Integer> minHistogram = getMinHistogram(image);
+		return (minHistogram.getLeft() * 100) / minHistogram.getRight();
+	}
+
+	public static Pair<Integer, Integer> getMinHistogram(ImagePlus image) {
+		int[] histogram = image.getProcessor().getHistogram();
+		int minVal = 0;
+		for (int i = 0; i < histogram.length; i++) {
+			if (histogram[i] > 0) {
+				minVal = i;
+				break;
+			}
+		}
+		return Pair.of(minVal, histogram.length);
 	}
 
 	public static boolean isPngRgbStack(ImagePlus image, String filePath) {
