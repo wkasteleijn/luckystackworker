@@ -9,6 +9,8 @@ export class Profile {
   denoiseRadius: number;
   denoiseIterations: number;
   gamma: number;
+  contrast: number;
+  brightness: number;
   red: number;
   green: number;
   blue: number;

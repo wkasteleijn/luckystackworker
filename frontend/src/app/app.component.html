@@ -297,6 +297,42 @@
         </div>
       </div>
 
+      <div class="sliderRow">
+        <div class="sliderLabel">Contrast</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected"
+            step="1"
+            min="0"
+            max="100"
+            (input)="contrastChanged($event, false)"
+            (change)="contrastChanged($event,true)"
+            [(ngModel)]="contrast"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ contrast }}</span>
+          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ contrast == 0 ? "Off":""}}</span>
+        </div>
+      </div>
+
+      <div class="sliderRow">
+        <div class="sliderLabel">Brightness</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected"
+            step="1"
+            min="0"
+            max="100"
+            (input)="brightnessChanged($event, false)"
+            (change)="brightnessChanged($event,true)"
+            [(ngModel)]="brightness"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ brightness }}</span>
+          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ brightness == 0 ? "Off":""}}</span>
+        </div>
+      </div>
+
       <div class="sliderRow" title="Usage of Saturation will convert the image to sRGB. Only use this when no further processing is needed outside of LuckyStackWorker.">
         <div class="sliderLabel">Saturation</div>
         <div class="slider">

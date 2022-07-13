@@ -39,6 +39,8 @@ export class AppComponent implements OnInit {
   denoiseRadius: number;
   denoiseIterations: number;
   gamma: number;
+  contrast: number;
+  brightness: number;
   saturation: number;
   red: number;
   green: number;
@@ -208,6 +210,26 @@ export class AppComponent implements OnInit {
     }
   }
 
+  contrastChanged(event: any, update: boolean) {
+    this.profile.contrast = event.value;
+    this.contrast = event.value;
+    this.profile.operation = 'contrast';
+    console.log('contrastChanged called: ' + this.profile.contrast);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  brightnessChanged(event: any, update: boolean) {
+    this.profile.brightness = event.value;
+    this.brightness = event.value;
+    this.profile.operation = 'brightness';
+    console.log('brightnessChanged called: ' + this.profile.brightness);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
   saturationChanged(event: any, update: boolean) {
     this.profile.saturation = event.value;
     this.saturation = event.value;
@@ -329,6 +351,8 @@ export class AppComponent implements OnInit {
     this.denoiseIterations = this.profile.denoiseIterations;
     this.saturation = this.profile.saturation;
     this.gamma = this.profile.gamma;
+    this.contrast = this.profile.contrast;
+    this.brightness = this.profile.brightness;
     this.red = this.profile.red;
     this.green = this.profile.green;
     this.blue = this.profile.blue;
