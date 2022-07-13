@@ -92,6 +92,8 @@ public class Util {
 				.denoiseRadius(new BigDecimal(getSetting(props, "denoiseRadius", profileName))) //
 				.denoiseIterations(Integer.valueOf(getSetting(props, "denoiseIterations", profileName))) //
 				.gamma(new BigDecimal(getSetting(props, "gamma", profileName))) //
+				.contrast(Integer.valueOf(getSetting(props, "contrast", profileName))) //
+				.brightness(Integer.valueOf(getSetting(props, "brightness", profileName))) //
 				.red(new BigDecimal(getSetting(props, "red", profileName))) //
 				.green(new BigDecimal(getSetting(props, "green", profileName))) //
 				.blue(new BigDecimal(getSetting(props, "blue", profileName))) //

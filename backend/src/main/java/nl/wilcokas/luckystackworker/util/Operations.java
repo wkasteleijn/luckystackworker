@@ -23,6 +23,8 @@ public final class Operations {
 	private static final int STACK_POSITION_RED = 1;
 	private static final int STACK_POSITION_GREEN = 2;
 	private static final int STACK_POSITION_BLUE = 3;
+	private static final String HISTOGRAM_STRETCH_MACRO = Util
+			.readFromInputStream(Operations.class.getResourceAsStream("/histogramstretch.ijm"));
 
 	public static void correctExposure(ImagePlus image) throws IOException {
 		image.setDefault16bitRange(16);
@@ -56,6 +58,12 @@ public final class Operations {
 		if (!operationList.contains(OperationEnum.GAMMA)) {
 			applyGamma(image, profile);
 		}
+		if (!operationList.contains(OperationEnum.CONTRAST)) {
+			applyContrast(image, profile);
+		}
+		if (!operationList.contains(OperationEnum.BRIGHTNESS)) {
+			applyBrightness(image, profile);
+		}
 		if (!operationList.contains(OperationEnum.RED)) {
 			applyRed(image, profile);
 		}
@@ -73,6 +81,8 @@ public final class Operations {
 		applySharpen(image, profile);
 		applyDenoise(image, profile);
 		applyGamma(image, profile);
+		applyContrast(image, profile);
+		applyBrightness(image, profile);
 		applyRed(image, profile);
 		applyGreen(image, profile);
 		applyBlue(image, profile);
@@ -167,6 +177,40 @@ public final class Operations {
 			}
 		}
 		return null;
+	}
+
+	public static void applyContrast(ImagePlus image, final Profile profile) {
+		if (profile.getContrast() != 0) {
+			if (validateRGBStack(image)) {
+				log.info("Applying contrast increase with factor {} to image {}", profile.getSaturation(),
+						image.getID());
+				double newMin = (profile.getContrast()) * (16384.0 / 100.0);
+				double newMax = 65536 - newMin;
+				applyHistogramStretch(image, profile, newMin, newMax);
+			} else {
+				log.warn("Attemping to apply contrast increase to a non RGB image {}", image.getFileInfo());
+			}
+		}
+	}
+
+	public static void applyBrightness(ImagePlus image, final Profile profile) {
+		if (profile.getBrightness() != 0) {
+			if (validateRGBStack(image)) {
+				log.info("Applying brightness increase with factor {} to image {}", profile.getSaturation(),
+						image.getID());
+				double newMax = 65536 - (profile.getBrightness()) * (49152.0 / 100.0);
+				applyHistogramStretch(image, profile, 0, newMax);
+			} else {
+				log.warn("Attemping to apply brightness increase to a non RGB image {}", image.getFileInfo());
+			}
+		}
+	}
+
+	private static void applyHistogramStretch(ImagePlus image, final Profile profile, double newMin, double newMax) {
+		StringSubstitutor stringSubstitutor = new StringSubstitutor(Map.of("newmin", newMin, "newmax", newMax));
+		String result = stringSubstitutor.replace(HISTOGRAM_STRETCH_MACRO);
+		WindowManager.setTempCurrentImage(image);
+		new Interpreter().run(result);
 	}
 
 	private static ImageProcessor getImageStackProcessor(final ImagePlus img, final int stackPosition) {

@@ -125,6 +125,10 @@ public class ReferenceImageService {
 			Operations.applyDenoise(finalResultImage, profile);
 		} else if (OperationEnum.GAMMA == operation) {
 			Operations.applyGamma(finalResultImage, profile);
+		} else if (OperationEnum.CONTRAST == operation) {
+			Operations.applyContrast(finalResultImage, profile);
+		} else if (OperationEnum.BRIGHTNESS == operation) {
+			Operations.applyBrightness(finalResultImage, profile);
 		} else if (OperationEnum.RED == operation) {
 			Operations.applyRed(finalResultImage, profile);
 		} else if (OperationEnum.GREEN == operation) {

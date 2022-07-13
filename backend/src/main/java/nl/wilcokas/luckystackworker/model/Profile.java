@@ -69,6 +69,12 @@ public class Profile {
 	@Column(name = "saturation")
 	private BigDecimal saturation;
 
+	@Column(name = "contrast")
+	private int contrast;
+
+	@Column(name = "brightness")
+	private int brightness;
+
 	// Non persisted setting properties that are passed to the frontend.
 	private String operation;
 	private String rootFolder;
