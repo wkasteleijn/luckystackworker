@@ -44,33 +44,30 @@ public final class Operations {
 
 	public static void applyAllOperationsExcept(final ImagePlus image, final Profile profile,
 			final OperationEnum... operations) {
-		List<OperationEnum> operationList = Arrays.asList(operations);
-		if ((!operationList.contains(OperationEnum.AMOUNT)) && (!operationList.contains(OperationEnum.RADIUS))
-				&& (!operationList.contains(OperationEnum.ITERATIONS))) {
+		List<OperationEnum> excludedOperationList = Arrays.asList(operations);
+		if ((!excludedOperationList.contains(OperationEnum.AMOUNT)) && (!excludedOperationList.contains(OperationEnum.RADIUS))
+				&& (!excludedOperationList.contains(OperationEnum.ITERATIONS))) {
 			applySharpen(image, profile);
 		}
-		if ((!operationList.contains(OperationEnum.DENOISEAMOUNT))
-				&& (!operationList.contains(OperationEnum.DENOISESIGMA))
-				&& (!operationList.contains(OperationEnum.DENOISERADIUS))
-				&& (!operationList.contains(OperationEnum.DENOISEITERATIONS))) {
+		if ((!excludedOperationList.contains(OperationEnum.DENOISEAMOUNT))
+				&& (!excludedOperationList.contains(OperationEnum.DENOISESIGMA))
+				&& (!excludedOperationList.contains(OperationEnum.DENOISERADIUS))
+				&& (!excludedOperationList.contains(OperationEnum.DENOISEITERATIONS))) {
 			applyDenoise(image, profile);
 		}
-		if (!operationList.contains(OperationEnum.GAMMA)) {
+		if (!excludedOperationList.contains(OperationEnum.GAMMA)) {
 			applyGamma(image, profile);
 		}
-		if (!operationList.contains(OperationEnum.CONTRAST)) {
-			applyContrast(image, profile);
+		if ((!excludedOperationList.contains(OperationEnum.CONTRAST)) && (!excludedOperationList.contains(OperationEnum.BRIGHTNESS))) {
+			applyBrightnessAndContrast(image, profile);
 		}
-		if (!operationList.contains(OperationEnum.BRIGHTNESS)) {
-			applyBrightness(image, profile);
-		}
-		if (!operationList.contains(OperationEnum.RED)) {
+		if (!excludedOperationList.contains(OperationEnum.RED)) {
 			applyRed(image, profile);
 		}
-		if (!operationList.contains(OperationEnum.GREEN)) {
+		if (!excludedOperationList.contains(OperationEnum.GREEN)) {
 			applyGreen(image, profile);
 		}
-		if (!operationList.contains(OperationEnum.BLUE)) {
+		if (!excludedOperationList.contains(OperationEnum.BLUE)) {
 			applyBlue(image, profile);
 		}
 	}
@@ -81,8 +78,7 @@ public final class Operations {
 		applySharpen(image, profile);
 		applyDenoise(image, profile);
 		applyGamma(image, profile);
-		applyContrast(image, profile);
-		applyBrightness(image, profile);
+		applyBrightnessAndContrast(image, profile);
 		applyRed(image, profile);
 		applyGreen(image, profile);
 		applyBlue(image, profile);
@@ -169,8 +165,10 @@ public final class Operations {
 				StringSubstitutor stringSubstitutor = new StringSubstitutor(Map.of("factor", profile.getSaturation()));
 				String result = stringSubstitutor.replace(macro);
 				ImagePlus image2 = image.duplicate();
+				Util.copyInto(image, image2, image.getRoi());
 				WindowManager.setTempCurrentImage(image2);
 				new Interpreter().run(result);
+				WindowManager.setTempCurrentImage(image);
 				return image2;
 			} else {
 				log.warn("Attemping to apply saturation increase to a non RGB image {}", image.getFileInfo());
@@ -179,39 +177,32 @@ public final class Operations {
 		return null;
 	}
 
-	public static void applyContrast(ImagePlus image, final Profile profile) {
-		if (profile.getContrast() != 0) {
-			if (validateRGBStack(image)) {
-				log.info("Applying contrast increase with factor {} to image {}", profile.getSaturation(),
-						image.getID());
-				double newMin = (profile.getContrast()) * (16384.0 / 100.0);
-				double newMax = 65536 - newMin;
-				applyHistogramStretch(image, profile, newMin, newMax);
-			} else {
-				log.warn("Attemping to apply contrast increase to a non RGB image {}", image.getFileInfo());
-			}
+	public static void applyBrightnessAndContrast(ImagePlus image, final Profile profile) {
+		if (profile.getContrast() != 0 || profile.getBrightness() != 0) {
+			log.info("Applying contrast increase with factor {} to image {}", profile.getContrast(),
+					image.getID());
+
+			// contrast
+			double newMin = Math.round((profile.getContrast()) * (16384.0 / 100.0));
+			double newMax = 65536 - newMin;
+
+			// brightness
+			newMax = Math.round(newMax - (profile.getBrightness()) * (49152.0 / 100.0));
+
+			//			for (int slice = 1; slice <= 3; slice++) {
+			//				image.setSlice(slice);
+			//				image.getProcessor().setMinAndMax(newMin, newMax);
+			//				image.updateAndDraw();
+			//			}
+			//			IJ.run(image, "Apply LUT", null);
+			StringSubstitutor stringSubstitutor = new StringSubstitutor(
+					Map.of("isStack", validateRGBStack(image), "newMin", newMin, "newMax", newMax));
+			String result = stringSubstitutor.replace(HISTOGRAM_STRETCH_MACRO);
+			WindowManager.setTempCurrentImage(image);
+			new Interpreter().run(result);
 		}
 	}
 
-	public static void applyBrightness(ImagePlus image, final Profile profile) {
-		if (profile.getBrightness() != 0) {
-			if (validateRGBStack(image)) {
-				log.info("Applying brightness increase with factor {} to image {}", profile.getSaturation(),
-						image.getID());
-				double newMax = 65536 - (profile.getBrightness()) * (49152.0 / 100.0);
-				applyHistogramStretch(image, profile, 0, newMax);
-			} else {
-				log.warn("Attemping to apply brightness increase to a non RGB image {}", image.getFileInfo());
-			}
-		}
-	}
-
-	private static void applyHistogramStretch(ImagePlus image, final Profile profile, double newMin, double newMax) {
-		StringSubstitutor stringSubstitutor = new StringSubstitutor(Map.of("newmin", newMin, "newmax", newMax));
-		String result = stringSubstitutor.replace(HISTOGRAM_STRETCH_MACRO);
-		WindowManager.setTempCurrentImage(image);
-		new Interpreter().run(result);
-	}
 
 	private static ImageProcessor getImageStackProcessor(final ImagePlus img, final int stackPosition) {
 		return img.getStack().getProcessor(stackPosition);

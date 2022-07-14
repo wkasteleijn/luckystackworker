@@ -231,6 +231,23 @@ public class Util {
 				.build();
 	}
 
+	public static void copyInto(final ImagePlus origin, final ImagePlus destination, Roi roi) {
+		log.info("Copying image {} into image {}", origin.getID(), destination.getID());
+		destination.setImage(origin);
+		destination.setTitle("PROCESSING");
+		for (int slice = 1; slice <= 3; slice++) {
+			destination.setSlice(slice);
+			origin.setSlice(slice);
+			destination.getProcessor().setMinAndMax(origin.getProcessor().getMin(), origin.getProcessor().getMax());
+			destination.updateAndDraw();
+		}
+		IJ.run(destination, "Apply LUT", null);
+
+		if (roi != null) {
+			destination.setRoi(roi);
+		}
+	}
+
 	private static String getSetting(Map<String, String> props, String setting, String name) {
 		return props.get(name + "." + setting);
 	}

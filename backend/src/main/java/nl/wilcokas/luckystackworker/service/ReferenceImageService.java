@@ -106,7 +106,7 @@ public class ReferenceImageService {
 		final OperationEnum operation = profile.getOperation() == null ? null
 				: OperationEnum.valueOf(profile.getOperation().toUpperCase());
 		if (previousOperation == null || previousOperation != operation) {
-			copyInto(referenceImage, processedImage);
+			Util.copyInto(referenceImage, processedImage, roi);
 			if (Operations.isSharpenOperation(operation)) {
 				Operations.applyAllOperationsExcept(processedImage, profile, operation, OperationEnum.DENOISEAMOUNT,
 						OperationEnum.DENOISERADIUS, OperationEnum.DENOISESIGMA, OperationEnum.DENOISEITERATIONS);
@@ -115,7 +115,7 @@ public class ReferenceImageService {
 			}
 			previousOperation = operation;
 		}
-		copyInto(processedImage, finalResultImage);
+		Util.copyInto(processedImage, finalResultImage, roi);
 		setDefaultLayoutSettings(finalResultImage, finalResultImage.getWindow().getLocation());
 
 		if (Operations.isSharpenOperation(operation)) {
@@ -125,10 +125,11 @@ public class ReferenceImageService {
 			Operations.applyDenoise(finalResultImage, profile);
 		} else if (OperationEnum.GAMMA == operation) {
 			Operations.applyGamma(finalResultImage, profile);
-		} else if (OperationEnum.CONTRAST == operation) {
-			Operations.applyContrast(finalResultImage, profile);
-		} else if (OperationEnum.BRIGHTNESS == operation) {
-			Operations.applyBrightness(finalResultImage, profile);
+		} else if ((OperationEnum.CONTRAST == operation) || (OperationEnum.BRIGHTNESS == operation)) {
+			// TODO: fix verkleuring hier icm met saturatie, treedt alleen op als ALLEEN
+			// contrast of brightness
+			// wordt aangepast..
+			Operations.applyBrightnessAndContrast(finalResultImage, profile);
 		} else if (OperationEnum.RED == operation) {
 			Operations.applyRed(finalResultImage, profile);
 		} else if (OperationEnum.GREEN == operation) {
@@ -352,15 +353,6 @@ public class ReferenceImageService {
 			finalResultImage.setTitle(this.filePath);
 		}
 		return isLargeImage;
-	}
-
-	private void copyInto(final ImagePlus origin, final ImagePlus destination) {
-		log.info("Copying image {} into image {}", origin.getID(), destination.getID());
-		destination.setImage(origin);
-		destination.setTitle("PROCESSING");
-		if (roi != null) {
-			destination.setRoi(roi);
-		}
 	}
 
 	private void setDefaultLayoutSettings(ImagePlus image, Point location) {

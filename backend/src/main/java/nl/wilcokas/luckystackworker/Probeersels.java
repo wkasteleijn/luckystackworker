@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import ij.ImagePlus;
 import ij.io.Opener;
+import ij.process.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -11,7 +12,7 @@ public class Probeersels {
 	public static void main(String[] args) throws InterruptedException, IOException {
 
 		ImagePlus image = new Opener()
-				.openImage("D:\\Jup\\040921\\pipp_20210905_163919\\Jup_232158_pipp_AS_P9_lapl6_ap28.tif");
+				.openImage("D:\\Jup\\040921\\pipp_20210905_163919\\Jup_232158_pipp_AS_P9_lapl6_ap28_LSW.tif");
 		// .openImage("D:\\Jup\\testsession\\Jup_224759_AS_P30_lapl5_ap44.tif");
 		// .openImage("D:\\Sun\\220522\\Sun_100434_AS_P1_lapl4_ap1531.tif");
 
@@ -91,10 +92,31 @@ public class Probeersels {
 		//		image.updateAndDraw();
 		//		log.info("End manipulation");
 
+		// Set exposure back to original value
 		image.setDefault16bitRange(16);
 		image.resetDisplayRange();
 		image.updateAndDraw();
 
+		for (int layer = 1; layer <= 3; layer++) {
+			ImageProcessor p = image.getStack().getProcessor(layer);
+			// p.setHistogramRange(20000, 30000);
+			p.setThreshold(10000, 40000, ImageProcessor.OVER_UNDER_LUT);
+			// p.resetThreshold();
+		}
+		image.setSlice(0);
+		image.getProcessor().setMinAndMax(10000, 40000);
+		image.setSlice(1);
+		image.getProcessor().setMinAndMax(10000, 40000);
+		image.setSlice(2);
+		image.getProcessor().setMinAndMax(10000, 40000);
+		// image.resetDisplayRange();
+		image.updateAndDraw();
+
+		// for (int layer = 1; layer <= 3; layer++) {
+		// ImageProcessor p = image.getStack().getProcessor(layer);
+		// image.setDisplayRange(minHistogram.getLeft(), maxHistogram.getLeft(), layer);
+		// }
+		// image.updateAndDraw();
 		// call("ij.ImagePlus.setDefault16bitRange", 16);
 
 		// Histogram stretching
@@ -138,7 +160,7 @@ public class Probeersels {
 		//		image.setRoi(128, 128, 640, 480);
 		//		ImagePlus crop = image.crop();
 
-		Thread.currentThread().sleep(25000);
+		Thread.currentThread().sleep(5000);
 		System.exit(0);
 	}
 }
