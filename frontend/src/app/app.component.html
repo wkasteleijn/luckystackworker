@@ -333,6 +333,24 @@
         </div>
       </div>
 
+      <div class="sliderRow">
+        <div class="sliderLabel">Darken Background</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected"
+            step="1"
+            min="0"
+            max="100"
+            (input)="backgroundChanged($event, false)"
+            (change)="backgroundChanged($event,true)"
+            [(ngModel)]="background"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ background }}</span>
+          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ background == 0 ? "Off":""}}</span>
+        </div>
+      </div>
+
       <div class="sliderRow" title="Usage of Saturation will convert the image to sRGB. Only use this when no further processing is needed outside of LuckyStackWorker.">
         <div class="sliderLabel">Saturation</div>
         <div class="slider">
@@ -365,6 +383,7 @@
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ red }}</span>
+          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ red == 0 ? "Off":""}}</span>
         </div>
       </div>
       <div class="sliderRow">
@@ -381,6 +400,7 @@
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ green }}</span>
+          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ green == 0 ? "Off":""}}</span>
         </div>
       </div>
       <div class="sliderRow">
@@ -397,6 +417,7 @@
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ blue }}</span>
+          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ blue == 0 ? "Off":""}}</span>
         </div>
       </div>
     </mat-card-content>

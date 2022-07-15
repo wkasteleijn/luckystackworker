@@ -11,6 +11,7 @@ export class Profile {
   gamma: number;
   contrast: number;
   brightness: number;
+  background: number;
   red: number;
   green: number;
   blue: number;

@@ -1,5 +1,10 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+17/7/2022 minor release 2.1.0:
+- Added new sliders to control contrast, brightness & darken background
+- Fixed spinner not always showing when processing large images
+- Replaced initial exposure correction problem of ImageJ with correct handling of exposure (exact match with original)
+
 1/7/2022: revision release 2.0.1
 - Fixed issue with cropping selection using the wrong mouse picker after deselecting the ROI.
 - Using 2 decimals for saturation

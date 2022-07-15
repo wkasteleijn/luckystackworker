@@ -106,7 +106,7 @@ public class ReferenceImageService {
 		final OperationEnum operation = profile.getOperation() == null ? null
 				: OperationEnum.valueOf(profile.getOperation().toUpperCase());
 		if (previousOperation == null || previousOperation != operation) {
-			Util.copyInto(referenceImage, processedImage, roi);
+			Util.copyInto(referenceImage, processedImage, roi, profile, false);
 			if (Operations.isSharpenOperation(operation)) {
 				Operations.applyAllOperationsExcept(processedImage, profile, operation, OperationEnum.DENOISEAMOUNT,
 						OperationEnum.DENOISERADIUS, OperationEnum.DENOISESIGMA, OperationEnum.DENOISEITERATIONS);
@@ -115,7 +115,7 @@ public class ReferenceImageService {
 			}
 			previousOperation = operation;
 		}
-		Util.copyInto(processedImage, finalResultImage, roi);
+		Util.copyInto(processedImage, finalResultImage, roi, profile, true);
 		setDefaultLayoutSettings(finalResultImage, finalResultImage.getWindow().getLocation());
 
 		if (Operations.isSharpenOperation(operation)) {
@@ -125,11 +125,9 @@ public class ReferenceImageService {
 			Operations.applyDenoise(finalResultImage, profile);
 		} else if (OperationEnum.GAMMA == operation) {
 			Operations.applyGamma(finalResultImage, profile);
-		} else if ((OperationEnum.CONTRAST == operation) || (OperationEnum.BRIGHTNESS == operation)) {
-			// TODO: fix verkleuring hier icm met saturatie, treedt alleen op als ALLEEN
-			// contrast of brightness
-			// wordt aangepast..
-			Operations.applyBrightnessAndContrast(finalResultImage, profile);
+		} else if ((OperationEnum.CONTRAST == operation) || (OperationEnum.BRIGHTNESS == operation)
+				|| (OperationEnum.BACKGROUND == operation)) {
+			Operations.applyBrightnessAndContrast(finalResultImage, profile, false);
 		} else if (OperationEnum.RED == operation) {
 			Operations.applyRed(finalResultImage, profile);
 		} else if (OperationEnum.GREEN == operation) {

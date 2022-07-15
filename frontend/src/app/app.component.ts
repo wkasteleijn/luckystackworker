@@ -41,6 +41,7 @@ export class AppComponent implements OnInit {
   gamma: number;
   contrast: number;
   brightness: number;
+  background: number;
   saturation: number;
   red: number;
   green: number;
@@ -230,6 +231,16 @@ export class AppComponent implements OnInit {
     }
   }
 
+  backgroundChanged(event: any, update: boolean) {
+    this.profile.background = event.value;
+    this.background = event.value;
+    this.profile.operation = 'background';
+    console.log('backgroundChanged called: ' + this.profile.background);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
   saturationChanged(event: any, update: boolean) {
     this.profile.saturation = event.value;
     this.saturation = event.value;
@@ -353,6 +364,7 @@ export class AppComponent implements OnInit {
     this.gamma = this.profile.gamma;
     this.contrast = this.profile.contrast;
     this.brightness = this.profile.brightness;
+    this.background = this.profile.background;
     this.red = this.profile.red;
     this.green = this.profile.green;
     this.blue = this.profile.blue;

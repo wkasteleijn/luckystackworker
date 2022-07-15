@@ -75,6 +75,9 @@ public class Profile {
 	@Column(name = "brightness")
 	private int brightness;
 
+	@Column(name = "background")
+	private int background;
+
 	// Non persisted setting properties that are passed to the frontend.
 	private String operation;
 	private String rootFolder;

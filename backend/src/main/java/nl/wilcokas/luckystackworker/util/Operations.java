@@ -58,8 +58,10 @@ public final class Operations {
 		if (!excludedOperationList.contains(OperationEnum.GAMMA)) {
 			applyGamma(image, profile);
 		}
-		if ((!excludedOperationList.contains(OperationEnum.CONTRAST)) && (!excludedOperationList.contains(OperationEnum.BRIGHTNESS))) {
-			applyBrightnessAndContrast(image, profile);
+		if ((!excludedOperationList.contains(OperationEnum.CONTRAST))
+				&& (!excludedOperationList.contains(OperationEnum.BRIGHTNESS))
+				&& (!excludedOperationList.contains(OperationEnum.BACKGROUND))) {
+			applyBrightnessAndContrast(image, profile, true);
 		}
 		if (!excludedOperationList.contains(OperationEnum.RED)) {
 			applyRed(image, profile);
@@ -78,7 +80,7 @@ public final class Operations {
 		applySharpen(image, profile);
 		applyDenoise(image, profile);
 		applyGamma(image, profile);
-		applyBrightnessAndContrast(image, profile);
+		applyBrightnessAndContrast(image, profile, true);
 		applyRed(image, profile);
 		applyGreen(image, profile);
 		applyBlue(image, profile);
@@ -165,10 +167,9 @@ public final class Operations {
 				StringSubstitutor stringSubstitutor = new StringSubstitutor(Map.of("factor", profile.getSaturation()));
 				String result = stringSubstitutor.replace(macro);
 				ImagePlus image2 = image.duplicate();
-				Util.copyInto(image, image2, image.getRoi());
+				Util.copyInto(image, image2, image.getRoi(), profile, true);
 				WindowManager.setTempCurrentImage(image2);
 				new Interpreter().run(result);
-				WindowManager.setTempCurrentImage(image);
 				return image2;
 			} else {
 				log.warn("Attemping to apply saturation increase to a non RGB image {}", image.getFileInfo());
@@ -177,24 +178,24 @@ public final class Operations {
 		return null;
 	}
 
-	public static void applyBrightnessAndContrast(ImagePlus image, final Profile profile) {
-		if (profile.getContrast() != 0 || profile.getBrightness() != 0) {
+	public static void applyBrightnessAndContrast(ImagePlus image, final Profile profile, boolean copyMinMax) {
+		if (profile.getContrast() != 0 || profile.getBrightness() != 0 || profile.getBackground() != 0) {
+			if (copyMinMax) {
+				Util.copyMinMax(image, image);
+			}
 			log.info("Applying contrast increase with factor {} to image {}", profile.getContrast(),
 					image.getID());
 
-			// contrast
+			// Contrast
 			double newMin = Math.round((profile.getContrast()) * (16384.0 / 100.0));
 			double newMax = 65536 - newMin;
 
-			// brightness
+			// Brightness
 			newMax = Math.round(newMax - (profile.getBrightness()) * (49152.0 / 100.0));
 
-			//			for (int slice = 1; slice <= 3; slice++) {
-			//				image.setSlice(slice);
-			//				image.getProcessor().setMinAndMax(newMin, newMax);
-			//				image.updateAndDraw();
-			//			}
-			//			IJ.run(image, "Apply LUT", null);
+			// Darken background
+			newMin = Math.round(newMin + (profile.getBackground()) * (16384.0 / 100.0));
+
 			StringSubstitutor stringSubstitutor = new StringSubstitutor(
 					Map.of("isStack", validateRGBStack(image), "newMin", newMin, "newMax", newMax));
 			String result = stringSubstitutor.replace(HISTOGRAM_STRETCH_MACRO);

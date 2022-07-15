@@ -94,6 +94,7 @@ public class Util {
 				.gamma(new BigDecimal(getSetting(props, "gamma", profileName))) //
 				.contrast(Integer.valueOf(getSetting(props, "contrast", profileName))) //
 				.brightness(Integer.valueOf(getSetting(props, "brightness", profileName))) //
+				.background(Integer.valueOf(getSetting(props, "background", profileName))) //
 				.red(new BigDecimal(getSetting(props, "red", profileName))) //
 				.green(new BigDecimal(getSetting(props, "green", profileName))) //
 				.blue(new BigDecimal(getSetting(props, "blue", profileName))) //
@@ -231,21 +232,28 @@ public class Util {
 				.build();
 	}
 
-	public static void copyInto(final ImagePlus origin, final ImagePlus destination, Roi roi) {
+	public static void copyInto(final ImagePlus origin, final ImagePlus destination, Roi roi, Profile profile,
+			boolean copyMinMax) {
 		log.info("Copying image {} into image {}", origin.getID(), destination.getID());
 		destination.setImage(origin);
 		destination.setTitle("PROCESSING");
-		for (int slice = 1; slice <= 3; slice++) {
+		if (copyMinMax && (profile.getBrightness() > 0 || profile.getContrast() > 0) || profile.getBackground() > 0) {
+			copyMinMax(origin, destination);
+		}
+
+		if (roi != null) {
+			destination.setRoi(roi);
+		}
+	}
+
+	public static void copyMinMax(final ImagePlus origin, final ImagePlus destination) {
+		for (int slice = 1; slice <= origin.getStack().size(); slice++) {
 			destination.setSlice(slice);
 			origin.setSlice(slice);
 			destination.getProcessor().setMinAndMax(origin.getProcessor().getMin(), origin.getProcessor().getMax());
 			destination.updateAndDraw();
 		}
 		IJ.run(destination, "Apply LUT", null);
-
-		if (roi != null) {
-			destination.setRoi(roi);
-		}
 	}
 
 	private static String getSetting(Map<String, String> props, String setting, String name) {
