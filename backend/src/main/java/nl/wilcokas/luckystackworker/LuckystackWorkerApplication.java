@@ -18,6 +18,13 @@ public class LuckystackWorkerApplication {
 		log.info("Java vendor is {}", System.getProperty("java.vendor"));
 		log.info("Java version is {}", System.getProperty("java.version"));
 
+		log.info("Starting electron GUI");
+		try {
+			Runtime.getRuntime().exec(".\\lsw_gui.exe");
+		} catch (IOException e) {
+			log.error("Failed to start GUI! ", e);
+		}
+
 		SpringApplication.run(LuckystackWorkerApplication.class, args);
 	}
 }

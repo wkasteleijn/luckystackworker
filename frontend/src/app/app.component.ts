@@ -7,6 +7,8 @@ import { Profile } from './model/profile';
 import { NewVersionComponent } from './new_version/newversion.component';
 import { version } from '../../package.json';
 
+const SERVICE_POLL_DELAY_MS = 250;
+
 interface ProfileSelection {
   value: string;
   viewValue: string;
@@ -18,6 +20,7 @@ interface ProfileSelection {
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
+
   profiles: ProfileSelection[] = [
     { value: 'mer', viewValue: 'Mercury' },
     { value: 'ven', viewValue: 'Venus' },
@@ -395,7 +398,7 @@ export class AppComponent implements OnInit {
     this.getStatusUpdate();
     if ('Idle' !== this.workerStatus) {
       console.log(this.workerStatus);
-      setTimeout(() => this.waitForWorker(), 500);
+      setTimeout(() => this.waitForWorker(), SERVICE_POLL_DELAY_MS);
     } else {
       console.log('Worker is done!');
       this.hideSpinner();
@@ -429,12 +432,12 @@ export class AppComponent implements OnInit {
           this.checkLatestVersion();
         } else {
           console.log('Profile was not yet selected');
-          setTimeout(() => this.pollSelectedProfile(), 500);
+          setTimeout(() => this.pollSelectedProfile(), SERVICE_POLL_DELAY_MS);
         }
       },
       (error) => {
         console.log('Profile was not yet selected');
-        setTimeout(() => this.pollSelectedProfile(), 500);
+        setTimeout(() => this.pollSelectedProfile(), SERVICE_POLL_DELAY_MS);
       }
     );
   }

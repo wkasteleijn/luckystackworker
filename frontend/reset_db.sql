@@ -10,7 +10,7 @@ update profiles set contrast=0;
 update profiles set brightness=0;
 update profiles set background=0;
 select * from profiles;
-update settings set latest_known_version='2.1.0';
+update settings set latest_known_version='2.2.0';
 update settings set latest_known_version_checked=null;
 update settings set root_folder='C:/';
 select * from settings;

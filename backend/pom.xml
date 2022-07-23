@@ -11,7 +11,7 @@
 
 	<groupId>nl.wilcokas</groupId>
 	<artifactId>luckystackworker</artifactId>
-	<version>2.1.0</version>
+	<version>2.2.0</version>
 	<name>LuckyStackWorker</name>
 	<description>LuckyStackWorker Application</description>
 
@@ -66,7 +66,7 @@
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>ij</artifactId>
-			<version>1.53o</version>
+			<version>1.53o-lsw</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

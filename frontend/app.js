@@ -1,7 +1,6 @@
 const { app, BrowserWindow } = require("electron");
 const url = require("url");
 const path = require("path");
-//var kill = require("tree-kill");
 
 let mainWindow;
 
@@ -17,10 +16,6 @@ function createWindow() {
       nodeIntegration: true,
     },
   });
-
-  var child = require("child_process").spawn(
-    app.getAppPath() + "\\lsworker.bat"
-  );
 
   mainWindow.loadURL(
     url.format({
