@@ -8,3 +8,4 @@ RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\src
 RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\node_modules
 DEL /Q .\LuckyStackWorker-win32-x64\resources\app\createExe*.bat
 DEL /Q .\LuckyStackWorker-win32-x64\resources\app\reset_db.sql
+DEL /Q .\LuckyStackWorker-win32-x64\resources\app\launch4j_lsw.xml

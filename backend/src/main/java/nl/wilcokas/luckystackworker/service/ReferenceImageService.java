@@ -5,6 +5,9 @@ import java.awt.Component;
 import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Window;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
@@ -15,6 +18,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.velocity.exception.ResourceNotFoundException;
@@ -24,7 +28,7 @@ import org.springframework.stereotype.Service;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
-import ij.gui.Roi;
+import ij.gui.RoiListener;
 import ij.gui.Toolbar;
 import ij.io.Opener;
 import lombok.Getter;
@@ -41,7 +45,7 @@ import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
 @Service
-public class ReferenceImageService {
+public class ReferenceImageService implements RoiListener, WindowListener {
 
 	private ImagePlus referenceImage;
 	private ImagePlus processedImage;
@@ -53,7 +57,11 @@ public class ReferenceImageService {
 
 	private OperationEnum previousOperation;
 	private String filePath;
-	private Roi roi = null;
+
+	private boolean roiActive = false;
+	private JFrame roiIndicatorFrame = null;
+	private JTextField roiIndicatorTextField = null;
+
 	private int zoomFactor = 0;
 
 	private Image iconImage = new ImageIcon(getClass().getResource("/luckystackworker_icon.png")).getImage();
@@ -106,7 +114,7 @@ public class ReferenceImageService {
 		final OperationEnum operation = profile.getOperation() == null ? null
 				: OperationEnum.valueOf(profile.getOperation().toUpperCase());
 		if (previousOperation == null || previousOperation != operation) {
-			Util.copyInto(referenceImage, processedImage, roi, profile, false);
+			Util.copyInto(referenceImage, processedImage, finalResultImage.getRoi(), profile, false);
 			if (Operations.isSharpenOperation(operation)) {
 				Operations.applyAllOperationsExcept(processedImage, profile, operation, OperationEnum.DENOISEAMOUNT,
 						OperationEnum.DENOISERADIUS, OperationEnum.DENOISESIGMA, OperationEnum.DENOISEITERATIONS);
@@ -115,7 +123,7 @@ public class ReferenceImageService {
 			}
 			previousOperation = operation;
 		}
-		Util.copyInto(processedImage, finalResultImage, roi, profile, true);
+		Util.copyInto(processedImage, finalResultImage, finalResultImage.getRoi(), profile, true);
 		setDefaultLayoutSettings(finalResultImage, finalResultImage.getWindow().getLocation());
 
 		if (Operations.isSharpenOperation(operation)) {
@@ -158,7 +166,7 @@ public class ReferenceImageService {
 		log.info("Saving image to folder {}", dir);
 		String fileNameNoExt = Util.getFilename(path)[0];
 		String finalPath = fileNameNoExt + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
-		Util.saveImage(finalResultImage, finalPath, Util.isPngRgbStack(finalResultImage, filePath), roi != null);
+		Util.saveImage(finalResultImage, finalPath, Util.isPngRgbStack(finalResultImage, filePath), roiActive);
 		log.info("Saved file to {}", finalPath);
 		writeProfile(fileNameNoExt);
 	}
@@ -203,20 +211,22 @@ public class ReferenceImageService {
 	}
 
 	public void crop() {
-		if (roi == null) {
+		if (!roiActive) {
 			int width = finalResultImage.getWidth() / 2;
 			int height = finalResultImage.getHeight() / 2;
 			int x = (finalResultImage.getWidth() - width) / 2;
 			int y = (finalResultImage.getHeight() - height) / 2;
 			finalResultImage.setRoi(x, y, width, height);
-			roi = finalResultImage.getRoi();
 			new Toolbar().setTool(Toolbar.RECTANGLE);
 			LuckyStackWorkerContext.setSelectedRoi(finalResultImage.getRoi());
+			roiActive = true;
+			showRoiIndicator();
 		} else {
-			roi = null;
+			roiActive = false;
 			finalResultImage.deleteRoi();
 			new Toolbar().setTool(Toolbar.HAND);
 			LuckyStackWorkerContext.setSelectedRoi(null);
+			hideRoiIndicator();
 		}
 	}
 
@@ -261,6 +271,76 @@ public class ReferenceImageService {
 			}
 		}
 		return Version.builder().latestVersion(latestKnowVersion).isNewVersion(false).build();
+	}
+
+	@Override
+	public void roiModified(ImagePlus imp, int id) {
+		if (roiIndicatorTextField != null) {
+			roiIndicatorTextField.setText(((int) finalResultImage.getRoi().getFloatWidth()) + " X "
+					+ ((int) finalResultImage.getRoi().getFloatHeight()));
+		}
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		hideRoiIndicator();
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+	}
+
+	private void showRoiIndicator() {
+		roiIndicatorFrame = new JFrame();
+		roiIndicatorFrame.setAlwaysOnTop(true);
+		roiIndicatorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		Window parentWindow = finalResultImage.getWindow();
+		roiIndicatorFrame.setLocationRelativeTo(parentWindow);
+		roiIndicatorFrame.getContentPane().setBackground(Color.BLACK);
+		roiIndicatorFrame.requestFocus();
+		roiIndicatorFrame.setUndecorated(true);
+		Point location = parentWindow.getLocation();
+		roiIndicatorFrame.setLocation((int) location.getX() + 16, (int) (location.getY() + 32));
+		roiIndicatorFrame.setSize(64, 24);
+		roiIndicatorTextField = new JTextField();
+		roiIndicatorTextField.setBackground(Color.BLACK);
+		roiIndicatorTextField.setForeground(Color.LIGHT_GRAY);
+		roiIndicatorTextField.setEditable(false);
+		roiIndicatorTextField.setBorder(null);
+		roiIndicatorTextField.setText(((int) finalResultImage.getRoi().getFloatWidth()) + " X "
+				+ ((int) finalResultImage.getRoi().getFloatHeight()));
+		roiIndicatorTextField.setSelectedTextColor(Color.LIGHT_GRAY);
+		roiIndicatorFrame.add(roiIndicatorTextField);
+		roiIndicatorFrame.setVisible(true);
+	}
+
+	private void hideRoiIndicator() {
+		if (roiIndicatorFrame != null) {
+			roiIndicatorTextField = null;
+			roiIndicatorFrame.dispose();
+			roiIndicatorFrame=null;
+		}
+		roiActive = false;
 	}
 
 	private String requestLatestVersion() {
@@ -330,7 +410,6 @@ public class ReferenceImageService {
 			isLargeImage = setZoom(finalResultImage, false);
 			setDefaultLayoutSettings(finalResultImage,
 					new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y));
-			roi = null;
 			zoomFactor = 0;
 
 			processedImage = finalResultImage.duplicate();
@@ -362,6 +441,8 @@ public class ReferenceImageService {
 			window.setLocation(location);
 		}
 		new Toolbar().setTool(Toolbar.HAND);
+		image.getRoi().addRoiListener(this);
+		image.getWindow().addWindowListener(this);
 	}
 
 	private boolean setZoom(ImagePlus image, boolean isUpdate) {
@@ -408,5 +489,4 @@ public class ReferenceImageService {
 			return dlg;
 		}
 	}
-
 }
