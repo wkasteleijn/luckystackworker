@@ -6,6 +6,8 @@ import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Window;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -45,7 +47,7 @@ import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
 @Service
-public class ReferenceImageService implements RoiListener, WindowListener {
+public class ReferenceImageService implements RoiListener, WindowListener, ComponentListener {
 
 	private ImagePlus referenceImage;
 	private ImagePlus processedImage;
@@ -276,7 +278,7 @@ public class ReferenceImageService implements RoiListener, WindowListener {
 	@Override
 	public void roiModified(ImagePlus imp, int id) {
 		if (roiIndicatorTextField != null) {
-			roiIndicatorTextField.setText(((int) finalResultImage.getRoi().getFloatWidth()) + " X "
+			roiIndicatorTextField.setText(((int) finalResultImage.getRoi().getFloatWidth()) + " x "
 					+ ((int) finalResultImage.getRoi().getFloatHeight()));
 		}
 	}
@@ -296,10 +298,16 @@ public class ReferenceImageService implements RoiListener, WindowListener {
 
 	@Override
 	public void windowIconified(WindowEvent e) {
+		if (roiIndicatorFrame != null) {
+			roiIndicatorFrame.setVisible(false);
+		}
 	}
 
 	@Override
 	public void windowDeiconified(WindowEvent e) {
+		if (roiIndicatorFrame != null) {
+			roiIndicatorFrame.setVisible(true);
+		}
 	}
 
 	@Override
@@ -310,28 +318,58 @@ public class ReferenceImageService implements RoiListener, WindowListener {
 	public void windowDeactivated(WindowEvent e) {
 	}
 
+	@Override
+	public void componentResized(ComponentEvent e) {
+		setRoiIndicatorLocation();
+	}
+
+	@Override
+	public void componentMoved(ComponentEvent e) {
+		setRoiIndicatorLocation();
+	}
+
+	@Override
+	public void componentShown(ComponentEvent e) {
+		if (roiIndicatorFrame != null) {
+			roiIndicatorFrame.setVisible(true);
+		}
+	}
+
+	@Override
+	public void componentHidden(ComponentEvent e) {
+		if (roiIndicatorFrame != null) {
+			roiIndicatorFrame.setVisible(false);
+		}
+	}
+
 	private void showRoiIndicator() {
 		roiIndicatorFrame = new JFrame();
+		roiIndicatorFrame.setType(javax.swing.JFrame.Type.UTILITY);
 		roiIndicatorFrame.setAlwaysOnTop(true);
 		roiIndicatorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		Window parentWindow = finalResultImage.getWindow();
-		roiIndicatorFrame.setLocationRelativeTo(parentWindow);
+		roiIndicatorFrame.setLocationRelativeTo(finalResultImage.getWindow());
 		roiIndicatorFrame.getContentPane().setBackground(Color.BLACK);
-		roiIndicatorFrame.requestFocus();
+		setRoiIndicatorLocation();
 		roiIndicatorFrame.setUndecorated(true);
-		Point location = parentWindow.getLocation();
-		roiIndicatorFrame.setLocation((int) location.getX() + 16, (int) (location.getY() + 32));
 		roiIndicatorFrame.setSize(64, 24);
 		roiIndicatorTextField = new JTextField();
 		roiIndicatorTextField.setBackground(Color.BLACK);
 		roiIndicatorTextField.setForeground(Color.LIGHT_GRAY);
 		roiIndicatorTextField.setEditable(false);
 		roiIndicatorTextField.setBorder(null);
-		roiIndicatorTextField.setText(((int) finalResultImage.getRoi().getFloatWidth()) + " X "
+		roiIndicatorTextField.setText(((int) finalResultImage.getRoi().getFloatWidth()) + " x "
 				+ ((int) finalResultImage.getRoi().getFloatHeight()));
 		roiIndicatorTextField.setSelectedTextColor(Color.LIGHT_GRAY);
 		roiIndicatorFrame.add(roiIndicatorTextField);
 		roiIndicatorFrame.setVisible(true);
+	}
+
+	private void setRoiIndicatorLocation() {
+		if (roiIndicatorFrame != null) {
+			Window parentWindow = finalResultImage.getWindow();
+			Point location = parentWindow.getLocation();
+			roiIndicatorFrame.setLocation((int) location.getX() + 16, (int) (location.getY() + 32));
+		}
 	}
 
 	private void hideRoiIndicator() {
@@ -443,6 +481,7 @@ public class ReferenceImageService implements RoiListener, WindowListener {
 		new Toolbar().setTool(Toolbar.HAND);
 		image.getRoi().addRoiListener(this);
 		image.getWindow().addWindowListener(this);
+		image.getWindow().addComponentListener(this);
 	}
 
 	private boolean setZoom(ImagePlus image, boolean isUpdate) {
