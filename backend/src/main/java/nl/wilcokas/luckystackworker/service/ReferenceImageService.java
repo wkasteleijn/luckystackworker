@@ -24,7 +24,6 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.velocity.exception.ResourceNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ij.IJ;
@@ -68,12 +67,16 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
 	private Image iconImage = new ImageIcon(getClass().getResource("/luckystackworker_icon.png")).getImage();
 
-	@Autowired
 	private SettingsRepository settingsRepository;
-	@Autowired
 	private HttpService httpService;
-	@Autowired
 	private ProfileService profileService;
+
+	public ReferenceImageService(SettingsRepository settingsRepository, HttpService httpService, ProfileService profileService) {
+		this.settingsRepository = settingsRepository;
+		this.httpService = httpService;
+		this.profileService = profileService;
+		createRoiIndicator();
+	}
 
 	public Profile selectReferenceImage(String filePath) throws IOException {
 		JFrame frame = getParentFrame();
@@ -277,10 +280,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
 	@Override
 	public void roiModified(ImagePlus imp, int id) {
-		if (roiIndicatorTextField != null) {
-			roiIndicatorTextField.setText(((int) finalResultImage.getRoi().getFloatWidth()) + " x "
-					+ ((int) finalResultImage.getRoi().getFloatHeight()));
-		}
+		updateRoiText();
 	}
 
 	@Override
@@ -298,16 +298,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
 	@Override
 	public void windowIconified(WindowEvent e) {
-		if (roiIndicatorFrame != null) {
-			roiIndicatorFrame.setVisible(false);
-		}
+		roiIndicatorFrame.setVisible(false);
 	}
 
 	@Override
 	public void windowDeiconified(WindowEvent e) {
-		if (roiIndicatorFrame != null) {
-			roiIndicatorFrame.setVisible(true);
-		}
+		roiIndicatorFrame.setVisible(true);
 	}
 
 	@Override
@@ -330,26 +326,20 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
 	@Override
 	public void componentShown(ComponentEvent e) {
-		if (roiIndicatorFrame != null) {
-			roiIndicatorFrame.setVisible(true);
-		}
+		roiIndicatorFrame.setVisible(true);
 	}
 
 	@Override
 	public void componentHidden(ComponentEvent e) {
-		if (roiIndicatorFrame != null) {
-			roiIndicatorFrame.setVisible(false);
-		}
+		roiIndicatorFrame.setVisible(false);
 	}
 
-	private void showRoiIndicator() {
+	private void createRoiIndicator() {
 		roiIndicatorFrame = new JFrame();
 		roiIndicatorFrame.setType(javax.swing.JFrame.Type.UTILITY);
 		roiIndicatorFrame.setAlwaysOnTop(true);
 		roiIndicatorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		roiIndicatorFrame.setLocationRelativeTo(finalResultImage.getWindow());
 		roiIndicatorFrame.getContentPane().setBackground(Color.BLACK);
-		setRoiIndicatorLocation();
 		roiIndicatorFrame.setUndecorated(true);
 		roiIndicatorFrame.setSize(64, 24);
 		roiIndicatorTextField = new JTextField();
@@ -357,27 +347,30 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 		roiIndicatorTextField.setForeground(Color.LIGHT_GRAY);
 		roiIndicatorTextField.setEditable(false);
 		roiIndicatorTextField.setBorder(null);
-		roiIndicatorTextField.setText(((int) finalResultImage.getRoi().getFloatWidth()) + " x "
-				+ ((int) finalResultImage.getRoi().getFloatHeight()));
 		roiIndicatorTextField.setSelectedTextColor(Color.LIGHT_GRAY);
 		roiIndicatorFrame.add(roiIndicatorTextField);
+	}
+
+	private void showRoiIndicator() {
+		setRoiIndicatorLocation();
+		updateRoiText();
 		roiIndicatorFrame.setVisible(true);
 	}
 
+	private void updateRoiText() {
+		roiIndicatorTextField.setText(((int) finalResultImage.getRoi().getFloatWidth()) + " x "
+				+ ((int) finalResultImage.getRoi().getFloatHeight()));
+
+	}
+
 	private void setRoiIndicatorLocation() {
-		if (roiIndicatorFrame != null) {
-			Window parentWindow = finalResultImage.getWindow();
-			Point location = parentWindow.getLocation();
-			roiIndicatorFrame.setLocation((int) location.getX() + 16, (int) (location.getY() + 32));
-		}
+		Window parentWindow = finalResultImage.getWindow();
+		Point location = parentWindow.getLocation();
+		roiIndicatorFrame.setLocation((int) location.getX() + 16, (int) (location.getY() + 32));
 	}
 
 	private void hideRoiIndicator() {
-		if (roiIndicatorFrame != null) {
-			roiIndicatorTextField = null;
-			roiIndicatorFrame.dispose();
-			roiIndicatorFrame=null;
-		}
+		roiIndicatorFrame.setVisible(false);
 		roiActive = false;
 	}
 

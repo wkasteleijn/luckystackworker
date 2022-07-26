@@ -1,6 +1,7 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
 23/7/2022 minor release 2.2.0:
+- Added ROI dimension indicator
 - Improved startup time
 
 17/7/2022 minor release 2.1.0:
