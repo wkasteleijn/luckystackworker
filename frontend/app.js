@@ -9,7 +9,7 @@ function createWindow() {
     resizable: false,
     autoHideMenuBar: true,
     width: 686,
-    height: 532,
+    height: 598,
     x: 64,
     y: 64
   });
