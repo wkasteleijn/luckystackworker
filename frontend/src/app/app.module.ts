@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import {MatSliderModule} from '@angular/material/slider';
+import {MatTabsModule} from '@angular/material/tabs';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
@@ -29,6 +30,7 @@ import { AboutComponent } from './about/about.component';
     HttpClientModule,
     MatSnackBarModule,
     MatCardModule,
+    MatTabsModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
     BrowserAnimationsModule,

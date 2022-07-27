@@ -88,6 +88,7 @@ select:hover {
 
 .cardColor {
   background-color: rgb(25, 25, 25);
+  color: rgb(168, 168, 168) !important;
 }
 
 .cardColorNight {
@@ -111,3 +112,25 @@ select:hover {
   min-width: 512px !important;
   margin-top: 64px !important;
 }
+
+.mat-tab-label {
+  color: rgb(200, 200, 200);
+  background-color: rgb(25, 25, 25);
+}
+
+.mat-tab-body-content {
+  background-color: rgb(25, 25, 25);
+}
+.mat-tab-body {
+  height: 274px;
+}
+
+.mat-ink-bar {
+background-color: blue !important;
+}
+
+  .sliderTabs {
+  margin-top: 8px;
+  max-width: 648px;
+}
+

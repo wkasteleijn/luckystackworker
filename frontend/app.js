@@ -9,12 +9,9 @@ function createWindow() {
     resizable: false,
     autoHideMenuBar: true,
     width: 686,
-    height: 912,
+    height: 532,
     x: 64,
-    y: 64,
-    webPreferences: {
-      nodeIntegration: true,
-    },
+    y: 64
   });
 
   mainWindow.loadURL(

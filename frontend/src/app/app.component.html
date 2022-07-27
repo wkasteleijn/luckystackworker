@@ -7,14 +7,22 @@
   >
   </mat-progress-spinner>
 </div>
-<div class="{{nightModeEnabled() ? 'container containerColorNight':'container containerColor'}}">
+<div
+  class="{{
+    nightModeEnabled()
+      ? 'container containerColorNight'
+      : 'container containerColor'
+  }}"
+>
   <div class="button_container">
     <button
       *ngIf="openRefImageEnabled()"
       type="button"
       mat-button
       (click)="openReferenceImage()"
-      class="{{nightModeEnabled() ? 'activeColorNight button':'activeColor button'}}"
+      class="{{
+        nightModeEnabled() ? 'activeColorNight button' : 'activeColor button'
+      }}"
     >
       Open Reference Image
     </button>
@@ -38,7 +46,9 @@
         class="{{
           !refImageSelected || !openRefImageEnabled()
             ? 'dropdown_disabled'
-            : nightModeEnabled() ? 'dropdown activeColorNight':'dropdown activeColor'
+            : nightModeEnabled()
+            ? 'dropdown activeColorNight'
+            : 'dropdown activeColor'
         }}"
       >
         <option *ngFor="let profile of profiles" [value]="profile.value">
@@ -51,7 +61,9 @@
       *ngIf="openRefImageEnabled()"
       type="button"
       mat-button
-      class="button {{nightModeEnabled() ? 'activeColorNight':'activeColor'}}"
+      class="button {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
       (click)="loadProfile()"
     >
       Load Profile
@@ -63,21 +75,40 @@
       disabled
       class="button_disabled"
     >
-    Load Profile
+      Load Profile
     </button>
 
-    <mat-slide-toggle *ngIf="openRefImageEnabled()" class="crop" [(ngModel)]="crop" [color]="colorTheme()" (change)="cropSelectionChanged()"><span class="sliderLabel">Crop</span></mat-slide-toggle>
-    <mat-slide-toggle *ngIf="!openRefImageEnabled()" class="crop" [(ngModel)]="crop" disabled [color]="colorTheme()" (change)="cropSelectionChanged()"><span class="sliderLabel">Crop</span></mat-slide-toggle>
+    <mat-slide-toggle
+      *ngIf="openRefImageEnabled()"
+      class="crop"
+      [(ngModel)]="crop"
+      [color]="colorTheme()"
+      (change)="cropSelectionChanged()"
+      ><span class="sliderLabel">Crop</span></mat-slide-toggle
+    >
+    <mat-slide-toggle
+      *ngIf="!openRefImageEnabled()"
+      class="crop"
+      [(ngModel)]="crop"
+      disabled
+      [color]="colorTheme()"
+      (change)="cropSelectionChanged()"
+      ><span class="sliderLabel">Crop</span></mat-slide-toggle
+    >
 
     <button
       *ngIf="openRefImageEnabled()"
       type="button"
       mat-button
       (click)="zoomIn()"
-      class="{{nightModeEnabled() ? 'plusZoom buttonZoom activeColorNight' : 'plusZoom buttonZoom activeColor'}}"
+      class="{{
+        nightModeEnabled()
+          ? 'plusZoom buttonZoom activeColorNight'
+          : 'plusZoom buttonZoom activeColor'
+      }}"
       title="Zoom in"
     >
-    &nbsp;&nbsp;+&nbsp;&nbsp;
+      &nbsp;&nbsp;+&nbsp;&nbsp;
     </button>
     <button
       *ngIf="!openRefImageEnabled()"
@@ -86,7 +117,7 @@
       disabled
       class="plusZoom buttonDisabledZoom"
     >
-    &nbsp;&nbsp;+&nbsp;&nbsp;
+      &nbsp;&nbsp;+&nbsp;&nbsp;
     </button>
 
     <button
@@ -94,7 +125,11 @@
       type="button"
       mat-button
       (click)="zoomOut()"
-      class="{{nightModeEnabled() ? 'buttonZoom buttonZoomSpace activeColorNight' : 'buttonZoom buttonZoomSpace activeColor'}}"
+      class="{{
+        nightModeEnabled()
+          ? 'buttonZoom buttonZoomSpace activeColorNight'
+          : 'buttonZoom buttonZoomSpace activeColor'
+      }}"
       title="Zoom out"
     >
       &nbsp;&nbsp;-&nbsp;&nbsp;
@@ -106,9 +141,8 @@
       disabled
       class="buttonDisabledZoom buttonZoomSpace"
     >
-    &nbsp;&nbsp;-&nbsp;&nbsp;
+      &nbsp;&nbsp;-&nbsp;&nbsp;
     </button>
-
   </div>
 
   <div class="button_container_top button_container">
@@ -123,23 +157,23 @@
         class="{{
           !refImageSelected || !openRefImageEnabled()
             ? 'dropdown_disabled rootFolder'
-            : nightModeEnabled() ? ' activeColorNight dropdown rootFolder':'activeColor dropdown rootFolder'
+            : nightModeEnabled()
+            ? ' activeColorNight dropdown rootFolder'
+            : 'activeColor dropdown rootFolder'
         }}"
       />
     </mat-form-field>
 
-    <mat-slide-toggle [(ngModel)]="nightMode" [color]="colorTheme()"><span class="sliderLabel">Night Mode</span></mat-slide-toggle>
+    <mat-slide-toggle [(ngModel)]="nightMode" [color]="colorTheme()"
+      ><span class="sliderLabel">Night Mode</span></mat-slide-toggle
+    >
 
   </div>
-
-  <!-- Sharpen panel -->
-  <mat-card class="{{nightModeEnabled() ? 'card cardColorNight': 'card cardColor'}}">
-    <mat-card-header class="cardTitle">
-      <mat-card-title>Sharpen</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
+  <mat-tab-group class="sliderTabs" selectedIndex="0">
+    <!-- Sharpen panel -->
+    <mat-tab label="Sharpen & Denoise">
       <div class="sliderRow">
-        <div class="sliderLabel">Radius</div>
+        <div class="sliderLabel">Sharpen Radius</div>
         <div class="slider">
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected"
@@ -155,7 +189,7 @@
         </div>
       </div>
       <div class="sliderRow">
-        <div class="sliderLabel">Amount</div>
+        <div class="sliderLabel">Sharpen Amount</div>
         <div class="slider">
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected"
@@ -163,7 +197,7 @@
             min="5000"
             max="9999"
             (input)="amountChanged($event, false)"
-            (change)="amountChanged($event,true)"
+            (change)="amountChanged($event, true)"
             [(ngModel)]="amount"
             [color]="colorTheme()"
           ></mat-slider>
@@ -171,7 +205,7 @@
         </div>
       </div>
       <div class="sliderRow">
-        <div class="sliderLabel">Iterations</div>
+        <div class="sliderLabel">Sharpen Iterations</div>
         <div class="slider">
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected"
@@ -180,25 +214,16 @@
             min="1"
             max="10"
             (input)="iterationsChanged($event, false)"
-            (change)="iterationsChanged($event,true)"
+            (change)="iterationsChanged($event, true)"
             [(ngModel)]="iterations"
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ iterations }}</span>
         </div>
       </div>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Denoise panel -->
-  <mat-card class="{{nightModeEnabled() ? 'card cardColorNight': 'card cardColor'}}">
-    <mat-card-header class="cardTitle">
-      <mat-card-title>Denoise</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Sigma</div>
+        <div class="sliderLabel">Denoise Sigma</div>
         <div class="slider">
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected"
@@ -207,26 +232,38 @@
             min="0"
             max="5"
             (input)="denoiseSigmaChanged($event, false)"
-            (change)="denoiseSigmaChanged($event,true)"
+            (change)="denoiseSigmaChanged($event, true)"
             [(ngModel)]="denoiseSigma"
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ denoiseSigma }}</span>
-          <span *ngIf="refImageSelected"  class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{denoiseSigma === 0 ? "Off" : (denoiseSigma > 2 ? "Mode 2":"Mode 1")}}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{
+              denoiseSigma === 0
+                ? "Off"
+                : denoiseSigma > 2
+                ? "Mode 2"
+                : "Mode 1"
+            }}</span
+          >
         </div>
       </div>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Amount</div>
+        <div class="sliderLabel">Denoise Amount</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || denoiseSigma === 0"
+            [disabled]="
+              shouldShowSpinner() || !refImageSelected || denoiseSigma === 0
+            "
             tickInterval="1000"
             step="1"
             min="0"
             max="100"
             (input)="denoiseAmountChanged($event, false)"
-            (change)="denoiseAmountChanged($event,true)"
+            (change)="denoiseAmountChanged($event, true)"
             [(ngModel)]="denoiseAmount"
             [color]="colorTheme()"
           ></mat-slider>
@@ -235,16 +272,18 @@
       </div>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Radius</div>
+        <div class="sliderLabel">Denoise Radius</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || denoiseSigma === 0"
+            [disabled]="
+              shouldShowSpinner() || !refImageSelected || denoiseSigma === 0
+            "
             tickInterval="1000"
             step="0.1"
             min="0.5"
             max="4"
             (input)="denoiseRadiusChanged($event, false)"
-            (change)="denoiseRadiusChanged($event,true)"
+            (change)="denoiseRadiusChanged($event, true)"
             [(ngModel)]="denoiseRadius"
             [color]="colorTheme()"
           ></mat-slider>
@@ -253,32 +292,34 @@
       </div>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Iterations</div>
+        <div class="sliderLabel">Denoise Iterations</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || denoiseSigma === 0"
+            [disabled]="
+              shouldShowSpinner() || !refImageSelected || denoiseSigma === 0
+            "
             tickInterval="1"
             step="1"
             min="1"
             max="10"
             (input)="denoiseIterationsChanged($event, false)"
-            (change)="denoiseIterationsChanged($event,true)"
+            (change)="denoiseIterationsChanged($event, true)"
             [(ngModel)]="denoiseIterations"
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ denoiseIterations }}</span>
         </div>
       </div>
-    </mat-card-content>
-  </mat-card>
 
-  <!-- Light & Color panel -->
-  <mat-card class="{{nightModeEnabled() ? 'card cardColorNight': 'card cardColor'}}">
-    <mat-card-header class="cardTitle">
-      <mat-card-title>Light & Color</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
+    </mat-tab>
 
+    <!-- Light & Color panel -->
+    <mat-tab
+      class="{{
+        nightModeEnabled() ? 'card cardColorNight' : 'card cardColor'
+      }}"
+      label="Light & Color"
+    >
       <div class="sliderRow">
         <div class="sliderLabel">Gamma</div>
         <div class="slider">
@@ -288,12 +329,16 @@
             min="0.0"
             max="2.0"
             (input)="gammaChanged($event, false)"
-            (change)="gammaChanged($event,true)"
+            (change)="gammaChanged($event, true)"
             [(ngModel)]="gamma"
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ gamma }}</span>
-          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ gamma == 1 ? "Off":""}}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ gamma == 1 ? "Off" : "" }}</span
+          >
         </div>
       </div>
 
@@ -306,12 +351,16 @@
             min="0"
             max="100"
             (input)="contrastChanged($event, false)"
-            (change)="contrastChanged($event,true)"
+            (change)="contrastChanged($event, true)"
             [(ngModel)]="contrast"
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ contrast }}</span>
-          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ contrast == 0 ? "Off":""}}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ contrast == 0 ? "Off" : "" }}</span
+          >
         </div>
       </div>
 
@@ -324,12 +373,16 @@
             min="0"
             max="100"
             (input)="brightnessChanged($event, false)"
-            (change)="brightnessChanged($event,true)"
+            (change)="brightnessChanged($event, true)"
             [(ngModel)]="brightness"
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ brightness }}</span>
-          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ brightness == 0 ? "Off":""}}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ brightness == 0 ? "Off" : "" }}</span
+          >
         </div>
       </div>
 
@@ -342,16 +395,23 @@
             min="0"
             max="100"
             (input)="backgroundChanged($event, false)"
-            (change)="backgroundChanged($event,true)"
+            (change)="backgroundChanged($event, true)"
             [(ngModel)]="background"
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ background }}</span>
-          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ background == 0 ? "Off":""}}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ background == 0 ? "Off" : "" }}</span
+          >
         </div>
       </div>
 
-      <div class="sliderRow" title="Usage of Saturation will convert the image to sRGB. Only use this when no further processing is needed outside of LuckyStackWorker.">
+      <div
+        class="sliderRow"
+        title="Usage of Saturation will convert the image to sRGB. Only use this when no further processing is needed outside of LuckyStackWorker."
+      >
         <div class="sliderLabel">Saturation</div>
         <div class="slider">
           <mat-slider
@@ -360,12 +420,16 @@
             min="1.00"
             max="5.00"
             (input)="saturationChanged($event, false)"
-            (change)="saturationChanged($event,true)"
+            (change)="saturationChanged($event, true)"
             [(ngModel)]="saturation"
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ saturation }}</span>
-          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ saturation == 1 ? "Off":""}}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ saturation == 1 ? "Off" : "" }}</span
+          >
         </div>
       </div>
 
@@ -378,12 +442,16 @@
             min="0"
             max="255"
             (input)="redChanged($event, false)"
-            (change)="redChanged($event,true)"
+            (change)="redChanged($event, true)"
             [(ngModel)]="red"
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ red }}</span>
-          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ red == 0 ? "Off":""}}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ red == 0 ? "Off" : "" }}</span
+          >
         </div>
       </div>
       <div class="sliderRow">
@@ -395,12 +463,16 @@
             min="0"
             max="255"
             (input)="greenChanged($event, false)"
-            (change)="greenChanged($event,true)"
+            (change)="greenChanged($event, true)"
             [(ngModel)]="green"
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ green }}</span>
-          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ green == 0 ? "Off":""}}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ green == 0 ? "Off" : "" }}</span
+          >
         </div>
       </div>
       <div class="sliderRow">
@@ -412,33 +484,48 @@
             min="0"
             max="255"
             (input)="blueChanged($event, false)"
-            (change)="blueChanged($event,true)"
+            (change)="blueChanged($event, true)"
             [(ngModel)]="blue"
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ blue }}</span>
-          <span *ngIf="refImageSelected" class="{{nightMode ? 'modeLabelNight' : 'modeLabel'}}">{{ blue == 0 ? "Off":""}}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ blue == 0 ? "Off" : "" }}</span
+          >
         </div>
       </div>
-    </mat-card-content>
-  </mat-card>
+    </mat-tab>
 
-  <!-- Worker panel -->
-  <mat-card class="{{nightModeEnabled() ? 'card cardColorNight': 'card cardColor'}}">
-    <mat-card-content>
-      <span class="sliderLabel">Worker Status: {{ workerStatus }}</span>
-      <mat-progress-bar
-        [color]="colorTheme()"
-        [value]="workerProgress"
-        mode="determinate"
-        [bufferValue]="100"
+    <!-- Worker panel -->
+    <mat-card
+      class="{{
+        nightModeEnabled() ? 'card cardColorNight' : 'card cardColor'
+      }}"
+    >
+      <mat-card-content>
+        <span class="sliderLabel">Worker Status: {{ workerStatus }}</span>
+        <mat-progress-bar
+          [color]="colorTheme()"
+          [value]="workerProgress"
+          mode="determinate"
+          [bufferValue]="100"
         >
-      </mat-progress-bar>
-    </mat-card-content>
-  </mat-card>
+        </mat-progress-bar>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab-group>
 
   <div class="button_container" *ngIf="buttonBarEnabled()">
-    <button type="button" mat-button (click)="applyProfile()" class="button {{nightModeEnabled() ? 'activeColorNight':'activeColor'}}">
+    <button
+      type="button"
+      mat-button
+      (click)="applyProfile()"
+      class="button {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+    >
       Apply Profile
     </button>
     <span class="buttonDivider">&nbsp;</span>
@@ -446,7 +533,9 @@
       type="button"
       mat-button
       (click)="saveReferenceImage()"
-      class="button {{nightModeEnabled() ? 'activeColorNight':'activeColor'}}"
+      class="button {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
     >
       Save Reference Image
     </button>
@@ -454,15 +543,28 @@
       *ngIf="showVersionButton()"
       type="button"
       mat-button
-      class="buttonNewVersion button colorNewVersion" title="You are currently using an older version {{getCurrentVersion()}}. Don't miss out on the latest new features & improvement by downloading the latest version {{getLatestKnownVersion()}}.">
-      <a class="newVersionLink" target="_blank" href="https://www.wilcokas.com/luckystackworker/download">Download newer version!</a>
+      class="buttonNewVersion button colorNewVersion"
+      title="You are currently using an older version {{
+        getCurrentVersion()
+      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
+        getLatestKnownVersion()
+      }}."
+    >
+      <a
+        class="newVersionLink"
+        target="_blank"
+        href="https://www.wilcokas.com/luckystackworker/download"
+        >Download newer version!</a
+      >
     </button>
     <span *ngIf="!showVersionButton()" class="spanNoNewVersion"></span>
     <button
       *ngIf="openRefImageEnabled()"
       type="button"
       mat-button
-      class="button_about button  {{nightModeEnabled() ? 'activeColorNight':'activeColor'}}"
+      class="button_about button  {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
       (click)="openAbout()"
     >
       About
@@ -471,7 +573,9 @@
       type="button_exit"
       mat-button
       (click)="exit()"
-      class="button_exit button {{nightModeEnabled() ? 'activeColorNight':'activeColor'}}"
+      class="button_exit button {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
     >
       Exit
     </button>
