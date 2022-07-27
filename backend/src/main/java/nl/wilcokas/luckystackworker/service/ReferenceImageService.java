@@ -517,7 +517,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 		@Override
 		protected JDialog createDialog(Component parent) throws HeadlessException {
 			JDialog dlg = super.createDialog(parent);
-			dlg.setLocation(108, 255);
+			dlg.setLocation(108, 128);
 			return dlg;
 		}
 	}

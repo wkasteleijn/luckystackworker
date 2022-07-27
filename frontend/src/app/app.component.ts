@@ -524,6 +524,7 @@ export class AppComponent implements OnInit {
   private checkLatestVersion() {
     this.luckyStackWorkerService.getLatestVersion().subscribe(
       (data) => {
+        data.newVersion = true;
         this.latestKnownVersion = data.latestVersion;
         if (data.newVersion) {
           this.newVersionSnackbar.openFromComponent(NewVersionComponent, {

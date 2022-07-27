@@ -55,7 +55,7 @@ select:hover {
   background-color: rgb(65, 65, 65) !important;
 }
 
-  .mat-slider-thumb {
+.mat-slider-thumb {
   background-color: rgb(168, 168, 168) !important;
   color: lightgray;
 }
@@ -108,15 +108,20 @@ select:hover {
 }
 
 .mat-snack-bar-container {
-  height: 608px !important;
+  height: 396px !important;
   min-width: 512px !important;
-  margin-top: 64px !important;
+  margin-top: 56px !important;
 }
 
 .mat-tab-label {
   color: rgb(200, 200, 200);
   background-color: rgb(25, 25, 25);
 }
+
+.mat-tab-label:hover {
+  color: rgb(255, 255, 255);
+  background-color: rgb(0, 0, 0);
+ }
 
 .mat-tab-body-content {
   background-color: rgb(25, 25, 25);
