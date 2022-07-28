@@ -358,8 +358,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 	}
 
 	private void updateRoiText() {
-		roiIndicatorTextField.setText(((int) finalResultImage.getRoi().getFloatWidth()) + " x "
-				+ ((int) finalResultImage.getRoi().getFloatHeight()));
+		if (finalResultImage.getRoi() != null) {
+			roiIndicatorTextField.setText(((int) finalResultImage.getRoi().getFloatWidth()) + " x "
+					+ ((int) finalResultImage.getRoi().getFloatHeight()));
+		}
 
 	}
 
