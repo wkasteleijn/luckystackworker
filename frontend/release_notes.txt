@@ -1,8 +1,13 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
-23/7/2022 minor release 2.2.0:
+30/7/2022 minor release 2.2.1:
+- Some layout fixes
+
+29/7/2022 minor release 2.2.0:
 - Added ROI dimension indicator
 - Improved startup time
+- Replaced card layout with tabs to reduce GUI size
+- Fixed issues with crop selection
 
 17/7/2022 minor release 2.1.0:
 - Added new sliders to control contrast, brightness & darken background

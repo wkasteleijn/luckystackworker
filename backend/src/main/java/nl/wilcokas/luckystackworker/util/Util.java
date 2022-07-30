@@ -24,7 +24,6 @@ import ij.io.FileInfo;
 import ij.io.FileSaver;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.dto.Crop;
 import nl.wilcokas.luckystackworker.model.Profile;
 
 @Slf4j
@@ -223,15 +222,6 @@ public class Util {
 		return null;
 	}
 
-	public static Crop roiToCrop(Roi roi) {
-		return Crop.builder() //
-				.x(Double.valueOf(roi.getXBase()).intValue()) //
-				.y(Double.valueOf(roi.getYBase()).intValue()) //
-				.width(Double.valueOf(roi.getFloatWidth()).intValue()) //
-				.height(Double.valueOf(roi.getFloatHeight()).intValue()) //
-				.build();
-	}
-
 	public static void copyInto(final ImagePlus origin, final ImagePlus destination, Roi roi, Profile profile,
 			boolean copyMinMax) {
 		log.info("Copying image {} into image {}", origin.getID(), destination.getID());
@@ -242,7 +232,8 @@ public class Util {
 		}
 
 		if (roi != null) {
-			destination.setRoi(roi);
+			destination.setRoi((int) roi.getXBase(), (int) roi.getYBase(), (int) roi.getFloatWidth(),
+					(int) roi.getFloatHeight());
 		}
 	}
 

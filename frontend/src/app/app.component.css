@@ -23,14 +23,12 @@
 }
 
 .modeLabel {
-  color: blue;
-  font-weight: bold;
+  color:  lightgreen;
   margin-left: 8px;
 }
 
 .modeLabelNight {
   color: red;
-  font-weight: bold;
   margin-left: 8px;
 }
 
@@ -53,7 +51,6 @@
   padding-right: 12px;
   padding: 3px;
   border-radius: 8px;
-  margin-right: 24px;
 }
 
 .dropdown_disabled {
@@ -65,16 +62,15 @@
   padding-right: 12px;
   padding: 3px;
   border-radius: 8px;
-  margin-right: 24px;
 }
 
 .rootFolder {
   width: 404px;
   border-style: solid;
+  margin-left: 16px;
 }
 .dropdown_label {
   color: rgb(168, 168, 168);
-  margin-right: 16px;
 }
 
 .rootFolder_label {
@@ -119,7 +115,7 @@
 }
 
 .button_about {
-  margin-left: 36px;
+  margin-left: 34px;
 }
 
 .spanNoNewVersion {
@@ -174,7 +170,7 @@
 }
 
 .colorNewversion {
-  color: rgb(168, 168, 168);
+  color:  lightgreen;
 }
 
 .buttonNewVersion {
@@ -182,5 +178,6 @@
 }
 
 .newVersionLink {
-  color: rgb(168, 168, 168);
+  color:  lightgreen;
+  text-decoration: none;
 }

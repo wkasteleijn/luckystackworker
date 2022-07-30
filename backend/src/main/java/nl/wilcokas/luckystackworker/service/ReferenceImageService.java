@@ -293,7 +293,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
 	@Override
 	public void windowClosed(WindowEvent e) {
-		hideRoiIndicator();
+		roiIndicatorFrame.setVisible(false);
 	}
 
 	@Override
@@ -444,6 +444,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 			setDefaultLayoutSettings(finalResultImage,
 					new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y));
 			zoomFactor = 0;
+			roiActive = false;
 
 			processedImage = finalResultImage.duplicate();
 			log.info("Opened duplicate image with id {}", processedImage.getID());
