@@ -5,7 +5,7 @@ import { AboutComponent } from './about/about.component';
 import { LuckyStackWorkerService } from './luckystackworker.service';
 import { Profile } from './model/profile';
 import { NewVersionComponent } from './new_version/newversion.component';
-import { version } from '../../package.json';
+import version from '../../package.json';
 
 const SERVICE_POLL_DELAY_MS = 250;
 
@@ -59,7 +59,7 @@ export class AppComponent implements OnInit {
   nightMode: boolean = false;
   crop: boolean = false;
   _showSpinner = false;
-  latestKnownVersion = version;
+  latestKnownVersion = version.version;
   private isLargeImage: boolean = false;
 
   componentColor: ThemePalette = 'primary';
@@ -510,7 +510,7 @@ export class AppComponent implements OnInit {
   }
 
   public getCurrentVersion() {
-    return version;
+    return version.version;
   }
 
   public getLatestKnownVersion() {
@@ -518,7 +518,7 @@ export class AppComponent implements OnInit {
   }
 
   public showVersionButton(): boolean {
-    return version !== this.latestKnownVersion;
+    return version.version !== this.latestKnownVersion;
   }
 
   private checkLatestVersion() {

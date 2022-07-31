@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBarRef } from '@angular/material/snack-bar';
-import { version } from '../../../package.json';
+import version from '../../../package.json';
 
 @Component({
   selector: 'app-about',
@@ -16,7 +16,7 @@ export class AboutComponent implements OnInit {
   }
 
   getVersion() {
-    return version;
+    return version.version;
   }
 
 }

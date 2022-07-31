@@ -3,6 +3,7 @@ backend/.settings/
 backend/.classpath
 backend/.project
 frontend/node_modules
+frontend/.angular
 frontend/dist
 frontend/LuckyStackWorker-win32-x64
 frontend/LuckyStackWorker-win32-x64.zip

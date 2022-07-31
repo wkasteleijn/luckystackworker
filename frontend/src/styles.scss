@@ -134,8 +134,11 @@ select:hover {
 background-color: lightgreen !important;
 }
 
-  .sliderTabs {
+.mat-tab-group {
+  max-width: 648px !important;
+}
+
+.sliderTabs {
   margin-top: 8px;
-  max-width: 648px;
 }
 
