@@ -6,6 +6,7 @@ COPY .\LuckyStackWorker-win32-x64\\resources\app\LICENSE_LSW.txt .\LuckyStackWor
 COPY .\LuckyStackWorker-win32-x64\\resources\app\release_notes.txt .\LuckyStackWorker-win32-x64
 RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\src
 RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\node_modules
+RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\.angular
 DEL /Q .\LuckyStackWorker-win32-x64\resources\app\createExe*.bat
 DEL /Q .\LuckyStackWorker-win32-x64\resources\app\reset_db.sql
 DEL /Q .\LuckyStackWorker-win32-x64\resources\app\launch4j_lsw.xml

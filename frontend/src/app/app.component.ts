@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import version from '../../package.json';
 import { AboutComponent } from './about/about.component';
 import { LuckyStackWorkerService } from './luckystackworker.service';
 import { Profile } from './model/profile';
 import { NewVersionComponent } from './new_version/newversion.component';
-import version from '../../package.json';
 
 const SERVICE_POLL_DELAY_MS = 250;
 
@@ -20,7 +20,6 @@ interface ProfileSelection {
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-
   profiles: ProfileSelection[] = [
     { value: 'mer', viewValue: 'Mercury' },
     { value: 'ven', viewValue: 'Venus' },
@@ -198,7 +197,9 @@ export class AppComponent implements OnInit {
     this.profile.denoiseIterations = event.value;
     this.denoiseIterations = event.value;
     this.profile.operation = 'denoiseIterations';
-    console.log('denoiseIterationsChanged called: ' + this.profile.denoiseRadius);
+    console.log(
+      'denoiseIterationsChanged called: ' + this.profile.denoiseRadius
+    );
     if (update) {
       this.updateProfile();
     }
@@ -386,7 +387,7 @@ export class AppComponent implements OnInit {
         }
       },
       (error) => {
-        console.log(error)
+        console.log(error);
         if (this.profile.largeImage) {
           this.hideSpinner();
         }
@@ -530,7 +531,7 @@ export class AppComponent implements OnInit {
             horizontalPosition: 'center',
             verticalPosition: 'top',
           });
-         }
+        }
       },
       (error) => console.log(error)
     );

@@ -168,7 +168,6 @@
     <mat-slide-toggle [(ngModel)]="nightMode" [color]="colorTheme()"
       ><span class="sliderLabel">Night Mode</span></mat-slide-toggle
     >
-
   </div>
   <mat-tab-group class="sliderTabs" selectedIndex="0">
     <!-- Sharpen panel -->
@@ -257,7 +256,10 @@
         <div class="slider">
           <mat-slider
             [disabled]="
-              shouldShowSpinner() || !refImageSelected || denoiseSigma === 0 || crop
+              shouldShowSpinner() ||
+              !refImageSelected ||
+              denoiseSigma === 0 ||
+              crop
             "
             tickInterval="1000"
             step="1"
@@ -277,7 +279,10 @@
         <div class="slider">
           <mat-slider
             [disabled]="
-              shouldShowSpinner() || !refImageSelected || denoiseSigma === 0 || crop
+              shouldShowSpinner() ||
+              !refImageSelected ||
+              denoiseSigma === 0 ||
+              crop
             "
             tickInterval="1000"
             step="0.1"
@@ -297,7 +302,10 @@
         <div class="slider">
           <mat-slider
             [disabled]="
-              shouldShowSpinner() || !refImageSelected || denoiseSigma === 0 || crop
+              shouldShowSpinner() ||
+              !refImageSelected ||
+              denoiseSigma === 0 ||
+              crop
             "
             tickInterval="1"
             step="1"
@@ -311,7 +319,6 @@
           <span class="sliderLabel">{{ denoiseIterations }}</span>
         </div>
       </div>
-
     </mat-tab>
 
     <!-- Light & Color panel -->
@@ -500,23 +507,21 @@
     </mat-tab>
   </mat-tab-group>
 
-    <!-- Worker panel -->
-    <mat-card
-      class="{{
-        nightModeEnabled() ? 'card cardColorNight' : 'card cardColor'
-      }}"
-    >
-      <mat-card-content>
-        <span class="sliderLabel">Worker Status: {{ workerStatus }}</span>
-        <mat-progress-bar
-          [color]="colorTheme()"
-          [value]="workerProgress"
-          mode="determinate"
-          [bufferValue]="100"
-        >
-        </mat-progress-bar>
-      </mat-card-content>
-    </mat-card>
+  <!-- Worker panel -->
+  <mat-card
+    class="{{ nightModeEnabled() ? 'card cardColorNight' : 'card cardColor' }}"
+  >
+    <mat-card-content>
+      <span class="sliderLabel">Worker Status: {{ workerStatus }}</span>
+      <mat-progress-bar
+        [color]="colorTheme()"
+        [value]="workerProgress"
+        mode="determinate"
+        [bufferValue]="100"
+      >
+      </mat-progress-bar>
+    </mat-card-content>
+  </mat-card>
 
   <div class="button_container" *ngIf="buttonBarEnabled()">
     <button
