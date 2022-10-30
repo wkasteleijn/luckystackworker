@@ -99,6 +99,7 @@ public class ProfileController {
             if (profile != null) {
                 profile.setLargeImage(referenceImageService.isLargeImage());
                 updateProfile(profile);
+                LuckyStackWorkerContext.setSelectedProfile(profile.getName());
                 return profile;
             }
         }

@@ -348,6 +348,7 @@ export class AppComponent implements OnInit {
         if (data) {
           console.log(data);
           this.profile = data;
+          this.selectedProfile = data.name;
           this.updateProfileSettings();
         }
         this.hideSpinner();

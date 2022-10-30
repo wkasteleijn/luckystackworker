@@ -1,5 +1,5 @@
 MOVE lsw_gui-win32-x64 LuckyStackWorker-win32-x64
-COPY ..\backend\target\luckystackworker-2.2.2.jar .\LuckyStackWorker-win32-x64\luckystackworker.jar
+COPY ..\backend\target\luckystackworker-2.2.3.jar .\LuckyStackWorker-win32-x64\luckystackworker.jar
 COPY .\LuckyStackWorker.exe .\LuckyStackWorker-win32-x64
 COPY ..\backend\lsw_db.mv.db .\LuckyStackWorker-win32-x64\
 COPY .\LuckyStackWorker-win32-x64\\resources\app\LICENSE_LSW.txt .\LuckyStackWorker-win32-x64

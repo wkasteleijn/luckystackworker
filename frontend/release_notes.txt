@@ -1,5 +1,8 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+30/10/2022 revision release 2.2.3:
+- Fixed bug in load profile not switching to the profile in the yaml file being loaded.
+
 04/09/2022 revision release 2.2.2:
 - Fixed spinner no longer showing for large images when load profile was selected.
 - Upgraded to the latest jdk 17 and angular 14.
