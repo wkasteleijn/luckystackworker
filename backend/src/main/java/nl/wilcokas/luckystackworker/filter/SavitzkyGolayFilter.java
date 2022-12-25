@@ -30,9 +30,9 @@ public class SavitzkyGolayFilter {
     private static final int[] RADIUS_49_FACTORS = { //
             0, -14, -33, -39, -39, -14, 0, //
             -14, -22, 61, 87, 61, -22, -14, //
-            -33, 61, 228, 349, 228, 61, -22, -14, //
+            -33, 61, 228, 349, 228, 61, -33, //
             -39, 87, 349, 1763, 349, 87, -39, //
-            -33, 61, 228, 349, 228, 61, -22, -14, //
+            -33, 61, 228, 349, 228, 61, -33, //
             -14, -22, 61, 87, 61, -22, -14, //
             0, -14, -33, -39, -39, -14, 0, //
     };
@@ -47,6 +47,30 @@ public class SavitzkyGolayFilter {
             { -3, 3 }, { -2, 3 }, { -1, 3 }, { 0, 3 }, { 1, 3 }, { 2, 3 }, { 3, 3 },//
     };
 
+    private static final int[] RADIUS_81_FACTORS = { //
+            0, -2, -32, -54, -62, -54, -32, -2, 0, //
+            -2, -49, -22, 35, 54, 35, -22, -49, -2, //
+            -32, -22, 80, 194, 230, 194, 80, -22, -32, //
+            -54, 35, 194, 446, 631, 446, 194, 35, -54, //
+            -62, 54, 230, 631, 2981, 631, 230, 54, -62, //
+            -54, 35, 194, 446, 631, 446, 194, 35, -54, //
+            -32, -22, 80, 194, 230, 194, 80, -22, -32, //
+            -2, -49, -22, 35, 54, 35, -22, -49, -2, //
+            0, -2, -32, -54, -62, -54, -32, -2, 0 //
+    };
+
+    private static final int[][] RADIUS_81_OFFSETS = { //
+            { -4, -4 }, { -3, -4 }, { -2, -4 }, { -1, -4 }, { 0, -4 }, { 1, -4 }, { 2, -4 }, { 3, -4 }, { 4, -4 }, //
+            { -4, -3 }, { -3, -3 }, { -2, -3 }, { -1, -3 }, { 0, -3 }, { 1, -3 }, { 2, -3 }, { 3, -3 }, { 4, -3 }, //
+            { -4, -3 }, { -3, -2 }, { -2, -2 }, { -1, -2 }, { 0, -2 }, { 1, -2 }, { 2, -2 }, { 3, -2 }, { 4, -2 }, //
+            { -4, -3 }, { -3, -1 }, { -2, -1 }, { -1, -1 }, { 0, -1 }, { 1, -1 }, { 2, -1 }, { 3, -1 }, { 4, -1 }, //
+            { -4, -3 }, { -3, 0 }, { -2, 0 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, //
+            { -4, 1 }, { -3, 1 }, { -2, 1 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 2, 1 }, { 3, 1 }, { 4, 1 }, //
+            { -4, 2 }, { -3, 2 }, { -2, 2 }, { -1, 2 }, { 0, 2 }, { 1, 2 }, { 2, 2 }, { 3, 2 }, { 4, 2 }, //
+            { -4, 3 }, { -3, 3 }, { -2, 3 }, { -1, 3 }, { 0, 3 }, { 1, 3 }, { 2, 3 }, { 3, 3 }, { 4, 3 }, //
+            { -4, 4 }, { -3, 3 }, { -2, 3 }, { -1, 3 }, { 0, 3 }, { 1, 3 }, { 2, 3 }, { 3, 3 }, { 4, 4 } //
+    };
+
     private static final int RADIUS_25_CENTER = 12;
     private static final int RADIUS_25_DIVISOR = 2447;
     private static final int RADIUS_25_ROWLENGTH = 5;
@@ -55,7 +79,12 @@ public class SavitzkyGolayFilter {
     private static final int RADIUS_49_DIVISOR = 4287;
     private static final int RADIUS_49_ROWLENGTH = 7;
 
+    private static final int RADIUS_81_CENTER = 40;
+    private static final int RADIUS_81_DIVISOR = 9253;
+    private static final int RADIUS_81_ROWLENGTH = 9;
+
     private static final int SHORT_HALF_SIZE = 32768;
+    private static final int UNSIGNED_INT_SIZE = 65536;
     private static final int MAX_INT_VALUE = 65535;
 
     public void apply(ImagePlus image, final SavitzkyGolayRadius radius) {
@@ -80,6 +109,13 @@ public class SavitzkyGolayFilter {
             radiusCenter = RADIUS_49_CENTER;
             radiusRowLength = RADIUS_49_ROWLENGTH;
         }
+        case RADIUS_81 -> {
+            radiusFactors = RADIUS_81_FACTORS;
+            radiusOffsets = RADIUS_81_OFFSETS;
+            radiusDivisor = RADIUS_81_DIVISOR;
+            radiusCenter = RADIUS_81_CENTER;
+            radiusRowLength = RADIUS_81_ROWLENGTH;
+        }
         default -> {
             radiusFactors = RADIUS_25_FACTORS;
             radiusOffsets = RADIUS_25_OFFSETS;
@@ -92,7 +128,7 @@ public class SavitzkyGolayFilter {
         for (int layer = 1; layer <= 3; layer++) {
             ImageProcessor p = image.getStack().getProcessor(layer);
             short[] pixels = (short[]) p.getPixels();
-            short[] pixelsResult = pixels.clone();
+            short[] pixelsResult = new short[pixels.length];
             for (int i = 0; i < pixels.length; i++) {
                 int newValueUnsignedInt = getPixelValueUnsignedInt(pixels, i, image.getWidth(), radiusFactors, radiusOffsets,
                         radiusDivisor, radiusCenter, radiusRowLength);
@@ -130,10 +166,10 @@ public class SavitzkyGolayFilter {
     }
 
     private int convertToUnsignedInt(final short value) {
-        return SHORT_HALF_SIZE + value;
+        return value < 0 ? value + UNSIGNED_INT_SIZE : value;
     }
 
     private short convertToShort(final int value) {
-        return (short) (value - SHORT_HALF_SIZE);
+        return (short) (value >= SHORT_HALF_SIZE ? value - UNSIGNED_INT_SIZE : value);
     }
 }

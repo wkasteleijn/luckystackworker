@@ -163,9 +163,12 @@ public class Probeersels {
         //		image.setRoi(128, 128, 640, 480);
         //		ImagePlus crop = image.crop();
 
+        Thread.currentThread().sleep(1000);
 
         SavitzkyGolayFilter savitzkyGolayFilter = new SavitzkyGolayFilter();
-        savitzkyGolayFilter.apply(image, SavitzkyGolayRadius.RADIUS_49);
+        log.info("Starting filter");
+        savitzkyGolayFilter.apply(image, SavitzkyGolayRadius.RADIUS_25);
+        log.info("Filter applied");
 
         Thread.currentThread().sleep(5000);
         System.exit(0);
