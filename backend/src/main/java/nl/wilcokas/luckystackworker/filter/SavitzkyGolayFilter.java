@@ -1,8 +1,5 @@
 package nl.wilcokas.luckystackworker.filter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 
 import ij.ImagePlus;
@@ -146,15 +143,15 @@ public class SavitzkyGolayFilter {
             int[][] radiusOffsets, int radiusDivisor, int radiusCenter, int radiusRowLength) {
         final int yPosition = position / width;
         final int xPosition = position % width;
-        List<Integer> multipliedValues = new ArrayList<>();
+        int multipliedTotal = 0;
         for (int i = 0; i < radiusOffsets.length; i++) {
             int xOffset = radiusOffsets[i][0];
             int yOffset = radiusOffsets[i][1];
             int offsetValueUnsignedInt = getOffsetValueUnsignedInt(pixels, xPosition + xOffset, yPosition + yOffset, width);
             int factor = radiusFactors[radiusCenter + (yOffset * radiusRowLength) + xOffset];
-            multipliedValues.add(offsetValueUnsignedInt * factor);
+            multipliedTotal += offsetValueUnsignedInt * factor;
         }
-        return multipliedValues.stream().reduce(Integer::sum).orElse(0) / radiusDivisor;
+        return multipliedTotal / radiusDivisor;
     }
 
     private int getOffsetValueUnsignedInt(short[] pixels, final int xPosition, final int yPosition, final int width) {

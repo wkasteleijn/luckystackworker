@@ -7,6 +7,7 @@ import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter;
 import nl.wilcokas.luckystackworker.filter.SavitzkyGolayRadius;
+import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
 public class Probeersels {
@@ -167,8 +168,10 @@ public class Probeersels {
 
         SavitzkyGolayFilter savitzkyGolayFilter = new SavitzkyGolayFilter();
         log.info("Starting filter");
-        savitzkyGolayFilter.apply(image, SavitzkyGolayRadius.RADIUS_25);
+        savitzkyGolayFilter.apply(image, SavitzkyGolayRadius.RADIUS_81);
         log.info("Filter applied");
+
+        Util.saveImage(image, "C:\\Users\\wkast\\archive\\Jup\\testsession\\noisyimage_denoised_3.tif", false, false);
 
         Thread.currentThread().sleep(5000);
         System.exit(0);
