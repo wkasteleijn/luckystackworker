@@ -3,10 +3,12 @@ package nl.wilcokas.luckystackworker;
 import java.io.IOException;
 
 import ij.ImagePlus;
+import ij.ImageStack;
 import ij.io.Opener;
+import ij.process.FloatProcessor;
+import ij.process.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter;
-import nl.wilcokas.luckystackworker.filter.SavitzkyGolayRadius;
+import nl.wilcokas.luckystackworker.filter.LSWUnsharpMask;
 import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
@@ -164,13 +166,21 @@ public class Probeersels {
         //		image.setRoi(128, 128, 640, 480);
         //		ImagePlus crop = image.crop();
 
-        Thread.currentThread().sleep(1000);
 
-        SavitzkyGolayFilter savitzkyGolayFilter = new SavitzkyGolayFilter();
-        for (int i = 0; i < 1; i++) {
-            log.info("Starting filter");
-            savitzkyGolayFilter.apply(image, SavitzkyGolayRadius.RADIUS_81, 100);
-            log.info("Filter applied");
+        //        SavitzkyGolayFilter savitzkyGolayFilter = new SavitzkyGolayFilter();
+        //        for (int i = 0; i < 1; i++) {
+        //            log.info("Starting filter");
+        //            savitzkyGolayFilter.apply(image, SavitzkyGolayRadius.RADIUS_81, 100);
+        //            log.info("Filter applied");
+        //        }
+
+        LSWUnsharpMask mask = new LSWUnsharpMask();
+        ImageStack stack = image.getStack();
+        for (int i = 1; i <= 3; i++) {
+            ImageProcessor p = stack.getProcessor(i);
+            FloatProcessor fp = null;
+            fp = p.toFloat(i, fp);
+            mask.sharpenFloat(fp, 1.0, 0.99f);
         }
 
         Util.saveImage(image, "C:\\Users\\wkast\\archive\\Jup\\testsession\\noisyimage_denoised.tif", false, false);

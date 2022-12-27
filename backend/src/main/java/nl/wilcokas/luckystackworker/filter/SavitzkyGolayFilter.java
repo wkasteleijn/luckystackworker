@@ -3,6 +3,7 @@ package nl.wilcokas.luckystackworker.filter;
 import org.springframework.stereotype.Component;
 
 import ij.ImagePlus;
+import ij.ImageStack;
 import ij.process.ImageProcessor;
 
 @Component
@@ -125,8 +126,9 @@ public class SavitzkyGolayFilter {
         }
         }
 
-        for (int layer = 1; layer <= 3; layer++) {
-            ImageProcessor p = image.getStack().getProcessor(layer);
+        ImageStack stack = image.getStack();
+        for (int layer = 1; layer <= stack.size(); layer++) {
+            ImageProcessor p = stack.getProcessor(layer);
             short[] pixels = (short[]) p.getPixels();
 
             short[] pixelsResult = new short[pixels.length];
