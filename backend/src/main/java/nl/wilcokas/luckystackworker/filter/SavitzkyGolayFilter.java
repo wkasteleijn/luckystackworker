@@ -84,7 +84,7 @@ public class SavitzkyGolayFilter {
     private static final int UNSIGNED_INT_SIZE = 65536;
     private static final int MAX_INT_VALUE = 65535;
 
-    public void apply(ImagePlus image, final SavitzkyGolayRadius radius) {
+    public void apply(ImagePlus image, final SavitzkyGolayRadius radius, int amount) {
 
         int[] radiusFactors;
         int[][] radiusOffsets;
@@ -92,6 +92,9 @@ public class SavitzkyGolayFilter {
         int radiusCenter;
         int radiusRowLength;
         switch (radius) {
+        case OFF -> {
+            return;
+        }
         case RADIUS_25 -> {
             radiusFactors = RADIUS_25_FACTORS;
             radiusOffsets = RADIUS_25_OFFSETS;
@@ -125,10 +128,12 @@ public class SavitzkyGolayFilter {
         for (int layer = 1; layer <= 3; layer++) {
             ImageProcessor p = image.getStack().getProcessor(layer);
             short[] pixels = (short[]) p.getPixels();
+
             short[] pixelsResult = new short[pixels.length];
             for (int i = 0; i < pixels.length; i++) {
-                int newValueUnsignedInt = getPixelValueUnsignedInt(pixels, i, image.getWidth(), radiusFactors, radiusOffsets,
-                        radiusDivisor, radiusCenter, radiusRowLength);
+                long newValueUnsignedInt = getPixelValueUnsignedInt(pixels, i, image.getWidth(), radiusFactors, radiusOffsets,
+                        radiusDivisor,
+                        radiusCenter, radiusRowLength, amount);
                 pixelsResult[i] = convertToShort(
                         newValueUnsignedInt > MAX_INT_VALUE ? MAX_INT_VALUE : (newValueUnsignedInt < 0 ? 0 : newValueUnsignedInt));
             }
@@ -139,19 +144,19 @@ public class SavitzkyGolayFilter {
         image.updateAndDraw();
     }
 
-    private int getPixelValueUnsignedInt(short[] pixels, final int position, final int width, int[] radiusFactors,
-            int[][] radiusOffsets, int radiusDivisor, int radiusCenter, int radiusRowLength) {
+    private long getPixelValueUnsignedInt(short[] pixels, final int position, final int width, int[] radiusFactors, int[][] radiusOffsets,
+            double radiusDivisor, int radiusCenter, int radiusRowLength, double amount) {
         final int yPosition = position / width;
         final int xPosition = position % width;
-        int multipliedTotal = 0;
+        double multipliedTotal = 0;
+        int pixelValueUnsignedInt = convertToUnsignedInt(pixels[position]);
         for (int i = 0; i < radiusOffsets.length; i++) {
-            int xOffset = radiusOffsets[i][0];
-            int yOffset = radiusOffsets[i][1];
-            int offsetValueUnsignedInt = getOffsetValueUnsignedInt(pixels, xPosition + xOffset, yPosition + yOffset, width);
-            int factor = radiusFactors[radiusCenter + (yOffset * radiusRowLength) + xOffset];
+            int offsetValueUnsignedInt = getOffsetValueUnsignedInt(pixels,  xPosition + radiusOffsets[i][0],
+                    yPosition + radiusOffsets[i][1], width);
+            int factor = radiusFactors[radiusCenter + (radiusOffsets[i][1] * radiusRowLength) + radiusOffsets[i][0]];
             multipliedTotal += offsetValueUnsignedInt * factor;
         }
-        return multipliedTotal / radiusDivisor;
+        return Math.round(((amount / 100) * (multipliedTotal / radiusDivisor)) + (((100 - amount) / 100) * pixelValueUnsignedInt));
     }
 
     private int getOffsetValueUnsignedInt(short[] pixels, final int xPosition, final int yPosition, final int width) {
@@ -166,7 +171,8 @@ public class SavitzkyGolayFilter {
         return value < 0 ? value + UNSIGNED_INT_SIZE : value;
     }
 
-    private short convertToShort(final int value) {
+    private short convertToShort(long value) {
         return (short) (value >= SHORT_HALF_SIZE ? value - UNSIGNED_INT_SIZE : value);
     }
+
 }

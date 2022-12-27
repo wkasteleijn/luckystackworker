@@ -167,11 +167,13 @@ public class Probeersels {
         Thread.currentThread().sleep(1000);
 
         SavitzkyGolayFilter savitzkyGolayFilter = new SavitzkyGolayFilter();
-        log.info("Starting filter");
-        savitzkyGolayFilter.apply(image, SavitzkyGolayRadius.RADIUS_81);
-        log.info("Filter applied");
+        for (int i = 0; i < 1; i++) {
+            log.info("Starting filter");
+            savitzkyGolayFilter.apply(image, SavitzkyGolayRadius.RADIUS_81, 100);
+            log.info("Filter applied");
+        }
 
-        Util.saveImage(image, "C:\\Users\\wkast\\archive\\Jup\\testsession\\noisyimage_denoised_3.tif", false, false);
+        Util.saveImage(image, "C:\\Users\\wkast\\archive\\Jup\\testsession\\noisyimage_denoised.tif", false, false);
 
         Thread.currentThread().sleep(5000);
         System.exit(0);

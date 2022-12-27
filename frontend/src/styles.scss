@@ -1,4 +1,4 @@
-@import '~@angular/material/theming';
+@import "~@angular/material/theming";
 @include mat-core();
 
 $my-app-primary: mat-palette($mat-blue, A700);
@@ -7,8 +7,14 @@ $my-app-warn: mat-palette($mat-deep-orange, A700);
 $my-app-theme: mat-light-theme($my-app-primary, $my-app-accent, $my-app-warn);
 @include angular-material-theme($my-app-theme);
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
 
 .page {
   background-color: rgb(43, 43, 43);
@@ -25,7 +31,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .button {
   border: 3px;
-  border-style:solid;
+  border-style: solid;
   font-weight: bold;
   font-size: 12px;
   color: rgb(168, 168, 168);
@@ -37,18 +43,18 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 button:hover {
-   color: rgb(210, 210, 210);
-   border-color:rgb(80, 80, 255) !important;
-  }
+  color: rgb(210, 210, 210);
+  border-color: rgb(80, 80, 255) !important;
+}
 
 input:hover {
   color: rgb(210, 210, 210) !important;
-  border-color:rgb(80, 80, 255) !important;
+  border-color: rgb(80, 80, 255) !important;
 }
 
 select:hover {
   color: rgb(210, 210, 210) !important;
-  border-color:rgb(80, 80, 255) !important;
+  border-color: rgb(80, 80, 255) !important;
 }
 
 .mat-slider-thumb-label {
@@ -60,13 +66,12 @@ select:hover {
   color: lightgray;
 }
 
-
 .mat-slide-toggle-thumb {
   background-color: rgb(168, 168, 168) !important;
   color: lightgray;
 }
 
- .mat-slider-track-background {
+.mat-slider-track-background {
   background-color: black !important;
 }
 
@@ -121,17 +126,17 @@ select:hover {
 .mat-tab-label:hover {
   color: rgb(255, 255, 255);
   background-color: rgb(0, 0, 0);
- }
+}
 
 .mat-tab-body-content {
   background-color: rgb(25, 25, 25);
 }
 .mat-tab-body {
-  height: 274px;
+  height: 434px;
 }
 
 .mat-ink-bar {
-background-color: lightgreen !important;
+  background-color: lightgreen !important;
 }
 
 .mat-tab-group {
@@ -142,3 +147,22 @@ background-color: lightgreen !important;
   margin-top: 8px;
 }
 
+.mat-radio-button {
+  margin-top: 16px;
+  margin-left: 8px;
+}
+
+.mat-radio-outer-circle {
+  border-color: blue;
+}
+
+.mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
+  border-color: blue;
+}
+.mat-radio-button.mat-accent .mat-radio-ripple .mat-ripple-element {
+  background-color: blue;
+}
+.mat-radio-button.mat-accent .mat-radio-inner-circle {
+  color: blue;
+  background-color: blue;
+}

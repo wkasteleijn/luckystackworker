@@ -16,6 +16,9 @@ export class Profile {
   green: number;
   blue: number;
   saturation: number;
+  savitzkyGolaySize: number;
+  savitzkyGolayAmount: number;
+  savitzkyGolayIterations: number;
   operation: string;
   rootFolder: string;
   largeImage: boolean;

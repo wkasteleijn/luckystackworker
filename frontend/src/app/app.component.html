@@ -172,8 +172,9 @@
   <mat-tab-group class="sliderTabs" selectedIndex="0">
     <!-- Sharpen panel -->
     <mat-tab label="Sharpen & Denoise">
+      <div class="sliderRowCategoryTitle">Sharpen</div>
       <div class="sliderRow">
-        <div class="sliderLabel">Sharpen Radius</div>
+        <div class="sliderLabel">Radius</div>
         <div class="slider">
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
@@ -189,7 +190,7 @@
         </div>
       </div>
       <div class="sliderRow">
-        <div class="sliderLabel">Sharpen Amount</div>
+        <div class="sliderLabel">Amount</div>
         <div class="slider">
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
@@ -205,7 +206,7 @@
         </div>
       </div>
       <div class="sliderRow">
-        <div class="sliderLabel">Sharpen Iterations</div>
+        <div class="sliderLabel">Iterations</div>
         <div class="slider">
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
@@ -222,8 +223,9 @@
         </div>
       </div>
 
+      <div class="sliderRowCategoryTitle">Sigma Denoise</div>
       <div class="sliderRow">
-        <div class="sliderLabel">Denoise Sigma</div>
+        <div class="sliderLabel">Sigma</div>
         <div class="slider">
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
@@ -252,7 +254,7 @@
       </div>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Denoise Amount</div>
+        <div class="sliderLabel">Amount</div>
         <div class="slider">
           <mat-slider
             [disabled]="
@@ -275,7 +277,7 @@
       </div>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Denoise Radius</div>
+        <div class="sliderLabel">Radius</div>
         <div class="slider">
           <mat-slider
             [disabled]="
@@ -298,7 +300,7 @@
       </div>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Denoise Iterations</div>
+        <div class="sliderLabel">Iterations</div>
         <div class="slider">
           <mat-slider
             [disabled]="
@@ -319,6 +321,64 @@
           <span class="sliderLabel">{{ denoiseIterations }}</span>
         </div>
       </div>
+
+      <div class="sliderRowCategoryTitle">Savitzky-Golay Denoise</div>
+      <div class="sliderRow">
+        <div class="sliderLabel">Size</div>
+        <div class="slider">
+          <mat-radio-group
+            class="sliderRadio"
+            [(ngModel)]="savitzkyGolaySize"
+            (change)="savitzkyGolaySizeChanged($event)"
+          >
+            <mat-radio-button value="0">0</mat-radio-button>
+            <mat-radio-button value="2">25</mat-radio-button>
+            <mat-radio-button value="3">49</mat-radio-button>
+            <mat-radio-button value="4">81</mat-radio-button>
+          </mat-radio-group>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ savitzkyGolaySize == 0 ? "Off" : "" }}</span
+          >
+        </div>
+      </div>
+
+      <div class="sliderRow">
+        <div class="sliderLabel">Amount</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            tickInterval="1"
+            step="1"
+            min="1"
+            max="100"
+            (input)="savitzkyGolayAmountChanged($event, false)"
+            (change)="savitzkyGolayAmountChanged($event, true)"
+            [(ngModel)]="savitzkyGolayAmount"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ savitzkyGolayAmount }}</span>
+        </div>
+      </div>
+
+      <div class="sliderRow">
+        <div class="sliderLabel">Iterations</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            tickInterval="1"
+            step="1"
+            min="1"
+            max="10"
+            (input)="savitzkyGolayIterationsChanged($event, false)"
+            (change)="savitzkyGolayIterationsChanged($event, true)"
+            [(ngModel)]="savitzkyGolayIterations"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ savitzkyGolayIterations }}</span>
+        </div>
+      </div>
     </mat-tab>
 
     <!-- Light & Color panel -->
@@ -328,6 +388,7 @@
       }}"
       label="Light & Color"
     >
+      <div class="sliderRowCategoryTitle">Light</div>
       <div class="sliderRow">
         <div class="sliderLabel">Gamma</div>
         <div class="slider">
@@ -416,6 +477,7 @@
         </div>
       </div>
 
+      <div class="sliderRowCategoryTitle">Color</div>
       <div
         class="sliderRow"
         title="Usage of Saturation will convert the image to sRGB. Only use this when no further processing is needed outside of LuckyStackWorker."

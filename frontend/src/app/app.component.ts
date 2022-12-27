@@ -40,6 +40,9 @@ export class AppComponent implements OnInit {
   denoiseSigma: number;
   denoiseRadius: number;
   denoiseIterations: number;
+  savitzkyGolaySize: number;
+  savitzkyGolayAmount: number;
+  savitzkyGolayIterations: number;
   gamma: number;
   contrast: number;
   brightness: number;
@@ -297,6 +300,41 @@ export class AppComponent implements OnInit {
     );
   }
 
+  savitzkyGolayIterationsChanged(event: any, update: boolean) {
+    this.profile.savitzkyGolayIterations = event.value;
+    this.savitzkyGolayIterations = event.value;
+    this.profile.operation = 'savitzkyGolayIterations';
+    console.log(
+      'savitzkyGolayIterationsChanged called: ' +
+        this.profile.savitzkyGolayIterations
+    );
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  savitzkyGolayAmountChanged(event: any, update: boolean) {
+    this.profile.savitzkyGolayAmount = event.value;
+    this.savitzkyGolayAmount = event.value;
+    this.profile.operation = 'savitzkyGolayAmount';
+    console.log(
+      'savitzkyGolayAmountChanged called: ' + this.profile.savitzkyGolayAmount
+    );
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  savitzkyGolaySizeChanged(event: any) {
+    this.profile.savitzkyGolaySize = event.value;
+    this.savitzkyGolaySize = event.value;
+    this.profile.operation = 'savitzkyGolaySize';
+    console.log(
+      'savitzkyGolaySizeChanged called: ' + this.profile.savitzkyGolaySize
+    );
+    this.updateProfile();
+  }
+
   selectRootFolder() {
     console.log('selectRootFolder called');
     this.showSpinner();
@@ -365,6 +403,9 @@ export class AppComponent implements OnInit {
     this.denoiseSigma = this.profile.denoiseSigma;
     this.denoiseRadius = this.profile.denoiseRadius;
     this.denoiseIterations = this.profile.denoiseIterations;
+    this.savitzkyGolayIterations = this.profile.savitzkyGolayIterations;
+    this.savitzkyGolayAmount = this.profile.savitzkyGolayAmount;
+    this.savitzkyGolaySize = this.profile.savitzkyGolaySize;
     this.saturation = this.profile.saturation;
     this.gamma = this.profile.gamma;
     this.contrast = this.profile.contrast;

@@ -23,7 +23,7 @@
 }
 
 .modeLabel {
-  color:  lightgreen;
+  color: lightgreen;
   margin-left: 8px;
 }
 
@@ -42,6 +42,20 @@
   flex-wrap: nowrap;
   align-items: baseline;
   max-height: 32px;
+}
+
+.sliderRadio {
+}
+
+.sliderRowCategoryTitle {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  max-height: 32px;
+  margin-left: 16px;
+  margin-top: 12px;
+  color: lightgreen;
 }
 .dropdown {
   color: rgb(168, 168, 168);
@@ -170,7 +184,7 @@
 }
 
 .colorNewversion {
-  color:  lightgreen;
+  color: lightgreen;
 }
 
 .buttonNewVersion {
@@ -178,6 +192,6 @@
 }
 
 .newVersionLink {
-  color:  lightgreen;
+  color: lightgreen;
   text-decoration: none;
 }

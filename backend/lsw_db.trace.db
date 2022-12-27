@@ -259,3 +259,6 @@ INSERT INTO "PUBLIC"."PROFILES" (
 (8, 8920.00, 0.00, 2, 0, 2.00, 'uranus', 0.00, 1.00, 0.00, 0.00, NULL, NULL, 1.00, 2.00, 1, 1.00, 0, 0, 0),
 (9, 9000.00, 0.00, 2, 0, 2.00, 'neptune', 0.00, 1.00, 0.00, 0.00, NULL, NULL, 1.00, 2.00, 1, 1.00, 0, 0, 0),
 (10, 6520.00, 0.00, 6, 0, 1.50, 'sun', 0.00, 1.00, 0.00, 0.00, NULL, NULL, 1.00, 2.00, 2, 1.00, 0, 0, 0) [42001-214]
+2022-12-27 16:11:18 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]pdate profiles set savitzky_golay_iterations=0"; expected "PREPARE"; SQL statement:
+pdate profiles set savitzky_golay_iterations=0 [42001-214]

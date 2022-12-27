@@ -14,33 +14,36 @@ import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 @Slf4j
 public class ProfileService {
 
-	@Autowired
-	private ProfileRepository profileRepository;
+    @Autowired
+    private ProfileRepository profileRepository;
 
-	public void updateProfile(Profile profile) {
-		log.info("updateProfile called with profile {}", profile);
-		Profile result = profileRepository.findByName(profile.getName()).orElseThrow(
-				() -> new ResourceNotFoundException(String.format("Unknown profile %s", profile.getName())));
-		result.setRadius(profile.getRadius());
-		result.setAmount(profile.getAmount());
-		result.setIterations(profile.getIterations());
-		result.setLevel(profile.getLevel());
-		result.setDenoise(profile.getDenoise());
-		result.setDenoiseSigma(profile.getDenoiseSigma());
-		result.setDenoiseRadius(profile.getDenoiseRadius());
-		result.setDenoiseIterations(profile.getDenoiseIterations());
-		result.setGamma(profile.getGamma());
-		result.setRed(profile.getRed());
-		result.setGreen(profile.getGreen());
-		result.setBlue(profile.getBlue());
-		result.setSaturation(profile.getSaturation());
-		result.setContrast(profile.getContrast());
-		result.setBrightness(profile.getBrightness());
-		result.setBackground(profile.getBackground());
-		profileRepository.save(result);
-	}
+    public void updateProfile(Profile profile) {
+        log.info("updateProfile called with profile {}", profile);
+        Profile result = profileRepository.findByName(profile.getName()).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Unknown profile %s", profile.getName())));
+        result.setRadius(profile.getRadius());
+        result.setAmount(profile.getAmount());
+        result.setIterations(profile.getIterations());
+        result.setLevel(profile.getLevel());
+        result.setDenoise(profile.getDenoise());
+        result.setDenoiseSigma(profile.getDenoiseSigma());
+        result.setDenoiseRadius(profile.getDenoiseRadius());
+        result.setDenoiseIterations(profile.getDenoiseIterations());
+        result.setSavitzkyGolayAmount(profile.getSavitzkyGolayAmount());
+        result.setSavitzkyGolaySize(profile.getSavitzkyGolaySize());
+        result.setSavitzkyGolayIterations(profile.getSavitzkyGolayIterations());
+        result.setGamma(profile.getGamma());
+        result.setRed(profile.getRed());
+        result.setGreen(profile.getGreen());
+        result.setBlue(profile.getBlue());
+        result.setSaturation(profile.getSaturation());
+        result.setContrast(profile.getContrast());
+        result.setBrightness(profile.getBrightness());
+        result.setBackground(profile.getBackground());
+        profileRepository.save(result);
+    }
 
-	public Optional<Profile> findByName(String profileName) {
-		return profileRepository.findByName(profileName);
-	}
+    public Optional<Profile> findByName(String profileName) {
+        return profileRepository.findByName(profileName);
+    }
 }
