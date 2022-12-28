@@ -9,9 +9,9 @@ function createWindow() {
     resizable: false,
     autoHideMenuBar: true,
     width: 688,
-    height: 598,
+    height: 756,
     x: 64,
-    y: 64
+    y: 64,
   });
 
   mainWindow.loadURL(
@@ -21,7 +21,6 @@ function createWindow() {
       slashes: true,
     })
   );
-
 }
 
 app.on("ready", createWindow);

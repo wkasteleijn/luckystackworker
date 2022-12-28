@@ -326,13 +326,26 @@ export class AppComponent implements OnInit {
   }
 
   savitzkyGolaySizeChanged(event: any) {
-    this.profile.savitzkyGolaySize = event.value;
-    this.savitzkyGolaySize = event.value;
+    this.profile.savitzkyGolaySize = +event.value;
+    this.savitzkyGolaySize = +event.value;
     this.profile.operation = 'savitzkyGolaySize';
     console.log(
       'savitzkyGolaySizeChanged called: ' + this.profile.savitzkyGolaySize
     );
     this.updateProfile();
+  }
+
+  get savitzkyGolaySizeDisplayValue(): number {
+    if (this.savitzkyGolaySize === 0) {
+      return 0;
+    } else if (this.savitzkyGolaySize === 2) {
+      return 25;
+    } else if (this.savitzkyGolaySize === 3) {
+      return 49;
+    } else if (this.savitzkyGolaySize === 4) {
+      return 81;
+    }
+    return 0;
   }
 
   selectRootFolder() {
@@ -406,6 +419,7 @@ export class AppComponent implements OnInit {
     this.savitzkyGolayIterations = this.profile.savitzkyGolayIterations;
     this.savitzkyGolayAmount = this.profile.savitzkyGolayAmount;
     this.savitzkyGolaySize = this.profile.savitzkyGolaySize;
+    console.log(' this.savitzkyGolaySize == ' + this.savitzkyGolaySize);
     this.saturation = this.profile.saturation;
     this.gamma = this.profile.gamma;
     this.contrast = this.profile.contrast;

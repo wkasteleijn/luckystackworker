@@ -79,6 +79,10 @@ select:hover {
   width: 428px;
 }
 
+.mat-radio-group {
+  width: 428px;
+}
+
 .card {
   max-width: 616px;
   margin-top: 8px;
@@ -113,7 +117,7 @@ select:hover {
 }
 
 .mat-snack-bar-container {
-  height: 396px !important;
+  height: 450px !important;
   min-width: 512px !important;
   margin-top: 56px !important;
 }
@@ -165,4 +169,8 @@ select:hover {
 .mat-radio-button.mat-accent .mat-radio-inner-circle {
   color: blue;
   background-color: blue;
+}
+
+.mat-radio-label-content {
+  color: rgb(168, 168, 168);
 }

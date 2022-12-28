@@ -44,9 +44,6 @@
   max-height: 32px;
 }
 
-.sliderRadio {
-}
-
 .sliderRowCategoryTitle {
   display: flex;
   flex-direction: row;
@@ -194,4 +191,8 @@
 .newVersionLink {
   color: lightgreen;
   text-decoration: none;
+}
+
+.savgoySizeButton {
+  margin-right: 24px;
 }

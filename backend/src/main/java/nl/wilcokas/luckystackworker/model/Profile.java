@@ -79,13 +79,13 @@ public class Profile {
     private int background;
 
     @Column(name = "savitzkyGolaySize")
-    private Integer savitzkyGolaySize;
+    private int savitzkyGolaySize;
 
     @Column(name = "savitzkyGolayAmount")
-    private Integer savitzkyGolayAmount;
+    private int savitzkyGolayAmount;
 
     @Column(name = "savitzkyGolayIterations")
-    private Integer savitzkyGolayIterations;
+    private int savitzkyGolayIterations;
 
     // Non persisted setting properties that are passed to the frontend.
     private String operation;

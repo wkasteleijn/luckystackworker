@@ -1,12 +1,12 @@
 {
   "name": "luckystackworker",
   "productName": "LuckyStackWorker",
-  "version": "2.2.3",
+  "version": "2.3.0",
   "main": "app.js",
   "scripts": {
     "ng": "ng",
-    "serve": "ng serve",
-    "start": "ng build --base-href ./ && electron .",
+    "serve": "ng serve --configuration development",
+    "start": "ng build --base-href ./ && electron . --configuration production",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",

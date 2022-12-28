@@ -232,20 +232,34 @@
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             [(ngModel)]="savitzkyGolaySize"
             (change)="savitzkyGolaySizeChanged($event)"
+            class="savgoyRadioGroup"
           >
-            <mat-radio-button value="0" [checked]="savitzkyGolaySize == 0"
+            <mat-radio-button
+              value="0"
+              [checked]="savitzkyGolaySize == 0"
+              class="savgoySizeButton"
               >0</mat-radio-button
             >
-            <mat-radio-button value="2" [checked]="savitzkyGolaySize == 2"
+            <mat-radio-button
+              value="2"
+              [checked]="savitzkyGolaySize == 2"
+              class="savgoySizeButton"
               >25</mat-radio-button
             >
-            <mat-radio-button value="3" [checked]="savitzkyGolaySize == 3"
+            <mat-radio-button
+              value="3"
+              [checked]="savitzkyGolaySize == 3"
+              class="savgoySizeButton"
               >49</mat-radio-button
             >
-            <mat-radio-button value="4" [checked]="savitzkyGolaySize == 4"
+            <mat-radio-button
+              value="4"
+              [checked]="savitzkyGolaySize == 4"
+              class="savgoySizeButton"
               >81</mat-radio-button
             >
           </mat-radio-group>
+          <span class="sliderLabel">{{ savitzkyGolaySizeDisplayValue }}</span>
           <span
             *ngIf="refImageSelected"
             class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
