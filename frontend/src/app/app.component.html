@@ -232,38 +232,26 @@
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             [(ngModel)]="savitzkyGolaySize"
             (change)="savitzkyGolaySizeChanged($event)"
-            class="savgoyRadioGroup"
           >
-            <mat-radio-button
-              value="0"
-              [checked]="savitzkyGolaySize == 0"
-              class="savgoySizeButton"
+            <mat-radio-button value="0" class="savgoySizeButton"
               >0</mat-radio-button
             >
-            <mat-radio-button
-              value="2"
-              [checked]="savitzkyGolaySize == 2"
-              class="savgoySizeButton"
+            <mat-radio-button value="2" class="savgoySizeButton"
               >25</mat-radio-button
             >
-            <mat-radio-button
-              value="3"
-              [checked]="savitzkyGolaySize == 3"
-              class="savgoySizeButton"
+            <mat-radio-button value="3" class="savgoySizeButton"
               >49</mat-radio-button
             >
-            <mat-radio-button
-              value="4"
-              [checked]="savitzkyGolaySize == 4"
-              class="savgoySizeButton"
+            <mat-radio-button value="4" class="savgoySizeButton"
               >81</mat-radio-button
             >
           </mat-radio-group>
+          <span class="radioMargin"></span>
           <span class="sliderLabel">{{ savitzkyGolaySizeDisplayValue }}</span>
           <span
             *ngIf="refImageSelected"
             class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ savitzkyGolaySize == 0 ? "Off" : "" }}</span
+            >{{ savitzkyGolaySize === "0" ? "Off" : "" }}</span
           >
         </div>
       </div>
@@ -275,7 +263,7 @@
             [disabled]="
               shouldShowSpinner() ||
               !refImageSelected ||
-              savitzkyGolaySize == 0 ||
+              savitzkyGolaySize === '0' ||
               crop
             "
             tickInterval="1"
@@ -298,7 +286,7 @@
             [disabled]="
               shouldShowSpinner() ||
               !refImageSelected ||
-              savitzkyGolaySize == 0 ||
+              savitzkyGolaySize == '0' ||
               crop
             "
             tickInterval="1"

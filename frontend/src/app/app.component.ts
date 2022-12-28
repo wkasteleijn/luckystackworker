@@ -40,7 +40,7 @@ export class AppComponent implements OnInit {
   denoiseSigma: number;
   denoiseRadius: number;
   denoiseIterations: number;
-  savitzkyGolaySize: number;
+  savitzkyGolaySize: string;
   savitzkyGolayAmount: number;
   savitzkyGolayIterations: number;
   gamma: number;
@@ -327,7 +327,7 @@ export class AppComponent implements OnInit {
 
   savitzkyGolaySizeChanged(event: any) {
     this.profile.savitzkyGolaySize = +event.value;
-    this.savitzkyGolaySize = +event.value;
+    this.savitzkyGolaySize = event.value;
     this.profile.operation = 'savitzkyGolaySize';
     console.log(
       'savitzkyGolaySizeChanged called: ' + this.profile.savitzkyGolaySize
@@ -336,13 +336,13 @@ export class AppComponent implements OnInit {
   }
 
   get savitzkyGolaySizeDisplayValue(): number {
-    if (this.savitzkyGolaySize === 0) {
+    if (this.savitzkyGolaySize === '0') {
       return 0;
-    } else if (this.savitzkyGolaySize === 2) {
+    } else if (this.savitzkyGolaySize === '2') {
       return 25;
-    } else if (this.savitzkyGolaySize === 3) {
+    } else if (this.savitzkyGolaySize === '3') {
       return 49;
-    } else if (this.savitzkyGolaySize === 4) {
+    } else if (this.savitzkyGolaySize === '4') {
       return 81;
     }
     return 0;
@@ -418,7 +418,7 @@ export class AppComponent implements OnInit {
     this.denoiseIterations = this.profile.denoiseIterations;
     this.savitzkyGolayIterations = this.profile.savitzkyGolayIterations;
     this.savitzkyGolayAmount = this.profile.savitzkyGolayAmount;
-    this.savitzkyGolaySize = this.profile.savitzkyGolaySize;
+    this.savitzkyGolaySize = this.profile.savitzkyGolaySize.toString();
     console.log(' this.savitzkyGolaySize == ' + this.savitzkyGolaySize);
     this.saturation = this.profile.saturation;
     this.gamma = this.profile.gamma;
