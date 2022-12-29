@@ -1,8 +1,11 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+29/12/2022 revision release 2.4.0:
+- Moved database and log files to ~/AppData/Local folder
+- Added an setup installer for easy installation.
+
 28/12/2022 revision release 2.3.0:
 - Added new Savitzky-Golay denoising filter controls
-- Added an installer
 
 30/10/2022 revision release 2.2.3:
 - Fixed bug in load profile not switching to the profile in the yaml file being loaded.
