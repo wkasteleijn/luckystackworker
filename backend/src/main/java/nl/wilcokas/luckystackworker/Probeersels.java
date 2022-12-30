@@ -3,10 +3,7 @@ package nl.wilcokas.luckystackworker;
 import java.io.IOException;
 
 import ij.ImagePlus;
-import ij.ImageStack;
 import ij.io.Opener;
-import ij.process.FloatProcessor;
-import ij.process.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.filter.LSWUnsharpMask;
 import nl.wilcokas.luckystackworker.util.Util;
@@ -16,7 +13,7 @@ public class Probeersels {
     public static void main(String[] args) throws InterruptedException, IOException {
 
         ImagePlus image = new Opener()
-                .openImage("C:\\Users\\wkast\\archive\\Jup\\testsession\\noisyimage.tif");
+                .openImage("C:\\Users\\wkast\\archive\\Jup\\testsession\\Jup_2022-09-29-2130_5-Wilco-DeRot_AS_P25_lapl4_ap245.tif");
         // .openImage("D:\\Jup\\testsession\\Jup_224759_AS_P30_lapl5_ap44.tif");
         // .openImage("D:\\Sun\\220522\\Sun_100434_AS_P1_lapl4_ap1531.tif");
 
@@ -175,13 +172,7 @@ public class Probeersels {
         //        }
 
         LSWUnsharpMask mask = new LSWUnsharpMask();
-        ImageStack stack = image.getStack();
-        for (int i = 1; i <= 3; i++) {
-            ImageProcessor p = stack.getProcessor(i);
-            FloatProcessor fp = null;
-            fp = p.toFloat(i, fp);
-            mask.sharpenFloat(fp, 1.0, 0.99f);
-        }
+        mask.apply(image, 1.0, 0.99f, true);
 
         Util.saveImage(image, "C:\\Users\\wkast\\archive\\Jup\\testsession\\noisyimage_denoised.tif", false, false);
 

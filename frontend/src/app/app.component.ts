@@ -37,7 +37,7 @@ export class AppComponent implements OnInit {
   amount: number;
   iterations: number;
   denoiseAmount: number;
-  denoiseSigma: number;
+  denoiseSigma: string;
   denoiseRadius: number;
   denoiseIterations: number;
   savitzkyGolaySize: string;
@@ -177,7 +177,7 @@ export class AppComponent implements OnInit {
   }
 
   denoiseSigmaChanged(event: any, update: boolean) {
-    this.profile.denoiseSigma = event.value;
+    this.profile.denoiseSigma = +event.value;
     this.denoiseSigma = event.value;
     this.profile.operation = 'denoiseSigma';
     console.log('denoiseSigmaChanged called: ' + this.profile.denoiseSigma);
@@ -413,7 +413,7 @@ export class AppComponent implements OnInit {
     this.amount = this.profile.amount;
     this.iterations = this.profile.iterations;
     this.denoiseAmount = this.profile.denoise;
-    this.denoiseSigma = this.profile.denoiseSigma;
+    this.denoiseSigma = this.profile.denoiseSigma.toString();
     this.denoiseRadius = this.profile.denoiseRadius;
     this.denoiseIterations = this.profile.denoiseIterations;
     this.savitzkyGolayIterations = this.profile.savitzkyGolayIterations;

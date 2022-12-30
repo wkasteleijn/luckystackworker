@@ -223,41 +223,39 @@
         </div>
       </div>
 
-      <div class="sliderRowCategoryTitle">Savitzky-Golay Denoise</div>
       <div class="sliderRow">
-        <div class="sliderLabel">Size</div>
-        <div class="slider">
+        <div class="sliderRowCategoryTitle">Savitzky-Golay Denoise</div>
+        <div class="savgolayRadio">
           <mat-radio-group
             [color]="colorTheme()"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             [(ngModel)]="savitzkyGolaySize"
             (change)="savitzkyGolaySizeChanged($event)"
           >
-            <mat-radio-button value="0" class="savgoySizeButton"
-              >0</mat-radio-button
+            <mat-radio-button value="0" class="radioSizeButton"
+              >Off</mat-radio-button
             >
-            <mat-radio-button value="2" class="savgoySizeButton"
+            <mat-radio-button value="2" class="radioSizeButton"
               >25</mat-radio-button
             >
-            <mat-radio-button value="3" class="savgoySizeButton"
+            <mat-radio-button value="3" class="radioSizeButton"
               >49</mat-radio-button
             >
-            <mat-radio-button value="4" class="savgoySizeButton"
+            <mat-radio-button value="4" class="radioSizeButton"
               >81</mat-radio-button
             >
           </mat-radio-group>
-          <span class="radioMargin"></span>
-          <span class="sliderLabel">{{ savitzkyGolaySizeDisplayValue }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ savitzkyGolaySize === "0" ? "Off" : "" }}</span
-          >
         </div>
       </div>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Amount</div>
+        <div
+          class="{{
+            savitzkyGolaySize === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+          }}"
+        >
+          Amount
+        </div>
         <div class="slider">
           <mat-slider
             [disabled]="
@@ -275,18 +273,29 @@
             [(ngModel)]="savitzkyGolayAmount"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ savitzkyGolayAmount }}</span>
+          <span
+            class="{{
+              savitzkyGolaySize === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+            }}"
+            >{{ savitzkyGolayAmount }}</span
+          >
         </div>
       </div>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Iterations</div>
+        <div
+          class="{{
+            savitzkyGolaySize === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+          }}"
+        >
+          Iterations
+        </div>
         <div class="slider">
           <mat-slider
             [disabled]="
               shouldShowSpinner() ||
               !refImageSelected ||
-              savitzkyGolaySize == '0' ||
+              savitzkyGolaySize === '0' ||
               crop
             "
             tickInterval="1"
@@ -298,48 +307,51 @@
             [(ngModel)]="savitzkyGolayIterations"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ savitzkyGolayIterations }}</span>
-        </div>
-      </div>
-
-      <div class="sliderRowCategoryTitle">Sigma Denoise</div>
-      <div class="sliderRow">
-        <div class="sliderLabel">Sigma</div>
-        <div class="slider">
-          <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            tickInterval="1000"
-            step="0.1"
-            min="0"
-            max="5"
-            (input)="denoiseSigmaChanged($event, false)"
-            (change)="denoiseSigmaChanged($event, true)"
-            [(ngModel)]="denoiseSigma"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span class="sliderLabel">{{ denoiseSigma }}</span>
           <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{
-              denoiseSigma === 0
-                ? "Off"
-                : denoiseSigma > 2
-                ? "Mode 2"
-                : "Mode 1"
-            }}</span
+            class="{{
+              savitzkyGolaySize === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+            }}"
+            >{{ savitzkyGolayIterations }}</span
           >
         </div>
       </div>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Amount</div>
+        <div class="sliderRowCategoryTitle">Sigma Denoise</div>
+        <div class="sigmaRadio">
+          <mat-radio-group
+            [color]="colorTheme()"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [(ngModel)]="denoiseSigma"
+            (change)="denoiseSigmaChanged($event, true)"
+          >
+            <mat-radio-button value="0" class="radioSizeButton"
+              >Off</mat-radio-button
+            >
+            <mat-radio-button value="2" class="radioSizeButton"
+              >Mode 1</mat-radio-button
+            >
+            <mat-radio-button value="5" class="radioSizeButton"
+              >Mode 2</mat-radio-button
+            >
+          </mat-radio-group>
+        </div>
+      </div>
+
+      <div class="sliderRow">
+        <div
+          class="{{
+            denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+          }}"
+        >
+          Amount
+        </div>
         <div class="slider">
           <mat-slider
             [disabled]="
               shouldShowSpinner() ||
               !refImageSelected ||
-              denoiseSigma === 0 ||
+              denoiseSigma === '0' ||
               crop
             "
             tickInterval="1000"
@@ -351,18 +363,29 @@
             [(ngModel)]="denoiseAmount"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ denoiseAmount }}</span>
+          <span
+            class="{{
+              denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+            }}"
+            >{{ denoiseAmount }}</span
+          >
         </div>
       </div>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Radius</div>
+        <div
+          class="{{
+            denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+          }}"
+        >
+          Radius
+        </div>
         <div class="slider">
           <mat-slider
             [disabled]="
               shouldShowSpinner() ||
               !refImageSelected ||
-              denoiseSigma === 0 ||
+              denoiseSigma === '0' ||
               crop
             "
             tickInterval="1000"
@@ -374,18 +397,29 @@
             [(ngModel)]="denoiseRadius"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ denoiseRadius }}</span>
+          <span
+            class="{{
+              denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+            }}"
+            >{{ denoiseRadius }}</span
+          >
         </div>
       </div>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Iterations</div>
+        <div
+          class="{{
+            denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+          }}"
+        >
+          Iterations
+        </div>
         <div class="slider">
           <mat-slider
             [disabled]="
               shouldShowSpinner() ||
               !refImageSelected ||
-              denoiseSigma === 0 ||
+              denoiseSigma === '0' ||
               crop
             "
             tickInterval="1"
@@ -397,7 +431,12 @@
             [(ngModel)]="denoiseIterations"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ denoiseIterations }}</span>
+          <span
+            class="{{
+              denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+            }}"
+            >{{ denoiseIterations }}</span
+          >
         </div>
       </div>
     </mat-tab>
@@ -595,7 +634,7 @@
     class="{{ nightModeEnabled() ? 'card cardColorNight' : 'card cardColor' }}"
   >
     <mat-card-content>
-      <span class="sliderLabel">Worker Status: {{ workerStatus }}</span>
+      <span class="workerLabel">Worker Status: {{ workerStatus }}</span>
       <mat-progress-bar
         [color]="colorTheme()"
         [value]="workerProgress"

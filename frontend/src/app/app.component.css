@@ -22,6 +22,12 @@
   margin-left: 16px;
 }
 
+.sliderLabelDisabled {
+  width: 108px;
+  color: rgb(64, 64, 64);
+  margin-left: 16px;
+}
+
 .modeLabel {
   color: lightgreen;
   margin-left: 8px;
@@ -54,6 +60,11 @@
   margin-top: 12px;
   color: lightgreen;
 }
+
+.workerLabel {
+  color: lightgreen;
+}
+
 .dropdown {
   color: rgb(168, 168, 168);
   background-color: black;
@@ -193,10 +204,17 @@
   text-decoration: none;
 }
 
-.savgoySizeButton {
+.radioSizeButton {
   margin-right: 24px;
 }
 
 .radioMargin {
-  margin-left: 141px;
+  margin-left: 100px;
+  color: rgb(168, 168, 168);
+}
+.savgolayRadio {
+  margin-left: 48px;
+}
+.sigmaRadio {
+  margin-left: 92px;
 }
