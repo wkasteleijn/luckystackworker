@@ -213,8 +213,14 @@
   color: rgb(168, 168, 168);
 }
 .savgolayRadio {
-  margin-left: 48px;
+  margin-left: 24px;
 }
 .sigmaRadio {
-  margin-left: 92px;
+  margin-left: 24px;
+}
+.controlSeperator {
+  margin-top: 16px;
+}
+.controlSeperatorColor {
+  margin-top: 32px;
 }
