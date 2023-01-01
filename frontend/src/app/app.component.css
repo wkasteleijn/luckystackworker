@@ -207,6 +207,10 @@
 .radioSizeButton {
   margin-right: 24px;
 }
+.radioSizeButtonSharpen {
+  margin-left: 56px;
+  margin-top: -24px !important;
+}
 
 .radioMargin {
   margin-left: 100px;
@@ -223,4 +227,25 @@
 }
 .controlSeperatorColor {
   margin-top: 32px;
+}
+.sharpenMode {
+  color: rgb(168, 168, 168);
+  vertical-align: center;
+}
+.sharpenModeRGB {
+  margin-left: 24px;
+}
+.sharpenIncludeCheckBox {
+  margin-right: 8px;
+}
+.sharpenModeIncludeLabel {
+  margin-top: 4px !important;
+}
+.individualCheckBox {
+  margin-left: 10px;
+  margin-right: 8px;
+}
+.individualLabel {
+  color: rgb(168, 168, 168);
+  margin-right: 16px;
 }

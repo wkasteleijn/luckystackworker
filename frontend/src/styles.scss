@@ -132,7 +132,7 @@ select:hover {
   background-color: rgb(25, 25, 25);
 }
 .mat-tab-body {
-  height: 402px;
+  height: 434px;
 }
 
 .mat-ink-bar {
@@ -169,4 +169,8 @@ select:hover {
 
 .mat-radio-label-content {
   color: rgb(168, 168, 168);
+}
+
+.mat-checkbox-checked.mat-accent .mat-checkbox-background {
+  background-color: blue !important;
 }

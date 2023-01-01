@@ -33,9 +33,18 @@ export class AppComponent implements OnInit {
   ];
 
   title = 'LuckyStackWorker';
+
+  // sharpen
   radius: number;
   amount: number;
   iterations: number;
+  sharpenMode: string;
+  sharpenIncludeRed: boolean = true;
+  sharpenIncludeGreen: boolean = true;
+  sharpenIncludeBlue: boolean = true;
+  sharpenIndividually: boolean;
+  sharpenColorChannel: string;
+
   denoiseAmount: number;
   denoiseSigma: string;
   denoiseRadius: number;
@@ -164,6 +173,21 @@ export class AppComponent implements OnInit {
     if (update) {
       this.updateProfile();
     }
+  }
+
+  sharpenModeChanged(event: any, update: boolean) {
+    // TODO
+    // this.profile.iterations = event.value;
+    // this.iterations = event.value;
+    // this.profile.operation = 'iterations';
+    // console.log('iterationsChanged called: ' + this.profile.iterations);
+    // if (update) {
+    //   this.updateProfile();
+    // }
+  }
+
+  sharpenColorChannelChanged(event: any, update: boolean) {
+    // TODO
   }
 
   denoiseAmountChanged(event: any, update: boolean) {

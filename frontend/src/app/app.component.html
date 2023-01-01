@@ -170,9 +170,70 @@
     >
   </div>
   <mat-tab-group class="sliderTabs" selectedIndex="0">
-    <!-- Sharpen panel -->
     <mat-tab label="Sharpen & Denoise">
-      <div class="sliderRowCategoryTitle">Sharpen</div>
+      <!-- Sharpen panel -->
+      <div class="sliderRow">
+        <div class="sliderRowCategoryTitle">Sharpen</div>
+        <div class="sigmaRadio">
+          <mat-radio-group
+            [color]="colorTheme()"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [(ngModel)]="sharpenMode"
+            (change)="sharpenModeChanged($event, true)"
+            class="sharpenMode"
+          >
+            <mat-radio-button value="luminance" class="radioSizeButtonSharpen"
+              >Luminance mode: include&nbsp;&nbsp;
+            </mat-radio-button>
+            <mat-checkbox
+              [(ngModel)]="sharpenIncludeRed"
+              class="sharpenIncludeCheckBox"
+              >Red</mat-checkbox
+            >
+            <mat-checkbox
+              class="sharpenIncludeCheckBox"
+              [(ngModel)]="sharpenIncludeGreen"
+              >Green</mat-checkbox
+            >
+            <mat-checkbox
+              class="sharpenIncludeCheckBox"
+              [(ngModel)]="sharpenIncludeBlue"
+              >Blue</mat-checkbox
+            >
+            <mat-radio-button value="rgb" class="radioSizeButton sharpenModeRGB"
+              >RGB mode</mat-radio-button
+            >
+          </mat-radio-group>
+        </div>
+      </div>
+
+      <div class="sliderRow">
+        <div class="sliderLabel"></div>
+        <div class="slider">
+          <mat-checkbox
+            class="individualCheckBox"
+            [(ngModel)]="sharpenIndividually"
+          ></mat-checkbox>
+          <span class="individualLabel">Individual</span>
+          <mat-radio-group
+            [color]="colorTheme()"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [(ngModel)]="sharpenColorChannel"
+            (change)="sharpenColorChannelChanged($event, true)"
+          >
+            <mat-radio-button value="red" class="radioSizeButton"
+              >Red</mat-radio-button
+            >
+            <mat-radio-button value="green" class="radioSizeButton"
+              >Green</mat-radio-button
+            >
+            <mat-radio-button value="blue" class="radioSizeButton"
+              >Blue</mat-radio-button
+            >
+          </mat-radio-group>
+        </div>
+      </div>
+
       <div class="sliderRow">
         <div class="sliderLabel">Radius</div>
         <div class="slider">

@@ -173,7 +173,7 @@ public class Probeersels {
 
         LSWUnsharpMask mask = new LSWUnsharpMask();
         // mask.apply(image, 1, 0.92f, 3);
-        mask.applyLuminance(image, 1, 0.92f, 3, 1.5f, true, true, true);
+        mask.applyLuminance(image, 1, 0.92f, 3, 1.5f, true, true, false);
 
         Util.saveImage(image, "C:\\Users\\wkast\\archive\\Jup\\testsession\\noisyimage_denoised_lum.tif", false, false);
 
