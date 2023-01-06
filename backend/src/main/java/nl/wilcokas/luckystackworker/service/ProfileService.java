@@ -32,6 +32,9 @@ public class ProfileService {
         result.setSavitzkyGolayAmount(profile.getSavitzkyGolayAmount());
         result.setSavitzkyGolaySize(profile.getSavitzkyGolaySize());
         result.setSavitzkyGolayIterations(profile.getSavitzkyGolayIterations());
+        result.setClippingStrength(profile.getClippingStrength());
+        result.setClippingRange(profile.getClippingRange());
+        result.setSharpenMode(profile.getSharpenMode());
         result.setGamma(profile.getGamma());
         result.setRed(profile.getRed());
         result.setGreen(profile.getGreen());

@@ -93,6 +93,9 @@ public class Util {
                 .savitzkyGolayAmount(Integer.valueOf(getSetting(props, "savitzkyGolayAmount", profileName))) //
                 .savitzkyGolayIterations(Integer.valueOf(getSetting(props, "savitzkyGolayIterations", profileName))) //
                 .savitzkyGolaySize(Integer.valueOf(getSetting(props, "savitzkyGolaySize", profileName))) //
+                .clippingStrength(Integer.valueOf(getSetting(props, "clippingStrength", profileName))) //
+                .clippingRange(Integer.valueOf(getSetting(props, "clippingRange", profileName))) //
+                .sharpenMode(getSetting(props, "sharpenMode", profileName)) //
                 .gamma(new BigDecimal(getSetting(props, "gamma", profileName))) //
                 .contrast(Integer.valueOf(getSetting(props, "contrast", profileName))) //
                 .brightness(Integer.valueOf(getSetting(props, "brightness", profileName))) //

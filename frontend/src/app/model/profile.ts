@@ -19,6 +19,9 @@ export class Profile {
   savitzkyGolaySize: number;
   savitzkyGolayAmount: number;
   savitzkyGolayIterations: number;
+  clippingStrength: number;
+  clippingRange: number;
+  sharpenMode: string;
   operation: string;
   rootFolder: string;
   largeImage: boolean;

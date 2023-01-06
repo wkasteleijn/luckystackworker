@@ -15,8 +15,12 @@ import ij.WindowManager;
 import ij.macro.Interpreter;
 import ij.process.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
 import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter;
 import nl.wilcokas.luckystackworker.filter.SavitzkyGolayRadius;
+import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
+import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenParameters;
+import nl.wilcokas.luckystackworker.filter.settings.UnsharpMaskParameters;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
 
@@ -36,7 +40,8 @@ public final class Operations {
 
     public static boolean isSharpenOperation(final OperationEnum operation) {
         return ((OperationEnum.AMOUNT == operation) || (OperationEnum.RADIUS == operation)
-                || (OperationEnum.ITERATIONS == operation));
+                || (OperationEnum.ITERATIONS == operation) || (OperationEnum.SHARPENMODE == operation)
+                || (OperationEnum.CLIPPINGSTRENGTH == operation) || (OperationEnum.CLIPPINGRANGE == operation));
     }
 
     public static boolean isDenoiseOperation(final OperationEnum operation) {
@@ -53,7 +58,8 @@ public final class Operations {
             final OperationEnum... operations) {
         List<OperationEnum> excludedOperationList = Arrays.asList(operations);
         if ((!excludedOperationList.contains(OperationEnum.AMOUNT)) && (!excludedOperationList.contains(OperationEnum.RADIUS))
-                && (!excludedOperationList.contains(OperationEnum.ITERATIONS))) {
+                && (!excludedOperationList.contains(OperationEnum.ITERATIONS)) && (!excludedOperationList.contains(OperationEnum.CLIPPINGSTRENGTH))
+                && (!excludedOperationList.contains(OperationEnum.CLIPPINGRANGE)) && (!excludedOperationList.contains(OperationEnum.SHARPENMODE))) {
             applySharpen(image, profile);
         }
         if ((!excludedOperationList.contains(OperationEnum.DENOISEAMOUNT))
@@ -105,9 +111,17 @@ public final class Operations {
         if (profile.getRadius() != null && profile.getAmount() != null) {
             log.info("Applying sharpen with radius {}, amount {}, iterations {} to image {}", profile.getRadius(),
                     profile.getAmount(), iterations, image.getID());
-            for (int i = 0; i < iterations; i++) {
-                IJ.run(image, "Unsharp Mask...", String.format("radius=%s mask=%s", profile.getRadius(),
-                        profile.getAmount().divide(new BigDecimal("10000"))));
+            float amount = profile.getAmount().divide(new BigDecimal("10000")).floatValue();
+            LSWSharpenFilter filter = new LSWSharpenFilter();
+            float clippingStrength = ((float) profile.getClippingStrength()) / 1000f;
+            UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radius(profile.getRadius().doubleValue()).amount(amount)
+                    .iterations(iterations).clippingStrength(clippingStrength).clippingRange(100 - profile.getClippingRange()).build();
+            LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
+                    .saturation(1).unsharpMaskParameters(usParams).build();
+            if (profile.getSharpenMode().equals(LSWSharpenMode.RGB.toString())) {
+                filter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
+            } else {
+                filter.applyLuminanceMode(image, parameters);
             }
         }
     }

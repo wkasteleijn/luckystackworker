@@ -87,6 +87,15 @@ public class Profile {
     @Column(name = "savitzkyGolayIterations")
     private int savitzkyGolayIterations;
 
+    @Column(name = "clippingStrength")
+    private int clippingStrength;
+
+    @Column(name = "clippingRange")
+    private int clippingRange;
+
+    @Column(name = "sharpenMode")
+    private String sharpenMode;
+
     // Non persisted setting properties that are passed to the frontend.
     private String operation;
     private String rootFolder;

@@ -5,7 +5,7 @@ import java.io.IOException;
 import ij.ImagePlus;
 import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.luckystackworker.filter.LSWUnsharpMask;
+import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
 import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
@@ -171,9 +171,9 @@ public class Probeersels {
         //            log.info("Filter applied");
         //        }
 
-        LSWUnsharpMask mask = new LSWUnsharpMask();
+        LSWSharpenFilter mask = new LSWSharpenFilter();
         // mask.apply(image, 1, 0.92f, 3);
-        mask.applyLuminance(image, 1, 0.92f, 3, 1.5f, true, true, false);
+        // mask.applyLuminanceMode(image, 1, 0.92f, 3, 1.5f, true, true, false);
 
         Util.saveImage(image, "C:\\Users\\wkast\\archive\\Jup\\testsession\\noisyimage_denoised_lum.tif", false, false);
 

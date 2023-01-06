@@ -182,58 +182,15 @@
             (change)="sharpenModeChanged($event, true)"
             class="sharpenMode"
           >
-            <mat-radio-button value="luminance" class="radioSizeButtonSharpen"
-              >Luminance mode: include&nbsp;&nbsp;
+            <mat-radio-button value="LUMINANCE" class="radioSizeButtonSharpen"
+              >Luminance
             </mat-radio-button>
-            <mat-checkbox
-              [(ngModel)]="sharpenIncludeRed"
-              class="sharpenIncludeCheckBox"
-              >Red</mat-checkbox
-            >
-            <mat-checkbox
-              class="sharpenIncludeCheckBox"
-              [(ngModel)]="sharpenIncludeGreen"
-              >Green</mat-checkbox
-            >
-            <mat-checkbox
-              class="sharpenIncludeCheckBox"
-              [(ngModel)]="sharpenIncludeBlue"
-              >Blue</mat-checkbox
-            >
-            <mat-radio-button value="rgb" class="radioSizeButton sharpenModeRGB"
-              >RGB mode</mat-radio-button
+            <mat-radio-button value="RGB" class="radioSizeButton sharpenModeRGB"
+              >RGB</mat-radio-button
             >
           </mat-radio-group>
         </div>
       </div>
-
-      <div class="sliderRow">
-        <div class="sliderLabel"></div>
-        <div class="slider">
-          <mat-checkbox
-            class="individualCheckBox"
-            [(ngModel)]="sharpenIndividually"
-          ></mat-checkbox>
-          <span class="individualLabel">Individual</span>
-          <mat-radio-group
-            [color]="colorTheme()"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            [(ngModel)]="sharpenColorChannel"
-            (change)="sharpenColorChannelChanged($event, true)"
-          >
-            <mat-radio-button value="red" class="radioSizeButton"
-              >Red</mat-radio-button
-            >
-            <mat-radio-button value="green" class="radioSizeButton"
-              >Green</mat-radio-button
-            >
-            <mat-radio-button value="blue" class="radioSizeButton"
-              >Blue</mat-radio-button
-            >
-          </mat-radio-group>
-        </div>
-      </div>
-
       <div class="sliderRow">
         <div class="sliderLabel">Radius</div>
         <div class="slider">
@@ -281,6 +238,40 @@
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ iterations }}</span>
+        </div>
+      </div>
+      <div class="sliderRow">
+        <div class="sliderLabel">Clipping Strength</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            tickInterval="1"
+            step="1"
+            min="1"
+            max="100"
+            (input)="clippingStrengthChanged($event, false)"
+            (change)="clippingStrengthChanged($event, true)"
+            [(ngModel)]="clippingStrength"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ clippingStrength }}</span>
+        </div>
+      </div>
+      <div class="sliderRow">
+        <div class="sliderLabel">Clipping Range</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            tickInterval="1"
+            step="1"
+            min="1"
+            max="100"
+            (input)="clippingRangeChanged($event, false)"
+            (change)="clippingRangeChanged($event, true)"
+            [(ngModel)]="clippingRange"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ clippingRange }}</span>
         </div>
       </div>
 

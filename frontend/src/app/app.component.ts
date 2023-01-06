@@ -39,11 +39,8 @@ export class AppComponent implements OnInit {
   amount: number;
   iterations: number;
   sharpenMode: string;
-  sharpenIncludeRed: boolean = true;
-  sharpenIncludeGreen: boolean = true;
-  sharpenIncludeBlue: boolean = true;
-  sharpenIndividually: boolean;
-  sharpenColorChannel: string;
+  clippingStrength: number;
+  clippingRange: number;
 
   denoiseAmount: number;
   denoiseSigma: string;
@@ -175,19 +172,34 @@ export class AppComponent implements OnInit {
     }
   }
 
-  sharpenModeChanged(event: any, update: boolean) {
-    // TODO
-    // this.profile.iterations = event.value;
-    // this.iterations = event.value;
-    // this.profile.operation = 'iterations';
-    // console.log('iterationsChanged called: ' + this.profile.iterations);
-    // if (update) {
-    //   this.updateProfile();
-    // }
+  clippingStrengthChanged(event: any, update: boolean) {
+    this.profile.clippingStrength = event.value;
+    this.clippingStrength = event.value;
+    this.profile.operation = 'clippingStrength';
+    console.log('clippingStrength called: ' + this.profile.clippingStrength);
+    if (update) {
+      this.updateProfile();
+    }
   }
 
-  sharpenColorChannelChanged(event: any, update: boolean) {
-    // TODO
+  clippingRangeChanged(event: any, update: boolean) {
+    this.profile.clippingRange = event.value;
+    this.clippingRange = event.value;
+    this.profile.operation = 'clippingRange';
+    console.log('clippingRange called: ' + this.profile.clippingRange);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  sharpenModeChanged(event: any, update: boolean) {
+    this.profile.sharpenMode = event.value;
+    this.sharpenMode = event.value;
+    this.profile.operation = 'sharpenMode';
+    console.log('sharpenMode called: ' + this.profile.sharpenMode);
+    if (update) {
+      this.updateProfile();
+    }
   }
 
   denoiseAmountChanged(event: any, update: boolean) {
@@ -443,7 +455,9 @@ export class AppComponent implements OnInit {
     this.savitzkyGolayIterations = this.profile.savitzkyGolayIterations;
     this.savitzkyGolayAmount = this.profile.savitzkyGolayAmount;
     this.savitzkyGolaySize = this.profile.savitzkyGolaySize.toString();
-    console.log(' this.savitzkyGolaySize == ' + this.savitzkyGolaySize);
+    this.clippingStrength = this.profile.clippingStrength;
+    this.clippingRange = this.profile.clippingRange;
+    this.sharpenMode = this.profile.sharpenMode;
     this.saturation = this.profile.saturation;
     this.gamma = this.profile.gamma;
     this.contrast = this.profile.contrast;
