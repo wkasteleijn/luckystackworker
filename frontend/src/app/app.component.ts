@@ -375,10 +375,11 @@ export class AppComponent implements OnInit {
   denoiseAlgorithmChanged(event: any) {
     if (event.value === 'SAVGOLAY') {
       this.profile.denoiseSigma = 0;
+      this.profile.operation = 'savitzkyGolaySize';
     } else {
       this.profile.savitzkyGolaySize = 0;
+      this.profile.operation = 'denoiseSigma';
     }
-    this.profile.operation = 'denoiseAlgorithm';
     console.log(
       'denoiseAlgorithmChanged called: ' + this.profile.savitzkyGolaySize
     );

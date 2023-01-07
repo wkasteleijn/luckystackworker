@@ -80,15 +80,6 @@ public final class Operations {
                 && (!excludedOperationList.contains(OperationEnum.BACKGROUND))) {
             applyBrightnessAndContrast(image, profile, true);
         }
-        if (!excludedOperationList.contains(OperationEnum.RED)) {
-            applyRed(image, profile);
-        }
-        if (!excludedOperationList.contains(OperationEnum.GREEN)) {
-            applyGreen(image, profile);
-        }
-        if (!excludedOperationList.contains(OperationEnum.BLUE)) {
-            applyBlue(image, profile);
-        }
     }
 
     public static void applyAllOperations(ImagePlus image, final Map<String, String> profileSettings,
@@ -97,11 +88,8 @@ public final class Operations {
         applySharpen(image, profile);
         applyDenoise(image, profile);
         applySavitzkyGolayDenoise(image, profile);
-        applyGamma(image, profile);
+        applyGammaAndRGBCorrections(image, profile);
         applyBrightnessAndContrast(image, profile, true);
-        applyRed(image, profile);
-        applyGreen(image, profile);
-        applyBlue(image, profile);
         applySaturation(image, profile);
     }
 
@@ -129,7 +117,7 @@ public final class Operations {
     public static void applyDenoise(final ImagePlus image, final Profile profile) {
         if (profile.getDenoiseSigma() != null && (profile.getDenoiseSigma().compareTo(BigDecimal.ZERO) > 0)) {
             int iterations = profile.getDenoiseIterations() == 0 ? 1 : profile.getDenoiseIterations();
-            log.info("Applying denoise with value {} to image {}", profile.getDenoise(), image.getID());
+            log.info("Applying Sigma denoise with value {} to image {}", profile.getDenoise(), image.getID());
             BigDecimal factor = profile.getDenoise().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100)
                     : profile.getDenoise();
             BigDecimal minimum = factor.divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
@@ -142,47 +130,46 @@ public final class Operations {
         }
     }
 
-    public static void applyGamma(final ImagePlus image, final Profile profile) {
+    public static void applyGammaAndRGBCorrections(final ImagePlus image, final Profile profile) {
+        ImageProcessor ipRed = getImageStackProcessor(image, STACK_POSITION_RED); // .gamma(value);
+        ImageProcessor ipGreen = getImageStackProcessor(image, STACK_POSITION_GREEN); // .gamma(value);
+        ImageProcessor ipBlue = getImageStackProcessor(image, STACK_POSITION_BLUE); // .gamma(value);
+
+        double gammaRed = 1f;
+        double gammaGreen = 1f;
+        double gammaBlue = 1f;
+        boolean gammaChanged = false;
+        if (profile.getRed() != null && (profile.getRed().compareTo(BigDecimal.ZERO) > 0) && validateRGBStack(image)) {
+            log.info("Applying red reduction with value {} to image {}", profile.getRed(), image.getID());
+            gammaRed += (profile.getRed().divide(new BigDecimal("255"), 3, RoundingMode.HALF_EVEN)).floatValue();
+            gammaChanged = true;
+        }
+        if (profile.getGreen() != null && (profile.getGreen().compareTo(BigDecimal.ZERO) > 0) && validateRGBStack(image)) {
+            log.info("Applying green reduction with value {} to image {}", profile.getGreen(), image.getID());
+            gammaGreen += (profile.getGreen().divide(new BigDecimal("255"), 3, RoundingMode.HALF_EVEN)).floatValue();
+            gammaChanged = true;
+        }
+        if (profile.getBlue() != null && (profile.getBlue().compareTo(BigDecimal.ZERO) > 0) && validateRGBStack(image)) {
+            log.info("Applying blue reduction with value {} to image {}", profile.getBlue(), image.getID());
+            gammaBlue += (profile.getBlue().divide(new BigDecimal("255"), 3, RoundingMode.HALF_EVEN)).floatValue();
+            gammaChanged = true;
+        }
         if (profile.getGamma() != null && (profile.getGamma().compareTo(BigDecimal.ONE) != 0)) {
             log.info("Applying gamma correction with value {} to image {}", profile.getGamma(), image.getID());
-            IJ.run(image, "Gamma...", String.format("value=%s", 2 - profile.getGamma().doubleValue()));
+            double gammaCorrectionValue = 1d - profile.getGamma().doubleValue();
+            gammaRed += gammaCorrectionValue;
+            gammaGreen += gammaCorrectionValue;
+            gammaBlue += gammaCorrectionValue;
+            gammaChanged = true;
         }
-    }
 
-    public static void applyRed(final ImagePlus image, final Profile profile) {
-        if (profile.getRed() != null && (profile.getRed().compareTo(BigDecimal.ZERO) > 0)) {
-            if (validateRGBStack(image)) {
-                log.info("Applying red reduction with value {} to image {}", profile.getRed(), image.getID());
-                getImageStackProcessor(image, STACK_POSITION_RED).gamma(getGammaColorValue(profile.getRed()));
-                image.updateAndDraw();
-            } else {
-                log.warn("Attemping to apply red reduction to a non RGB image {}", image.getFileInfo());
-            }
+        if (gammaChanged) {
+            ipRed.gamma(gammaRed);
+            ipGreen.gamma(gammaGreen);
+            ipBlue.gamma(gammaBlue);
         }
-    }
 
-    public static void applyGreen(final ImagePlus image, final Profile profile) {
-        if (profile.getGreen() != null && (profile.getGreen().compareTo(BigDecimal.ZERO) > 0)) {
-            if (validateRGBStack(image)) {
-                log.info("Applying green reduction with value {} to image {}", profile.getGreen(), image.getID());
-                getImageStackProcessor(image, STACK_POSITION_GREEN).gamma(getGammaColorValue(profile.getGreen()));
-                image.updateAndDraw();
-            } else {
-                log.warn("Attemping to apply green reduction to a non RGB image {}", image.getFileInfo());
-            }
-        }
-    }
-
-    public static void applyBlue(final ImagePlus image, final Profile profile) {
-        if (profile.getBlue() != null && (profile.getBlue().compareTo(BigDecimal.ZERO) > 0)) {
-            if (validateRGBStack(image)) {
-                log.info("Applying blue reduction with value {} to image {}", profile.getBlue(), image.getID());
-                getImageStackProcessor(image, STACK_POSITION_BLUE).gamma(getGammaColorValue(profile.getBlue()));
-                image.updateAndDraw();
-            } else {
-                log.warn("Attemping to apply blue reduction to a non RGB image {}", image.getFileInfo());
-            }
-        }
+        image.updateAndDraw();
     }
 
     public static void applySaturation(final ImagePlus image, final Profile profile) {
@@ -260,10 +247,12 @@ public final class Operations {
     }
 
     public static void applySavitzkyGolayDenoise(ImagePlus image, final Profile profile) {
-        log.info("Starting filter");
-        int iterations = profile.getSavitzkyGolayIterations() == 0 ? 1 : profile.getSavitzkyGolayIterations();
-        for (int i = 0; i < iterations; i++) {
-            new SavitzkyGolayFilter().apply(image, SavitzkyGolayRadius.valueOf(profile.getSavitzkyGolaySize()), profile.getSavitzkyGolayAmount());
+        if (profile.getSavitzkyGolaySize() > 0) {
+            log.info("Starting SavitzkyGolayDenoise filter");
+            int iterations = profile.getSavitzkyGolayIterations() == 0 ? 1 : profile.getSavitzkyGolayIterations();
+            for (int i = 0; i < iterations; i++) {
+                new SavitzkyGolayFilter().apply(image, SavitzkyGolayRadius.valueOf(profile.getSavitzkyGolaySize()), profile.getSavitzkyGolayAmount());
+            }
         }
     }
 

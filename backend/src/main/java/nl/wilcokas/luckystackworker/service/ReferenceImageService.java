@@ -143,17 +143,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         } else if ((OperationEnum.CONTRAST == operation) || (OperationEnum.BRIGHTNESS == operation)
                 || (OperationEnum.BACKGROUND == operation)) {
             Operations.applyBrightnessAndContrast(finalResultImage, profile, false);
-        } else if (OperationEnum.RED == operation) {
-            Operations.applyRed(finalResultImage, profile);
-        } else if (OperationEnum.GREEN == operation) {
-            Operations.applyGreen(finalResultImage, profile);
-        } else if (OperationEnum.BLUE == operation) {
-            Operations.applyBlue(finalResultImage, profile);
         }
 
         // Exception for gamma, always apply last and only on the final result as it
         // messes up the sharpening.
-        Operations.applyGamma(finalResultImage, profile);
+        Operations.applyGammaAndRGBCorrections(finalResultImage, profile);
 
         Operations.applySaturation(finalResultImage, profile);
 
