@@ -24,6 +24,7 @@ import ij.io.FileInfo;
 import ij.io.FileSaver;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.model.Profile;
 
 @Slf4j
@@ -208,6 +209,11 @@ public class Util {
             if (profileStr != null) {
                 Profile profile = new Yaml().load(profileStr);
 
+                // Added since v3.0.0, so older version written yaml needs to stay compatible.
+                if (profile.getSharpenMode() == null) {
+                    profile.setSharpenMode(LSWSharpenMode.LUMINANCE.toString());
+                }
+
                 // Added since v2.3.0, so older version written yaml needs to stay compatible.
                 if (profile.getSavitzkyGolayIterations() == 0) {
                     profile.setSavitzkyGolayIterations(1);
@@ -256,6 +262,92 @@ public class Util {
             destination.updateAndDraw();
         }
         IJ.run(destination, "Apply LUT", null);
+    }
+
+    public static float[] rgbToHsl(float red, float green, float blue, boolean includeRed, boolean includeGreen, boolean includeBlue,
+            LSWSharpenMode mode) {
+        float max = Math.max(Math.max(red, green), blue);
+        float min = Math.min(Math.min(red, green), blue);
+        float c = max - min;
+
+        float hue_ = 0.f;
+        if (c == 0) {
+            hue_ = 0;
+        } else if (max == red) {
+            hue_ = (green - blue) / c;
+            if (hue_ < 0)
+                hue_ += 6.f;
+        } else if (max == green) {
+            hue_ = (blue - red) / c + 2.f;
+        } else if (max == blue) {
+            hue_ = (red - green) / c + 4.f;
+        }
+        float hue = 60.f * hue_;
+
+        float luminance;
+        if (mode == LSWSharpenMode.LUMINANCE) {
+            float luminanceDivisor = (includeRed ? 1 : 0) + (includeGreen ? 1 : 0) + (includeBlue ? 1 : 0);
+            luminance = ((includeRed ? red : 0) + (includeGreen ? green : 0) + (includeBlue ? blue : 0)) / luminanceDivisor;
+        } else {
+            luminance = (max + min) * 0.5f;
+        }
+
+        float saturation;
+        if (c == 0) {
+            saturation = 0.f;
+        } else {
+            saturation = c / (1 - Math.abs(2.f * luminance - 1.f));
+        }
+
+        float[] hsl = new float[3];
+        hsl[0] = hue;
+        hsl[1] = saturation;
+        hsl[2] = luminance;
+        return hsl;
+    }
+
+    public static float[] hslToRgb(float hue, float saturation, float luminance, float hueCorrectionFactor) {
+        float c = (1 - Math.abs(2.f * luminance - 1.f)) * saturation;
+        float hue_ = hue / 60.f;
+        float h_mod2 = hue_;
+        if (h_mod2 >= 4.f)
+            h_mod2 -= 4.f;
+        else if (h_mod2 >= 2.f)
+            h_mod2 -= 2.f;
+
+        float x = c * (1 - Math.abs(h_mod2 - 1));
+        float r_, g_, b_;
+        if (hue_ < 1) {
+            r_ = c;
+            g_ = x;
+            b_ = 0;
+        } else if (hue_ < 2) {
+            r_ = x;
+            g_ = c;
+            b_ = 0;
+        } else if (hue_ < 3) {
+            r_ = 0;
+            g_ = c;
+            b_ = x;
+        } else if (hue_ < 4) {
+            r_ = 0;
+            g_ = x;
+            b_ = c;
+        } else if (hue_ < 5) {
+            r_ = x;
+            g_ = 0;
+            b_ = c;
+        } else {
+            r_ = c;
+            g_ = 0;
+            b_ = x;
+        }
+
+        float m = luminance - (0.5f * c);
+        float red = ((r_ + m) + 0.5f) * (1f + hueCorrectionFactor);
+        float green = ((g_ + m) + 0.5f) * (1f - hueCorrectionFactor);
+        float blue = ((b_ + m) + 0.5f) * (1f + hueCorrectionFactor);
+        return new float[] { red, green, blue };
     }
 
     private static String getSetting(Map<String, String> props, String setting, String name) {

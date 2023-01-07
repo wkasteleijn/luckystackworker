@@ -10,6 +10,7 @@ import ij.process.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenParameters;
 import nl.wilcokas.luckystackworker.filter.settings.UnsharpMaskParameters;
+import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
 public class LSWSharpenFilter {
@@ -17,18 +18,39 @@ public class LSWSharpenFilter {
     private static final float FLOAT_MAX_SATURATED_VALUE = 65535f;
 
     public void applyRGBMode(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) {
+        ImageStack finalStack = image.getStack();
+        ImageStack intialStack = finalStack.duplicate();
+
+        // Pass 1, first apply the filter normally to the intialStack.
         for (int i = 0; i < unsharpMaskParameters.getIterations(); i++) {
-            ImageStack stack = image.getStack();
-            for (int slice = 1; slice <= stack.getSize(); slice++) {
-                ImageProcessor ip = stack.getProcessor(slice);
+            for (int slice = 1; slice <= intialStack.getSize(); slice++) {
+                ImageProcessor ip = intialStack.getProcessor(slice);
                 FloatProcessor fp = ip.toFloat(slice, null);
                 fp.snapshot();
                 doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
                         unsharpMaskParameters.getClippingRange(), fp);
                 ip.setPixels(slice, fp);
             }
-            image.updateAndDraw();
+
         }
+
+        // Pass 2, apply the adaptive filter based on the result of pass 1.
+        for (int i = 0; i < unsharpMaskParameters.getIterations(); i++) {
+            for (int slice = 1; slice <= intialStack.getSize(); slice++) {
+                ImageProcessor ipInitial = intialStack.getProcessor(slice);
+                FloatProcessor fpInitial = ipInitial.toFloat(slice, null);
+                ImageProcessor ipFinal = finalStack.getProcessor(slice);
+                FloatProcessor fpFinal = ipFinal.toFloat(slice, null);
+                fpFinal.snapshot();
+                doUnsharpMaskAdaptive(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(),
+                        unsharpMaskParameters.getClippingStrength(),
+                        unsharpMaskParameters.getClippingRange(), fpInitial, fpFinal);
+                ipFinal.setPixels(slice, fpFinal);
+            }
+
+        }
+
+        image.updateAndDraw();
     }
 
     public void applyLuminanceMode(ImagePlus image, final LSWSharpenParameters parameters) {
@@ -37,12 +59,16 @@ public class LSWSharpenFilter {
             return;
         }
         UnsharpMaskParameters unsharpMaskParameters = parameters.getUnsharpMaskParameters();
-        boolean saturationApplied = false;
+
+        ImageStack finalStack = image.getStack();
+        ImageStack intialStack = finalStack.duplicate();
+
+        // Pass 1, first apply the filter normally to the intialStack.
+        FloatProcessor fpLumInitial = null;
         for (int it = 0; it < unsharpMaskParameters.getIterations(); it++) {
-            ImageStack stack = image.getStack();
-            ImageProcessor ipRed = stack.getProcessor(1);
-            ImageProcessor ipGreen = stack.getProcessor(2);
-            ImageProcessor ipBlue = stack.getProcessor(3);
+            ImageProcessor ipRed = intialStack.getProcessor(1);
+            ImageProcessor ipGreen = intialStack.getProcessor(2);
+            ImageProcessor ipBlue = intialStack.getProcessor(3);
 
             FloatProcessor fpRed = ipRed.toFloat(1, null);
             FloatProcessor fpGreen = ipGreen.toFloat(2, null);
@@ -58,20 +84,19 @@ public class LSWSharpenFilter {
             float[] pixelsSat = new float[pixelsRed.length];
             float[] pixelsLum = new float[pixelsRed.length];
             for (int i = 0; i < pixelsRed.length; i++) {
-                float[] hsl = rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], parameters.isIncludeRed(), parameters.isIncludeGreen(),
-                        parameters.isIncludeBlue());
+                float[] hsl = Util.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], parameters.isIncludeRed(), parameters.isIncludeGreen(),
+                        parameters.isIncludeBlue(), parameters.getMode());
                 pixelsHue[i] = hsl[0];
-                pixelsSat[i] = hsl[1] * (saturationApplied ? 1f : parameters.getSaturation());
+                pixelsSat[i] = hsl[1];
                 pixelsLum[i] = hsl[2];
             }
-            saturationApplied = true;
-            FloatProcessor fpLum = new FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum);
-            fpLum.snapshot();
+            fpLumInitial = new FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum);
+            fpLumInitial.snapshot();
             doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
-                    unsharpMaskParameters.getClippingRange(), fpLum);
+                    unsharpMaskParameters.getClippingRange(), fpLumInitial);
 
             for (int i = 0; i < pixelsRed.length; i++) {
-                float[] rgb = hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
+                float[] rgb = Util.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
                 pixelsRed[i] = rgb[0];
                 pixelsGreen[i] = rgb[1];
                 pixelsBlue[i] = rgb[2];
@@ -80,70 +105,59 @@ public class LSWSharpenFilter {
             ipRed.setPixels(1, fpRed);
             ipGreen.setPixels(2, fpGreen);
             ipBlue.setPixels(3, fpBlue);
-            image.updateAndDraw();
         }
-    }
 
-    //    public void applyIndividualLuminanceMode(ImagePlus image, final LSWSharpenParameters parameters) {
-    //        if (!parameters.isIncludeRed() && !parameters.isIncludeGreen() && !parameters.isIncludeBlue()) {
-    //            log.error("Cannot have red, green and blue excluded");
-    //            return;
-    //        }
-    //        UnsharpMaskParameters unsharpMaskParametersRed = parameters.getUnsharpMaskParametersRed();
-    //        UnsharpMaskParameters unsharpMaskParametersGreen = parameters.getUnsharpMaskParametersGreen();
-    //        UnsharpMaskParameters unsharpMaskParametersBlue = parameters.getUnsharpMaskParametersBlue();
-    //        boolean saturationApplied = false;
-    //        ImageStack stack = image.getStack();
-    //        ImageProcessor ipRed = stack.getProcessor(1);
-    //        ImageProcessor ipGreen = stack.getProcessor(2);
-    //        ImageProcessor ipBlue = stack.getProcessor(3);
-    //
-    //        for (int it = 0; it < unsharpMaskParameters.getIterations(); it++) {
-    //
-    //            FloatProcessor fpRed = ipRed.toFloat(1, null);
-    //            FloatProcessor fpGreen = ipGreen.toFloat(2, null);
-    //            FloatProcessor fpBlue = ipBlue.toFloat(3, null);
-    //            fpRed.snapshot();
-    //            fpGreen.snapshot();
-    //            fpBlue.snapshot();
-    //            float[] pixelsRed = (float[]) fpRed.getPixels();
-    //            float[] pixelsGreen = (float[]) fpGreen.getPixels();
-    //            float[] pixelsBlue = (float[]) fpBlue.getPixels();
-    //
-    //            float[] pixelsHue = new float[pixelsRed.length];
-    //            float[] pixelsSat = new float[pixelsRed.length];
-    //            float[] pixelsLum = new float[pixelsRed.length];
-    //            for (int i = 0; i < pixelsRed.length; i++) {
-    //                float[] hsl = rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], parameters.isIncludeRed(), parameters.isIncludeGreen(),
-    //                        parameters.isIncludeBlue());
-    //                pixelsHue[i] = hsl[0];
-    //                pixelsSat[i] = hsl[1] * (saturationApplied ? 1f : parameters.getSaturation());
-    //                pixelsLum[i] = hsl[2];
-    //            }
-    //            saturationApplied = true;
-    //            FloatProcessor fpLum = new FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum);
-    //            fpLum.snapshot();
-    //            doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), fpLum);
-    //
-    //            for (int i = 0; i < pixelsRed.length; i++) {
-    //                float[] rgb = hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
-    //                pixelsRed[i] = rgb[0];
-    //                pixelsGreen[i] = rgb[1];
-    //                pixelsBlue[i] = rgb[2];
-    //            }
-    //
-    //            ipRed.setPixels(1, fpRed);
-    //            ipGreen.setPixels(2, fpGreen);
-    //            ipBlue.setPixels(3, fpBlue);
-    //            image.updateAndDraw();
-    //        }
-    //    }
+        // Pass 2, apply the adaptive filter based on the result of pass 1.
+        for (int it = 0; it < unsharpMaskParameters.getIterations(); it++) {
+            ImageProcessor ipRed = finalStack.getProcessor(1);
+            ImageProcessor ipGreen = finalStack.getProcessor(2);
+            ImageProcessor ipBlue = finalStack.getProcessor(3);
+
+            FloatProcessor fpRed = ipRed.toFloat(1, null);
+            FloatProcessor fpGreen = ipGreen.toFloat(2, null);
+            FloatProcessor fpBlue = ipBlue.toFloat(3, null);
+            fpRed.snapshot();
+            fpGreen.snapshot();
+            fpBlue.snapshot();
+            float[] pixelsRed = (float[]) fpRed.getPixels();
+            float[] pixelsGreen = (float[]) fpGreen.getPixels();
+            float[] pixelsBlue = (float[]) fpBlue.getPixels();
+
+            float[] pixelsHue = new float[pixelsRed.length];
+            float[] pixelsSat = new float[pixelsRed.length];
+            float[] pixelsLum = new float[pixelsRed.length];
+            for (int i = 0; i < pixelsRed.length; i++) {
+                float[] hsl = Util.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], parameters.isIncludeRed(), parameters.isIncludeGreen(),
+                        parameters.isIncludeBlue(), parameters.getMode());
+                pixelsHue[i] = hsl[0];
+                pixelsSat[i] = hsl[1];
+                pixelsLum[i] = hsl[2];
+            }
+            FloatProcessor fpLum = new FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum);
+            fpLum.snapshot();
+            doUnsharpMaskAdaptive(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
+                    unsharpMaskParameters.getClippingRange(), fpLumInitial, fpLum);
+
+            for (int i = 0; i < pixelsRed.length; i++) {
+                float[] rgb = Util.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
+                pixelsRed[i] = rgb[0];
+                pixelsGreen[i] = rgb[1];
+                pixelsBlue[i] = rgb[2];
+            }
+
+            ipRed.setPixels(1, fpRed);
+            ipGreen.setPixels(2, fpGreen);
+            ipBlue.setPixels(3, fpBlue);
+        }
+
+        image.updateAndDraw();
+    }
 
     /*
      * Unsharp mask algorithm that prevents edge clipping effect.
      * @param radius
      * @param amount
-     * @param clippingStrength the factor of the clipping suppression
+     * @param clippingStrength the factor of the clipping suppression, if set to 0 it means no clipping supression is being applied.
      * @param clippingRange represents the histogram % value from where the clipping has to be suppressed by holding off the amount.
      * @param fp
      */
@@ -157,8 +171,31 @@ public class LSWSharpenFilter {
         Rectangle roi = fp.getRoi();
         for (int y = roi.y; y < roi.y + roi.height; y++) {
             for (int x = roi.x, p = width * y + x; x < roi.x + roi.width; x++, p++) {
-                float pixelValue = getUnsharpMaskValue(snapshotPixels[p], pixels[p], amount);
-                int cutoffIndex = Math.round(((pixelValue < 0f ? 0f : pixelValue) / FLOAT_MAX_SATURATED_VALUE) * 100f);
+                pixels[p] = getUnsharpMaskValue(snapshotPixels[p], pixels[p], amount);
+            }
+        }
+    }
+
+    /*
+     * Unsharp mask algorithm that prevents edge clipping effect.
+     * @param radius
+     * @param amount
+     * @param clippingStrength the factor of the clipping suppression, if set to 0 it means no clipping supression is being applied.
+     * @param clippingRange represents the histogram % value from where the clipping has to be suppressed by holding off the amount.
+     * @param fp
+     */
+    private void doUnsharpMaskAdaptive(double radius, float amount, float clippingStrength, float clippingRange, FloatProcessor fpInitial,
+            FloatProcessor fpFinal) {
+        GaussianBlur gb = new GaussianBlur();
+        gb.blurGaussian(fpFinal, radius, radius, 0.01);
+        float[] initialPixels = (float[]) fpInitial.getPixels();
+        float[] pixels = (float[]) fpFinal.getPixels();
+        float[] snapshotPixels = (float[]) fpFinal.getSnapshotPixels();
+        int width = fpFinal.getWidth();
+        Rectangle roi = fpFinal.getRoi();
+        for (int y = roi.y; y < roi.y + roi.height; y++) {
+            for (int x = roi.x, p = width * y + x; x < roi.x + roi.width; x++, p++) {
+                int cutoffIndex = Math.round(((initialPixels[p] < 0f ? 0f : initialPixels[p]) / FLOAT_MAX_SATURATED_VALUE) * 100f);
                 float cutoffFactor = getCutoffFactor(cutoffIndex, clippingRange) * clippingStrength;
                 float amountNew = amount - (amount * (cutoffFactor / 100));
                 float pixelValueNew = getUnsharpMaskValue(snapshotPixels[p], pixels[p], amountNew);
@@ -183,84 +220,68 @@ public class LSWSharpenFilter {
         return (pixelValue - amount * pixelValueAfterBlur) / (1f - amount);
     }
 
-    private float[] rgbToHsl(float red, float green, float blue, boolean includeRed, boolean includeGreen, boolean includeBlue) {
-        float max = Math.max(Math.max(red, green), blue);
-        float min = Math.min(Math.min(red, green), blue);
-        float c = max - min;
-
-        float hue_ = 0.f;
-        if (c == 0) {
-            hue_ = 0;
-        } else if (max == red) {
-            hue_ = (green - blue) / c;
-            if (hue_ < 0)
-                hue_ += 6.f;
-        } else if (max == green) {
-            hue_ = (blue - red) / c + 2.f;
-        } else if (max == blue) {
-            hue_ = (red - green) / c + 4.f;
-        }
-        float hue = 60.f * hue_;
-
-        float luminanceDivisor = (includeRed ? 1 : 0) + (includeGreen ? 1 : 0) + (includeBlue ? 1 : 0);
-        float luminance = ((includeRed ? red : 0) + (includeGreen ? green : 0) + (includeBlue ? blue : 0)) / luminanceDivisor;
-
-        float saturation;
-        if (c == 0) {
-            saturation = 0.f;
-        } else {
-            saturation = c / (1 - Math.abs(2.f * luminance - 1.f));
-        }
-
-        float[] hsl = new float[3];
-        hsl[0] = hue;
-        hsl[1] = saturation;
-        hsl[2] = luminance;
-        return hsl;
-    }
-
-    private float[] hslToRgb(float hue, float saturation, float luminance, float hueCorrectionFactor) {
-        float c = (1 - Math.abs(2.f * luminance - 1.f)) * saturation;
-        float hue_ = hue / 60.f;
-        float h_mod2 = hue_;
-        if (h_mod2 >= 4.f)
-            h_mod2 -= 4.f;
-        else if (h_mod2 >= 2.f)
-            h_mod2 -= 2.f;
-
-        float x = c * (1 - Math.abs(h_mod2 - 1));
-        float r_, g_, b_;
-        if (hue_ < 1) {
-            r_ = c;
-            g_ = x;
-            b_ = 0;
-        } else if (hue_ < 2) {
-            r_ = x;
-            g_ = c;
-            b_ = 0;
-        } else if (hue_ < 3) {
-            r_ = 0;
-            g_ = c;
-            b_ = x;
-        } else if (hue_ < 4) {
-            r_ = 0;
-            g_ = x;
-            b_ = c;
-        } else if (hue_ < 5) {
-            r_ = x;
-            g_ = 0;
-            b_ = c;
-        } else {
-            r_ = c;
-            g_ = 0;
-            b_ = x;
-        }
-
-        float m = luminance - (0.5f * c);
-        float red = ((r_ + m) + 0.5f) * (1f + hueCorrectionFactor);
-        float green = ((g_ + m) + 0.5f) * (1f - hueCorrectionFactor);
-        float blue = ((b_ + m) + 0.5f) * (1f + hueCorrectionFactor);
-        return new float[] { red, green, blue };
-    }
+    // public void applyIndividualLuminanceMode(ImagePlus image, final
+    // LSWSharpenParameters parameters) {
+    // if (!parameters.isIncludeRed() && !parameters.isIncludeGreen() &&
+    // !parameters.isIncludeBlue()) {
+    // log.error("Cannot have red, green and blue excluded");
+    // return;
+    // }
+    // UnsharpMaskParameters unsharpMaskParametersRed =
+    // parameters.getUnsharpMaskParametersRed();
+    // UnsharpMaskParameters unsharpMaskParametersGreen =
+    // parameters.getUnsharpMaskParametersGreen();
+    // UnsharpMaskParameters unsharpMaskParametersBlue =
+    // parameters.getUnsharpMaskParametersBlue();
+    // boolean saturationApplied = false;
+    // ImageStack stack = image.getStack();
+    // ImageProcessor ipRed = stack.getProcessor(1);
+    // ImageProcessor ipGreen = stack.getProcessor(2);
+    // ImageProcessor ipBlue = stack.getProcessor(3);
+    //
+    // for (int it = 0; it < unsharpMaskParameters.getIterations(); it++) {
+    //
+    // FloatProcessor fpRed = ipRed.toFloat(1, null);
+    // FloatProcessor fpGreen = ipGreen.toFloat(2, null);
+    // FloatProcessor fpBlue = ipBlue.toFloat(3, null);
+    // fpRed.snapshot();
+    // fpGreen.snapshot();
+    // fpBlue.snapshot();
+    // float[] pixelsRed = (float[]) fpRed.getPixels();
+    // float[] pixelsGreen = (float[]) fpGreen.getPixels();
+    // float[] pixelsBlue = (float[]) fpBlue.getPixels();
+    //
+    // float[] pixelsHue = new float[pixelsRed.length];
+    // float[] pixelsSat = new float[pixelsRed.length];
+    // float[] pixelsLum = new float[pixelsRed.length];
+    // for (int i = 0; i < pixelsRed.length; i++) {
+    // float[] hsl = rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i],
+    // parameters.isIncludeRed(), parameters.isIncludeGreen(),
+    // parameters.isIncludeBlue());
+    // pixelsHue[i] = hsl[0];
+    // pixelsSat[i] = hsl[1] * (saturationApplied ? 1f :
+    // parameters.getSaturation());
+    // pixelsLum[i] = hsl[2];
+    // }
+    // saturationApplied = true;
+    // FloatProcessor fpLum = new FloatProcessor(image.getWidth(),
+    // image.getHeight(), pixelsLum);
+    // fpLum.snapshot();
+    // doUnsharpMask(unsharpMaskParameters.getRadius(),
+    // unsharpMaskParameters.getAmount(), fpLum);
+    //
+    // for (int i = 0; i < pixelsRed.length; i++) {
+    // float[] rgb = hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
+    // pixelsRed[i] = rgb[0];
+    // pixelsGreen[i] = rgb[1];
+    // pixelsBlue[i] = rgb[2];
+    // }
+    //
+    // ipRed.setPixels(1, fpRed);
+    // ipGreen.setPixels(2, fpGreen);
+    // ipBlue.setPixels(3, fpBlue);
+    // image.updateAndDraw();
+    // }
+    // }
 
 }

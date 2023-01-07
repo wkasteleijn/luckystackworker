@@ -140,8 +140,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             Operations.applyDenoise(finalResultImage, profile);
         } else if (Operations.isSavitzkyGolayDenoiseOperation(operation)) {
             Operations.applySavitzkyGolayDenoise(finalResultImage, profile);
-        } else if (OperationEnum.GAMMA == operation) {
-            Operations.applyGamma(finalResultImage, profile);
         } else if ((OperationEnum.CONTRAST == operation) || (OperationEnum.BRIGHTNESS == operation)
                 || (OperationEnum.BACKGROUND == operation)) {
             Operations.applyBrightnessAndContrast(finalResultImage, profile, false);
@@ -153,19 +151,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             Operations.applyBlue(finalResultImage, profile);
         }
 
-        // Exception for saturation, always apply it as last as it will convert to RGB
-        // color.
-        ImagePlus duplicatedImage = Operations.applySaturation(finalResultImage, profile);
-        if (duplicatedImage != null) {
-            duplicatedImage.setRoi(finalResultImage.getRoi());
-            Point location = finalResultImage.getWindow().getLocation();
-            finalResultImage.getWindow().setVisible(false);
-            finalResultImage.close();
-            finalResultImage = duplicatedImage;
-            finalResultImage.show(filePath);
-            setDefaultLayoutSettings(finalResultImage, location);
-            setZoom(finalResultImage, true);
-        }
+        // Exception for gamma, always apply last and only on the final result as it
+        // messes up the sharpening.
+        Operations.applyGamma(finalResultImage, profile);
+
+        Operations.applySaturation(finalResultImage, profile);
 
         finalResultImage.setTitle(filePath);
     }

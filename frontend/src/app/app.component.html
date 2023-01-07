@@ -241,13 +241,13 @@
         </div>
       </div>
       <div class="sliderRow">
-        <div class="sliderLabel">Clipping Strength</div>
+        <div class="sliderLabel">Suppress Clipping</div>
         <div class="slider">
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             tickInterval="1"
             step="1"
-            min="1"
+            min="0"
             max="100"
             (input)="clippingStrengthChanged($event, false)"
             (change)="clippingStrengthChanged($event, true)"
@@ -255,13 +255,23 @@
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ clippingStrength }}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ clippingStrength == 0 ? "Off" : "" }}</span
+          >
         </div>
       </div>
       <div class="sliderRow">
-        <div class="sliderLabel">Clipping Range</div>
+        <div class="sliderLabel">Suppression Range</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="
+              shouldShowSpinner() ||
+              !refImageSelected ||
+              clippingStrength === 0 ||
+              crop
+            "
             tickInterval="1"
             step="1"
             min="1"
@@ -271,7 +281,12 @@
             [(ngModel)]="clippingRange"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ clippingRange }}</span>
+          <span
+            class="{{
+              clippingStrength === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
+            }}"
+            >{{ clippingRange }}</span
+          >
         </div>
       </div>
 
@@ -596,10 +611,7 @@
       <div class="controlSeperatorColor"></div>
 
       <div class="sliderRowCategoryTitle">Color</div>
-      <div
-        class="sliderRow"
-        title="Usage of Saturation will convert the image to sRGB. Only use this when no further processing is needed outside of LuckyStackWorker."
-      >
+      <div class="sliderRow">
         <div class="sliderLabel">Saturation</div>
         <div class="slider">
           <mat-slider

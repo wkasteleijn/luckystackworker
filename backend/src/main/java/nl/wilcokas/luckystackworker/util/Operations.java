@@ -11,8 +11,10 @@ import org.apache.commons.text.StringSubstitutor;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.ImageStack;
 import ij.WindowManager;
 import ij.macro.Interpreter;
+import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
@@ -73,9 +75,6 @@ public final class Operations {
                 && (!excludedOperationList.contains(OperationEnum.SAVITZKYGOLAYSIZE))) {
             applySavitzkyGolayDenoise(image, profile);
         }
-        if (!excludedOperationList.contains(OperationEnum.GAMMA)) {
-            applyGamma(image, profile);
-        }
         if ((!excludedOperationList.contains(OperationEnum.CONTRAST))
                 && (!excludedOperationList.contains(OperationEnum.BRIGHTNESS))
                 && (!excludedOperationList.contains(OperationEnum.BACKGROUND))) {
@@ -92,7 +91,7 @@ public final class Operations {
         }
     }
 
-    public static ImagePlus applyAllOperations(ImagePlus image, final Map<String, String> profileSettings,
+    public static void applyAllOperations(ImagePlus image, final Map<String, String> profileSettings,
             String profileName) {
         final Profile profile = Util.toProfile(profileSettings, profileName);
         applySharpen(image, profile);
@@ -103,7 +102,7 @@ public final class Operations {
         applyRed(image, profile);
         applyGreen(image, profile);
         applyBlue(image, profile);
-        return applySaturation(image, profile);
+        applySaturation(image, profile);
     }
 
     public static void applySharpen(final ImagePlus image, Profile profile) {
@@ -113,11 +112,12 @@ public final class Operations {
                     profile.getAmount(), iterations, image.getID());
             float amount = profile.getAmount().divide(new BigDecimal("10000")).floatValue();
             LSWSharpenFilter filter = new LSWSharpenFilter();
-            float clippingStrength = ((float) profile.getClippingStrength()) / 1000f;
+            float clippingStrength = (profile.getClippingStrength()) / 1000f;
             UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radius(profile.getRadius().doubleValue()).amount(amount)
                     .iterations(iterations).clippingStrength(clippingStrength).clippingRange(100 - profile.getClippingRange()).build();
+            LSWSharpenMode mode = LSWSharpenMode.valueOf(profile.getSharpenMode());
             LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
-                    .saturation(1).unsharpMaskParameters(usParams).build();
+                    .saturation(1f).unsharpMaskParameters(usParams).mode(mode).build();
             if (profile.getSharpenMode().equals(LSWSharpenMode.RGB.toString())) {
                 filter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
             } else {
@@ -185,24 +185,52 @@ public final class Operations {
         }
     }
 
-    public static ImagePlus applySaturation(final ImagePlus image, final Profile profile) {
+    public static void applySaturation(final ImagePlus image, final Profile profile) {
         if (profile.getSaturation() != null && (profile.getSaturation().compareTo(BigDecimal.ONE) > 0)) {
             if (validateRGBStack(image)) {
                 log.info("Applying saturation increase with factor {} to image {}", profile.getSaturation(),
                         image.getID());
-                String macro = Util.readFromInputStream(Operations.class.getResourceAsStream("/saturation.ijm"));
-                StringSubstitutor stringSubstitutor = new StringSubstitutor(Map.of("factor", profile.getSaturation()));
-                String result = stringSubstitutor.replace(macro);
-                ImagePlus image2 = image.duplicate();
-                Util.copyInto(image, image2, image.getRoi(), profile, true);
-                WindowManager.setTempCurrentImage(image2);
-                new Interpreter().run(result);
-                return image2;
+                ImageStack stack = image.getStack();
+                ImageProcessor ipRed = stack.getProcessor(1);
+                ImageProcessor ipGreen = stack.getProcessor(2);
+                ImageProcessor ipBlue = stack.getProcessor(3);
+
+                FloatProcessor fpRed = ipRed.toFloat(1, null);
+                FloatProcessor fpGreen = ipGreen.toFloat(2, null);
+                FloatProcessor fpBlue = ipBlue.toFloat(3, null);
+                fpRed.snapshot();
+                fpGreen.snapshot();
+                fpBlue.snapshot();
+                float[] pixelsRed = (float[]) fpRed.getPixels();
+                float[] pixelsGreen = (float[]) fpGreen.getPixels();
+                float[] pixelsBlue = (float[]) fpBlue.getPixels();
+
+                float[] pixelsHue = new float[pixelsRed.length];
+                float[] pixelsSat = new float[pixelsRed.length];
+                float[] pixelsLum = new float[pixelsRed.length];
+                for (int i = 0; i < pixelsRed.length; i++) {
+                    LSWSharpenMode mode = LSWSharpenMode.valueOf(profile.getSharpenMode());
+                    float[] hsl = Util.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], true, true, true, mode);
+                    pixelsHue[i] = hsl[0];
+                    pixelsSat[i] = hsl[1] * profile.getSaturation().floatValue();
+                    pixelsLum[i] = hsl[2];
+                }
+
+                for (int i = 0; i < pixelsRed.length; i++) {
+                    float[] rgb = Util.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
+                    pixelsRed[i] = rgb[0];
+                    pixelsGreen[i] = rgb[1];
+                    pixelsBlue[i] = rgb[2];
+                }
+
+                ipRed.setPixels(1, fpRed);
+                ipGreen.setPixels(2, fpGreen);
+                ipBlue.setPixels(3, fpBlue);
+                image.updateAndDraw();
             } else {
                 log.warn("Attemping to apply saturation increase to a non RGB image {}", image.getFileInfo());
             }
         }
-        return null;
     }
 
     public static void applyBrightnessAndContrast(ImagePlus image, final Profile profile, boolean copyMinMax) {
