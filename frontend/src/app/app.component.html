@@ -293,221 +293,243 @@
       <div class="controlSeperator"></div>
 
       <div class="sliderRow">
-        <div class="sliderRowCategoryTitle">Savitzky-Golay Denoise</div>
-        <div class="savgolayRadio">
-          <mat-radio-group
-            [color]="colorTheme()"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            [(ngModel)]="savitzkyGolaySize"
-            (change)="savitzkyGolaySizeChanged($event)"
-          >
-            <mat-radio-button value="0" class="radioSizeButton"
-              >Off</mat-radio-button
-            >
-            <mat-radio-button value="2" class="radioSizeButton"
-              >25</mat-radio-button
-            >
-            <mat-radio-button value="3" class="radioSizeButton"
-              >49</mat-radio-button
-            >
-            <mat-radio-button value="4" class="radioSizeButton"
-              >81</mat-radio-button
-            >
-          </mat-radio-group>
-        </div>
-      </div>
-
-      <div class="sliderRow">
-        <div
-          class="{{
-            savitzkyGolaySize === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-          }}"
+        <div class="sliderRowCategoryTitle">Denoise</div>
+        <mat-radio-group
+          [color]="colorTheme()"
+          [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+          [(ngModel)]="denoiseAlgorithm"
+          (change)="denoiseAlgorithmChanged($event)"
         >
-          Amount
+          <mat-radio-button value="OFF" class="radioSizeButtonDenoise"
+            >Off</mat-radio-button
+          >
+          <mat-radio-button value="SAVGOLAY" class="denoiseMode"
+            >Savitzky-Golay</mat-radio-button
+          >
+          <mat-radio-button value="SIGMA" class="denoiseMode"
+            >Sigma</mat-radio-button
+          >
+        </mat-radio-group>
+      </div>
+      <div *ngIf="denoiseAlgorithm === 'SAVGOLAY'">
+        <div class="sliderRow">
+          <div class="sliderLabel">Kernel Size</div>
+          <div class="slider">
+            <mat-radio-group
+              [color]="colorTheme()"
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [(ngModel)]="savitzkyGolaySize"
+              (change)="savitzkyGolaySizeChanged($event)"
+            >
+              <mat-radio-button value="2" class="radioSizeButton"
+                >25</mat-radio-button
+              >
+              <mat-radio-button value="3" class="radioSizeButton"
+                >49</mat-radio-button
+              >
+              <mat-radio-button value="4" class="radioSizeButton"
+                >81</mat-radio-button
+              >
+            </mat-radio-group>
+          </div>
         </div>
-        <div class="slider">
-          <mat-slider
-            [disabled]="
-              shouldShowSpinner() ||
-              !refImageSelected ||
-              savitzkyGolaySize === '0' ||
-              crop
-            "
-            tickInterval="1"
-            step="1"
-            min="1"
-            max="100"
-            (input)="savitzkyGolayAmountChanged($event, false)"
-            (change)="savitzkyGolayAmountChanged($event, true)"
-            [(ngModel)]="savitzkyGolayAmount"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span
+        <div class="savgolayRadio"></div>
+
+        <div class="sliderRow">
+          <div
             class="{{
               savitzkyGolaySize === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
             }}"
-            >{{ savitzkyGolayAmount }}</span
           >
+            Amount
+          </div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="
+                shouldShowSpinner() ||
+                !refImageSelected ||
+                savitzkyGolaySize === '0' ||
+                crop
+              "
+              tickInterval="1"
+              step="1"
+              min="1"
+              max="100"
+              (input)="savitzkyGolayAmountChanged($event, false)"
+              (change)="savitzkyGolayAmountChanged($event, true)"
+              [(ngModel)]="savitzkyGolayAmount"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span
+              class="{{
+                savitzkyGolaySize === '0'
+                  ? 'sliderLabelDisabled'
+                  : 'sliderLabel'
+              }}"
+              >{{ savitzkyGolayAmount }}</span
+            >
+          </div>
         </div>
-      </div>
 
-      <div class="sliderRow">
-        <div
-          class="{{
-            savitzkyGolaySize === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-          }}"
-        >
-          Iterations
-        </div>
-        <div class="slider">
-          <mat-slider
-            [disabled]="
-              shouldShowSpinner() ||
-              !refImageSelected ||
-              savitzkyGolaySize === '0' ||
-              crop
-            "
-            tickInterval="1"
-            step="1"
-            min="1"
-            max="10"
-            (input)="savitzkyGolayIterationsChanged($event, false)"
-            (change)="savitzkyGolayIterationsChanged($event, true)"
-            [(ngModel)]="savitzkyGolayIterations"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span
+        <div class="sliderRow">
+          <div
             class="{{
               savitzkyGolaySize === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
             }}"
-            >{{ savitzkyGolayIterations }}</span
           >
+            Iterations
+          </div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="
+                shouldShowSpinner() ||
+                !refImageSelected ||
+                savitzkyGolaySize === '0' ||
+                crop
+              "
+              tickInterval="1"
+              step="1"
+              min="1"
+              max="10"
+              (input)="savitzkyGolayIterationsChanged($event, false)"
+              (change)="savitzkyGolayIterationsChanged($event, true)"
+              [(ngModel)]="savitzkyGolayIterations"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span
+              class="{{
+                savitzkyGolaySize === '0'
+                  ? 'sliderLabelDisabled'
+                  : 'sliderLabel'
+              }}"
+              >{{ savitzkyGolayIterations }}</span
+            >
+          </div>
         </div>
       </div>
 
-      <div class="controlSeperator"></div>
-
-      <div class="sliderRow">
-        <div class="sliderRowCategoryTitle">Sigma Denoise</div>
-        <div class="sigmaRadio">
-          <mat-radio-group
-            [color]="colorTheme()"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            [(ngModel)]="denoiseSigma"
-            (change)="denoiseSigmaChanged($event, true)"
-          >
-            <mat-radio-button value="0" class="radioSizeButton"
-              >Off</mat-radio-button
-            >
-            <mat-radio-button value="2" class="radioSizeButton"
-              >Mode 1</mat-radio-button
-            >
-            <mat-radio-button value="5" class="radioSizeButton"
-              >Mode 2</mat-radio-button
-            >
-          </mat-radio-group>
+      <div *ngIf="denoiseAlgorithm === 'SIGMA'">
+        <div class="sliderRow">
+          <div class="sliderLabel">Mode</div>
+          <div class="slider">
+            <div>
+              <mat-radio-group
+                [color]="colorTheme()"
+                [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+                [(ngModel)]="denoiseSigma"
+                (change)="denoiseSigmaChanged($event, true)"
+              >
+                <mat-radio-button value="2" class="radioSizeButton"
+                  >Mode 1</mat-radio-button
+                >
+                <mat-radio-button value="5" class="radioSizeButton"
+                  >Mode 2</mat-radio-button
+                >
+              </mat-radio-group>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="sliderRow">
-        <div
-          class="{{
-            denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-          }}"
-        >
-          Amount
-        </div>
-        <div class="slider">
-          <mat-slider
-            [disabled]="
-              shouldShowSpinner() ||
-              !refImageSelected ||
-              denoiseSigma === '0' ||
-              crop
-            "
-            tickInterval="1000"
-            step="1"
-            min="0"
-            max="100"
-            (input)="denoiseAmountChanged($event, false)"
-            (change)="denoiseAmountChanged($event, true)"
-            [(ngModel)]="denoiseAmount"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span
+        <div class="sliderRow">
+          <div
             class="{{
               denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
             }}"
-            >{{ denoiseAmount }}</span
           >
+            Amount
+          </div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="
+                shouldShowSpinner() ||
+                !refImageSelected ||
+                denoiseSigma === '0' ||
+                crop
+              "
+              tickInterval="1000"
+              step="1"
+              min="0"
+              max="100"
+              (input)="denoiseAmountChanged($event, false)"
+              (change)="denoiseAmountChanged($event, true)"
+              [(ngModel)]="denoiseAmount"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span
+              class="{{
+                denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+              }}"
+              >{{ denoiseAmount }}</span
+            >
+          </div>
         </div>
-      </div>
 
-      <div class="sliderRow">
-        <div
-          class="{{
-            denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-          }}"
-        >
-          Radius
-        </div>
-        <div class="slider">
-          <mat-slider
-            [disabled]="
-              shouldShowSpinner() ||
-              !refImageSelected ||
-              denoiseSigma === '0' ||
-              crop
-            "
-            tickInterval="1000"
-            step="0.1"
-            min="0.5"
-            max="4"
-            (input)="denoiseRadiusChanged($event, false)"
-            (change)="denoiseRadiusChanged($event, true)"
-            [(ngModel)]="denoiseRadius"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span
+        <div class="sliderRow">
+          <div
             class="{{
               denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
             }}"
-            >{{ denoiseRadius }}</span
           >
+            Radius
+          </div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="
+                shouldShowSpinner() ||
+                !refImageSelected ||
+                denoiseSigma === '0' ||
+                crop
+              "
+              tickInterval="1000"
+              step="0.1"
+              min="0.5"
+              max="4"
+              (input)="denoiseRadiusChanged($event, false)"
+              (change)="denoiseRadiusChanged($event, true)"
+              [(ngModel)]="denoiseRadius"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span
+              class="{{
+                denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+              }}"
+              >{{ denoiseRadius }}</span
+            >
+          </div>
         </div>
-      </div>
 
-      <div class="sliderRow">
-        <div
-          class="{{
-            denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-          }}"
-        >
-          Iterations
-        </div>
-        <div class="slider">
-          <mat-slider
-            [disabled]="
-              shouldShowSpinner() ||
-              !refImageSelected ||
-              denoiseSigma === '0' ||
-              crop
-            "
-            tickInterval="1"
-            step="1"
-            min="1"
-            max="10"
-            (input)="denoiseIterationsChanged($event, false)"
-            (change)="denoiseIterationsChanged($event, true)"
-            [(ngModel)]="denoiseIterations"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span
+        <div class="sliderRow">
+          <div
             class="{{
               denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
             }}"
-            >{{ denoiseIterations }}</span
           >
+            Iterations
+          </div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="
+                shouldShowSpinner() ||
+                !refImageSelected ||
+                denoiseSigma === '0' ||
+                crop
+              "
+              tickInterval="1"
+              step="1"
+              min="1"
+              max="10"
+              (input)="denoiseIterationsChanged($event, false)"
+              (change)="denoiseIterationsChanged($event, true)"
+              [(ngModel)]="denoiseIterations"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span
+              class="{{
+                denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+              }}"
+              >{{ denoiseIterations }}</span
+            >
+          </div>
         </div>
       </div>
     </mat-tab>

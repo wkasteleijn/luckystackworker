@@ -209,7 +209,13 @@
 }
 .radioSizeButtonSharpen {
   margin-left: 56px;
-  margin-top: -24px !important;
+}
+.denoiseMode {
+  margin-left: 24px;
+}
+
+.radioSizeButtonDenoise {
+  margin-left: 81px;
 }
 
 .radioMargin {

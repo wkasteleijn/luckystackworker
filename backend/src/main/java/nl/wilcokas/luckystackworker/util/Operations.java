@@ -112,7 +112,7 @@ public final class Operations {
                     profile.getAmount(), iterations, image.getID());
             float amount = profile.getAmount().divide(new BigDecimal("10000")).floatValue();
             LSWSharpenFilter filter = new LSWSharpenFilter();
-            float clippingStrength = (profile.getClippingStrength()) / 1000f;
+            float clippingStrength = (profile.getClippingStrength()) / 500f;
             UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radius(profile.getRadius().doubleValue()).amount(amount)
                     .iterations(iterations).clippingStrength(clippingStrength).clippingRange(100 - profile.getClippingRange()).build();
             LSWSharpenMode mode = LSWSharpenMode.valueOf(profile.getSharpenMode());

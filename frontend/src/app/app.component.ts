@@ -58,6 +58,7 @@ export class AppComponent implements OnInit {
   green: number;
   blue: number;
   profile: Profile;
+  denoiseAlgorithm: string;
 
   selectedProfile: string;
   rootFolder: string = 'C:\\';
@@ -367,6 +368,19 @@ export class AppComponent implements OnInit {
     this.profile.operation = 'savitzkyGolaySize';
     console.log(
       'savitzkyGolaySizeChanged called: ' + this.profile.savitzkyGolaySize
+    );
+    this.updateProfile();
+  }
+
+  denoiseAlgorithmChanged(event: any) {
+    if (event.value === 'SAVGOLAY') {
+      this.profile.denoiseSigma = 0;
+    } else {
+      this.profile.savitzkyGolaySize = 0;
+    }
+    this.profile.operation = 'denoiseAlgorithm';
+    console.log(
+      'denoiseAlgorithmChanged called: ' + this.profile.savitzkyGolaySize
     );
     this.updateProfile();
   }
