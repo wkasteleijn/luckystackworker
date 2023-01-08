@@ -19,6 +19,22 @@ public class LSWSharpenFilter {
 
     public void applyRGBMode(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) {
         ImageStack finalStack = image.getStack();
+        for (int i = 0; i < unsharpMaskParameters.getIterations(); i++) {
+            for (int slice = 1; slice <= finalStack.getSize(); slice++) {
+                ImageProcessor ipFinal = finalStack.getProcessor(slice);
+                FloatProcessor fpFinal = ipFinal.toFloat(slice, null);
+                fpFinal.snapshot();
+                doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
+                        unsharpMaskParameters.getClippingRange(), fpFinal);
+                ipFinal.setPixels(slice, fpFinal);
+            }
+
+        }
+        image.updateAndDraw();
+    }
+
+    public void applyRGBModeAdaptive(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) {
+        ImageStack finalStack = image.getStack();
         ImageStack intialStack = finalStack.duplicate();
 
         // Pass 1, first apply the filter normally to the intialStack.
@@ -54,6 +70,60 @@ public class LSWSharpenFilter {
     }
 
     public void applyLuminanceMode(ImagePlus image, final LSWSharpenParameters parameters) {
+        if (!parameters.isIncludeRed() && !parameters.isIncludeGreen() && !parameters.isIncludeBlue()) {
+            log.error("Cannot have red, green and blue excluded");
+            return;
+        }
+        UnsharpMaskParameters unsharpMaskParameters = parameters.getUnsharpMaskParameters();
+
+        ImageStack finalStack = image.getStack();
+
+        for (int it = 0; it < unsharpMaskParameters.getIterations(); it++) {
+            ImageProcessor ipRed = finalStack.getProcessor(1);
+            ImageProcessor ipGreen = finalStack.getProcessor(2);
+            ImageProcessor ipBlue = finalStack.getProcessor(3);
+
+            FloatProcessor fpRed = ipRed.toFloat(1, null);
+            FloatProcessor fpGreen = ipGreen.toFloat(2, null);
+            FloatProcessor fpBlue = ipBlue.toFloat(3, null);
+            fpRed.snapshot();
+            fpGreen.snapshot();
+            fpBlue.snapshot();
+            float[] pixelsRed = (float[]) fpRed.getPixels();
+            float[] pixelsGreen = (float[]) fpGreen.getPixels();
+            float[] pixelsBlue = (float[]) fpBlue.getPixels();
+
+            float[] pixelsHue = new float[pixelsRed.length];
+            float[] pixelsSat = new float[pixelsRed.length];
+            float[] pixelsLum = new float[pixelsRed.length];
+            for (int i = 0; i < pixelsRed.length; i++) {
+                float[] hsl = Util.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], parameters.isIncludeRed(), parameters.isIncludeGreen(),
+                        parameters.isIncludeBlue(), parameters.getMode());
+                pixelsHue[i] = hsl[0];
+                pixelsSat[i] = hsl[1];
+                pixelsLum[i] = hsl[2];
+            }
+            FloatProcessor fpLum = new FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum);
+            fpLum.snapshot();
+            doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
+                    unsharpMaskParameters.getClippingRange(), fpLum);
+
+            for (int i = 0; i < pixelsRed.length; i++) {
+                float[] rgb = Util.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
+                pixelsRed[i] = rgb[0];
+                pixelsGreen[i] = rgb[1];
+                pixelsBlue[i] = rgb[2];
+            }
+
+            ipRed.setPixels(1, fpRed);
+            ipGreen.setPixels(2, fpGreen);
+            ipBlue.setPixels(3, fpBlue);
+        }
+
+        image.updateAndDraw();
+    }
+
+    public void applyLuminanceModeAdaptive(ImagePlus image, final LSWSharpenParameters parameters) {
         if (!parameters.isIncludeRed() && !parameters.isIncludeGreen() && !parameters.isIncludeBlue()) {
             log.error("Cannot have red, green and blue excluded");
             return;

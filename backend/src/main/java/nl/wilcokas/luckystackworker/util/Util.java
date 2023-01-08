@@ -213,6 +213,10 @@ public class Util {
                 if (profile.getSharpenMode() == null) {
                     profile.setSharpenMode(LSWSharpenMode.LUMINANCE.toString());
                 }
+                if (profile.getClippingStrength() == 0) {
+                    profile.setClippingStrength(0);
+                    profile.setClippingRange(50);
+                }
 
                 // Added since v2.3.0, so older version written yaml needs to stay compatible.
                 if (profile.getSavitzkyGolayIterations() == 0) {

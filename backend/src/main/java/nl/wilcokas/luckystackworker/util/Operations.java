@@ -107,9 +107,17 @@ public final class Operations {
             LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
                     .saturation(1f).unsharpMaskParameters(usParams).mode(mode).build();
             if (profile.getSharpenMode().equals(LSWSharpenMode.RGB.toString())) {
-                filter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
+                if (profile.getClippingStrength() > 0) {
+                    filter.applyRGBModeAdaptive(image, parameters.getUnsharpMaskParameters());
+                } else {
+                    filter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
+                }
             } else {
-                filter.applyLuminanceMode(image, parameters);
+                if (profile.getClippingStrength() > 0) {
+                    filter.applyLuminanceModeAdaptive(image, parameters);
+                } else {
+                    filter.applyLuminanceMode(image, parameters);
+                }
             }
         }
     }
@@ -131,9 +139,9 @@ public final class Operations {
     }
 
     public static void applyGammaAndRGBCorrections(final ImagePlus image, final Profile profile) {
-        ImageProcessor ipRed = getImageStackProcessor(image, STACK_POSITION_RED); // .gamma(value);
-        ImageProcessor ipGreen = getImageStackProcessor(image, STACK_POSITION_GREEN); // .gamma(value);
-        ImageProcessor ipBlue = getImageStackProcessor(image, STACK_POSITION_BLUE); // .gamma(value);
+        ImageProcessor ipRed = getImageStackProcessor(image, STACK_POSITION_RED);
+        ImageProcessor ipGreen = getImageStackProcessor(image, STACK_POSITION_GREEN);
+        ImageProcessor ipBlue = getImageStackProcessor(image, STACK_POSITION_BLUE);
 
         double gammaRed = 1f;
         double gammaGreen = 1f;
