@@ -217,6 +217,16 @@ public class Util {
                     profile.setClippingStrength(0);
                     profile.setClippingRange(50);
                 }
+                if (profile.getSavitzkyGolaySize() == 0 && (profile.getDenoiseSigma() == null || BigDecimal.ZERO.equals(profile.getDenoiseSigma()))) {
+                    // if prior to 3.0.0 no denoise was set, prefer the defaults for savitzky-golay
+                    profile.setSavitzkyGolaySize(3);
+                    profile.setSavitzkyGolayAmount(75);
+                    profile.setSavitzkyGolayIterations(1);
+                } else if (profile.getSavitzkyGolaySize() > 0
+                        && (profile.getDenoiseSigma() != null || BigDecimal.ZERO.compareTo(profile.getDenoiseSigma()) < 0)) {
+                    // Prevent both being set, prefer savitzky-golay in that case.
+                    profile.setDenoiseSigma(BigDecimal.ZERO);
+                }
 
                 // Added since v2.3.0, so older version written yaml needs to stay compatible.
                 if (profile.getSavitzkyGolayIterations() == 0) {
@@ -263,7 +273,7 @@ public class Util {
             destination.setSlice(slice);
             origin.setSlice(slice);
             destination.getProcessor().setMinAndMax(origin.getProcessor().getMin(), origin.getProcessor().getMax());
-            destination.updateAndDraw();
+            // destination.updateAndDraw();
         }
         IJ.run(destination, "Apply LUT", null);
     }

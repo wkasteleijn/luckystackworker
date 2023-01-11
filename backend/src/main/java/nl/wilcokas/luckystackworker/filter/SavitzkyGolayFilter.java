@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.process.ImageProcessor;
+import nl.wilcokas.luckystackworker.filter.settings.SavitzkyGolayRadius;
 
 @Component
 public class SavitzkyGolayFilter {
@@ -143,7 +144,7 @@ public class SavitzkyGolayFilter {
                 pixels[i] = pixelsResult[i];
             }
         }
-        image.updateAndDraw();
+        // image.updateAndDraw();
     }
 
     private long getPixelValueUnsignedInt(short[] pixels, final int position, final int width, int[] radiusFactors, int[][] radiusOffsets,

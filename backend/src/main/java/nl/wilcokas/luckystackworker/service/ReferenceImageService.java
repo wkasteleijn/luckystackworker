@@ -147,9 +147,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
         // Exception for gamma, always apply last and only on the final result as it
         // messes up the sharpening.
-        Operations.applyGammaAndRGBCorrections(finalResultImage, profile);
+        Operations.applyGammaAndRGBCorrections(finalResultImage, profile, false);
 
         Operations.applySaturation(finalResultImage, profile);
+        finalResultImage.updateAndDraw();
 
         finalResultImage.setTitle(filePath);
     }

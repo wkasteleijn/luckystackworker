@@ -30,7 +30,7 @@ public class LSWSharpenFilter {
             }
 
         }
-        image.updateAndDraw();
+        // image.updateAndDraw();
     }
 
     public void applyRGBModeAdaptive(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) {
@@ -66,7 +66,7 @@ public class LSWSharpenFilter {
 
         }
 
-        image.updateAndDraw();
+        // image.updateAndDraw();
     }
 
     public void applyLuminanceMode(ImagePlus image, final LSWSharpenParameters parameters) {
@@ -120,7 +120,7 @@ public class LSWSharpenFilter {
             ipBlue.setPixels(3, fpBlue);
         }
 
-        image.updateAndDraw();
+        // image.updateAndDraw();
     }
 
     public void applyLuminanceModeAdaptive(ImagePlus image, final LSWSharpenParameters parameters) {
@@ -220,7 +220,7 @@ public class LSWSharpenFilter {
             ipBlue.setPixels(3, fpBlue);
         }
 
-        image.updateAndDraw();
+        // image.updateAndDraw();
     }
 
     /*

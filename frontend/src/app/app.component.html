@@ -420,10 +420,10 @@
                 (change)="denoiseSigmaChanged($event, true)"
               >
                 <mat-radio-button value="2" class="radioSizeButton"
-                  >Mode 1</mat-radio-button
+                  >1</mat-radio-button
                 >
                 <mat-radio-button value="5" class="radioSizeButton"
-                  >Mode 2</mat-radio-button
+                  >2</mat-radio-button
                 >
               </mat-radio-group>
             </div>
@@ -726,14 +726,27 @@
     class="{{ nightModeEnabled() ? 'card cardColorNight' : 'card cardColor' }}"
   >
     <mat-card-content>
-      <span class="workerLabel">Worker Status: {{ workerStatus }}</span>
-      <mat-progress-bar
-        [color]="colorTheme()"
-        [value]="workerProgress"
-        mode="determinate"
-        [bufferValue]="100"
-      >
-      </mat-progress-bar>
+      <div class="sliderRow">
+        <span class="workerLabel"
+          >Worker Status:
+          {{ workerProgress === 100 ? "Done" : workerStatus }}</span
+        >
+        <mat-checkbox [(ngModel)]="liveDetectionEnabled"
+          >Live Detection</mat-checkbox
+        >
+      </div>
+      <div class="sliderRow">
+        <mat-progress-bar
+          [color]="colorTheme()"
+          [value]="workerProgress"
+          mode="determinate"
+          [bufferValue]="100"
+        >
+        </mat-progress-bar>
+        <span class="progressBarPercentage"
+          >{{ workerProgress ? workerProgress : 0 }}%</span
+        >
+      </div>
     </mat-card-content>
   </mat-card>
 

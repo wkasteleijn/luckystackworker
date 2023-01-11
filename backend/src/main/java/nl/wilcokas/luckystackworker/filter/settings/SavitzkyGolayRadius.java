@@ -1,4 +1,4 @@
-package nl.wilcokas.luckystackworker.filter;
+package nl.wilcokas.luckystackworker.filter.settings;
 
 public enum SavitzkyGolayRadius {
     OFF(0), RADIUS_25(2), RADIUS_49(3), RADIUS_81(4);

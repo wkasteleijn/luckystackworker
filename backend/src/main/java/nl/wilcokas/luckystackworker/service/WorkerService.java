@@ -41,7 +41,8 @@ public class WorkerService {
                     imp = Util.fixNonTiffOpeningSettings(imp);
                 }
                 Operations.correctExposure(imp);
-                                Operations.applyAllOperations(imp, properties, profile);
+                Operations.applyAllOperations(imp, properties, profile);
+                imp.updateAndDraw();
                 if (LuckyStackWorkerContext.getSelectedRoi() != null) {
                     imp.setRoi(LuckyStackWorkerContext.getSelectedRoi());
                     imp = imp.crop();

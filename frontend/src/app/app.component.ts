@@ -74,6 +74,9 @@ export class AppComponent implements OnInit {
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
 
+  liveDetectionEnabled: boolean = true;
+  lastFileProcessed: string;
+
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
     private aboutSnackbar: MatSnackBar,
@@ -103,6 +106,7 @@ export class AppComponent implements OnInit {
             this.updateProfileSettings();
           }
           this.hideSpinner();
+          this.workerProgress = 0;
         },
         (error) => {
           console.log(error);
@@ -129,6 +133,8 @@ export class AppComponent implements OnInit {
   applyProfile() {
     console.log('applyProfile called');
     this.showSpinner();
+    this.workerStatus = 'Working';
+    this.workerProgress = 0;
     this.luckyStackWorkerService.applyProfile(this.profile).subscribe(
       (data) => {
         console.log(data);
@@ -139,8 +145,6 @@ export class AppComponent implements OnInit {
         this.hideSpinner();
       }
     );
-    this.workerStatus = 'Working';
-    this.workerProgress = 0;
   }
 
   radiusChanged(event: any, update: boolean) {
@@ -376,13 +380,34 @@ export class AppComponent implements OnInit {
     if (event.value === 'SAVGOLAY') {
       this.profile.denoiseSigma = 0;
       this.profile.operation = 'savitzkyGolaySize';
-    } else {
+      if (!this.profile.savitzkyGolaySize) {
+        // If not set, start with the defaults
+        this.profile.savitzkyGolaySize = 3;
+        this.profile.savitzkyGolayAmount = 75;
+        this.profile.savitzkyGolayIterations = 1;
+        this.savitzkyGolaySize = '3';
+        this.savitzkyGolayAmount = 75;
+        this.savitzkyGolayIterations = 1;
+      }
+    } else if (event.value === 'SIGMA') {
       this.profile.savitzkyGolaySize = 0;
       this.profile.operation = 'denoiseSigma';
+      if (!this.profile.denoiseSigma) {
+        this.profile.denoiseSigma = 2;
+        this.profile.denoise = 50;
+        this.profile.denoiseRadius = 1;
+        this.profile.denoiseIterations = 1;
+        this.denoiseSigma = '2';
+        this.denoiseAmount = 50;
+        this.denoiseRadius = 1;
+        this.denoiseIterations = 1;
+      }
+    } else {
+      // Off
+      this.profile.denoiseSigma = 0;
+      this.profile.savitzkyGolaySize = 0;
     }
-    console.log(
-      'denoiseAlgorithmChanged called: ' + this.profile.savitzkyGolaySize
-    );
+    console.log('denoiseAlgorithmChanged called: ' + event.value);
     this.updateProfile();
   }
 
@@ -470,6 +495,16 @@ export class AppComponent implements OnInit {
     this.savitzkyGolayIterations = this.profile.savitzkyGolayIterations;
     this.savitzkyGolayAmount = this.profile.savitzkyGolayAmount;
     this.savitzkyGolaySize = this.profile.savitzkyGolaySize.toString();
+    if (!this.profile.denoiseSigma && !this.profile.savitzkyGolaySize) {
+      this.denoiseAlgorithm = 'OFF';
+    } else if (this.profile.savitzkyGolaySize) {
+      this.denoiseAlgorithm = 'SAVGOLAY';
+      // prevent that both are selected under the hood, and prefer savitzky-golay in that case.
+      this.denoiseSigma = '0';
+      this.profile.denoiseSigma = 0;
+    } else {
+      this.denoiseAlgorithm = 'SIGMA';
+    }
     this.clippingStrength = this.profile.clippingStrength;
     this.clippingRange = this.profile.clippingRange;
     this.sharpenMode = this.profile.sharpenMode;
@@ -511,6 +546,7 @@ export class AppComponent implements OnInit {
       setTimeout(() => this.waitForWorker(), SERVICE_POLL_DELAY_MS);
     } else {
       console.log('Worker is done!');
+      this.workerProgress = 100;
       this.hideSpinner();
     }
   }
@@ -520,9 +556,11 @@ export class AppComponent implements OnInit {
       (data) => {
         console.log(data);
         this.workerStatus = data.message;
-        this.workerProgress = Math.round(
-          (data.filesProcessedCount / data.totalfilesCount) * 100
-        );
+        if (data.filesProcessedCount && data.totalfilesCount) {
+          this.workerProgress = Math.round(
+            (data.filesProcessedCount / data.totalfilesCount) * 100
+          );
+        }
       },
       (error) => console.log(error)
     );

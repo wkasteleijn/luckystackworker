@@ -63,6 +63,7 @@
 
 .workerLabel {
   color: lightgreen;
+  width: 435px;
 }
 
 .dropdown {
@@ -254,4 +255,9 @@
 .individualLabel {
   color: rgb(168, 168, 168);
   margin-right: 16px;
+}
+.progressBarPercentage {
+  margin-left: 24px;
+  margin-right: 32px;
+  width: 24px;
 }
