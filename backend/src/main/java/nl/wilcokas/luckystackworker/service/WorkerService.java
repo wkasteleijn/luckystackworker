@@ -32,7 +32,7 @@ public class WorkerService {
         operationService = new OperationService(lswSharpenFilter, rgbBalanceFilter, saturationFilter, savitzkyGolayFilter);
     }
 
-    public boolean processFile(final File file) {
+    public boolean processFile(final File file, boolean realtime) {
         String filePath = file.getAbsolutePath();
         Optional<String> profileOpt = Optional.ofNullable(Util.deriveProfileFromImageName(file.getAbsolutePath()));
         if (!profileOpt.isPresent()) {
@@ -40,11 +40,13 @@ public class WorkerService {
             return false;
         }
         String profile = profileOpt.get();
-        if (profile.equals(LuckyStackWorkerContext.getActiveProfile())) {
+        if (realtime || profile.equals(LuckyStackWorkerContext.getActiveProfile())) {
             try {
                 final String filename = Util.getImageName(Util.getIJFileFormat(filePath));
                 log.info("Applying profile '{}' to: {}", profile, filename);
-                LuckyStackWorkerContext.statusUpdate("Processing : " + filename);
+                if (!realtime) {
+                    LuckyStackWorkerContext.statusUpdate("Processing : " + filename);
+                }
 
                 ImagePlus imp = new Opener().openImage(filePath);
                 if (Util.isPngRgbStack(imp, filePath)) {

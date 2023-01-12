@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 
@@ -44,6 +45,7 @@ public class ProfileService {
         result.setBrightness(profile.getBrightness());
         result.setBackground(profile.getBackground());
         profileRepository.save(result);
+        LuckyStackWorkerContext.updateWorkerForProfile(profile);
     }
 
     public Optional<Profile> findByName(String profileName) {

@@ -731,7 +731,11 @@
           >Worker Status:
           {{ workerProgress === 100 ? "Done" : workerStatus }}</span
         >
-        <mat-checkbox [(ngModel)]="liveDetectionEnabled">Realtime</mat-checkbox>
+        <mat-checkbox
+          [(ngModel)]="realtimeEnabled"
+          (change)="realtimeEnabledChanged()"
+          >Realtime</mat-checkbox
+        >
       </div>
       <div class="sliderRow">
         <mat-progress-bar

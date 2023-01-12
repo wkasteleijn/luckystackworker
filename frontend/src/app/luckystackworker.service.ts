@@ -52,7 +52,7 @@ export class LuckyStackWorkerService {
   }
 
   zoomIn(): Observable<Object> {
-    return this.http.put(`${this.baseUrl}/reference/zoomin`,null);
+    return this.http.put(`${this.baseUrl}/reference/zoomin`, null);
   }
 
   zoomOut(): Observable<Object> {
@@ -67,4 +67,7 @@ export class LuckyStackWorkerService {
     return this.http.get(`${this.baseUrl}/profiles/version`);
   }
 
+  realtimeChanged(realtime: boolean): Observable<any> {
+    return this.http.put(`${this.baseUrl}/reference/realtime`, realtime);
+  }
 }

@@ -31,66 +31,77 @@ import nl.wilcokas.luckystackworker.util.Util;
 @Slf4j
 public class ReferenceController {
 
-	@Autowired
-	private ProfileRepository profileRepository;
+    @Autowired
+    private ProfileRepository profileRepository;
 
-	@Autowired
-	private ReferenceImageService referenceImageService;
+    @Autowired
+    private ReferenceImageService referenceImageService;
 
-	@GetMapping("/open")
-	public Profile openReferenceImage(@RequestParam String path) throws IOException {
-		final String base64DecodedPath = new String(Base64.getDecoder().decode(path));
-		return referenceImageService.selectReferenceImage(base64DecodedPath);
-	}
+    @GetMapping("/open")
+    public Profile openReferenceImage(@RequestParam String path) throws IOException {
+        final String base64DecodedPath = new String(Base64.getDecoder().decode(path));
+        return referenceImageService.selectReferenceImage(base64DecodedPath);
+    }
 
-	@GetMapping("/rootfolder")
-	public Profile selectRootFolder() {
-		JFrame frame = referenceImageService.getParentFrame();
-		JFileChooser jfc = referenceImageService
-				.getJFileChooser(LuckyStackWorkerContext.getWorkerProperties().get("inputFolder"));
-		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		int returnValue = jfc.showOpenDialog(frame);
-		frame.dispose();
-		Profile profile = new Profile();
-		if (returnValue == JFileChooser.APPROVE_OPTION) {
-			File selectedFolder = jfc.getSelectedFile();
-			String rootFolder = selectedFolder.getAbsolutePath();
-			log.info("RootFolder selected {} ", rootFolder);
-			referenceImageService.updateSettings(rootFolder, profile);
-		}
-		return profile;
-	}
+    @GetMapping("/rootfolder")
+    public Profile selectRootFolder() {
+        JFrame frame = referenceImageService.getParentFrame();
+        JFileChooser jfc = referenceImageService
+                .getJFileChooser(LuckyStackWorkerContext.getWorkerProperties().get("inputFolder"));
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int returnValue = jfc.showOpenDialog(frame);
+        frame.dispose();
+        Profile profile = new Profile();
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFolder = jfc.getSelectedFile();
+            String rootFolder = selectedFolder.getAbsolutePath();
+            log.info("RootFolder selected {} ", rootFolder);
+            referenceImageService.updateSettings(rootFolder, profile);
+        }
+        return profile;
+    }
 
-	@PutMapping("/save")
-	public void saveReferenceImage(@RequestBody String path) throws IOException {
-		JFrame frame = referenceImageService.getParentFrame();
-		// Ignoring path received from frontend as it isn't used.
-		String realPath = LuckyStackWorkerContext.getWorkerProperties().get("inputFolder");
-		JFileChooser jfc = referenceImageService.getJFileChooser(realPath);
-		jfc.setFileFilter(new FileNameExtensionFilter("TIFF", "tif"));
-		String fileNameNoExt = Util.getFilename(referenceImageService.getFilePath())[0];
-		jfc.setSelectedFile(
-				new File(fileNameNoExt + Constants.OUTPUT_POSTFIX + "." + Constants.SUPPORTED_OUTPUT_FORMAT));
-		int returnValue = jfc.showDialog(frame, "Save reference image");
-		frame.dispose();
-		if (returnValue == JFileChooser.APPROVE_OPTION) {
-			File selectedFile = jfc.getSelectedFile();
-			referenceImageService.saveReferenceImage(selectedFile.getAbsolutePath());
-		}
-	}
+    @PutMapping("/save")
+    public void saveReferenceImage(@RequestBody String path) throws IOException {
+        JFrame frame = referenceImageService.getParentFrame();
+        // Ignoring path received from frontend as it isn't used.
+        String realPath = LuckyStackWorkerContext.getWorkerProperties().get("inputFolder");
+        JFileChooser jfc = referenceImageService.getJFileChooser(realPath);
+        jfc.setFileFilter(new FileNameExtensionFilter("TIFF", "tif"));
+        String fileNameNoExt = Util.getFilename(referenceImageService.getFilePath())[0];
+        jfc.setSelectedFile(
+                new File(fileNameNoExt + Constants.OUTPUT_POSTFIX + "." + Constants.SUPPORTED_OUTPUT_FORMAT));
+        int returnValue = jfc.showDialog(frame, "Save reference image");
+        frame.dispose();
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = jfc.getSelectedFile();
+            referenceImageService.saveReferenceImage(selectedFile.getAbsolutePath());
+        }
+    }
 
-	@PutMapping("/zoomin")
-	public void zoomIn() {
-		referenceImageService.zoomIn();
-	}
+    @PutMapping("/zoomin")
+    public void zoomIn() {
+        referenceImageService.zoomIn();
+    }
 
-	@PutMapping("/zoomout")
-	public void zoomOut() {
-		referenceImageService.zoomOut();
-	}
+    @PutMapping("/zoomout")
+    public void zoomOut() {
+        referenceImageService.zoomOut();
+    }
 
-	@PutMapping("/crop")
-	public void crop() {
-		referenceImageService.crop();
-	}
+    @PutMapping("/crop")
+    public void crop() {
+        referenceImageService.crop();
+    }
+
+    @PutMapping("/realtime")
+    public void realTimeChanged(@RequestBody boolean realtime) {
+        if (realtime) {
+            log.info("Re-enabling realtime processing");
+            LuckyStackWorkerContext.enableRealTimeEnabled();
+        } else {
+            log.info("Disabling realtime processing");
+            LuckyStackWorkerContext.disableRealTimeEnabled();
+        }
+    }
 }

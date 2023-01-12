@@ -74,7 +74,7 @@ export class AppComponent implements OnInit {
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
 
-  liveDetectionEnabled: boolean = true;
+  realtimeEnabled: boolean = true;
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
@@ -408,6 +408,20 @@ export class AppComponent implements OnInit {
     }
     console.log('denoiseAlgorithmChanged called: ' + event.value);
     this.updateProfile();
+  }
+
+  realtimeEnabledChanged() {
+    console.log('realtimeEnabledChanged called: ' + this.realtimeEnabled);
+    this.luckyStackWorkerService
+      .realtimeChanged(this.realtimeEnabled)
+      .subscribe(
+        (data) => {
+          console.log(data);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
   }
 
   get savitzkyGolaySizeDisplayValue(): number {

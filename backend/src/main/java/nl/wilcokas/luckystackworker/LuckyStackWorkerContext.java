@@ -24,6 +24,8 @@ public class LuckyStackWorkerContext {
     private static String status = Constants.STATUS_WORKING;
     private static int filesProcessedCount = 0;
     private static int totalfilesCount = 0;
+    private static boolean realTimeEnabled = true;
+    private static boolean rootFolderSelected = false;
 
     @Getter
     @Setter
@@ -101,6 +103,7 @@ public class LuckyStackWorkerContext {
     }
 
     public static void updateWorkerForRootFolder(String rootFolder) {
+        rootFolderSelected = true;
         workerProperties.put("inputFolder", rootFolder);
     }
 
@@ -132,4 +135,21 @@ public class LuckyStackWorkerContext {
         return StatusUpdate.builder().message(status).filesProcessedCount(filesProcessedCount)
                 .totalfilesCount(totalfilesCount).build();
     }
+
+    public static boolean isRealTimeEnabled() {
+        return realTimeEnabled;
+    }
+
+    public static void disableRealTimeEnabled() {
+        realTimeEnabled = false;
+    }
+
+    public static void enableRealTimeEnabled() {
+        realTimeEnabled = true;
+    }
+
+    public static boolean isRootFolderSelected() {
+        return rootFolderSelected;
+    }
+
 }
