@@ -75,7 +75,6 @@ export class AppComponent implements OnInit {
   componentColorNight: ThemePalette = 'warn';
 
   liveDetectionEnabled: boolean = true;
-  lastFileProcessed: string;
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,

@@ -1,4 +1,4 @@
-package nl.wilcokas.luckystackworker.util;
+package nl.wilcokas.luckystackworker.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -8,16 +8,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.text.StringSubstitutor;
+import org.springframework.stereotype.Service;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.ImageStack;
 import ij.WindowManager;
 import ij.macro.Interpreter;
-import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
+import nl.wilcokas.luckystackworker.filter.RGBBalanceFilter;
+import nl.wilcokas.luckystackworker.filter.SaturationFilter;
 import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenParameters;
@@ -25,38 +26,49 @@ import nl.wilcokas.luckystackworker.filter.settings.SavitzkyGolayRadius;
 import nl.wilcokas.luckystackworker.filter.settings.UnsharpMaskParameters;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
+import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
-public final class Operations {
-    private static final int STACK_POSITION_RED = 1;
-    private static final int STACK_POSITION_GREEN = 2;
-    private static final int STACK_POSITION_BLUE = 3;
+@Service
+public class OperationService {
     private static final String HISTOGRAM_STRETCH_MACRO = Util
-            .readFromInputStream(Operations.class.getResourceAsStream("/histogramstretch.ijm"));
+            .readFromInputStream(OperationService.class.getResourceAsStream("/histogramstretch.ijm"));
 
-    public static void correctExposure(ImagePlus image) throws IOException {
-        image.setDefault16bitRange(16);
-        image.resetDisplayRange();
-        // image.updateAndDraw();
+    private final LSWSharpenFilter lswSharpenFilter;
+    private final RGBBalanceFilter rgbBalanceFilter;
+    private final SaturationFilter saturationFilter;
+    private final SavitzkyGolayFilter savitzkyGolayFilter;
+
+    public OperationService(final LSWSharpenFilter lswSharpenFilter, final RGBBalanceFilter rgbBalanceFilter,
+            final SaturationFilter saturationFilter, final SavitzkyGolayFilter savitzkyGolayFilter) {
+        this.lswSharpenFilter = lswSharpenFilter;
+        this.rgbBalanceFilter = rgbBalanceFilter;
+        this.saturationFilter = saturationFilter;
+        this.savitzkyGolayFilter = savitzkyGolayFilter;
     }
 
-    public static boolean isSharpenOperation(final OperationEnum operation) {
+    public void correctExposure(ImagePlus image) throws IOException {
+        image.setDefault16bitRange(16);
+        image.resetDisplayRange();
+    }
+
+    public boolean isSharpenOperation(final OperationEnum operation) {
         return ((OperationEnum.AMOUNT == operation) || (OperationEnum.RADIUS == operation) || (OperationEnum.ITERATIONS == operation)
                 || (OperationEnum.SHARPENMODE == operation) || (OperationEnum.CLIPPINGSTRENGTH == operation)
                 || (OperationEnum.CLIPPINGRANGE == operation));
     }
 
-    public static boolean isDenoiseOperation(final OperationEnum operation) {
+    public boolean isDenoiseOperation(final OperationEnum operation) {
         return (OperationEnum.DENOISEAMOUNT == operation) || (OperationEnum.DENOISERADIUS == operation) || (OperationEnum.DENOISESIGMA == operation)
                 || (OperationEnum.DENOISEITERATIONS == operation);
     }
 
-    public static boolean isSavitzkyGolayDenoiseOperation(final OperationEnum operation) {
+    public boolean isSavitzkyGolayDenoiseOperation(final OperationEnum operation) {
         return (OperationEnum.SAVITZKYGOLAYAMOUNT == operation) || (OperationEnum.SAVITZKYGOLAYITERATIONS == operation)
                 || (OperationEnum.SAVITZKYGOLAYSIZE == operation);
     }
 
-    public static void applyAllOperationsExcept(final ImagePlus image, final Profile profile, final OperationEnum... operations) {
+    public void applyAllOperationsExcept(final ImagePlus image, final Profile profile, final OperationEnum... operations) {
         List<OperationEnum> excludedOperationList = Arrays.asList(operations);
         if ((!excludedOperationList.contains(OperationEnum.AMOUNT)) && (!excludedOperationList.contains(OperationEnum.RADIUS))
                 && (!excludedOperationList.contains(OperationEnum.ITERATIONS)) && (!excludedOperationList.contains(OperationEnum.CLIPPINGSTRENGTH))
@@ -79,51 +91,50 @@ public final class Operations {
         }
     }
 
-    public static void applyAllOperations(ImagePlus image, final Map<String, String> profileSettings,
-            String profileName) {
+    public void applyAllOperations(ImagePlus image, final Map<String, String> profileSettings, String profileName) {
         final Profile profile = Util.toProfile(profileSettings, profileName);
-        applyAllOperations(image, profile, true);
+        applyAllOperations(image, profile);
     }
 
-    public static void applyAllOperations(ImagePlus image, Profile profile, boolean isWorker) {
+    public void applyAllOperations(ImagePlus image, Profile profile) {
         applySharpen(image, profile);
         applyDenoise(image, profile);
         applySavitzkyGolayDenoise(image, profile);
         applyBrightnessAndContrast(image, profile, true);
-        applyGammaAndRGBCorrections(image, profile, isWorker);
+        applyRGBBalance(image, profile);
+        applyGamma(image, profile);
         applySaturation(image, profile);
     }
 
-    public static void applySharpen(final ImagePlus image, Profile profile) {
+    public void applySharpen(final ImagePlus image, Profile profile) {
         int iterations = profile.getIterations() == 0 ? 1 : profile.getIterations();
         if (profile.getRadius() != null && profile.getAmount() != null) {
             log.info("Applying sharpen with radius {}, amount {}, iterations {} to image {}", profile.getRadius(),
                     profile.getAmount(), iterations, image.getID());
             float amount = profile.getAmount().divide(new BigDecimal("10000")).floatValue();
-            LSWSharpenFilter filter = new LSWSharpenFilter();
             float clippingStrength = (profile.getClippingStrength()) / 500f;
             UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radius(profile.getRadius().doubleValue()).amount(amount)
                     .iterations(iterations).clippingStrength(clippingStrength).clippingRange(100 - profile.getClippingRange()).build();
             LSWSharpenMode mode = LSWSharpenMode.valueOf(profile.getSharpenMode());
             LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
                     .saturation(1f).unsharpMaskParameters(usParams).mode(mode).build();
-            if (profile.getSharpenMode().equals(LSWSharpenMode.RGB.toString())) {
+            if (profile.getSharpenMode().equals(LSWSharpenMode.RGB.toString()) || !validateRGBStack(image)) {
                 if (profile.getClippingStrength() > 0) {
-                    filter.applyRGBModeAdaptive(image, parameters.getUnsharpMaskParameters());
+                    lswSharpenFilter.applyRGBModeAdaptive(image, parameters.getUnsharpMaskParameters());
                 } else {
-                    filter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
+                    lswSharpenFilter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
                 }
             } else {
                 if (profile.getClippingStrength() > 0) {
-                    filter.applyLuminanceModeAdaptive(image, parameters);
+                    lswSharpenFilter.applyLuminanceModeAdaptive(image, parameters);
                 } else {
-                    filter.applyLuminanceMode(image, parameters);
+                    lswSharpenFilter.applyLuminanceMode(image, parameters);
                 }
             }
         }
     }
 
-    public static void applyDenoise(final ImagePlus image, final Profile profile) {
+    public void applyDenoise(final ImagePlus image, final Profile profile) {
         if (profile.getDenoiseSigma() != null && (profile.getDenoiseSigma().compareTo(BigDecimal.ZERO) > 0)) {
             int iterations = profile.getDenoiseIterations() == 0 ? 1 : profile.getDenoiseIterations();
             log.info("Applying Sigma denoise with value {} to image {}", profile.getDenoise(), image.getID());
@@ -139,94 +150,42 @@ public final class Operations {
         }
     }
 
-    public static void applyGammaAndRGBCorrections(final ImagePlus image, final Profile profile, boolean isWorker) {
-        ImageProcessor ipRed = getImageStackProcessor(image, STACK_POSITION_RED);
-        ImageProcessor ipGreen = getImageStackProcessor(image, STACK_POSITION_GREEN);
-        ImageProcessor ipBlue = getImageStackProcessor(image, STACK_POSITION_BLUE);
-
-        double gammaRed = 1f;
-        double gammaGreen = 1f;
-        double gammaBlue = 1f;
-        boolean gammaChanged = false;
-        if (profile.getRed() != null && (profile.getRed().compareTo(BigDecimal.ZERO) > 0) && validateRGBStack(image)) {
-            log.info("Applying red reduction with value {} to image {}", profile.getRed(), image.getID());
-            gammaRed += getGammaColorValue(profile.getRed());
-            gammaChanged = true;
-        }
-        if (profile.getGreen() != null && (profile.getGreen().compareTo(BigDecimal.ZERO) > 0) && validateRGBStack(image)) {
-            log.info("Applying green reduction with value {} to image {}", profile.getGreen(), image.getID());
-            gammaGreen += getGammaColorValue(profile.getGreen());
-            gammaChanged = true;
-        }
-        if (profile.getBlue() != null && (profile.getBlue().compareTo(BigDecimal.ZERO) > 0) && validateRGBStack(image)) {
-            log.info("Applying blue reduction with value {} to image {}", profile.getBlue(), image.getID());
-            gammaBlue += getGammaColorValue(profile.getBlue());
-            gammaChanged = true;
-        }
+    public void applyGamma(final ImagePlus image, final Profile profile) {
         if (profile.getGamma() != null && (profile.getGamma().compareTo(BigDecimal.ONE) != 0)) {
             log.info("Applying gamma correction with value {} to image {}", profile.getGamma(), image.getID());
-            double gammaCorrectionValue = 1d - profile.getGamma().doubleValue();
-            gammaRed += gammaCorrectionValue;
-            gammaGreen += gammaCorrectionValue;
-            gammaBlue += gammaCorrectionValue;
-            gammaChanged = true;
+            for (int slice = 1; slice <= image.getStack().getSize(); slice++) {
+                ImageProcessor ip = getImageStackProcessor(image, slice);
+                ip.gamma(2d - profile.getGamma().doubleValue());
+            }
         }
 
-        if (gammaChanged) {
-            ipRed.gamma(gammaRed);
-            ipGreen.gamma(gammaGreen);
-            ipBlue.gamma(gammaBlue);
+    }
+
+    public void applyRGBBalance(final ImagePlus image, final Profile profile) {
+        if ((profile.getRed() != null && (profile.getRed().compareTo(BigDecimal.ONE) > 0))
+                || (profile.getGreen() != null && (profile.getGreen().compareTo(BigDecimal.ONE) > 0))
+                || (profile.getBlue() != null && (profile.getBlue().compareTo(BigDecimal.ONE) > 0))) {
+            if (validateRGBStack(image)) {
+                log.info("Applying RGB balance correction to image {} with values R {}, G {}, B {}", image.getID(), profile.getRed(), profile.getGreen(),
+                        profile.getBlue());
+                rgbBalanceFilter.apply(image, profile.getRed().intValue(), profile.getGreen().intValue(), profile.getBlue().intValue());
+            }
         }
     }
 
-    public static void applySaturation(final ImagePlus image, final Profile profile) {
+    public void applySaturation(final ImagePlus image, final Profile profile) {
         if (profile.getSaturation() != null && (profile.getSaturation().compareTo(BigDecimal.ONE) > 0)) {
             if (validateRGBStack(image)) {
                 log.info("Applying saturation increase with factor {} to image {}", profile.getSaturation(),
                         image.getID());
-                ImageStack stack = image.getStack();
-                ImageProcessor ipRed = stack.getProcessor(1);
-                ImageProcessor ipGreen = stack.getProcessor(2);
-                ImageProcessor ipBlue = stack.getProcessor(3);
-
-                FloatProcessor fpRed = ipRed.toFloat(1, null);
-                FloatProcessor fpGreen = ipGreen.toFloat(2, null);
-                FloatProcessor fpBlue = ipBlue.toFloat(3, null);
-                fpRed.snapshot();
-                fpGreen.snapshot();
-                fpBlue.snapshot();
-                float[] pixelsRed = (float[]) fpRed.getPixels();
-                float[] pixelsGreen = (float[]) fpGreen.getPixels();
-                float[] pixelsBlue = (float[]) fpBlue.getPixels();
-
-                float[] pixelsHue = new float[pixelsRed.length];
-                float[] pixelsSat = new float[pixelsRed.length];
-                float[] pixelsLum = new float[pixelsRed.length];
-                for (int i = 0; i < pixelsRed.length; i++) {
-                    LSWSharpenMode mode = LSWSharpenMode.valueOf(profile.getSharpenMode());
-                    float[] hsl = Util.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], true, true, true, mode);
-                    pixelsHue[i] = hsl[0];
-                    pixelsSat[i] = hsl[1] * profile.getSaturation().floatValue();
-                    pixelsLum[i] = hsl[2];
-                }
-
-                for (int i = 0; i < pixelsRed.length; i++) {
-                    float[] rgb = Util.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
-                    pixelsRed[i] = rgb[0];
-                    pixelsGreen[i] = rgb[1];
-                    pixelsBlue[i] = rgb[2];
-                }
-
-                ipRed.setPixels(1, fpRed);
-                ipGreen.setPixels(2, fpGreen);
-                ipBlue.setPixels(3, fpBlue);
+                saturationFilter.apply(image, profile);
             } else {
                 log.warn("Attemping to apply saturation increase to a non RGB image {}", image.getFileInfo());
             }
         }
     }
 
-    public static void applyBrightnessAndContrast(ImagePlus image, final Profile profile, boolean copyMinMax) {
+    public void applyBrightnessAndContrast(ImagePlus image, final Profile profile, boolean copyMinMax) {
         if (profile.getContrast() != 0 || profile.getBrightness() != 0 || profile.getBackground() != 0) {
             if (copyMinMax) {
                 Util.copyMinMax(image, image);
@@ -252,25 +211,21 @@ public final class Operations {
         }
     }
 
-    public static void applySavitzkyGolayDenoise(ImagePlus image, final Profile profile) {
+    public void applySavitzkyGolayDenoise(ImagePlus image, final Profile profile) {
         if (profile.getSavitzkyGolaySize() > 0) {
             log.info("Starting SavitzkyGolayDenoise filter");
             int iterations = profile.getSavitzkyGolayIterations() == 0 ? 1 : profile.getSavitzkyGolayIterations();
             for (int i = 0; i < iterations; i++) {
-                new SavitzkyGolayFilter().apply(image, SavitzkyGolayRadius.valueOf(profile.getSavitzkyGolaySize()), profile.getSavitzkyGolayAmount());
+                savitzkyGolayFilter.apply(image, SavitzkyGolayRadius.valueOf(profile.getSavitzkyGolaySize()), profile.getSavitzkyGolayAmount());
             }
         }
     }
 
-    private static ImageProcessor getImageStackProcessor(final ImagePlus img, final int stackPosition) {
+    private ImageProcessor getImageStackProcessor(final ImagePlus img, final int stackPosition) {
         return img.getStack().getProcessor(stackPosition);
     }
 
-    private static float getGammaColorValue(BigDecimal colorValue) {
-        return colorValue.divide(new BigDecimal("255"), 3, RoundingMode.HALF_EVEN).floatValue();
-    }
-
-    private static boolean validateRGBStack(ImagePlus image) {
+    private boolean validateRGBStack(ImagePlus image) {
         return image.getStack().size() == 3;
     }
 

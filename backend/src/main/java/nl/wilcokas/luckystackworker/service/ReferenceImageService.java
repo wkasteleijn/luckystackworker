@@ -41,7 +41,6 @@ import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.repository.SettingsRepository;
-import nl.wilcokas.luckystackworker.util.Operations;
 import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
@@ -70,11 +69,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private SettingsRepository settingsRepository;
     private HttpService httpService;
     private ProfileService profileService;
+    private OperationService operationService;
 
-    public ReferenceImageService(SettingsRepository settingsRepository, HttpService httpService, ProfileService profileService) {
+    public ReferenceImageService(SettingsRepository settingsRepository, HttpService httpService, ProfileService profileService,
+            OperationService operationService) {
         this.settingsRepository = settingsRepository;
         this.httpService = httpService;
         this.profileService = profileService;
+        this.operationService = operationService;
         createRoiIndicator();
     }
 
@@ -120,36 +122,38 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 : OperationEnum.valueOf(profile.getOperation().toUpperCase());
         if (previousOperation == null || previousOperation != operation) {
             Util.copyInto(referenceImage, processedImage, finalResultImage.getRoi(), profile, false);
-            if (Operations.isSharpenOperation(operation)) {
-                Operations.applyAllOperationsExcept(processedImage, profile, operation, OperationEnum.DENOISEAMOUNT,
+            if (operationService.isSharpenOperation(operation)) {
+                operationService.applyAllOperationsExcept(processedImage, profile, operation, OperationEnum.DENOISEAMOUNT,
                         OperationEnum.DENOISERADIUS, OperationEnum.DENOISESIGMA, OperationEnum.DENOISEITERATIONS,
                         OperationEnum.SAVITZKYGOLAYAMOUNT, OperationEnum.SAVITZKYGOLAYITERATIONS, OperationEnum.SAVITZKYGOLAYSIZE);
             } else {
-                Operations.applyAllOperationsExcept(processedImage, profile, operation);
+                operationService.applyAllOperationsExcept(processedImage, profile, operation);
             }
             previousOperation = operation;
         }
         Util.copyInto(processedImage, finalResultImage, finalResultImage.getRoi(), profile, true);
         setDefaultLayoutSettings(finalResultImage, finalResultImage.getWindow().getLocation());
 
-        if (Operations.isSharpenOperation(operation)) {
-            Operations.applySharpen(finalResultImage, profile);
-            Operations.applyDenoise(finalResultImage, profile);
-            Operations.applySavitzkyGolayDenoise(finalResultImage, profile);
-        } else if (Operations.isDenoiseOperation(operation)) {
-            Operations.applyDenoise(finalResultImage, profile);
-        } else if (Operations.isSavitzkyGolayDenoiseOperation(operation)) {
-            Operations.applySavitzkyGolayDenoise(finalResultImage, profile);
+        if (operationService.isSharpenOperation(operation)) {
+            operationService.applySharpen(finalResultImage, profile);
+            operationService.applyDenoise(finalResultImage, profile);
+            operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
+        } else if (operationService.isDenoiseOperation(operation)) {
+            operationService.applyDenoise(finalResultImage, profile);
+        } else if (operationService.isSavitzkyGolayDenoiseOperation(operation)) {
+            operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
         } else if ((OperationEnum.CONTRAST == operation) || (OperationEnum.BRIGHTNESS == operation)
                 || (OperationEnum.BACKGROUND == operation)) {
-            Operations.applyBrightnessAndContrast(finalResultImage, profile, false);
+            operationService.applyBrightnessAndContrast(finalResultImage, profile, false);
         }
+
+        operationService.applyRGBBalance(finalResultImage, profile);
 
         // Exception for gamma, always apply last and only on the final result as it
         // messes up the sharpening.
-        Operations.applyGammaAndRGBCorrections(finalResultImage, profile, false);
+        operationService.applyGamma(finalResultImage, profile);
 
-        Operations.applySaturation(finalResultImage, profile);
+        operationService.applySaturation(finalResultImage, profile);
         finalResultImage.updateAndDraw();
 
         finalResultImage.setTitle(filePath);
@@ -426,7 +430,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             if (Util.isPngRgbStack(finalResultImage, filePath)) {
                 finalResultImage = Util.fixNonTiffOpeningSettings(finalResultImage);
             }
-            Operations.correctExposure(finalResultImage);
+            operationService.correctExposure(finalResultImage);
             log.info("Opened final result image image with id {}", finalResultImage.getID());
             finalResultImage.show(filePath);
             isLargeImage = setZoom(finalResultImage, false);

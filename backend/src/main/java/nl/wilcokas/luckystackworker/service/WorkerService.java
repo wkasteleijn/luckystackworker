@@ -10,16 +10,26 @@ import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.util.Operations;
+import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
+import nl.wilcokas.luckystackworker.filter.RGBBalanceFilter;
+import nl.wilcokas.luckystackworker.filter.SaturationFilter;
+import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter;
 import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
 public class WorkerService {
 
+
     private Map<String, String> properties;
+    private final OperationService operationService;
 
     public WorkerService(Map<String, String> properties) throws IOException {
         this.properties = properties;
+        final LSWSharpenFilter lswSharpenFilter = new LSWSharpenFilter();
+        final RGBBalanceFilter rgbBalanceFilter = new RGBBalanceFilter();
+        final SaturationFilter saturationFilter = new SaturationFilter();
+        final SavitzkyGolayFilter savitzkyGolayFilter = new SavitzkyGolayFilter();
+        operationService = new OperationService(lswSharpenFilter, rgbBalanceFilter, saturationFilter, savitzkyGolayFilter);
     }
 
     public boolean processFile(final File file) {
@@ -40,8 +50,8 @@ public class WorkerService {
                 if (Util.isPngRgbStack(imp, filePath)) {
                     imp = Util.fixNonTiffOpeningSettings(imp);
                 }
-                Operations.correctExposure(imp);
-                Operations.applyAllOperations(imp, properties, profile);
+                operationService.correctExposure(imp);
+                operationService.applyAllOperations(imp, properties, profile);
                 imp.updateAndDraw();
                 if (LuckyStackWorkerContext.getSelectedRoi() != null) {
                     imp.setRoi(LuckyStackWorkerContext.getSelectedRoi());

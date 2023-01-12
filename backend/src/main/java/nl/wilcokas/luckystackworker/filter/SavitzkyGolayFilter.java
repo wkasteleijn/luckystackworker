@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.process.ImageProcessor;
+import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.filter.settings.SavitzkyGolayRadius;
 
 @Component
@@ -82,10 +83,6 @@ public class SavitzkyGolayFilter {
     private static final int RADIUS_81_DIVISOR = 9253;
     private static final int RADIUS_81_ROWLENGTH = 9;
 
-    private static final int SHORT_HALF_SIZE = 32768;
-    private static final int UNSIGNED_INT_SIZE = 65536;
-    private static final int MAX_INT_VALUE = 65535;
-
     public void apply(ImagePlus image, final SavitzkyGolayRadius radius, int amount) {
 
         int[] radiusFactors;
@@ -138,7 +135,7 @@ public class SavitzkyGolayFilter {
                         radiusDivisor,
                         radiusCenter, radiusRowLength, amount);
                 pixelsResult[i] = convertToShort(
-                        newValueUnsignedInt > MAX_INT_VALUE ? MAX_INT_VALUE : (newValueUnsignedInt < 0 ? 0 : newValueUnsignedInt));
+                        newValueUnsignedInt > Constants.MAX_INT_VALUE ? Constants.MAX_INT_VALUE : (newValueUnsignedInt < 0 ? 0 : newValueUnsignedInt));
             }
             for (int i = 0; i < pixels.length; i++) {
                 pixels[i] = pixelsResult[i];
@@ -171,11 +168,11 @@ public class SavitzkyGolayFilter {
     }
 
     private int convertToUnsignedInt(final short value) {
-        return value < 0 ? value + UNSIGNED_INT_SIZE : value;
+        return value < 0 ? value + Constants.UNSIGNED_INT_SIZE : value;
     }
 
     private short convertToShort(long value) {
-        return (short) (value >= SHORT_HALF_SIZE ? value - UNSIGNED_INT_SIZE : value);
+        return (short) (value >= Constants.SHORT_HALF_SIZE ? value - Constants.UNSIGNED_INT_SIZE : value);
     }
 
 }

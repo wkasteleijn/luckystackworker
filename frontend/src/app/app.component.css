@@ -63,7 +63,8 @@
 
 .workerLabel {
   color: lightgreen;
-  width: 435px;
+  width: 537px;
+  text-overflow: clip;
 }
 
 .dropdown {

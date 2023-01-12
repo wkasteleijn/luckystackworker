@@ -2,6 +2,8 @@ package nl.wilcokas.luckystackworker.filter;
 
 import java.awt.Rectangle;
 
+import org.springframework.stereotype.Component;
+
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.plugin.filter.GaussianBlur;
@@ -13,6 +15,7 @@ import nl.wilcokas.luckystackworker.filter.settings.UnsharpMaskParameters;
 import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
+@Component
 public class LSWSharpenFilter {
 
     private static final float FLOAT_MAX_SATURATED_VALUE = 65535f;
