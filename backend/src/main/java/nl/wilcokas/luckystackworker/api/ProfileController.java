@@ -108,8 +108,18 @@ public class ProfileController {
 
     @PutMapping
     public ResponseEntity<String> updateProfile(@RequestBody Profile profile) {
-        profileService.updateProfile(profile);
-        referenceImageService.updateProcessing(profile);
+        // Rate limiting added to prevent overloading whenever scroll keys are held down
+        // or pressed very quickly.
+        LocalDateTime activeOperationTime = LuckyStackWorkerContext.getActiveOperationTime();
+        if (activeOperationTime == null
+                || LocalDateTime.now().isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
+            LuckyStackWorkerContext.setActiveOperationTime(LocalDateTime.now());
+            profileService.updateProfile(profile);
+            referenceImageService.updateProcessing(profile);
+            LuckyStackWorkerContext.setActiveOperationTime(null);
+        } else {
+            log.warn("Attempt to update image while another operation was in progress");
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

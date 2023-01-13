@@ -1,6 +1,7 @@
 package nl.wilcokas.luckystackworker;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,6 +27,10 @@ public class LuckyStackWorkerContext {
     private static int totalfilesCount = 0;
     private static boolean realTimeEnabled = true;
     private static boolean rootFolderSelected = false;
+
+    @Getter
+    @Setter
+    private static LocalDateTime activeOperationTime = null;
 
     @Getter
     @Setter

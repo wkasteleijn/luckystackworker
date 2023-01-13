@@ -173,7 +173,15 @@
     <mat-tab label="Sharpen & Denoise">
       <!-- Sharpen panel -->
       <div class="sliderRow">
-        <div class="sliderRowCategoryTitle">Sharpen</div>
+        <div
+          class="sliderRowCategoryTitle {{
+            nightModeEnabled()
+              ? 'sliderRowCategoryTitleColorNight'
+              : 'sliderRowCategoryTitleColor'
+          }}"
+        >
+          Sharpen
+        </div>
         <div class="sigmaRadio">
           <mat-radio-group
             [color]="colorTheme()"
@@ -293,7 +301,17 @@
       <div class="controlSeperator"></div>
 
       <div class="sliderRow">
-        <div class="sliderRowCategoryTitle">Denoise</div>
+        <div
+          class="sliderRowCategoryTitle {{
+            denoiseAlgorithm === 'OFF'
+              ? 'denoiseOffLabel'
+              : nightModeEnabled()
+              ? 'sliderRowCategoryTitleColorNight'
+              : 'sliderRowCategoryTitleColor'
+          }}"
+        >
+          Denoise
+        </div>
         <mat-radio-group
           [color]="colorTheme()"
           [disabled]="shouldShowSpinner() || !refImageSelected || crop"
@@ -314,14 +332,16 @@
       <div *ngIf="denoiseAlgorithm === 'SAVGOLAY'">
         <div class="sliderRow">
           <div class="sliderLabel">Kernel Size</div>
-          <div class="slider">
+          <div>
             <mat-radio-group
               [color]="colorTheme()"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               [(ngModel)]="savitzkyGolaySize"
               (change)="savitzkyGolaySizeChanged($event)"
             >
-              <mat-radio-button value="2" class="radioSizeButton"
+              <mat-radio-button
+                value="2"
+                class="denoiseFirstRadio radioSizeButton"
                 >25</mat-radio-button
               >
               <mat-radio-button value="3" class="radioSizeButton"
@@ -411,7 +431,7 @@
       <div *ngIf="denoiseAlgorithm === 'SIGMA'">
         <div class="sliderRow">
           <div class="sliderLabel">Mode</div>
-          <div class="slider">
+          <div>
             <div>
               <mat-radio-group
                 [color]="colorTheme()"
@@ -419,7 +439,9 @@
                 [(ngModel)]="denoiseSigma"
                 (change)="denoiseSigmaChanged($event, true)"
               >
-                <mat-radio-button value="2" class="radioSizeButton"
+                <mat-radio-button
+                  value="2"
+                  class="denoiseFirstRadio radioSizeButton"
                   >1</mat-radio-button
                 >
                 <mat-radio-button value="5" class="radioSizeButton"
@@ -541,7 +563,15 @@
       }}"
       label="Light & Color"
     >
-      <div class="sliderRowCategoryTitle">Light</div>
+      <div
+        class="sliderRowCategoryTitle {{
+          nightModeEnabled()
+            ? 'sliderRowCategoryTitleColorNight'
+            : 'sliderRowCategoryTitleColor'
+        }}"
+      >
+        Light
+      </div>
       <div class="sliderRow">
         <div class="sliderLabel">Gamma</div>
         <div class="slider">
@@ -632,7 +662,15 @@
 
       <div class="controlSeperatorColor"></div>
 
-      <div class="sliderRowCategoryTitle">Color</div>
+      <div
+        class="sliderRowCategoryTitle {{
+          nightModeEnabled()
+            ? 'sliderRowCategoryTitleColorNight'
+            : 'sliderRowCategoryTitleColor'
+        }}"
+      >
+        Color
+      </div>
       <div class="sliderRow">
         <div class="sliderLabel">Saturation</div>
         <div class="slider">
@@ -722,19 +760,31 @@
   </mat-tab-group>
 
   <!-- Worker panel -->
-  <mat-card
-    class="{{ nightModeEnabled() ? 'card cardColorNight' : 'card cardColor' }}"
-  >
+  <mat-card class="card cardColor">
     <mat-card-content>
       <div class="sliderRow">
-        <span class="workerLabel"
-          >Worker Status:
-          {{ workerProgress === 100 ? "Done" : workerStatus }}</span
+        <span
+          class="workerLabel {{
+            nightModeEnabled()
+              ? 'sliderRowCategoryTitleColorNight'
+              : 'sliderRowCategoryTitleColor'
+          }}"
+          >Worker: {{ workerProgress === 100 ? "Done" : workerStatus }}</span
         >
         <mat-checkbox
           [(ngModel)]="realtimeEnabled"
           (change)="realtimeEnabledChanged()"
-          >Realtime</mat-checkbox
+          [color]="colorTheme()"
+        ></mat-checkbox
+        ><span
+          class="realtimeLabel {{
+            realtimeEnabled
+              ? nightModeEnabled()
+                ? 'sliderRowCategoryTitleColorNight'
+                : 'sliderRowCategoryTitleColor'
+              : ''
+          }}"
+          >Realtime</span
         >
       </div>
       <div class="sliderRow">

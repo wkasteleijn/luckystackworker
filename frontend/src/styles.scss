@@ -171,6 +171,15 @@ select:hover {
   color: rgb(168, 168, 168);
 }
 
-.mat-checkbox-checked.mat-accent .mat-checkbox-background {
+.mat-checkbox-checked.mat-accent .mat-checkbox-ripple .mat-ripple-element {
   background-color: blue !important;
+}
+
+.mat-checkbox-checked.mat-accent .mat-checkbox-background,
+.mat-checkbox-indeterminate.mat-accent .mat-checkbox-background .mat-checkbox {
+  background-color: blue !important;
+}
+
+.mat-checkbox-inner-container {
+  background-color: gray !important;
 }

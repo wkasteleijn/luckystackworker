@@ -23,5 +23,6 @@ public class Constants {
     public static final int SHORT_HALF_SIZE = 32768;
     public static final int UNSIGNED_INT_SIZE = 65536;
     public static final int MAX_INT_VALUE = 65535;
+    public static final int MAX_OPERATION_TIME_BEFORE_RESUMING = 5; // seconds
 
 }

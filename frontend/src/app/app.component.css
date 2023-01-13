@@ -22,6 +22,10 @@
   margin-left: 16px;
 }
 
+.denoiseOffLabel {
+  color: rgb(168, 168, 168);
+}
+
 .sliderLabelDisabled {
   width: 108px;
   color: rgb(64, 64, 64);
@@ -58,12 +62,17 @@
   max-height: 32px;
   margin-left: 16px;
   margin-top: 12px;
+}
+
+.sliderRowCategoryTitleColor {
   color: lightgreen;
+}
+.sliderRowCategoryTitleColorNight {
+  color: red;
 }
 
 .workerLabel {
-  color: lightgreen;
-  width: 537px;
+  width: 520px;
   text-overflow: clip;
 }
 
@@ -210,14 +219,14 @@
   margin-right: 24px;
 }
 .radioSizeButtonSharpen {
-  margin-left: 56px;
+  margin-left: 46px;
 }
 .denoiseMode {
   margin-left: 24px;
 }
 
 .radioSizeButtonDenoise {
-  margin-left: 81px;
+  margin-left: 72px;
 }
 
 .radioMargin {
@@ -261,4 +270,13 @@
   margin-left: 24px;
   margin-right: 32px;
   width: 24px;
+}
+.realtimeLabel {
+  margin-left: 24px;
+}
+.realtimeLabelActiveColor {
+  color: lightgreen;
+}
+.denoiseFirstRadio {
+  margin-left: 7px;
 }
