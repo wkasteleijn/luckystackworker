@@ -49,19 +49,21 @@ public class WorkerService {
                 }
 
                 ImagePlus imp = new Opener().openImage(filePath);
-                if (Util.isPngRgbStack(imp, filePath)) {
-                    imp = Util.fixNonTiffOpeningSettings(imp);
+                if (Util.validateImageFormat(imp, null)) {
+                    if (Util.isPngRgbStack(imp, filePath)) {
+                        imp = Util.fixNonTiffOpeningSettings(imp);
+                    }
+                    operationService.correctExposure(imp);
+                    operationService.applyAllOperations(imp, properties, profile);
+                    imp.updateAndDraw();
+                    if (LuckyStackWorkerContext.getSelectedRoi() != null) {
+                        imp.setRoi(LuckyStackWorkerContext.getSelectedRoi());
+                        imp = imp.crop();
+                    }
+                    Util.saveImage(imp, getOutputFile(file), Util.isPngRgbStack(imp, filePath),
+                            LuckyStackWorkerContext.getSelectedRoi() != null);
+                    return true;
                 }
-                operationService.correctExposure(imp);
-                operationService.applyAllOperations(imp, properties, profile);
-                imp.updateAndDraw();
-                if (LuckyStackWorkerContext.getSelectedRoi() != null) {
-                    imp.setRoi(LuckyStackWorkerContext.getSelectedRoi());
-                    imp = imp.crop();
-                }
-                Util.saveImage(imp, getOutputFile(file), Util.isPngRgbStack(imp, filePath),
-                        LuckyStackWorkerContext.getSelectedRoi() != null);
-                return true;
             } catch (Exception e) {
                 log.error("Error processing file: ", e);
             }

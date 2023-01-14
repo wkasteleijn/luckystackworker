@@ -12,6 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.util.ReflectionUtils;
 import org.yaml.snakeyaml.Yaml;
@@ -22,6 +25,10 @@ import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.io.FileInfo;
 import ij.io.FileSaver;
+import ij.process.ColorProcessor;
+import ij.process.FloatProcessor;
+import ij.process.ImageProcessor;
+import ij.process.ShortProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
@@ -362,6 +369,28 @@ public class Util {
         float green = ((g_ + m) + 0.5f) * (1f - hueCorrectionFactor);
         float blue = ((b_ + m) + 0.5f) * (1f + hueCorrectionFactor);
         return new float[] { red, green, blue };
+    }
+
+    public static boolean validateImageFormat(ImagePlus image, JFrame parentFrame) {
+        String message = "This file format is not supported. %nYou can only open 16-bit RGB and grayscale PNG and TIFF images.";
+        boolean is16Bit = false;
+        if (image != null) {
+            ImageProcessor processor = image.getProcessor();
+            is16Bit = processor instanceof ShortProcessor;
+            if (processor instanceof ColorProcessor) {
+                message += "%nThe file you selected is in 8-bit color format.";
+            } else if (processor instanceof FloatProcessor) {
+                message += "%nThe file you selected is in 32-bit grayscale format.";
+            }
+        }
+        if (!is16Bit) {
+            log.warn("Attempt to open a non 16-bit image");
+            if (parentFrame != null) {
+                JOptionPane.showMessageDialog(parentFrame, String.format(message));
+            }
+            return false;
+        }
+        return true;
     }
 
     private static String getSetting(Map<String, String> props, String setting, String name) {

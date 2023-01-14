@@ -1,5 +1,19 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+
+31/01/2023 major release 3.0.0:
+- New options for sharpening (luminance only). Replaced sharpening algorithm with a faster custom build version.
+- New sliders for supressing the edge clipping effect on Mars & Venus
+- Revised denoise options, choice between Savitzky-Golay or Sigma filter. Replaced Sigma filter sigma slider with a choice between mode 1 or 2
+- Added additional 129 & 169 kernel size options to the Savitzky-Golay filter
+- Added realtime processing, useful to pick up files automatically as they are being outputted by stacking apps (e.g. Autostakkert)
+- Full 16-bit support for Saturation slider through a custom build algorithm
+- Replaced RGB balance filter with a faster custom build algorithm
+- Better input validation, prevent non supported formats to be opened (non 16-bit image files)
+- Close currently opened image stack if a new one is opened
+- Added keyboard support by adding in a rate limit on the sliders, thereby fixing the overloading issue when arrow keys where held down
+- Various layout improvements
+
 29/12/2022 revision release 2.4.0:
 - Moved database and log files to ~/AppData/Local folder
 - Added an setup installer for easy installation.
