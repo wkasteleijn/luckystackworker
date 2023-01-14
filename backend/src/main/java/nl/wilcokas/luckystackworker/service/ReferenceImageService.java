@@ -32,6 +32,10 @@ import ij.gui.ImageWindow;
 import ij.gui.RoiListener;
 import ij.gui.Toolbar;
 import ij.io.Opener;
+import ij.process.ColorProcessor;
+import ij.process.FloatProcessor;
+import ij.process.ImageProcessor;
+import ij.process.ShortProcessor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
@@ -424,7 +428,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     private boolean openReferenceImage(String filePath, Profile profile) throws IOException {
         this.filePath = filePath;
+        if (finalResultImage != null) {
+            // Can only have 1 image open at a time.
+            finalResultImage.hide();
+        }
         finalResultImage = new Opener().openImage(Util.getIJFileFormat(this.filePath));
+        if (!validateImageFormat(finalResultImage)) {
+            return false;
+        }
         boolean isLargeImage = false;
         if (finalResultImage != null) {
             if (Util.isPngRgbStack(finalResultImage, filePath)) {
@@ -457,6 +468,27 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             finalResultImage.setTitle(this.filePath);
         }
         return isLargeImage;
+    }
+
+    private boolean validateImageFormat(ImagePlus image) {
+        String message = "This file format is not supported. %nYou can only open 16-bit RGB and grayscale PNG and TIFF images.";
+        boolean is16Bit = false;
+        if (image!=null) {
+            ImageProcessor processor = image.getProcessor();
+            is16Bit = processor instanceof ShortProcessor;
+            if (processor instanceof ColorProcessor) {
+                message += "%nThe file you selected is in 8-bit color format.";
+            } else if (processor instanceof FloatProcessor) {
+                message += "%nThe file you selected is in 32-bit grayscale format.";
+            }
+        }
+        if (!is16Bit) {
+            log.warn("Attempt to open a non 16-bit image");
+            JOptionPane.showMessageDialog(getParentFrame(),
+                    String.format(message));
+            return false;
+        }
+        return true;
     }
 
     private void setDefaultLayoutSettings(ImagePlus image, Point location) {
