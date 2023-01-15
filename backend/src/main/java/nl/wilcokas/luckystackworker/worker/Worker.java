@@ -96,8 +96,11 @@ public class Worker extends Thread {
                 if (!name.endsWith(Constants.OUTPUT_POSTFIX) && Arrays.asList(getExtensions()).contains(extension)
                         && !isInFileList(files, name + Constants.OUTPUT_POSTFIX)) {
                     log.info("Realtime processing file {}", name);
-                    workerService.processFile(file, true);
-                    break;
+                    if (workerService.processFile(file, true)) {
+                        // If one file was successfully processed then keep it to that, else find a next
+                        // one.
+                        break;
+                    }
                 }
             }
         } catch (Exception e) {

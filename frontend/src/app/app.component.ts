@@ -502,12 +502,16 @@ export class AppComponent implements OnInit {
     this.amount = this.profile.amount;
     this.iterations = this.profile.iterations;
     this.denoiseAmount = this.profile.denoise;
-    this.denoiseSigma = this.profile.denoiseSigma.toString();
+    this.denoiseSigma = this.profile.denoiseSigma
+      ? this.profile.denoiseSigma.toString()
+      : '0';
     this.denoiseRadius = this.profile.denoiseRadius;
     this.denoiseIterations = this.profile.denoiseIterations;
     this.savitzkyGolayIterations = this.profile.savitzkyGolayIterations;
     this.savitzkyGolayAmount = this.profile.savitzkyGolayAmount;
-    this.savitzkyGolaySize = this.profile.savitzkyGolaySize.toString();
+    this.savitzkyGolaySize = this.profile.savitzkyGolaySize
+      ? this.profile.savitzkyGolaySize.toString()
+      : '0';
     if (!this.profile.denoiseSigma && !this.profile.savitzkyGolaySize) {
       this.denoiseAlgorithm = 'OFF';
     } else if (this.profile.savitzkyGolaySize) {
