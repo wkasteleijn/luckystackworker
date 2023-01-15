@@ -1,13 +1,20 @@
 package nl.wilcokas.luckystackworker.filter;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.stereotype.Component;
 
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.process.ImageProcessor;
+import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.filter.settings.SavitzkyGolayRadius;
 
+@Slf4j
 @Component
 public class SavitzkyGolayFilter {
 
@@ -125,23 +132,33 @@ public class SavitzkyGolayFilter {
         }
 
         ImageStack stack = image.getStack();
+        // Run every stack in a seperate thread to increase performance.
+        int numThreads = Runtime.getRuntime().availableProcessors();
+        Executor executor = Executors.newFixedThreadPool(numThreads);
         for (int layer = 1; layer <= stack.size(); layer++) {
-            ImageProcessor p = stack.getProcessor(layer);
-            short[] pixels = (short[]) p.getPixels();
+            int finalLayer = layer;
+            executor.execute(() -> {
+                ImageProcessor p = stack.getProcessor(finalLayer);
+                short[] pixels = (short[]) p.getPixels();
 
-            short[] pixelsResult = new short[pixels.length];
-            for (int i = 0; i < pixels.length; i++) {
-                long newValueUnsignedInt = getPixelValueUnsignedInt(pixels, i, image.getWidth(), radiusFactors, radiusOffsets,
-                        radiusDivisor,
-                        radiusCenter, radiusRowLength, amount);
-                pixelsResult[i] = convertToShort(
-                        newValueUnsignedInt > Constants.MAX_INT_VALUE ? Constants.MAX_INT_VALUE : (newValueUnsignedInt < 0 ? 0 : newValueUnsignedInt));
-            }
-            for (int i = 0; i < pixels.length; i++) {
-                pixels[i] = pixelsResult[i];
-            }
+                short[] pixelsResult = new short[pixels.length];
+                for (int i = 0; i < pixels.length; i++) {
+                    long newValueUnsignedInt = getPixelValueUnsignedInt(pixels, i, image.getWidth(), radiusFactors, radiusOffsets, radiusDivisor,
+                            radiusCenter, radiusRowLength, amount);
+                    pixelsResult[i] = convertToShort(newValueUnsignedInt > Constants.MAX_INT_VALUE ? Constants.MAX_INT_VALUE
+                            : (newValueUnsignedInt < 0 ? 0 : newValueUnsignedInt));
+                }
+                for (int i = 0; i < pixels.length; i++) {
+                    pixels[i] = pixelsResult[i];
+                }
+            });
         }
-        // image.updateAndDraw();
+        ((ExecutorService) executor).shutdown();
+        try {
+            ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            log.warn("Savitzky-golay thread execution was stopped: ", e);
+        }
     }
 
     private long getPixelValueUnsignedInt(short[] pixels, final int position, final int width, int[] radiusFactors, int[][] radiusOffsets,

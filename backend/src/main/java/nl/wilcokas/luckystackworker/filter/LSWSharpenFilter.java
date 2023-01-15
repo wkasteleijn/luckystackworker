@@ -1,6 +1,10 @@
 package nl.wilcokas.luckystackworker.filter;
 
 import java.awt.Rectangle;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Component;
 
@@ -23,17 +27,29 @@ public class LSWSharpenFilter {
     public void applyRGBMode(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) {
         ImageStack finalStack = image.getStack();
         for (int i = 0; i < unsharpMaskParameters.getIterations(); i++) {
-            for (int slice = 1; slice <= finalStack.getSize(); slice++) {
-                ImageProcessor ipFinal = finalStack.getProcessor(slice);
-                FloatProcessor fpFinal = ipFinal.toFloat(slice, null);
-                fpFinal.snapshot();
-                doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
-                        unsharpMaskParameters.getClippingRange(), fpFinal);
-                ipFinal.setPixels(slice, fpFinal);
-            }
 
+            // Run every stack in a seperate thread to increase performance.
+            int numThreads = Runtime.getRuntime().availableProcessors();
+            Executor executor = Executors.newFixedThreadPool(numThreads);
+
+            for (int slice = 1; slice <= finalStack.getSize(); slice++) {
+                int finalLayer = slice;
+                executor.execute(() -> {
+                    ImageProcessor ipFinal = finalStack.getProcessor(finalLayer);
+                    FloatProcessor fpFinal = ipFinal.toFloat(finalLayer, null);
+                    fpFinal.snapshot();
+                    doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
+                            unsharpMaskParameters.getClippingRange(), fpFinal);
+                    ipFinal.setPixels(finalLayer, fpFinal);
+                });
+            }
+            ((ExecutorService) executor).shutdown();
+            try {
+                ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            } catch (InterruptedException e) {
+                log.warn("LSWSharpenFilter thread execution was stopped: ", e);
+            }
         }
-        // image.updateAndDraw();
     }
 
     public void applyRGBModeAdaptive(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) {
@@ -42,34 +58,56 @@ public class LSWSharpenFilter {
 
         // Pass 1, first apply the filter normally to the intialStack.
         for (int i = 0; i < unsharpMaskParameters.getIterations(); i++) {
-            for (int slice = 1; slice <= intialStack.getSize(); slice++) {
-                ImageProcessor ip = intialStack.getProcessor(slice);
-                FloatProcessor fp = ip.toFloat(slice, null);
-                fp.snapshot();
-                doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
-                        unsharpMaskParameters.getClippingRange(), fp);
-                ip.setPixels(slice, fp);
-            }
 
+            // Run every stack in a seperate thread to increase performance.
+            int numThreads = Runtime.getRuntime().availableProcessors();
+            Executor executor = Executors.newFixedThreadPool(numThreads);
+            for (int slice = 1; slice <= intialStack.getSize(); slice++) {
+                int finalLayer = slice;
+                executor.execute(() -> {
+                    ImageProcessor ip = intialStack.getProcessor(finalLayer);
+                    FloatProcessor fp = ip.toFloat(finalLayer, null);
+                    fp.snapshot();
+                    doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
+                            unsharpMaskParameters.getClippingRange(), fp);
+                    ip.setPixels(finalLayer, fp);
+                });
+            }
+            ((ExecutorService) executor).shutdown();
+            try {
+                ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            } catch (InterruptedException e) {
+                log.warn("LSWSharpenFilter thread execution was stopped: ", e);
+            }
         }
 
         // Pass 2, apply the adaptive filter based on the result of pass 1.
         for (int i = 0; i < unsharpMaskParameters.getIterations(); i++) {
+
+            // Run every stack in a seperate thread to increase performance.
+            int numThreads = Runtime.getRuntime().availableProcessors();
+            Executor executor = Executors.newFixedThreadPool(numThreads);
             for (int slice = 1; slice <= intialStack.getSize(); slice++) {
-                ImageProcessor ipInitial = intialStack.getProcessor(slice);
-                FloatProcessor fpInitial = ipInitial.toFloat(slice, null);
-                ImageProcessor ipFinal = finalStack.getProcessor(slice);
-                FloatProcessor fpFinal = ipFinal.toFloat(slice, null);
-                fpFinal.snapshot();
-                doUnsharpMaskAdaptive(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(),
-                        unsharpMaskParameters.getClippingStrength(),
-                        unsharpMaskParameters.getClippingRange(), fpInitial, fpFinal);
-                ipFinal.setPixels(slice, fpFinal);
+                int finalLayer = slice;
+                executor.execute(() -> {
+                    ImageProcessor ipInitial = intialStack.getProcessor(finalLayer);
+                    FloatProcessor fpInitial = ipInitial.toFloat(finalLayer, null);
+                    ImageProcessor ipFinal = finalStack.getProcessor(finalLayer);
+                    FloatProcessor fpFinal = ipFinal.toFloat(finalLayer, null);
+                    fpFinal.snapshot();
+                    doUnsharpMaskAdaptive(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(),
+                            unsharpMaskParameters.getClippingStrength(),
+                            unsharpMaskParameters.getClippingRange(), fpInitial, fpFinal);
+                    ipFinal.setPixels(finalLayer, fpFinal);
+                });
             }
-
+            ((ExecutorService) executor).shutdown();
+            try {
+                ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            } catch (InterruptedException e) {
+                log.warn("LSWSharpenFilter thread execution was stopped: ", e);
+            }
         }
-
-        // image.updateAndDraw();
     }
 
     public void applyLuminanceMode(ImagePlus image, final LSWSharpenParameters parameters) {
@@ -122,8 +160,6 @@ public class LSWSharpenFilter {
             ipGreen.setPixels(2, fpGreen);
             ipBlue.setPixels(3, fpBlue);
         }
-
-        // image.updateAndDraw();
     }
 
     public void applyLuminanceModeAdaptive(ImagePlus image, final LSWSharpenParameters parameters) {
@@ -222,8 +258,6 @@ public class LSWSharpenFilter {
             ipGreen.setPixels(2, fpGreen);
             ipBlue.setPixels(3, fpBlue);
         }
-
-        // image.updateAndDraw();
     }
 
     /*
