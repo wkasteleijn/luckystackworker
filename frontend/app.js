@@ -13,6 +13,7 @@ function createWindow() {
     x: 64,
     y: 64,
   });
+  mainWindow.removeMenu();
 
   mainWindow.loadURL(
     url.format({

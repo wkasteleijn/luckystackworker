@@ -83,6 +83,11 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    document.addEventListener('keyup', (event) => {
+      if (event.altKey) {
+        event.preventDefault();
+      }
+    });
     this.showSpinner();
     this.pollSelectedProfile();
   }

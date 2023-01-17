@@ -19,11 +19,16 @@ import nl.wilcokas.luckystackworker.filter.settings.SavitzkyGolayRadius;
 public class SavitzkyGolayFilter {
 
     private static final int[] RADIUS_25_FACTORS = { //
-            -4, -23, -29, -23, -4, //
-            -23, 108, 229, 108, -23, //
-            -29, 229, 1415, 229, -29, //
-            -23, 108, 229, 108, -23, //
-            -4, -23, -29, -23, -4 //
+            //            -4, -23, -29, -23, -4, //
+            //            -23, 108, 229, 108, -23, //
+            //            -29, 229, 1415, 229, -29, //
+            //            -23, 108, 229, 108, -23, //
+            //            -4, -23, -29, -23, -4 //
+            -4, -22, -29, -22, -4, //
+            -22, 114, 226, 114, -22, //
+            -29, 226, 2129, 226, -29, //
+            -22, 114, 226, 114, -22, //
+            -4, -22, -29, -22, -4, //
     };
 
     private static final int[][] RADIUS_25_OFFSETS = { //
@@ -79,7 +84,7 @@ public class SavitzkyGolayFilter {
     };
 
     private static final int RADIUS_25_CENTER = 12;
-    private static final int RADIUS_25_DIVISOR = 2447;
+    private static final int RADIUS_25_DIVISOR = 3181;
     private static final int RADIUS_25_ROWLENGTH = 5;
 
     private static final int RADIUS_49_CENTER = 24;
