@@ -370,14 +370,16 @@ export class AppComponent implements OnInit {
     }
   }
 
-  savitzkyGolaySizeChanged(event: any) {
+  savitzkyGolaySizeChanged(event: any, update: boolean) {
     this.profile.savitzkyGolaySize = +event.value;
     this.savitzkyGolaySize = event.value;
     this.profile.operation = 'savitzkyGolaySize';
     console.log(
       'savitzkyGolaySizeChanged called: ' + this.profile.savitzkyGolaySize
     );
-    this.updateProfile();
+    if (update) {
+      this.updateProfile();
+    }
   }
 
   denoiseAlgorithmChanged(event: any) {
@@ -430,14 +432,18 @@ export class AppComponent implements OnInit {
   }
 
   get savitzkyGolaySizeDisplayValue(): number {
-    if (this.savitzkyGolaySize === '0') {
+    if (this.savitzkyGolaySize == '0') {
       return 0;
-    } else if (this.savitzkyGolaySize === '2') {
+    } else if (this.savitzkyGolaySize == '2') {
       return 25;
-    } else if (this.savitzkyGolaySize === '3') {
+    } else if (this.savitzkyGolaySize == '3') {
       return 49;
-    } else if (this.savitzkyGolaySize === '4') {
+    } else if (this.savitzkyGolaySize == '4') {
       return 81;
+    } else if (this.savitzkyGolaySize == '5') {
+      return 121;
+    } else if (this.savitzkyGolaySize == '6') {
+      return 169;
     }
     return 0;
   }

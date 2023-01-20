@@ -332,25 +332,31 @@
       <div *ngIf="denoiseAlgorithm === 'SAVGOLAY'">
         <div class="sliderRow">
           <div class="sliderLabel">Kernel Size</div>
-          <div>
-            <mat-radio-group
-              [color]="colorTheme()"
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+          <div class="slider">
+            <mat-slider
+              [disabled]="
+                shouldShowSpinner() ||
+                !refImageSelected ||
+                savitzkyGolaySize === '0' ||
+                crop
+              "
+              tickInterval="1"
+              step="1"
+              min="2"
+              max="6"
+              (input)="savitzkyGolaySizeChanged($event, false)"
+              (change)="savitzkyGolaySizeChanged($event, true)"
               [(ngModel)]="savitzkyGolaySize"
-              (change)="savitzkyGolaySizeChanged($event)"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span
+              class="{{
+                savitzkyGolaySize === '0'
+                  ? 'sliderLabelDisabled'
+                  : 'sliderLabel'
+              }}"
+              >{{ savitzkyGolaySizeDisplayValue }}</span
             >
-              <mat-radio-button
-                value="2"
-                class="denoiseFirstRadio radioSizeButton"
-                >25</mat-radio-button
-              >
-              <mat-radio-button value="3" class="radioSizeButton"
-                >49</mat-radio-button
-              >
-              <mat-radio-button value="4" class="radioSizeButton"
-                >81</mat-radio-button
-              >
-            </mat-radio-group>
           </div>
         </div>
         <div class="savgolayRadio"></div>
