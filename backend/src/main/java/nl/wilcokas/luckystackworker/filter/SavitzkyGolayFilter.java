@@ -55,7 +55,7 @@ public class SavitzkyGolayFilter {
     };
 
     private static final int[] RADIUS_81_FACTORS = { //
-            0, -5, -63, -106, 120, -106, -63, -5, 0, //
+            0, -5, -63, -106, -120, -106, -63, -5, 0, //
             -5, -96, -41, 71, 105, 71, -41, -96, -5, //
             -63, -41, 154, 371, 444, 371, 154, -41, -63, //
             -106, 71, 371, 884, 1223, 884, 371, 71, -106, //
@@ -63,7 +63,7 @@ public class SavitzkyGolayFilter {
             -106, 71, 371, 884, 1223, 884, 371, 71, -106, //
             -63, -41, 154, 371, 444, 371, 154, -41, -63, //
             -5, -96, -41, 71, 105, 71, -41, -96, -5, //
-            0, -5, -63, -106, 120, -106, -63, -5, 0
+            0, -5, -63, -106, -120, -106, -63, -5, 0
 
             //            0, -2, -32, -54, -62, -54, -32, -2, 0, //
             //            -2, -49, -22, 35, 54, 35, -22, -49, -2, //
@@ -157,7 +157,7 @@ public class SavitzkyGolayFilter {
     private static final int RADIUS_49_ROWLENGTH = 7;
 
     private static final int RADIUS_81_CENTER = 40;
-    private static final int RADIUS_81_DIVISOR = 21250;
+    private static final int RADIUS_81_DIVISOR = 21010;
     private static final int RADIUS_81_ROWLENGTH = 9;
 
     private static final int RADIUS_121_CENTER = 60;
