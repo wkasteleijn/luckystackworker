@@ -52,7 +52,6 @@ public class Util {
         return getFilenameExtension(file.getAbsolutePath());
     }
 
-    
     public static String getFilenameExtension(String path) {
         String filename = getFilenameFromPath(path);
         return filename.indexOf(".") > 0 ? filename.substring(filename.lastIndexOf(".")+1).toLowerCase() : "";
