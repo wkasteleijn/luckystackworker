@@ -94,7 +94,7 @@ public class ProfileController {
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
             String selectedFilePath = selectedFile.getAbsolutePath();
-            String fileNameNoExt = Util.getFilename(selectedFilePath)[0];
+            String fileNameNoExt = Util.getFilename(selectedFilePath);
             Profile profile = Util.readProfile(fileNameNoExt);
             if (profile != null) {
                 profile.setLargeImage(referenceImageService.isLargeImage());

@@ -36,16 +36,34 @@ import nl.wilcokas.luckystackworker.model.Profile;
 
 @Slf4j
 public class Util {
+
+    private Util() {
+    }
+
     public static boolean fileExists(String path) {
         return Files.exists(Paths.get(path));
     }
 
-    public static String[] getFilename(File file) {
+    public static String getFilename(File file) {
         return getFilename(file.getAbsolutePath());
     }
 
-    public static String[] getFilename(String path) {
-        return path.split("\\.");
+    public static String getFilenameExtension(File file) {
+        return getFilenameExtension(file.getAbsolutePath());
+    }
+
+    public static String getFilenameExtension(String path) {
+        String filename = getFilenameFromPath(path);
+        return filename.indexOf(".") > 0 ? filename.substring(filename.lastIndexOf(".")+1).toLowerCase() : "";
+    }
+
+    public static String getFilename(String path) {
+        String filename = getFilenameFromPath(path);
+        return filename.indexOf(".") > 0 ? filename.substring(0, filename.lastIndexOf(".")).toLowerCase() : filename;
+    }
+
+    private static String getFilenameFromPath(String path) {
+        return path.indexOf("/") >= 0 ? path.substring(path.lastIndexOf("/") + 1) : path;
     }
 
     @SuppressWarnings("static-access")
@@ -224,13 +242,15 @@ public class Util {
                     profile.setClippingStrength(0);
                     profile.setClippingRange(50);
                 }
-                if (profile.getSavitzkyGolaySize() == 0 && (profile.getDenoiseSigma() == null || BigDecimal.ZERO.equals(profile.getDenoiseSigma()))) {
+                if (profile.getSavitzkyGolaySize() == 0
+                        && (profile.getDenoiseSigma() == null || BigDecimal.ZERO.equals(profile.getDenoiseSigma()))) {
                     // if prior to 3.0.0 no denoise was set, prefer the defaults for savitzky-golay
                     profile.setSavitzkyGolaySize(3);
                     profile.setSavitzkyGolayAmount(75);
                     profile.setSavitzkyGolayIterations(1);
                 } else if (profile.getSavitzkyGolaySize() > 0
-                        && (profile.getDenoiseSigma() != null || BigDecimal.ZERO.compareTo(profile.getDenoiseSigma()) < 0)) {
+                        && (profile.getDenoiseSigma() != null
+                                || BigDecimal.ZERO.compareTo(profile.getDenoiseSigma()) < 0)) {
                     // Prevent both being set, prefer savitzky-golay in that case.
                     profile.setDenoiseSigma(BigDecimal.ZERO);
                 }
@@ -285,7 +305,8 @@ public class Util {
         IJ.run(destination, "Apply LUT", null);
     }
 
-    public static float[] rgbToHsl(float red, float green, float blue, boolean includeRed, boolean includeGreen, boolean includeBlue,
+    public static float[] rgbToHsl(float red, float green, float blue, boolean includeRed, boolean includeGreen,
+            boolean includeBlue,
             LSWSharpenMode mode) {
         float max = Math.max(Math.max(red, green), blue);
         float min = Math.min(Math.min(red, green), blue);
@@ -308,7 +329,8 @@ public class Util {
         float luminance;
         if (mode == LSWSharpenMode.LUMINANCE) {
             float luminanceDivisor = (includeRed ? 1 : 0) + (includeGreen ? 1 : 0) + (includeBlue ? 1 : 0);
-            luminance = ((includeRed ? red : 0) + (includeGreen ? green : 0) + (includeBlue ? blue : 0)) / luminanceDivisor;
+            luminance = ((includeRed ? red : 0) + (includeGreen ? green : 0) + (includeBlue ? blue : 0))
+                    / luminanceDivisor;
         } else {
             luminance = (max + min) * 0.5f;
         }

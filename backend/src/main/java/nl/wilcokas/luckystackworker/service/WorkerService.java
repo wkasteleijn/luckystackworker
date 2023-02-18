@@ -72,7 +72,6 @@ public class WorkerService {
     }
 
     private String getOutputFile(final File file) {
-        String[] filename = Util.getFilename(file);
-        return filename[0] + Constants.OUTPUT_POSTFIX + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
+        return Util.getFilename(file) + Constants.OUTPUT_POSTFIX + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
     }
 }

@@ -92,7 +92,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             String selectedFilePath = selectedFile.getAbsolutePath();
             if (validateSelectedFile(selectedFilePath)) {
                 log.info("Image selected {} ", selectedFilePath);
-                String fileNameNoExt = Util.getFilename(selectedFilePath)[0];
+                String fileNameNoExt = Util.getFilename(selectedFilePath);
                 Profile profile = Util.readProfile(fileNameNoExt);
                 if (profile == null) {
                     String profileName = Util.deriveProfileFromImageName(selectedFilePath);
@@ -162,7 +162,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     public void saveReferenceImage(String path) throws IOException {
         String dir = Util.getFileDirectory(filePath);
         log.info("Saving image to folder {}", dir);
-        String fileNameNoExt = Util.getFilename(path)[0];
+        String fileNameNoExt = Util.getFilename(path);
         String finalPath = fileNameNoExt + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
         Util.saveImage(finalResultImage, finalPath, Util.isPngRgbStack(finalResultImage, filePath), roiActive);
         log.info("Saved file to {}", finalPath);
@@ -233,7 +233,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void writeProfile() throws IOException {
-        String fileNameNoExt = Util.getFilename(filePath)[0];
+        String fileNameNoExt = Util.getFilename(filePath);
         writeProfile(fileNameNoExt);
     }
 
@@ -500,7 +500,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     private boolean validateSelectedFile(String path) {
-        String extension = Util.getFilename(path)[1].toLowerCase();
+        String extension = Util.getFilenameExtension(path);
         if (!getSettings().getExtensions().contains(extension)) {
             JOptionPane.showMessageDialog(getParentFrame(),
                     String.format(

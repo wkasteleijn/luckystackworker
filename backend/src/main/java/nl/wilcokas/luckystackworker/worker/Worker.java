@@ -90,9 +90,8 @@ public class Worker extends Thread {
         try {
             Collection<File> files = getImages();
             for (File file : files) {
-                String[] filename = Util.getFilename(file);
-                String name = filename[0];
-                String extension = filename[filename.length - 1];
+                String name = Util.getFilename(file);
+                String extension = Util.getFilenameExtension(file);
                 if (!name.endsWith(Constants.OUTPUT_POSTFIX) && Arrays.asList(getExtensions()).contains(extension)
                         && !isInFileList(files, name + Constants.OUTPUT_POSTFIX)) {
                     log.info("Realtime processing file {}", name);
@@ -109,16 +108,15 @@ public class Worker extends Thread {
     }
 
     private boolean isInFileList(Collection<File> files, String filename) {
-        return files.stream().map(f -> Util.getFilename(f)[0]).anyMatch(filename::equals);
+        return files.stream().map(f -> Util.getFilename(f)).anyMatch(filename::equals);
     }
 
     private boolean processFiles(Collection<File> files) {
         boolean filesProcessed = false;
         int count = 0;
         for (File file : files) {
-            String[] filename = Util.getFilename(file);
-            String name = filename[0];
-            String extension = filename[filename.length - 1];
+            String name = Util.getFilename(file);
+            String extension = Util.getFilenameExtension(file);
             if (!name.endsWith(Constants.OUTPUT_POSTFIX) && Arrays.asList(getExtensions()).contains(extension)) {
                 filesProcessed = filesProcessed | workerService.processFile(file, false);
             }

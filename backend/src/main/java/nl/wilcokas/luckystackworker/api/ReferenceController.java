@@ -68,7 +68,7 @@ public class ReferenceController {
         String realPath = LuckyStackWorkerContext.getWorkerProperties().get("inputFolder");
         JFileChooser jfc = referenceImageService.getJFileChooser(realPath);
         jfc.setFileFilter(new FileNameExtensionFilter("TIFF", "tif"));
-        String fileNameNoExt = Util.getFilename(referenceImageService.getFilePath())[0];
+        String fileNameNoExt = Util.getFilename(referenceImageService.getFilePath());
         jfc.setSelectedFile(
                 new File(fileNameNoExt + Constants.OUTPUT_POSTFIX + "." + Constants.SUPPORTED_OUTPUT_FORMAT));
         int returnValue = jfc.showDialog(frame, "Save reference image");
