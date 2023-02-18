@@ -33,6 +33,7 @@ public class UtilTest {
             Assertions.assertEquals(expectedFilenameExtension, Util.getFilenameExtension(PATH_WITH_DOT_IN_FOLDER_PREFIX));
             Assertions.assertEquals("", Util.getFilenameExtension(PATH_WITH_NO_EXTENSION));
             Assertions.assertEquals("", Util.getFilenameExtension(PATH_WITH_ONLY_EXTENSION));
+            Assertions.assertEquals("png", Util.getFilenameExtension(PATH_WITH_DOT_IN_FILE));
         }
     
 }

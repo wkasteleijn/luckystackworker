@@ -17,6 +17,7 @@ public class LuckystackWorkerApplication {
 		log.info("Java home is {}", System.getProperty("java.home"));
 		log.info("Java vendor is {}", System.getProperty("java.vendor"));
 		log.info("Java version is {}", System.getProperty("java.version"));
+		log.info("Active profile is {}", System.getProperty("spring.profiles.active"));
 
 		log.info("Starting electron GUI");
 		try {

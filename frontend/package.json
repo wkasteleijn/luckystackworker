@@ -7,6 +7,8 @@
     "ng": "ng",
     "serve": "ng serve --configuration development",
     "start": "ng build --base-href . && electron . --configuration production",
+    "build-mac": "ng build --base-href . &",
+    "start-mac": "electron . --configuration production",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
