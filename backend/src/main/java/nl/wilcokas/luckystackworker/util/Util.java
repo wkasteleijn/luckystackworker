@@ -54,12 +54,16 @@ public class Util {
 
     public static String getFilenameExtension(String path) {
         String filename = getFilenameFromPath(path);
-        return filename.indexOf(".") > 0 ? filename.substring(filename.lastIndexOf(".")+1).toLowerCase() : "";
+        return filename.indexOf(".") > 0 ? filename.substring(filename.lastIndexOf(".") + 1).toLowerCase() : "";
     }
 
     public static String getFilename(String path) {
         String filename = getFilenameFromPath(path);
-        return filename.indexOf(".") > 0 ? filename.substring(0, filename.lastIndexOf(".")).toLowerCase() : filename;
+        return filename.indexOf(".") > 0 ? filename.substring(0, filename.lastIndexOf(".")) : filename;
+    }
+
+    public static String getPathWithoutExtension(String path) {
+        return path.indexOf(".") > 0 ? path.substring(0, path.lastIndexOf(".")) : path;
     }
 
     private static String getFilenameFromPath(String path) {

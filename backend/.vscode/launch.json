@@ -16,7 +16,7 @@
             "request": "launch",
             "mainClass": "nl.wilcokas.luckystackworker.LuckystackWorkerApplication",
             "projectName": "luckystackworker",
-            "args": ["-Dspring.profiles.active","mac"]
+            "vmArgs" : ["-Dspring.profiles.active=mac"],
         },
         {
             "type": "java",

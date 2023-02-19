@@ -30,7 +30,8 @@ public class WorkerService {
         final SaturationFilter saturationFilter = new SaturationFilter();
         final SavitzkyGolayFilter savitzkyGolayFilter = new SavitzkyGolayFilter();
         final SigmaFilterPlus sigmaFilterPlusFilter = new SigmaFilterPlus();
-        operationService = new OperationService(lswSharpenFilter, rgbBalanceFilter, saturationFilter, savitzkyGolayFilter, sigmaFilterPlusFilter);
+        operationService = new OperationService(lswSharpenFilter, rgbBalanceFilter, saturationFilter,
+                savitzkyGolayFilter, sigmaFilterPlusFilter);
     }
 
     public boolean processFile(final File file, boolean realtime) {
@@ -73,6 +74,7 @@ public class WorkerService {
     }
 
     private String getOutputFile(final File file) {
-        return Util.getFilename(file) + Constants.OUTPUT_POSTFIX + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
+        return Util.getPathWithoutExtension(file.getAbsolutePath()) + Constants.OUTPUT_POSTFIX + "."
+                + Constants.SUPPORTED_OUTPUT_FORMAT;
     }
 }

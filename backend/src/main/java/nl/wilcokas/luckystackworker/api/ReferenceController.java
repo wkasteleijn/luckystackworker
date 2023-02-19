@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -21,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.model.Profile;
-import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.util.Util;
 
@@ -32,10 +32,10 @@ import nl.wilcokas.luckystackworker.util.Util;
 public class ReferenceController {
 
     @Autowired
-    private ProfileRepository profileRepository;
-
-    @Autowired
     private ReferenceImageService referenceImageService;
+
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
 
     @GetMapping("/open")
     public Profile openReferenceImage(@RequestParam String path) throws IOException {
@@ -45,12 +45,23 @@ public class ReferenceController {
 
     @GetMapping("/rootfolder")
     public Profile selectRootFolder() {
+        String inputFolder = LuckyStackWorkerContext.getWorkerProperties().get("inputFolder");
         JFrame frame = referenceImageService.getParentFrame();
         JFileChooser jfc = referenceImageService
-                .getJFileChooser(LuckyStackWorkerContext.getWorkerProperties().get("inputFolder"));
+                .getJFileChooser(inputFolder);
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        if (Constants.SYSTEM_PROFILE_MAC.equals(activeProfile)) {
+            // Workaround for issue on macs, somehow needs to wait some milliseconds for the
+            // frame to be initialized.
+            try {
+                Thread.currentThread().sleep(500);
+            } catch (InterruptedException e) {
+                log.warn("Thread waiting for folder chooser got interrupted: {}", e.getMessage());
+            }
+        }
         int returnValue = jfc.showOpenDialog(frame);
         frame.dispose();
+
         Profile profile = new Profile();
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFolder = jfc.getSelectedFile();
