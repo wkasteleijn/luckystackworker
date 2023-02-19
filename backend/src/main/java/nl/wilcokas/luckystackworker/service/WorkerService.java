@@ -14,11 +14,11 @@ import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
 import nl.wilcokas.luckystackworker.filter.RGBBalanceFilter;
 import nl.wilcokas.luckystackworker.filter.SaturationFilter;
 import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter;
+import nl.wilcokas.luckystackworker.filter.SigmaFilterPlus;
 import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
 public class WorkerService {
-
 
     private Map<String, String> properties;
     private final OperationService operationService;
@@ -29,7 +29,8 @@ public class WorkerService {
         final RGBBalanceFilter rgbBalanceFilter = new RGBBalanceFilter();
         final SaturationFilter saturationFilter = new SaturationFilter();
         final SavitzkyGolayFilter savitzkyGolayFilter = new SavitzkyGolayFilter();
-        operationService = new OperationService(lswSharpenFilter, rgbBalanceFilter, saturationFilter, savitzkyGolayFilter);
+        final SigmaFilterPlus sigmaFilterPlusFilter = new SigmaFilterPlus();
+        operationService = new OperationService(lswSharpenFilter, rgbBalanceFilter, saturationFilter, savitzkyGolayFilter, sigmaFilterPlusFilter);
     }
 
     public boolean processFile(final File file, boolean realtime) {

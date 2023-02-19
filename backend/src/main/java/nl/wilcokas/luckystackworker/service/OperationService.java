@@ -10,16 +10,17 @@ import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.springframework.stereotype.Service;
 
-import ij.IJ;
 import ij.ImagePlus;
 import ij.WindowManager;
 import ij.macro.Interpreter;
 import ij.process.ImageProcessor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
 import nl.wilcokas.luckystackworker.filter.RGBBalanceFilter;
 import nl.wilcokas.luckystackworker.filter.SaturationFilter;
 import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter;
+import nl.wilcokas.luckystackworker.filter.SigmaFilterPlus;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenParameters;
 import nl.wilcokas.luckystackworker.filter.settings.SavitzkyGolayRadius;
@@ -29,6 +30,7 @@ import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class OperationService {
     private static final String HISTOGRAM_STRETCH_MACRO = Util
@@ -38,14 +40,7 @@ public class OperationService {
     private final RGBBalanceFilter rgbBalanceFilter;
     private final SaturationFilter saturationFilter;
     private final SavitzkyGolayFilter savitzkyGolayFilter;
-
-    public OperationService(final LSWSharpenFilter lswSharpenFilter, final RGBBalanceFilter rgbBalanceFilter,
-            final SaturationFilter saturationFilter, final SavitzkyGolayFilter savitzkyGolayFilter) {
-        this.lswSharpenFilter = lswSharpenFilter;
-        this.rgbBalanceFilter = rgbBalanceFilter;
-        this.saturationFilter = saturationFilter;
-        this.savitzkyGolayFilter = savitzkyGolayFilter;
-    }
+    private final SigmaFilterPlus sigmaFilterPlusFilter;
 
     public void correctExposure(ImagePlus image) throws IOException {
         image.setDefault16bitRange(16);
@@ -141,11 +136,9 @@ public class OperationService {
             BigDecimal factor = profile.getDenoise().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100)
                     : profile.getDenoise();
             BigDecimal minimum = factor.divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
-            String parameters = String.format("radius=%s use=%s minimum=%s outlier", profile.getDenoiseRadius(),
-                    profile.getDenoiseSigma(),
-                    minimum);
             for (int i = 0; i < iterations; i++) {
-                IJ.run(image, "SigmaFilterPlus...", parameters);
+                sigmaFilterPlusFilter.apply(image, profile.getDenoiseRadius().doubleValue(), profile.getDenoiseSigma().doubleValue(),
+                        minimum.doubleValue());
             }
         }
     }
