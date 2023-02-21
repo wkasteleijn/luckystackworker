@@ -8,3 +8,4 @@ frontend/dist
 frontend/LuckyStackWorker-win32-x64
 frontend/LuckyStackWorker-win32-x64.zip
 frontend/jre/
+.DS_Store

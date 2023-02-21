@@ -71,7 +71,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private ProfileService profileService;
     private OperationService operationService;
 
-    public ReferenceImageService(SettingsRepository settingsRepository, HttpService httpService, ProfileService profileService,
+    public ReferenceImageService(SettingsRepository settingsRepository, HttpService httpService,
+            ProfileService profileService,
             OperationService operationService) {
         this.settingsRepository = settingsRepository;
         this.httpService = httpService;
@@ -123,9 +124,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         if (previousOperation == null || previousOperation != operation) {
             Util.copyInto(referenceImage, processedImage, finalResultImage.getRoi(), profile, false);
             if (operationService.isSharpenOperation(operation)) {
-                operationService.applyAllOperationsExcept(processedImage, profile, operation, OperationEnum.DENOISEAMOUNT,
+                operationService.applyAllOperationsExcept(processedImage, profile, operation,
+                        OperationEnum.DENOISEAMOUNT,
                         OperationEnum.DENOISERADIUS, OperationEnum.DENOISESIGMA, OperationEnum.DENOISEITERATIONS,
-                        OperationEnum.SAVITZKYGOLAYAMOUNT, OperationEnum.SAVITZKYGOLAYITERATIONS, OperationEnum.SAVITZKYGOLAYSIZE);
+                        OperationEnum.SAVITZKYGOLAYAMOUNT, OperationEnum.SAVITZKYGOLAYITERATIONS,
+                        OperationEnum.SAVITZKYGOLAYSIZE);
             } else {
                 operationService.applyAllOperationsExcept(processedImage, profile, operation);
             }
@@ -160,13 +163,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void saveReferenceImage(String path) throws IOException {
-        String dir = Util.getFileDirectory(filePath);
-        log.info("Saving image to folder {}", dir);
-        String fileNameNoExt = Util.getFilename(path);
-        String finalPath = fileNameNoExt + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
-        Util.saveImage(finalResultImage, finalPath, Util.isPngRgbStack(finalResultImage, filePath), roiActive);
-        log.info("Saved file to {}", finalPath);
-        writeProfile(fileNameNoExt);
+        String pathNoExt = Util.getPathWithoutExtension(path);
+        String savePath = pathNoExt + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
+        log.info("Saving image to  {}", savePath);
+        Util.saveImage(finalResultImage, savePath,
+                Util.isPngRgbStack(finalResultImage, filePath), roiActive);
+        writeProfile(pathNoExt);
     }
 
     public MyFileChooser getJFileChooser(String path) {
@@ -233,18 +235,18 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void writeProfile() throws IOException {
-        String fileNameNoExt = Util.getFilename(filePath);
+        String fileNameNoExt = Util.getPathWithoutExtension(filePath);
         writeProfile(fileNameNoExt);
     }
 
-    public void writeProfile(String fileNameNoExt) throws IOException {
+    public void writeProfile(String pathNoExt) throws IOException {
         String profileName = LuckyStackWorkerContext.getSelectedProfile();
         if (profileName != null) {
             Profile profile = profileService.findByName(profileName)
                     .orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
-            Util.writeProfile(profile, fileNameNoExt);
+            Util.writeProfile(profile, pathNoExt);
         } else {
-            log.warn("Profile not saved, could not find the selected profile for file {}", fileNameNoExt);
+            log.warn("Profile not saved, could not find the selected profile for file {}", pathNoExt);
         }
     }
 
@@ -455,7 +457,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             referenceImage.show();
             referenceImage.getWindow().setVisible(false);
             log.info("Opened reference image image with id {}", referenceImage.getID());
-
 
             if (profile != null) {
                 updateProcessing(profile);

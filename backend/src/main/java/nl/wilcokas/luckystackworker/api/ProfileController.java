@@ -40,6 +40,7 @@ import nl.wilcokas.luckystackworker.util.Util;
 @Slf4j
 public class ProfileController {
 
+
     @Autowired
     private ProfileRepository profileRepository;
 

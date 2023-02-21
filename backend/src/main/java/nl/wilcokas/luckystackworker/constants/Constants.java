@@ -24,5 +24,7 @@ public class Constants {
     public static final int UNSIGNED_INT_SIZE = 65536;
     public static final int MAX_INT_VALUE = 65535;
     public static final int MAX_OPERATION_TIME_BEFORE_RESUMING = 5; // seconds
+    public static final String SYSTEM_PROFILE_WINDOWS = "win";
+    public static final String SYSTEM_PROFILE_MAC = "mac";
 
 }

@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.constants.Constants;
 
 @Slf4j
 @SpringBootApplication
@@ -17,13 +18,16 @@ public class LuckystackWorkerApplication {
 		log.info("Java home is {}", System.getProperty("java.home"));
 		log.info("Java vendor is {}", System.getProperty("java.vendor"));
 		log.info("Java version is {}", System.getProperty("java.version"));
-		log.info("Active profile is {}", System.getProperty("spring.profiles.active"));
+		String profile = System.getProperty("spring.profiles.active");
+		log.info("Active profile is {}", profile);
 
-		log.info("Starting electron GUI");
-		try {
-			Runtime.getRuntime().exec(".\\lsw_gui.exe");
-		} catch (IOException e) {
-			log.error("Failed to start GUI! ", e);
+		if (Constants.SYSTEM_PROFILE_WINDOWS.equals(profile)) {
+			log.info("Starting electron GUI");
+			try {
+				Runtime.getRuntime().exec(".\\lsw_gui.exe");
+			} catch (IOException e) {
+				log.error("Failed to start GUI! ", e);
+			}
 		}
 
 		SpringApplication.run(LuckystackWorkerApplication.class, args);
