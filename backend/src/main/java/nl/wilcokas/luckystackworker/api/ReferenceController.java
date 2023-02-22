@@ -3,6 +3,7 @@ package nl.wilcokas.luckystackworker.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Optional;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -46,23 +47,26 @@ public class ReferenceController {
     @GetMapping("/rootfolder")
     public Profile selectRootFolder() {
         JFrame frame = referenceImageService.getParentFrame();
+        String rootFolder = LuckyStackWorkerContext.getWorkerProperties().get("inputFolder");
         JFileChooser jfc = referenceImageService
-                .getJFileChooser(LuckyStackWorkerContext.getWorkerProperties().get("inputFolder"));
+                .getJFileChooser(rootFolder);
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int returnValue = jfc.showOpenDialog(frame);
         frame.dispose();
         Profile profile = new Profile();
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFolder = jfc.getSelectedFile();
-            String rootFolder = selectedFolder.getAbsolutePath();
+            rootFolder = selectedFolder.getAbsolutePath();
             log.info("RootFolder selected {} ", rootFolder);
             referenceImageService.updateSettings(rootFolder, profile);
+        } else {
+            profile.setRootFolder(rootFolder);
         }
         return profile;
     }
 
     @PutMapping("/save")
-    public void saveReferenceImage(@RequestBody String path) throws IOException {
+    public void saveReferenceImage(@RequestBody Optional<String> path) throws IOException {
         JFrame frame = referenceImageService.getParentFrame();
         // Ignoring path received from frontend as it isn't used.
         String realPath = LuckyStackWorkerContext.getWorkerProperties().get("inputFolder");
