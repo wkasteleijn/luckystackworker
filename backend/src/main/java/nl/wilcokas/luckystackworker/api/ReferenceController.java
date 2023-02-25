@@ -10,7 +10,6 @@ import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,9 +34,6 @@ public class ReferenceController {
     @Autowired
     private ReferenceImageService referenceImageService;
 
-    @Value("${spring.profiles.active}")
-    private String activeProfile;
-
     @GetMapping("/open")
     public Profile openReferenceImage(@RequestParam String path) throws IOException {
         final String base64DecodedPath = new String(Base64.getDecoder().decode(path));
@@ -51,18 +47,7 @@ public class ReferenceController {
         JFileChooser jfc = referenceImageService
                 .getJFileChooser(rootFolder);
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        if (Constants.SYSTEM_PROFILE_MAC.equals(activeProfile)) {
-            // Workaround for issue on macs, somehow needs to wait some milliseconds for the
-            // frame to be initialized.
-            try {
-                Thread.currentThread().sleep(500);
-            } catch (InterruptedException e) {
-                log.warn("Thread waiting for folder chooser got interrupted: {}", e.getMessage());
-            }
-        }
-        int returnValue = jfc.showOpenDialog(frame);
-        frame.dispose();
-
+        int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, false);
         Profile profile = new Profile();
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFolder = jfc.getSelectedFile();
@@ -85,7 +70,7 @@ public class ReferenceController {
         String fileNameNoExt = Util.getFilename(referenceImageService.getFilePath());
         jfc.setSelectedFile(
                 new File(fileNameNoExt + Constants.OUTPUT_POSTFIX + "." + Constants.SUPPORTED_OUTPUT_FORMAT));
-        int returnValue = jfc.showDialog(frame, "Save reference image");
+        int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, "Save reference image", true);
         frame.dispose();
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();

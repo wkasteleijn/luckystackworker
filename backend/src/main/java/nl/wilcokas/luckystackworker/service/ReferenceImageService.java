@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Taskbar;
 import java.awt.Window;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -24,6 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.velocity.exception.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import ij.IJ;
@@ -46,6 +48,9 @@ import nl.wilcokas.luckystackworker.util.Util;
 @Slf4j
 @Service
 public class ReferenceImageService implements RoiListener, WindowListener, ComponentListener {
+
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
 
     private ImagePlus referenceImage;
     private ImagePlus processedImage;
@@ -86,8 +91,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         JFileChooser jfc = getJFileChooser(filePath);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "png");
         jfc.setFileFilter(filter);
-        int returnValue = jfc.showOpenDialog(frame);
-        frame.dispose();
+        int returnValue = getFilenameFromDialog(frame, jfc, false);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
             String selectedFilePath = selectedFile.getAbsolutePath();
@@ -273,6 +277,32 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return Version.builder().latestVersion(latestKnowVersion).isNewVersion(false).build();
     }
 
+    public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, boolean isSaveDialog) {
+        return getFilenameFromDialog(frame, jfc, null, isSaveDialog);
+    }
+
+    public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, String title, boolean isSaveDialog) {
+        if (Constants.SYSTEM_PROFILE_MAC.equals(activeProfile)) {
+            // Workaround for issue on macs, somehow needs to wait some milliseconds for the
+            // frame to be initialized.
+            try {
+                Thread.currentThread().sleep(500);
+            } catch (InterruptedException e) {
+                log.warn("Thread waiting for folder chooser got interrupted: {}", e.getMessage());
+            }
+        }
+        int returnValue = 0;
+        if (isSaveDialog) {
+            returnValue = jfc.showSaveDialog(frame);
+        } else if (title != null) {
+            returnValue = jfc.showDialog(frame, title);
+        } else {
+            returnValue = jfc.showOpenDialog(frame);
+        }
+        frame.dispose();
+        return returnValue;
+    }
+
     @Override
     public void roiModified(ImagePlus imp, int id) {
         updateRoiText();
@@ -431,7 +461,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             finalResultImage.hide();
         }
         finalResultImage = new Opener().openImage(Util.getIJFileFormat(this.filePath));
-        if (!Util.validateImageFormat(finalResultImage, getParentFrame())) {
+        if (!Util.validateImageFormat(finalResultImage, getParentFrame(), activeProfile)) {
             return false;
         }
         boolean isLargeImage = false;
@@ -472,6 +502,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         image.setBorderColor(Color.BLACK);
         ImageWindow window = image.getWindow();
         window.setIconImage(iconImage);
+        if (Constants.SYSTEM_PROFILE_MAC.equals(activeProfile)) {
+            Taskbar.getTaskbar().setIconImage(iconImage);
+        }
         if (location != null) {
             window.setLocation(location);
         }

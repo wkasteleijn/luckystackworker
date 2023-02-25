@@ -397,7 +397,7 @@ public class Util {
         return new float[] { red, green, blue };
     }
 
-    public static boolean validateImageFormat(ImagePlus image, JFrame parentFrame) {
+    public static boolean validateImageFormat(ImagePlus image, JFrame parentFrame, String activeProfile) {
         String message = "This file format is not supported. %nYou can only open 16-bit RGB and grayscale PNG and TIFF images.";
         boolean is16Bit = false;
         if (image != null) {
@@ -412,6 +412,15 @@ public class Util {
         if (!is16Bit) {
             log.warn("Attempt to open a non 16-bit image");
             if (parentFrame != null) {
+                if (Constants.SYSTEM_PROFILE_MAC.equals(activeProfile)) {
+                    // Workaround for issue on macs, somehow needs to wait some milliseconds for the
+                    // frame to be initialized.
+                    try {
+                        Thread.currentThread().sleep(500);
+                    } catch (InterruptedException e) {
+                        log.warn("Thread waiting for folder chooser got interrupted: {}", e.getMessage());
+                    }
+                }
                 JOptionPane.showMessageDialog(parentFrame, String.format(message));
             }
             return false;
