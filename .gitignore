@@ -8,4 +8,5 @@ frontend/dist
 frontend/LuckyStackWorker-win32-x64
 frontend/LuckyStackWorker-win32-x64.zip
 frontend/jre/
+frontend/lsw-gui-darwin-x64
 .DS_Store
