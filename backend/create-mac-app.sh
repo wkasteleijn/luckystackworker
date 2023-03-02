@@ -4,3 +4,4 @@ cd luckystackworker.app/Contents/MacOS
 rm -rf JavaAppLauncher
 cp ~/Applications/universalJavaApplicationStub-custom-src JavaAppLauncher
 cp -r ~/git/luckystackworker/frontend/lsw-gui-darwin-x64/lsw-gui.app .
+cp -f ~/.lsw/lsw_db.mv.db ../Resources

@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -426,6 +428,20 @@ public class Util {
             return false;
         }
         return true;
+    }
+
+    public static String getLswVersion() {
+        InputStream is = Util.class.getResourceAsStream("/META-INF/manifest.mf");
+        if (is == null) {
+            return null;
+        }
+        try {
+            return (String) new Manifest(is)
+                    .getMainAttributes()
+                    .get(Attributes.Name.IMPLEMENTATION_VERSION);
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     private static String getSetting(Map<String, String> props, String setting, String name) {
