@@ -29,10 +29,12 @@ public class LuckystackWorkerApplication {
 			Runtime.getRuntime().exec(".\\lsw_gui.exe");
 		}
 
+		log.info("Determining database version and replace it if needed..");
 		String lswVersion = Util.getLswVersion();
 		if (lswVersion != null) {
 			log.info("Current app version is {}", lswVersion);
 			String dataFolder = getDataFolder(profile);
+			createDataFolderWhenMissing(dataFolder);
 			DataInfo dataInfo = getDataInfo(dataFolder);
 			if (dataInfo != null) {
 				if (!dataInfo.getVersion().equals(lswVersion)) {
@@ -66,11 +68,19 @@ public class LuckystackWorkerApplication {
 		return dataInfo;
 	}
 
+	private static void createDataFolderWhenMissing(String dataFolder) throws IOException {
+		Path path = Paths.get(dataFolder);
+		if (!Files.exists(path)) {
+			log.info("Creating data folder {}", dataFolder);
+			Files.createDirectories(path);
+		}
+	}
+
 	private static String getDataFolder(String profile) {
 		String dataFolder = System.getProperty("user.home");
-		if (Constants.SYSTEM_PROFILE_WINDOWS.equals(profile)) {
+		if (Constants.SYSTEM_PROFILE_MAC.equals(profile)) {
 			dataFolder += "/.lsw";
-		} else if (Constants.SYSTEM_PROFILE_MAC.equals(profile)) {
+		} else if (Constants.SYSTEM_PROFILE_WINDOWS.equals(profile)) {
 			dataFolder += "/AppData/Local/LuckyStackWorker";
 		}
 		return dataFolder;
@@ -78,19 +88,25 @@ public class LuckystackWorkerApplication {
 
 	private static void writeDataInfoFile(String lswVersion, String dataFolder) throws IOException {
 		DataInfo dataInfo;
-		dataInfo = DataInfo.builder().version(lswVersion).installationDate(LocalDate.now())
+		dataInfo = DataInfo.builder().version(lswVersion).instalationDate(LocalDate.now().toString())
 				.build();
 		String dataInfoStr = new Yaml().dump(dataInfo);
 		Files.writeString(Paths.get(dataFolder + "/data-info.yml"), dataInfoStr);
 	}
 
 	private static void copyDbFile(String profile, String dataFolder) throws IOException {
-		String resourceFolder = System.getProperty("user.dir");
-		if (Constants.SYSTEM_PROFILE_MAC.equals(profile)) {
-			resourceFolder += "/Contents/Resources";
-		}
-		Path dbFile = Paths.get(resourceFolder + "/lsw_db.mv.db");
-		Files.copy(dbFile, Paths.get(dataFolder), StandardCopyOption.REPLACE_EXISTING);
+		String resourceFolder = getResourceFolder(profile);
+		String lswDbFile = "/lsw_db.mv.db";
+		Path dbFile = Paths.get(resourceFolder + lswDbFile);
+		Files.copy(dbFile, Paths.get(dataFolder + lswDbFile), StandardCopyOption.REPLACE_EXISTING);
 		log.info("Writing new data info file");
+	}
+
+	private static String getResourceFolder(String profile) {
+		String resourceFolder = System.getProperty("user.dir");
+		if (Constants.SYSTEM_PROFILE_MAC.equals(profile) && !"true".equals(System.getProperty("dev.mode"))) {
+			resourceFolder += "/Resources";
+		}
+		return resourceFolder;
 	}
 }

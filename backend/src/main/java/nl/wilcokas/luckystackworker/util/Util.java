@@ -11,8 +11,6 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -431,17 +429,19 @@ public class Util {
     }
 
     public static String getLswVersion() {
-        InputStream is = Util.class.getResourceAsStream("/META-INF/manifest.mf");
-        if (is == null) {
-            return null;
-        }
-        try {
-            return (String) new Manifest(is)
-                    .getMainAttributes()
-                    .get(Attributes.Name.IMPLEMENTATION_VERSION);
-        } catch (IOException e) {
-            return null;
-        }
+        return System.getProperty("lsw.version");
+        // URLClassLoader classloader = (URLClassLoader) Util.class.getClassLoader();
+        // URL url = classloader.findResource("/META-INF/MANIFEST.MF");
+        // try {
+        // Manifest manifest = new Manifest(url.openStream());
+        // return (String) manifest
+        // .getMainAttributes()
+        // .get(Attributes.Name.IMPLEMENTATION_VERSION);
+        // } catch (IOException e) {
+        // log.warn("App version could not be determined due to missing
+        // implementation-version in manifest file!");
+        // return null;
+        // }
     }
 
     private static String getSetting(Map<String, String> props, String setting, String name) {

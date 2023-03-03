@@ -3,6 +3,10 @@ package nl.wilcokas.luckystackworker.constants;
 import java.math.BigDecimal;
 
 public class Constants {
+
+    private Constants() {
+    }
+
     public static final String OUTPUT_POSTFIX = "_LSW";
     public static final String STATUS_IDLE = "Idle";
     public static final String STATUS_WORKING = "Working";
