@@ -30,7 +30,8 @@ public class WorkerService {
         final SaturationFilter saturationFilter = new SaturationFilter();
         final SavitzkyGolayFilter savitzkyGolayFilter = new SavitzkyGolayFilter();
         final SigmaFilterPlus sigmaFilterPlusFilter = new SigmaFilterPlus();
-        operationService = new OperationService(lswSharpenFilter, rgbBalanceFilter, saturationFilter, savitzkyGolayFilter, sigmaFilterPlusFilter);
+        operationService = new OperationService(lswSharpenFilter, rgbBalanceFilter, saturationFilter,
+                savitzkyGolayFilter, sigmaFilterPlusFilter);
     }
 
     public boolean processFile(final File file, boolean realtime) {
@@ -50,7 +51,7 @@ public class WorkerService {
                 }
 
                 ImagePlus imp = new Opener().openImage(filePath);
-                if (Util.validateImageFormat(imp, null)) {
+                if (Util.validateImageFormat(imp, null, null)) {
                     if (Util.isPngRgbStack(imp, filePath)) {
                         imp = Util.fixNonTiffOpeningSettings(imp);
                     }

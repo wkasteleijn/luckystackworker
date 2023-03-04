@@ -40,7 +40,6 @@ import nl.wilcokas.luckystackworker.util.Util;
 @Slf4j
 public class ProfileController {
 
-
     @Autowired
     private ProfileRepository profileRepository;
 
@@ -77,9 +76,8 @@ public class ProfileController {
     @GetMapping("/{profile}")
     public Profile getProfile(@PathVariable(value = "profile") String profileName) {
         log.info("getProfile called with profile {}", profileName);
-        Profile profile = profileRepository.findByName(profileName)
+        return profileRepository.findByName(profileName)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
-        return profile;
     }
 
     @GetMapping("/load")
@@ -90,13 +88,12 @@ public class ProfileController {
                 .getJFileChooser(LuckyStackWorkerContext.getWorkerProperties().get("inputFolder"));
         FileNameExtensionFilter filter = new FileNameExtensionFilter("YAML", "yaml");
         jfc.setFileFilter(filter);
-        int returnValue = jfc.showOpenDialog(frame);
-        frame.dispose();
+        int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, false);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
             String selectedFilePath = selectedFile.getAbsolutePath();
-            String fileNameNoExt = Util.getFilename(selectedFilePath);
-            Profile profile = Util.readProfile(fileNameNoExt);
+            String filePathNoExt = Util.getPathWithoutExtension(selectedFilePath);
+            Profile profile = Util.readProfile(filePathNoExt);
             if (profile != null) {
                 profile.setLargeImage(referenceImageService.isLargeImage());
                 updateProfile(profile);
@@ -113,7 +110,8 @@ public class ProfileController {
         // or pressed very quickly.
         LocalDateTime activeOperationTime = LuckyStackWorkerContext.getActiveOperationTime();
         if (activeOperationTime == null
-                || LocalDateTime.now().isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
+                || LocalDateTime.now()
+                        .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
             LuckyStackWorkerContext.setActiveOperationTime(LocalDateTime.now());
             profileService.updateProfile(profile);
             referenceImageService.updateProcessing(profile);

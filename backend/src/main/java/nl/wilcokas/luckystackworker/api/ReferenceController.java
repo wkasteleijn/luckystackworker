@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.model.Profile;
-import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.util.Util;
 
@@ -31,9 +30,6 @@ import nl.wilcokas.luckystackworker.util.Util;
 @RequestMapping("/api/reference")
 @Slf4j
 public class ReferenceController {
-
-    @Autowired
-    private ProfileRepository profileRepository;
 
     @Autowired
     private ReferenceImageService referenceImageService;
@@ -51,8 +47,7 @@ public class ReferenceController {
         JFileChooser jfc = referenceImageService
                 .getJFileChooser(rootFolder);
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int returnValue = jfc.showOpenDialog(frame);
-        frame.dispose();
+        int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, false);
         Profile profile = new Profile();
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFolder = jfc.getSelectedFile();
@@ -75,7 +70,7 @@ public class ReferenceController {
         String fileNameNoExt = Util.getFilename(referenceImageService.getFilePath());
         jfc.setSelectedFile(
                 new File(fileNameNoExt + Constants.OUTPUT_POSTFIX + "." + Constants.SUPPORTED_OUTPUT_FORMAT));
-        int returnValue = jfc.showDialog(frame, "Save reference image");
+        int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, "Save reference image", true);
         frame.dispose();
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();

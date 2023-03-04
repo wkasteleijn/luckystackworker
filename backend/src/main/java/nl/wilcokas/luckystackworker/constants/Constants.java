@@ -3,6 +3,10 @@ package nl.wilcokas.luckystackworker.constants;
 import java.math.BigDecimal;
 
 public class Constants {
+
+    private Constants() {
+    }
+
     public static final String OUTPUT_POSTFIX = "_LSW";
     public static final String STATUS_IDLE = "Idle";
     public static final String STATUS_WORKING = "Working";
@@ -24,5 +28,7 @@ public class Constants {
     public static final int UNSIGNED_INT_SIZE = 65536;
     public static final int MAX_INT_VALUE = 65535;
     public static final int MAX_OPERATION_TIME_BEFORE_RESUMING = 5; // seconds
+    public static final String SYSTEM_PROFILE_WINDOWS = "win";
+    public static final String SYSTEM_PROFILE_MAC = "mac";
 
 }
