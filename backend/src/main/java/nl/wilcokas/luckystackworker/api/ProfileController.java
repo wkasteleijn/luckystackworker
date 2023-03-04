@@ -111,7 +111,7 @@ public class ProfileController {
         LocalDateTime activeOperationTime = LuckyStackWorkerContext.getActiveOperationTime();
         if (activeOperationTime == null
                 || LocalDateTime.now()
-                        .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
+                .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
             LuckyStackWorkerContext.setActiveOperationTime(LocalDateTime.now());
             profileService.updateProfile(profile);
             referenceImageService.updateProcessing(profile);

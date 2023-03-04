@@ -1,6 +1,7 @@
 const { app, BrowserWindow } = require("electron");
 const url = require("url");
 const path = require("path");
+const XMLHttpRequest = require("xhr2");
 
 let mainWindow;
 
@@ -14,8 +15,10 @@ function createWindow() {
     y: 64,
   });
   mainWindow.removeMenu();
-  app.dock.hide();
-  mainWindow.setSkipTaskbar(true);
+  if (process.platform === "darwin") {
+    app.dock.hide();
+    mainWindow.setSkipTaskbar(true);
+  }
 
   mainWindow.loadURL(
     url.format({
@@ -24,12 +27,19 @@ function createWindow() {
       slashes: true,
     })
   );
+  mainWindow.on("closed", () => {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("PUT", "http://localhost:8080/api/profiles/exit");
+    xmlHttp.send(null);
+  });
 }
 
 app.on("ready", createWindow);
 
 app.on("window-all-closed", function () {
-  if (process.platform !== "darwin") app.quit();
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
 });
 
 app.on("activate", function () {
