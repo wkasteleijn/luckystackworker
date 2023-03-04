@@ -51,7 +51,7 @@ public class WorkerService {
                 }
 
                 ImagePlus imp = new Opener().openImage(filePath);
-                if (Util.validateImageFormat(imp, null)) {
+                if (Util.validateImageFormat(imp, null, null)) {
                     if (Util.isPngRgbStack(imp, filePath)) {
                         imp = Util.fixNonTiffOpeningSettings(imp);
                     }

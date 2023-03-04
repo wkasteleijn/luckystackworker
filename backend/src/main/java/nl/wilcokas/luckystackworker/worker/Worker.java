@@ -69,7 +69,7 @@ public class Worker extends Thread {
 
     private void applyProfile(String activeProfile) {
         log.info("Applying profile {}", activeProfile);
-        Collection<File> files = getImages();
+        Collection<File> files = getImages(true);
         LuckyStackWorkerContext.setTotalfilesCount(files.size());
         LuckyStackWorkerContext.setFilesProcessedCount(0);
         if (!processFiles(files)) {
@@ -81,14 +81,14 @@ public class Worker extends Thread {
         LuckyStackWorkerContext.setTotalfilesCount(0);
     }
 
-    private Collection<File> getImages() {
-        return FileUtils.listFiles(Paths.get(getInputFolder()).toFile(), getExtensions(), true);
+    private Collection<File> getImages(boolean recursive) {
+        return FileUtils.listFiles(Paths.get(getInputFolder()).toFile(), getExtensions(), recursive);
     }
 
     private void realtimeProcess() {
         log.debug("Checking if there is any file to process...");
         try {
-            Collection<File> files = getImages();
+            Collection<File> files = getImages(false);
             for (File file : files) {
                 String name = Util.getFilename(file);
                 String extension = Util.getFilenameExtension(file);

@@ -14,6 +14,8 @@ function createWindow() {
     y: 64,
   });
   mainWindow.removeMenu();
+  app.dock.hide();
+  mainWindow.setSkipTaskbar(true);
 
   mainWindow.loadURL(
     url.format({
