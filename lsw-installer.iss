@@ -38,7 +38,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "C:\Users\wkast\git\planetherapy\frontend\LuckyStackWorker-win32-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\wkast\git\planetherapy\frontend\LuckyStackWorker-win32-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\Users\wkast\git\planetherapy\frontend\LuckyStackWorker-win32-x64\lsw_db.mv.db"; DestDir: "{localappdata}\LuckyStackWorker"; Flags: ignoreversion comparetimestamp
+Source: "C:\Users\wkast\git\planetherapy\frontend\LuckyStackWorker-win32-x64\lsw_db.mv.db"; DestDir: "{localappdata}\LuckyStackWorker"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
