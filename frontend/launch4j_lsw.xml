@@ -3,7 +3,7 @@
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
   <jar>luckystackworker.jar</jar>
-  <outfile>C:\Users\wkast\git\planetherapy\frontend\LuckyStackWorker.exe</outfile>
+  <outfile>C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
@@ -13,7 +13,7 @@
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>C:\Users\wkast\git\planetherapy\frontend\lsw_icon.ico</icon>
+  <icon>C:\Users\wkast\git\luckystackworker\frontend\lsw_icon.ico</icon>
   <jre>
     <path>resources\app\jre</path>
     <bundledJre64Bit>true</bundledJre64Bit>
@@ -22,6 +22,7 @@
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
+    <opt>-Dspring.profiles.active=win</opt>
   </jre>
   <versionInfo>
     <fileVersion>1.0.0.0</fileVersion>

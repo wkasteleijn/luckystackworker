@@ -1,7 +1,11 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+04/03/2023 minor release 3.1.0:
+- First release of the mac version (both x64 and arm)
+- Fixed bugs in file opening (folders with dots were causing problems)
+- Fixed db file not overwritten when installing new version
 
-31/01/2023 major release 3.0.0:
+31/01/2023 major release 3.0.0-beta:
 - New options for sharpening (luminance only). Replaced sharpening algorithm with a faster custom build version.
 - New sliders for supressing the edge clipping effect on Mars & Venus
 - Revised denoise options, choice between Savitzky-Golay or Sigma filter. Replaced Sigma filter sigma slider with a choice between mode 1 or 2
