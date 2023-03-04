@@ -4,6 +4,7 @@ LuckyStackWorker - RELEASE NOTES
 - First release of the mac version (both x64 and arm)
 - Fixed bugs in file opening (folders with dots were causing problems)
 - Fixed db file not overwritten when installing new version
+- Fixed UI windown close icon not closing the backend of the app
 
 31/01/2023 major release 3.0.0-beta:
 - New options for sharpening (luminance only). Replaced sharpening algorithm with a faster custom build version.
