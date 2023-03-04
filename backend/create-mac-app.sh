@@ -1,12 +1,24 @@
+if [ "$#" -ne 2 ]; then
+  echo "Usage: $0 [lsw_version] [architecture] (x64 or arm64)"
+  exit 1
+fi
 
-# IMPORTANT!: UPDATE VERSION HERE FOR EVERY RELEASE!
-export LSW_VERSION=3.1.0
+if [ "$2" = "x64" ]; then
+    echo "Building the LSW for $2 architecture"
+    export JRE_HOME="/Library/Java/JavaVirtualMachines/temurin-17.jre/Contents/Home"
+fi
+
+if [ "$2" = "arm64" ]; then
+    echo "Building the LSW for $2 architecture"
+    export JRE_HOME="/Users/wkasteleijn/Applications/jdk-17.0.6+10-jre/Contents/Home"
+fi
 
 cd ~/git/luckystackworker/backend/target
-jar2app -r /Library/Java/JavaVirtualMachines/temurin-17.jre/Contents/Home -i ../../frontend/luckystackworker_icon.icns -n "LuckyStackWorker" \
-    --jvm-options="-Dspring.profiles.active=mac -Dlsw.version=${LSW_VERSION}" luckystackworker-${LSW_VERSION}.jar
+rm -rf LuckyStackWorker.app
+jar2app -r $JRE_HOME -i ../../frontend/luckystackworker_icon.icns -n "LuckyStackWorker" \
+    --jvm-options="-Dspring.profiles.active=mac -Dlsw.version=$1" luckystackworker-$1.jar
 cd luckystackworker.app/Contents/MacOS
 rm -rf JavaAppLauncher
 cp ~/Applications/universalJavaApplicationStub-custom-src JavaAppLauncher
-cp -r ~/git/luckystackworker/frontend/lsw-gui-darwin-x64/lsw-gui.app .
+cp -r ~/git/luckystackworker/frontend/lsw-gui-darwin-$2/lsw-gui.app .
 cp -f ~/.lsw/lsw_db.mv.db ../Resources
