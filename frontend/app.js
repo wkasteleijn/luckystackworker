@@ -1,7 +1,6 @@
 const { app, BrowserWindow } = require("electron");
 const url = require("url");
 const path = require("path");
-const XMLHttpRequest = require("xhr2");
 
 let mainWindow;
 
@@ -27,10 +26,13 @@ function createWindow() {
       slashes: true,
     })
   );
+
   mainWindow.on("closed", () => {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("PUT", "http://localhost:8080/api/profiles/exit");
-    xmlHttp.send(null);
+    fetch("http://localhost:8080/api/profiles/exit", {
+      method: "PUT",
+    }).catch((error) => {
+      console.error(error);
+    });
   });
 }
 

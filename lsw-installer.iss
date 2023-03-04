@@ -20,11 +20,11 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile=C:\Users\wkast\git\planetherapy\frontend\LuckyStackWorker-win32-x64\LICENSE_LSW.txt
+LicenseFile=C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\LICENSE_LSW.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 OutputBaseFilename=LuckyStackWorker-setup
-SetupIconFile=C:\Users\wkast\git\planetherapy\frontend\LuckyStackWorker-win32-x64\resources\app\lsw_icon.ico
+SetupIconFile=C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\resources\app\lsw_icon.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -36,9 +36,9 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\wkast\git\planetherapy\frontend\LuckyStackWorker-win32-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\wkast\git\planetherapy\frontend\LuckyStackWorker-win32-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\Users\wkast\git\planetherapy\frontend\LuckyStackWorker-win32-x64\lsw_db.mv.db"; DestDir: "{localappdata}\LuckyStackWorker"; Flags: ignoreversion
+Source: "C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\lsw_db.mv.db"; DestDir: "{localappdata}\LuckyStackWorker"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
