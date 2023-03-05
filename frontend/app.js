@@ -30,9 +30,7 @@ function createWindow() {
   mainWindow.on("closed", () => {
     fetch("http://localhost:8080/api/profiles/exit", {
       method: "PUT",
-    }).catch((error) => {
-      console.error(error);
-    });
+    }).catch((error) => {});
   });
 }
 
