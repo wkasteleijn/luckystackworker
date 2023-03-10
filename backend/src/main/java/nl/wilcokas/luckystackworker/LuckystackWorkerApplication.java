@@ -26,11 +26,11 @@ public class LuckystackWorkerApplication {
 		String profile = System.getProperty("spring.profiles.active");
 		if (Constants.SYSTEM_PROFILE_WINDOWS.equals(profile)) {
 			log.info("Starting electron GUI");
-	                try {
-	                        Runtime.getRuntime().exec(".\\lsw_gui.exe");
-	                } catch (IOException e) {
-	                        log.error("Failed to start GUI! ", e);
-	                }
+			try {
+				Runtime.getRuntime().exec(".\\lsw_gui.exe");
+			} catch (IOException e) {
+				log.error("Failed to start GUI! ", e);
+			}
 		}
 
 		log.info("Determining database version and replace it if needed..");

@@ -152,7 +152,9 @@ public class ProfileController {
     @PutMapping("/exit")
     public void exit() {
         log.info("Exit called, ending application");
-        referenceImageService.getFinalResultImage().hide();
+        if (referenceImageService.getFinalResultImage() != null) {
+            referenceImageService.getFinalResultImage().hide();
+        }
         System.exit(0);
     }
 }
