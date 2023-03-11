@@ -1,5 +1,12 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+11/03/2023 revision release 3.1.1:
+- Fixed broken 16-bit PNG file opening
+- Fixed issues on MacOS with window focus and minimizing
+- Fixed problem on MacOS when closing GUI the image window would not immediately close
+- Reduced size of MacOS binary
+- Fixed issue with crop size indicator showing when window is de-iconified
+
 04/03/2023 minor release 3.1.0:
 - First release of the mac version (both x64 and arm)
 - Fixed bugs in file opening (folders with dots were causing problems)
