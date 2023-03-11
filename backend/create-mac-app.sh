@@ -17,8 +17,8 @@ cd ~/git/luckystackworker/backend/target
 rm -rf LuckyStackWorker.app
 jar2app -r $JRE_HOME -i ../../frontend/luckystackworker_icon.icns -n "LuckyStackWorker" \
     --jvm-options="-Dspring.profiles.active=mac -Dlsw.version=$1" luckystackworker-$1.jar
-cd luckystackworker.app/Contents/MacOS
+cd LuckyStackWorker.app/Contents/MacOS
 rm -rf JavaAppLauncher
 cp ~/Applications/universalJavaApplicationStub-custom-src JavaAppLauncher
-cp -r ~/git/luckystackworker/frontend/lsw-gui-darwin-$2/lsw-gui.app .
+cp -Ra ~/git/luckystackworker/frontend/lsw-gui-darwin-$2/lsw-gui.app .
 cp -f ~/.lsw/lsw_db.mv.db ../Resources
