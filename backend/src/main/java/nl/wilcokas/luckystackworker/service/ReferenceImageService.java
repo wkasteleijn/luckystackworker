@@ -323,12 +323,16 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     @Override
     public void windowIconified(WindowEvent e) {
-        roiIndicatorFrame.setVisible(false);
+        if (roiActive) {
+            roiIndicatorFrame.setVisible(false);
+        }
     }
 
     @Override
     public void windowDeiconified(WindowEvent e) {
-        roiIndicatorFrame.setVisible(true);
+        if (roiActive) {
+            roiIndicatorFrame.setVisible(true);
+        }
     }
 
     @Override
@@ -366,7 +370,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         roiIndicatorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         roiIndicatorFrame.getContentPane().setBackground(Color.BLACK);
         roiIndicatorFrame.setUndecorated(true);
-        roiIndicatorFrame.setSize(64, 24);
+        roiIndicatorFrame.setSize(72, 24);
         roiIndicatorTextField = new JTextField();
         roiIndicatorTextField.setBackground(Color.BLACK);
         roiIndicatorTextField.setForeground(Color.LIGHT_GRAY);
