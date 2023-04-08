@@ -14,6 +14,7 @@ import ij.plugin.filter.GaussianBlur;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenParameters;
 import nl.wilcokas.luckystackworker.filter.settings.UnsharpMaskParameters;
 import nl.wilcokas.luckystackworker.util.Util;
@@ -38,8 +39,7 @@ public class LSWSharpenFilter {
                     ImageProcessor ipFinal = finalStack.getProcessor(finalLayer);
                     FloatProcessor fpFinal = ipFinal.toFloat(finalLayer, null);
                     fpFinal.snapshot();
-                    doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
-                            unsharpMaskParameters.getClippingRange(), fpFinal);
+                    doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), fpFinal);
                     ipFinal.setPixels(finalLayer, fpFinal);
                 });
             }
@@ -52,7 +52,7 @@ public class LSWSharpenFilter {
         }
     }
 
-    public void applyRGBModeAdaptive(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) {
+    public void applyRGBModeClippingPrevention(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) {
         ImageStack finalStack = image.getStack();
         ImageStack intialStack = finalStack.duplicate();
 
@@ -68,8 +68,7 @@ public class LSWSharpenFilter {
                     ImageProcessor ip = intialStack.getProcessor(finalLayer);
                     FloatProcessor fp = ip.toFloat(finalLayer, null);
                     fp.snapshot();
-                    doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
-                            unsharpMaskParameters.getClippingRange(), fp);
+                    doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), fp);
                     ip.setPixels(finalLayer, fp);
                 });
             }
@@ -95,7 +94,7 @@ public class LSWSharpenFilter {
                     ImageProcessor ipFinal = finalStack.getProcessor(finalLayer);
                     FloatProcessor fpFinal = ipFinal.toFloat(finalLayer, null);
                     fpFinal.snapshot();
-                    doUnsharpMaskAdaptive(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(),
+                    doUnsharpMaskClippingPrevention(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(),
                             unsharpMaskParameters.getClippingStrength(),
                             unsharpMaskParameters.getClippingRange(), fpInitial, fpFinal);
                     ipFinal.setPixels(finalLayer, fpFinal);
@@ -106,6 +105,53 @@ public class LSWSharpenFilter {
                 ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
             } catch (InterruptedException e) {
                 log.warn("LSWSharpenFilter thread execution was stopped: ", e);
+            }
+        }
+    }
+
+    public void applyRGBModeDeringing(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) {
+        ImageStack originalStack = image.getStack();
+        ImageStack maskStack = originalStack.duplicate();
+        int minValue = 65535;
+        int maxValue = 0;
+        double radius = unsharpMaskParameters.getDeringRadius();
+        for (int layer = 1; layer <= maskStack.size(); layer++) {
+            ImageProcessor ip = maskStack.getProcessor(layer);
+            short[] maskPixels = (short[]) ip.getPixels();
+            for (int position = 0; position < maskPixels.length; position++) {
+                int value = Util.convertToUnsignedInt(maskPixels[position]);
+                if (value > maxValue) {
+                    maxValue = value;
+                }
+                if (value < minValue) {
+                    minValue = value;
+                }
+            }
+            int average = (maxValue - minValue) / 4; // start cutting of from 0.25 times the average.
+            for (int position = 0; position < maskPixels.length; position++) {
+                int value = Util.convertToUnsignedInt(maskPixels[position]);
+                if (value < average) {
+                    maskPixels[position] = 0;
+                } else if (value > average) {
+                    maskPixels[position] = -1;
+                }
+            }
+            FloatProcessor fp = ip.toFloat(1, null);
+            GaussianBlur gb = new GaussianBlur();
+            gb.blurGaussian(fp, radius, radius, 0.01);
+            ip.setPixels(1, fp);
+        }
+
+        for (int i = 0; i < unsharpMaskParameters.getIterations(); i++) {
+
+            for (int slice = 1; slice <= originalStack.getSize(); slice++) {
+                ImageProcessor ip = originalStack.getProcessor(slice);
+                ImageProcessor ipMask = maskStack.getProcessor(slice);
+                FloatProcessor fp = ip.toFloat(slice, null);
+                fp.snapshot();
+                doUnsharpMaskDeringing(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(),
+                        unsharpMaskParameters.getDeringStrength(), fp, ipMask);
+                ip.setPixels(slice, fp);
             }
         }
     }
@@ -146,8 +192,7 @@ public class LSWSharpenFilter {
             }
             FloatProcessor fpLum = new FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum);
             fpLum.snapshot();
-            doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
-                    unsharpMaskParameters.getClippingRange(), fpLum);
+            doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), fpLum);
 
             for (int i = 0; i < pixelsRed.length; i++) {
                 float[] rgb = Util.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
@@ -162,7 +207,7 @@ public class LSWSharpenFilter {
         }
     }
 
-    public void applyLuminanceModeAdaptive(ImagePlus image, final LSWSharpenParameters parameters) {
+    public void applyLuminanceModeClippingPrevention(ImagePlus image, final LSWSharpenParameters parameters) {
         if (!parameters.isIncludeRed() && !parameters.isIncludeGreen() && !parameters.isIncludeBlue()) {
             log.error("Cannot have red, green and blue excluded");
             return;
@@ -201,8 +246,7 @@ public class LSWSharpenFilter {
             }
             fpLumInitial = new FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum);
             fpLumInitial.snapshot();
-            doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
-                    unsharpMaskParameters.getClippingRange(), fpLumInitial);
+            doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), fpLumInitial);
 
             for (int i = 0; i < pixelsRed.length; i++) {
                 float[] rgb = Util.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
@@ -244,7 +288,7 @@ public class LSWSharpenFilter {
             }
             FloatProcessor fpLum = new FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum);
             fpLum.snapshot();
-            doUnsharpMaskAdaptive(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
+            doUnsharpMaskClippingPrevention(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), unsharpMaskParameters.getClippingStrength(),
                     unsharpMaskParameters.getClippingRange(), fpLumInitial, fpLum);
 
             for (int i = 0; i < pixelsRed.length; i++) {
@@ -261,15 +305,14 @@ public class LSWSharpenFilter {
     }
 
     /*
-     * Unsharp mask algorithm that prevents edge clipping effect.
+     * Unsharp mask algorithm.
      * @param radius
      * @param amount
      * @param clippingStrength the factor of the clipping suppression, if set to 0 it means no clipping supression is being applied.
      * @param clippingRange represents the histogram % value from where the clipping has to be suppressed by holding off the amount.
      * @param fp
      */
-    private void doUnsharpMask(double radius, float amount, float clippingStrength, float clippingRange,
-            FloatProcessor fp) {
+    private void doUnsharpMask(double radius, float amount, FloatProcessor fp) {
         GaussianBlur gb = new GaussianBlur();
         gb.blurGaussian(fp, radius, radius, 0.01);
         float[] pixels = (float[]) fp.getPixels();
@@ -291,7 +334,7 @@ public class LSWSharpenFilter {
      * @param clippingRange represents the histogram % value from where the clipping has to be suppressed by holding off the amount.
      * @param fp
      */
-    private void doUnsharpMaskAdaptive(double radius, float amount, float clippingStrength, float clippingRange, FloatProcessor fpInitial,
+    private void doUnsharpMaskClippingPrevention(double radius, float amount, float clippingStrength, float clippingRange, FloatProcessor fpInitial,
             FloatProcessor fpFinal) {
         GaussianBlur gb = new GaussianBlur();
         gb.blurGaussian(fpFinal, radius, radius, 0.01);
@@ -305,6 +348,34 @@ public class LSWSharpenFilter {
                 int cutoffIndex = Math.round(((initialPixels[p] < 0f ? 0f : initialPixels[p]) / FLOAT_MAX_SATURATED_VALUE) * 100f);
                 float cutoffFactor = getCutoffFactor(cutoffIndex, clippingRange) * clippingStrength;
                 float amountNew = amount - (amount * (cutoffFactor / 100));
+                float pixelValueNew = getUnsharpMaskValue(snapshotPixels[p], pixels[p], amountNew);
+                pixels[p] = pixelValueNew;
+            }
+        }
+    }
+
+    /*
+     * Unsharp mask algorithm that prevents ring effects at sharp planet edges (Jupiter, Mars, Venus).
+     * @param radius
+     * @param amount
+     * @param deringStrength the factor of the deringing, if set to 0 it means no deringing is being applied.
+     * @param fp
+     * @param fpMask the processor layer that serves as a mask from where the sharpen amount cutoff factor is determined
+     */
+    private void doUnsharpMaskDeringing(double radius, float amount, float deringStrength, FloatProcessor fp,
+            ImageProcessor ipMask) {
+        GaussianBlur gb = new GaussianBlur();
+        gb.blurGaussian(fp, radius, radius, 0.01);
+        float[] pixels = (float[]) fp.getPixels();
+        short[] maskPixels = (short[]) ipMask.getPixels();
+        float[] snapshotPixels = (float[]) fp.getSnapshotPixels();
+        int width = fp.getWidth();
+        Rectangle roi = fp.getRoi();
+        for (int y = roi.y; y < roi.y + roi.height; y++) {
+            for (int x = roi.x, p = width * y + x; x < roi.x + roi.width; x++, p++) {
+                int maskValue = Util.convertToUnsignedInt(maskPixels[p]);
+                float cutoffFactor = (Constants.MAX_INT_VALUE - maskValue) / (Constants.MAX_INT_VALUE / 100);
+                float amountNew = amount - (amount * ((cutoffFactor / 100) * deringStrength));
                 float pixelValueNew = getUnsharpMaskValue(snapshotPixels[p], pixels[p], amountNew);
                 pixels[p] = pixelValueNew;
             }

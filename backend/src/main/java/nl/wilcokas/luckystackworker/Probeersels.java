@@ -6,7 +6,7 @@ import ij.ImagePlus;
 import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
-import nl.wilcokas.luckystackworker.util.Util;
+import nl.wilcokas.luckystackworker.filter.settings.UnsharpMaskParameters;
 
 @Slf4j
 public class Probeersels {
@@ -19,46 +19,45 @@ public class Probeersels {
 
         // IJ.run(image, "RGB Color", null);
         image.show();
-        //		int[] histogram = image.getProcessor().getHistogram();
-        //		int maxVal = 0;
-        //		for (int i = histogram.length - 1; i >= 0; i--) {
-        //			if (histogram[i] > 0) {
-        //				maxVal = i;
-        //				break;
-        //			}
-        //		}
-        //		int percentage = (maxVal * 100) / 65536;
-        //		System.out.println("maxVal = " + maxVal);
-        //		System.out.println("percentage = " + percentage);
+        // int[] histogram = image.getProcessor().getHistogram();
+        // int maxVal = 0;
+        // for (int i = histogram.length - 1; i >= 0; i--) {
+        // if (histogram[i] > 0) {
+        // maxVal = i;
+        // break;
+        // }
+        // }
+        // int percentage = (maxVal * 100) / 65536;
+        // System.out.println("maxVal = " + maxVal);
+        // System.out.println("percentage = " + percentage);
 
         // Zelf de zoom en xpos en ypos tov van origineel bijhouden: zoom :75, 100, 150,
         // 200, 300, 400, 600, ..
         // xpos: bij 200% zoom op 1024 grootte image: 1024-512/2 = 256
         // ypos : etc
-        //		int zoom = 100;
-        //		IJ.run("In [+]");
-        //		zoom += 50;
-        //		IJ.run("In [+]");
-        //		zoom += 50;
-        //		IJ.run("In [+]");
-        //		zoom += 100;
-        //		IJ.run("In [+]");
-        //		zoom += 100;
+        // int zoom = 100;
+        // IJ.run("In [+]");
+        // zoom += 50;
+        // IJ.run("In [+]");
+        // zoom += 50;
+        // IJ.run("In [+]");
+        // zoom += 100;
+        // IJ.run("In [+]");
+        // zoom += 100;
 
-        //		Thread.currentThread().sleep(2000);
-        //		int xpos = image.getRoi().size();
-        //		int ypos = image.getProcessor().getRoi().y;
-        //		int newXPos = xpos - 16;
-        //		int newYPos = ypos - 16;
+        // Thread.currentThread().sleep(2000);
+        // int xpos = image.getRoi().size();
+        // int ypos = image.getProcessor().getRoi().y;
+        // int newXPos = xpos - 16;
+        // int newYPos = ypos - 16;
         //
-        //		IJ.run("Set... ", "zoom=" + zoom + " x=" + newXPos + " y=" + newYPos);
+        // IJ.run("Set... ", "zoom=" + zoom + " x=" + newXPos + " y=" + newYPos);
         // IJ.run(image, "Unsharp Mask...", "radius=2.0 mask=0.97");
         // IJ.run(image, "SigmaFilterPlus...", "radius=2 use=2 minimum=1 outlier");
 
         // File suggestie bij save dialoog:
         // https://stackoverflow.com/questions/356671/how-do-i-set-a-suggested-file-name-using-jfilechooser-showsavedialog
         // jFileChooser.setSelectedFile(new File("fileToSave.txt"));
-
 
         // Thread.currentThread().sleep(5000);
 
@@ -67,53 +66,52 @@ public class Probeersels {
         // subtracted by 65536. So the highest possible value = -1, with the lowest
         // value being 0;
 
-        //		log.info("Start manipulation");
-        //		int maxHistogramVal = Util.getMaxHistogramPercentage(image);
-        //		double correctionFactor = Constants.DEFAULT_EXP_CORRECTION_FACTOR;
-        //		if (maxHistogramVal < 50) {
-        //			correctionFactor = 1.9;
-        //		} else if (maxHistogramVal > 70) {
-        //			correctionFactor = 1.25;
-        //		} else if (maxHistogramVal > 60) {
-        //			correctionFactor = 1.5;
-        //		}
-        //		log.debug("maxHistogramPercentage = " + maxHistogramVal);
-        //		for (int layer = 1; layer <= 3; layer++) {
-        //			ImageProcessor p = image.getStack().getProcessor(layer);
-        //			short[] pixels = (short[]) p.getPixels();
-        //			for (int i = 0; i < pixels.length; i++) {
-        //				int newValue = (int) ((pixels[i] < 0 ? 65536 + pixels[i] : pixels[i]) / correctionFactor);
-        //				if (newValue >= 0) {
-        //					pixels[i] = (short) (newValue > 32767 ? newValue - 65536 : newValue);
-        //				} else {
-        //					pixels[i] = 0;
-        //				}
-        //			}
-        //		}
-        //		image.updateAndDraw();
-        //		log.info("End manipulation");
-
+        // log.info("Start manipulation");
+        // int maxHistogramVal = Util.getMaxHistogramPercentage(image);
+        // double correctionFactor = Constants.DEFAULT_EXP_CORRECTION_FACTOR;
+        // if (maxHistogramVal < 50) {
+        // correctionFactor = 1.9;
+        // } else if (maxHistogramVal > 70) {
+        // correctionFactor = 1.25;
+        // } else if (maxHistogramVal > 60) {
+        // correctionFactor = 1.5;
+        // }
+        // log.debug("maxHistogramPercentage = " + maxHistogramVal);
+        // for (int layer = 1; layer <= 3; layer++) {
+        // ImageProcessor p = image.getStack().getProcessor(layer);
+        // short[] pixels = (short[]) p.getPixels();
+        // for (int i = 0; i < pixels.length; i++) {
+        // int newValue = (int) ((pixels[i] < 0 ? 65536 + pixels[i] : pixels[i]) /
+        // correctionFactor);
+        // if (newValue >= 0) {
+        // pixels[i] = (short) (newValue > 32767 ? newValue - 65536 : newValue);
+        // } else {
+        // pixels[i] = 0;
+        // }
+        // }
+        // }
+        // image.updateAndDraw();
+        // log.info("End manipulation");
 
         // Set exposure back to original value
         image.setDefault16bitRange(16);
         image.resetDisplayRange();
         image.updateAndDraw();
 
-        //		for (int layer = 1; layer <= 3; layer++) {
-        //			ImageProcessor p = image.getStack().getProcessor(layer);
-        //			// p.setHistogramRange(20000, 30000);
-        //			p.setThreshold(10000, 40000, ImageProcessor.OVER_UNDER_LUT);
-        //			// p.resetThreshold();
-        //		}
-        //		image.setSlice(0);
-        //		image.getProcessor().setMinAndMax(10000, 40000);
-        //		image.setSlice(1);
-        //		image.getProcessor().setMinAndMax(10000, 40000);
-        //		image.setSlice(2);
-        //		image.getProcessor().setMinAndMax(10000, 40000);
-        //		// image.resetDisplayRange();
-        //		image.updateAndDraw();
-
+        // for (int layer = 1; layer <= 3; layer++) {
+        // ImageProcessor p = image.getStack().getProcessor(layer);
+        // // p.setHistogramRange(20000, 30000);
+        // p.setThreshold(10000, 40000, ImageProcessor.OVER_UNDER_LUT);
+        // // p.resetThreshold();
+        // }
+        // image.setSlice(0);
+        // image.getProcessor().setMinAndMax(10000, 40000);
+        // image.setSlice(1);
+        // image.getProcessor().setMinAndMax(10000, 40000);
+        // image.setSlice(2);
+        // image.getProcessor().setMinAndMax(10000, 40000);
+        // // image.resetDisplayRange();
+        // image.updateAndDraw();
 
         // for (int layer = 1; layer <= 3; layer++) {
         // ImageProcessor p = image.getStack().getProcessor(layer);
@@ -123,61 +121,71 @@ public class Probeersels {
         // call("ij.ImagePlus.setDefault16bitRange", 16);
 
         // Histogram stretching
-        //		Pair<Integer, Integer> minHistogram = Util.getMinHistogram(image);
-        //		Pair<Integer, Integer> maxHistogram = Util.getMaxHistogram(image);
-        //		for (int layer = 1; layer <= 3; layer++) {
-        //			ImageProcessor p = image.getStack().getProcessor(layer);
-        //			image.setDisplayRange(minHistogram.getLeft(), maxHistogram.getLeft(), layer);
-        //		}
-        //		image.updateAndDraw();
-        //		log.info("End manipulation");
+        // Pair<Integer, Integer> minHistogram = Util.getMinHistogram(image);
+        // Pair<Integer, Integer> maxHistogram = Util.getMaxHistogram(image);
+        // for (int layer = 1; layer <= 3; layer++) {
+        // ImageProcessor p = image.getStack().getProcessor(layer);
+        // image.setDisplayRange(minHistogram.getLeft(), maxHistogram.getLeft(), layer);
+        // }
+        // image.updateAndDraw();
+        // log.info("End manipulation");
 
-        //		int averageHistogram = (maxHistogram.getLeft() + minHistogram.getLeft()) / 2;
-        //		double stretchFactor = 1.1;
-        //		for (int layer = 1; layer <= 3; layer++) {
-        //			ImageProcessor p = image.getStack().getProcessor(layer);
-        //			short[] pixels = (short[]) p.getPixels();
-        //			for (int i = 0; i < pixels.length; i++) {
-        //				int actualPixelValue = pixels[i] < 0 ? 65536 + pixels[i] : pixels[i];
-        //				int newValue = averageHistogram;
-        //				if (actualPixelValue > averageHistogram) {
-        //					newValue = (int) (actualPixelValue * stretchFactor);
-        //				} else if (actualPixelValue < averageHistogram) {
-        //					newValue = (int) (actualPixelValue / stretchFactor);
-        //				}
-        //				pixels[i] = (short) (newValue > 32767 ? newValue - 65536 : newValue);
-        //			}
-        //		}
-        //		image.updateAndDraw();
-
+        // int averageHistogram = (maxHistogram.getLeft() + minHistogram.getLeft()) / 2;
+        // double stretchFactor = 1.1;
+        // for (int layer = 1; layer <= 3; layer++) {
+        // ImageProcessor p = image.getStack().getProcessor(layer);
+        // short[] pixels = (short[]) p.getPixels();
+        // for (int i = 0; i < pixels.length; i++) {
+        // int actualPixelValue = pixels[i] < 0 ? 65536 + pixels[i] : pixels[i];
+        // int newValue = averageHistogram;
+        // if (actualPixelValue > averageHistogram) {
+        // newValue = (int) (actualPixelValue * stretchFactor);
+        // } else if (actualPixelValue < averageHistogram) {
+        // newValue = (int) (actualPixelValue / stretchFactor);
+        // }
+        // pixels[i] = (short) (newValue > 32767 ? newValue - 65536 : newValue);
+        // }
+        // }
+        // image.updateAndDraw();
 
         // Saturation
-        //		log.info("Start saturation");
-        //		String macro = Util.readFromInputStream(Operations.class.getResourceAsStream("/saturation.ijm"));
-        //		StringSubstitutor stringSubstitutor = new StringSubstitutor(Map.of("factor", 3.5));
-        //		String result = stringSubstitutor.replace(macro);
-        //		WindowManager.setTempCurrentImage(image);
-        //		new Interpreter().run(result);
+        // log.info("Start saturation");
+        // String macro =
+        // Util.readFromInputStream(Operations.class.getResourceAsStream("/saturation.ijm"));
+        // StringSubstitutor stringSubstitutor = new StringSubstitutor(Map.of("factor",
+        // 3.5));
+        // String result = stringSubstitutor.replace(macro);
+        // WindowManager.setTempCurrentImage(image);
+        // new Interpreter().run(result);
 
         // cropping
-        //		image.setRoi(128, 128, 640, 480);
-        //		ImagePlus crop = image.crop();
+        // image.setRoi(128, 128, 640, 480);
+        // ImagePlus crop = image.crop();
 
+        // SavitzkyGolayFilter savitzkyGolayFilter = new SavitzkyGolayFilter();
+        // for (int i = 0; i < 1; i++) {
+        // log.info("Starting filter");
+        // savitzkyGolayFilter.apply(image, SavitzkyGolayRadius.RADIUS_81, 100);
+        // log.info("Filter applied");
+        // }
 
-        //        SavitzkyGolayFilter savitzkyGolayFilter = new SavitzkyGolayFilter();
-        //        for (int i = 0; i < 1; i++) {
-        //            log.info("Starting filter");
-        //            savitzkyGolayFilter.apply(image, SavitzkyGolayRadius.RADIUS_81, 100);
-        //            log.info("Filter applied");
-        //        }
-
-        LSWSharpenFilter mask = new LSWSharpenFilter();
+        // LSWSharpenFilter mask = new LSWSharpenFilter();
         // mask.apply(image, 1, 0.92f, 3);
         // mask.applyLuminanceMode(image, 1, 0.92f, 3, 1.5f, true, true, false);
 
-        Util.saveImage(image, "C:\\Users\\wkast\\archive\\Jup\\testsession\\noisyimage_denoised_lum.tif", false, false);
+        // De-ringing
+        LSWSharpenFilter filter = new LSWSharpenFilter();
+        UnsharpMaskParameters parameters = UnsharpMaskParameters.builder().amount(0.92f).radius(1).iterations(3).deringRadius(5).deringStrength(0.2f)
+                .build();
+        filter.applyRGBModeDeringing(image, parameters);
+        image.updateAndDraw();
+
+        // Util.saveImage(image,
+        // "C:\\Users\\wkast\\archive\\Jup\\testsession\\noisyimage_denoised_lum.tif",
+        // false, false);
 
         Thread.currentThread().sleep(5000);
         System.exit(0);
     }
+
 }

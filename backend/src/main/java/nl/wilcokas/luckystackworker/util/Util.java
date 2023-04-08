@@ -254,7 +254,7 @@ public class Util {
                     profile.setSavitzkyGolayIterations(1);
                 } else if (profile.getSavitzkyGolaySize() > 0
                         && (profile.getDenoiseSigma() != null
-                                || BigDecimal.ZERO.compareTo(profile.getDenoiseSigma()) < 0)) {
+                        || BigDecimal.ZERO.compareTo(profile.getDenoiseSigma()) < 0)) {
                     // Prevent both being set, prefer savitzky-golay in that case.
                     profile.setDenoiseSigma(BigDecimal.ZERO);
                 }
@@ -442,6 +442,14 @@ public class Util {
         // implementation-version in manifest file!");
         // return null;
         // }
+    }
+
+    public static int convertToUnsignedInt(final short value) {
+        return value < 0 ? value + Constants.UNSIGNED_INT_SIZE : value;
+    }
+
+    public static short convertToShort(long value) {
+        return (short) (value >= Constants.SHORT_HALF_SIZE ? value - Constants.UNSIGNED_INT_SIZE : value);
     }
 
     private static String getSetting(Map<String, String> props, String setting, String name) {

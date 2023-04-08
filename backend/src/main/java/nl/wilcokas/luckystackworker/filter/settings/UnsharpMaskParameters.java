@@ -13,4 +13,6 @@ public class UnsharpMaskParameters {
     private int iterations;
     private float clippingStrength;
     private float clippingRange;
+    private double deringRadius;
+    private float deringStrength;
 }

@@ -13,6 +13,7 @@ import ij.process.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.filter.settings.SavitzkyGolayRadius;
+import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
 @Component
@@ -237,7 +238,7 @@ public class SavitzkyGolayFilter {
                 for (int i = 0; i < pixels.length; i++) {
                     long newValueUnsignedInt = getPixelValueUnsignedInt(pixels, i, image.getWidth(), radiusFactors, radiusOffsets, radiusDivisor,
                             radiusCenter, radiusRowLength, amount);
-                    pixelsResult[i] = convertToShort(newValueUnsignedInt > Constants.MAX_INT_VALUE ? Constants.MAX_INT_VALUE
+                    pixelsResult[i] = Util.convertToShort(newValueUnsignedInt > Constants.MAX_INT_VALUE ? Constants.MAX_INT_VALUE
                             : (newValueUnsignedInt < 0 ? 0 : newValueUnsignedInt));
                 }
                 for (int i = 0; i < pixels.length; i++) {
@@ -258,7 +259,7 @@ public class SavitzkyGolayFilter {
         final int yPosition = position / width;
         final int xPosition = position % width;
         double multipliedTotal = 0;
-        int pixelValueUnsignedInt = convertToUnsignedInt(pixels[position]);
+        int pixelValueUnsignedInt = Util.convertToUnsignedInt(pixels[position]);
         for (int i = 0; i < radiusOffsets.length; i++) {
             int offsetValueUnsignedInt = getOffsetValueUnsignedInt(pixels,  xPosition + radiusOffsets[i][0],
                     yPosition + radiusOffsets[i][1], width);
@@ -273,15 +274,7 @@ public class SavitzkyGolayFilter {
         if (position < 0 || position >= pixels.length) {
             return 0;
         }
-        return convertToUnsignedInt(pixels[position]);
-    }
-
-    private int convertToUnsignedInt(final short value) {
-        return value < 0 ? value + Constants.UNSIGNED_INT_SIZE : value;
-    }
-
-    private short convertToShort(long value) {
-        return (short) (value >= Constants.SHORT_HALF_SIZE ? value - Constants.UNSIGNED_INT_SIZE : value);
+        return Util.convertToUnsignedInt(pixels[position]);
     }
 
 }

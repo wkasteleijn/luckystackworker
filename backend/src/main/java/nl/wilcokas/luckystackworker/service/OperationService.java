@@ -115,13 +115,13 @@ public class OperationService {
                     .saturation(1f).unsharpMaskParameters(usParams).mode(mode).build();
             if (profile.getSharpenMode().equals(LSWSharpenMode.RGB.toString()) || !validateRGBStack(image)) {
                 if (profile.getClippingStrength() > 0) {
-                    lswSharpenFilter.applyRGBModeAdaptive(image, parameters.getUnsharpMaskParameters());
+                    lswSharpenFilter.applyRGBModeClippingPrevention(image, parameters.getUnsharpMaskParameters());
                 } else {
                     lswSharpenFilter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
                 }
             } else {
                 if (profile.getClippingStrength() > 0) {
-                    lswSharpenFilter.applyLuminanceModeAdaptive(image, parameters);
+                    lswSharpenFilter.applyLuminanceModeClippingPrevention(image, parameters);
                 } else {
                     lswSharpenFilter.applyLuminanceMode(image, parameters);
                 }
