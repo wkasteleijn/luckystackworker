@@ -6,6 +6,8 @@ import ij.ImagePlus;
 import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
+import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
+import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenParameters;
 import nl.wilcokas.luckystackworker.filter.settings.UnsharpMaskParameters;
 
 @Slf4j
@@ -175,9 +177,12 @@ public class Probeersels {
 
         // De-ringing
         LSWSharpenFilter filter = new LSWSharpenFilter();
-        UnsharpMaskParameters parameters = UnsharpMaskParameters.builder().amount(0.92f).radius(1).iterations(3).deringRadius(5).deringStrength(0.2f)
+        UnsharpMaskParameters unsharpMaskParameters = UnsharpMaskParameters.builder().amount(0.9f).radius(1).iterations(3).deringRadius(3)
+                .deringStrength(0.13f)
                 .build();
-        filter.applyRGBModeDeringing(image, parameters);
+        LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
+                .saturation(1f).unsharpMaskParameters(unsharpMaskParameters).mode(LSWSharpenMode.LUMINANCE).build();
+        filter.applyLuminanceMode(image, parameters);
         image.updateAndDraw();
 
         // Util.saveImage(image,
