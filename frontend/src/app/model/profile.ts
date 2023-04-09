@@ -21,6 +21,8 @@ export class Profile {
   savitzkyGolayIterations: number;
   clippingStrength: number;
   clippingRange: number;
+  deringRadius: number;
+  deringStrength: number;
   sharpenMode: string;
   operation: string;
   rootFolder: string;

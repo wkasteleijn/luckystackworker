@@ -22,6 +22,12 @@
   margin-left: 16px;
 }
 
+.edgeArtifactLabel {
+  width: 178px;
+  color: rgb(168, 168, 168);
+  margin-left: 16px;
+}
+
 .denoiseOffLabel {
   color: rgb(168, 168, 168);
 }

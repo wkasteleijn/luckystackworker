@@ -50,7 +50,8 @@ public class OperationService {
     public boolean isSharpenOperation(final OperationEnum operation) {
         return ((OperationEnum.AMOUNT == operation) || (OperationEnum.RADIUS == operation) || (OperationEnum.ITERATIONS == operation)
                 || (OperationEnum.SHARPENMODE == operation) || (OperationEnum.CLIPPINGSTRENGTH == operation)
-                || (OperationEnum.CLIPPINGRANGE == operation));
+                || (OperationEnum.CLIPPINGRANGE == operation) || (OperationEnum.DERINGRADIUS == operation)
+                || (OperationEnum.DERINGSTRENGTH == operation));
     }
 
     public boolean isDenoiseOperation(final OperationEnum operation) {
@@ -67,7 +68,8 @@ public class OperationService {
         List<OperationEnum> excludedOperationList = Arrays.asList(operations);
         if ((!excludedOperationList.contains(OperationEnum.AMOUNT)) && (!excludedOperationList.contains(OperationEnum.RADIUS))
                 && (!excludedOperationList.contains(OperationEnum.ITERATIONS)) && (!excludedOperationList.contains(OperationEnum.CLIPPINGSTRENGTH))
-                && (!excludedOperationList.contains(OperationEnum.CLIPPINGRANGE)) && (!excludedOperationList.contains(OperationEnum.SHARPENMODE))) {
+                && (!excludedOperationList.contains(OperationEnum.CLIPPINGRANGE)) && (!excludedOperationList.contains(OperationEnum.DERINGRADIUS))
+                && (!excludedOperationList.contains(OperationEnum.DERINGSTRENGTH)) && (!excludedOperationList.contains(OperationEnum.SHARPENMODE))) {
             applySharpen(image, profile);
         }
         if ((!excludedOperationList.contains(OperationEnum.DENOISEAMOUNT)) && (!excludedOperationList.contains(OperationEnum.DENOISESIGMA))
@@ -108,8 +110,10 @@ public class OperationService {
                     profile.getAmount(), iterations, image.getID());
             float amount = profile.getAmount().divide(new BigDecimal("10000")).floatValue();
             float clippingStrength = (profile.getClippingStrength()) / 500f;
+            float deringStrength = profile.getDeringStrength() / 100f;
             UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radius(profile.getRadius().doubleValue()).amount(amount)
-                    .iterations(iterations).clippingStrength(clippingStrength).clippingRange(100 - profile.getClippingRange()).build();
+                    .iterations(iterations).clippingStrength(clippingStrength).clippingRange(100 - profile.getClippingRange())
+                    .deringRadius(profile.getDeringRadius().doubleValue()).deringStrength(deringStrength).build();
             LSWSharpenMode mode = LSWSharpenMode.valueOf(profile.getSharpenMode());
             LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
                     .saturation(1f).unsharpMaskParameters(usParams).mode(mode).build();

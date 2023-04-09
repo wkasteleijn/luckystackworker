@@ -24,7 +24,7 @@
         nightModeEnabled() ? 'activeColorNight button' : 'activeColor button'
       }}"
     >
-      Open Reference Image
+      Open Reference Stack
     </button>
     <button
       *ngIf="!openRefImageEnabled()"
@@ -33,7 +33,7 @@
       disabled
       class="button_disabled"
     >
-      Open Reference Image
+      Open Reference Stack
     </button>
     <span class="buttonDivider">&nbsp;</span>
     <mat-form-field appearance="fill">
@@ -248,57 +248,128 @@
           <span class="sliderLabel">{{ iterations }}</span>
         </div>
       </div>
+
       <div class="sliderRow">
-        <div class="sliderLabel">Suppress Clipping</div>
+        <div class="edgeArtifactLabel">Edge Artefact Suppression Mode</div>
         <div class="slider">
-          <mat-slider
+          <mat-radio-group
+            [color]="colorTheme()"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            tickInterval="1"
-            step="1"
-            min="0"
-            max="100"
-            (input)="clippingStrengthChanged($event, false)"
-            (change)="clippingStrengthChanged($event, true)"
-            [(ngModel)]="clippingStrength"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span class="sliderLabel">{{ clippingStrength }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ clippingStrength == 0 ? "Off" : "" }}</span
+            [(ngModel)]="edgeArtefactSupressionMode"
+            (change)="edgeArtefactSupressionModeChanged($event, true)"
+            class="sharpenMode"
           >
-        </div>
-      </div>
-      <div class="sliderRow">
-        <div class="sliderLabel">Suppression Range</div>
-        <div class="slider">
-          <mat-slider
-            [disabled]="
-              shouldShowSpinner() ||
-              !refImageSelected ||
-              clippingStrength === 0 ||
-              crop
-            "
-            tickInterval="1"
-            step="1"
-            min="1"
-            max="100"
-            (input)="clippingRangeChanged($event, false)"
-            (change)="clippingRangeChanged($event, true)"
-            [(ngModel)]="clippingRange"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span
-            class="{{
-              clippingStrength === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
-            }}"
-            >{{ clippingRange }}</span
-          >
+            <mat-radio-button value="OFF" class="denoiseMode"
+              >Off</mat-radio-button
+            >
+            <mat-radio-button value="DERING" class="denoiseMode"
+              >Dering
+            </mat-radio-button>
+            <mat-radio-button value="CLIPPING" class="denoiseMode"
+              >Clipping</mat-radio-button
+            >
+          </mat-radio-group>
         </div>
       </div>
 
-      <div class="controlSeperator"></div>
+      <div *ngIf="edgeArtefactSupressionMode === 'CLIPPING'">
+        <div class="sliderRow">
+          <div class="sliderLabel">Suppress Clipping</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              tickInterval="1"
+              step="1"
+              min="1"
+              max="100"
+              (input)="clippingStrengthChanged($event, false)"
+              (change)="clippingStrengthChanged($event, true)"
+              [(ngModel)]="clippingStrength"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span class="sliderLabel">{{ clippingStrength }}</span>
+          </div>
+        </div>
+        <div class="sliderRow">
+          <div class="sliderLabel">Suppression Range</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="
+                shouldShowSpinner() ||
+                !refImageSelected ||
+                clippingStrength === 0 ||
+                crop
+              "
+              tickInterval="1"
+              step="1"
+              min="1"
+              max="100"
+              (input)="clippingRangeChanged($event, false)"
+              (change)="clippingRangeChanged($event, true)"
+              [(ngModel)]="clippingRange"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span
+              class="{{
+                clippingStrength === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
+              }}"
+              >{{ clippingRange }}</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="edgeArtefactSupressionMode === 'DERING'">
+        <div class="sliderRow">
+          <div class="sliderLabel">Dering Strength</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              tickInterval="1"
+              step="1"
+              min="1"
+              max="100"
+              (input)="deringStrengthChanged($event, false)"
+              (change)="deringStrengthChanged($event, true)"
+              [(ngModel)]="deringStrength"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span
+              class="{{
+                deringStrength === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
+              }}"
+              >{{ deringStrength }}</span
+            >
+          </div>
+        </div>
+        <div class="sliderRow">
+          <div class="sliderLabel">Dering Radius</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="
+                shouldShowSpinner() ||
+                !refImageSelected ||
+                deringStrength === 0 ||
+                crop
+              "
+              tickInterval="1"
+              step="1"
+              min="1"
+              max="100"
+              (input)="deringRadiusChanged($event, false)"
+              (change)="deringRadiusChanged($event, true)"
+              [(ngModel)]="deringRadius"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span
+              class="{{
+                deringRadius === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
+              }}"
+              >{{ deringRadius }}</span
+            >
+          </div>
+        </div>
+      </div>
 
       <div class="sliderRow">
         <div

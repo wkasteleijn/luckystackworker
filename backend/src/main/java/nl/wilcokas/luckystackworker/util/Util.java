@@ -125,6 +125,8 @@ public class Util {
                 .savitzkyGolaySize(Integer.valueOf(getSetting(props, "savitzkyGolaySize", profileName))) //
                 .clippingStrength(Integer.valueOf(getSetting(props, "clippingStrength", profileName))) //
                 .clippingRange(Integer.valueOf(getSetting(props, "clippingRange", profileName))) //
+                .deringRadius(new BigDecimal(getSetting(props, "deringRadius", profileName))) //
+                .deringStrength(Integer.valueOf(getSetting(props, "deringStrength", profileName))) //
                 .sharpenMode(getSetting(props, "sharpenMode", profileName)) //
                 .gamma(new BigDecimal(getSetting(props, "gamma", profileName))) //
                 .contrast(Integer.valueOf(getSetting(props, "contrast", profileName))) //
@@ -237,6 +239,12 @@ public class Util {
             profileStr = Files.readString(Paths.get(filePath + ".yaml"));
             if (profileStr != null) {
                 Profile profile = new Yaml().load(profileStr);
+
+                // Added since v3.2.0, so older version written yaml needs to stay compatible.
+                if (profile.getDeringStrength() == 0) {
+                    profile.setDeringStrength(0);
+                    profile.setDeringRadius(new BigDecimal(3));
+                }
 
                 // Added since v3.0.0, so older version written yaml needs to stay compatible.
                 if (profile.getSharpenMode() == null) {

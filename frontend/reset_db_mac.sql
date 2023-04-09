@@ -14,6 +14,8 @@ update profiles set savitzky_golay_amount=50;
 update profiles set savitzky_golay_iterations=1;
 update profiles set clipping_strength=0;
 update profiles set clipping_range=25;
+update profiles set dering_strength=0;
+update profiles set dering_radius=3;
 update profiles set sharpen_mode='LUMINANCE';
 select * from profiles;
 update settings set latest_known_version='3.1.1';

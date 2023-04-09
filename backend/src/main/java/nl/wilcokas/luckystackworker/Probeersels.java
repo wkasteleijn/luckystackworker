@@ -15,7 +15,7 @@ public class Probeersels {
     public static void main(String[] args) throws InterruptedException, IOException {
 
         ImagePlus image = new Opener()
-                .openImage("C:\\Users\\wkast\\archive\\Jup\\testsession\\Jup_2022-09-29-2130_5-Wilco-DeRot_AS_P25_lapl4_ap245.tif");
+                .openImage("C:\\Users\\wkast\\archive\\Jup\\testsession\\Mars_2023-01-02-1946_1-DeRot_AS_P1_lapl4_ap47.tif");
         // .openImage("D:\\Jup\\testsession\\Jup_224759_AS_P30_lapl5_ap44.tif");
         // .openImage("D:\\Sun\\220522\\Sun_100434_AS_P1_lapl4_ap1531.tif");
 
@@ -177,7 +177,7 @@ public class Probeersels {
 
         // De-ringing
         LSWSharpenFilter filter = new LSWSharpenFilter();
-        UnsharpMaskParameters unsharpMaskParameters = UnsharpMaskParameters.builder().amount(0.9f).radius(1).iterations(3).deringRadius(3)
+        UnsharpMaskParameters unsharpMaskParameters = UnsharpMaskParameters.builder().amount(0.995f).radius(1).iterations(1).deringRadius(4)
                 .deringStrength(0.13f)
                 .build();
         LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)

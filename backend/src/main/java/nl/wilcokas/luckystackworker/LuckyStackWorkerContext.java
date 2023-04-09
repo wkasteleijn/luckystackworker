@@ -81,6 +81,8 @@ public class LuckyStackWorkerContext {
         workerProperties.put(name + ".savitzkyGolayIterations", String.valueOf(profile.getSavitzkyGolayIterations()));
         workerProperties.put(name + ".clippingStrength", String.valueOf(profile.getClippingStrength()));
         workerProperties.put(name + ".clippingRange", String.valueOf(profile.getClippingRange()));
+        workerProperties.put(name + ".deringRadius", String.valueOf(profile.getDeringRadius()));
+        workerProperties.put(name + ".deringStrength", String.valueOf(profile.getDeringStrength()));
         workerProperties.put(name + ".sharpenMode", String.valueOf(profile.getSharpenMode()));
         workerProperties.put(name + ".gamma", String.valueOf(profile.getGamma()));
         workerProperties.put(name + ".contrast", String.valueOf(profile.getContrast()));

@@ -39,8 +39,11 @@ export class AppComponent implements OnInit {
   amount: number;
   iterations: number;
   sharpenMode: string;
+  edgeArtefactSupressionMode: string;
   clippingStrength: number;
   clippingRange: number;
+  deringRadius: number;
+  deringStrength: number;
 
   denoiseAmount: number;
   denoiseSigma: string;
@@ -201,6 +204,26 @@ export class AppComponent implements OnInit {
     }
   }
 
+  deringRadiusChanged(event: any, update: boolean) {
+    this.profile.deringRadius = event.value;
+    this.deringRadius = event.value;
+    this.profile.operation = 'deringRadius';
+    console.log('deringRadius called: ' + this.profile.deringRadius);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  deringStrengthChanged(event: any, update: boolean) {
+    this.profile.deringStrength = event.value;
+    this.deringStrength = event.value;
+    this.profile.operation = 'deringStrength';
+    console.log('deringStrength called: ' + this.profile.deringStrength);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
   sharpenModeChanged(event: any, update: boolean) {
     this.profile.sharpenMode = event.value;
     this.sharpenMode = event.value;
@@ -209,6 +232,35 @@ export class AppComponent implements OnInit {
     if (update) {
       this.updateProfile();
     }
+  }
+
+  edgeArtefactSupressionModeChanged(event: any, update: boolean) {
+    if (event.value === 'CLIPPING') {
+      this.profile.deringStrength = 0;
+      this.profile.operation = 'clippingStrength';
+      if (!this.profile.clippingStrength) {
+        // If not set, start with the defaults
+        this.profile.clippingRange = 50;
+        this.profile.clippingStrength = 10;
+        this.clippingRange = 50;
+        this.clippingStrength = 10;
+      }
+    } else if (event.value === 'DERING') {
+      this.profile.clippingStrength = 0;
+      this.profile.operation = 'deringStrength';
+      if (!this.profile.deringStrength) {
+        this.profile.deringRadius = 3;
+        this.profile.deringStrength = 10;
+        this.deringRadius = 3;
+        this.deringStrength = 10;
+      }
+    } else {
+      // Off
+      this.profile.clippingStrength = 0;
+      this.profile.deringStrength = 0;
+    }
+    console.log('edgeArtefactSupressionMode called: ' + event.value);
+    this.updateProfile();
   }
 
   denoiseAmountChanged(event: any, update: boolean) {
@@ -535,6 +587,18 @@ export class AppComponent implements OnInit {
     }
     this.clippingStrength = this.profile.clippingStrength;
     this.clippingRange = this.profile.clippingRange;
+    this.deringRadius = this.profile.deringRadius;
+    this.deringStrength = this.profile.deringStrength;
+    if (!this.profile.clippingStrength && !this.profile.deringStrength) {
+      this.edgeArtefactSupressionMode = 'OFF';
+    } else if (this.profile.deringStrength) {
+      this.edgeArtefactSupressionMode = 'DERING';
+      // prevent that both are selected under the hood, and prefer dering in that case.
+      this.clippingStrength = 0;
+      this.profile.clippingStrength = 0;
+    } else {
+      this.edgeArtefactSupressionMode = 'CLIPPING';
+    }
     this.sharpenMode = this.profile.sharpenMode;
     this.saturation = this.profile.saturation;
     this.gamma = this.profile.gamma;

@@ -93,6 +93,12 @@ public class Profile {
     @Column(name = "clippingRange")
     private int clippingRange;
 
+    @Column(name = "deringRadius")
+    private BigDecimal deringRadius;
+
+    @Column(name = "deringStrength")
+    private int deringStrength;
+
     @Column(name = "sharpenMode")
     private String sharpenMode;
 
