@@ -102,6 +102,18 @@ public class Profile {
     @Column(name = "sharpenMode")
     private String sharpenMode;
 
+    @Column(name = "localContrastMode")
+    private String localContrastMode;
+
+    @Column(name = "localContrastFine")
+    private int localContrastFine;
+
+    @Column(name = "localContrastMedium")
+    private int localContrastMedium;
+
+    @Column(name = "localContrastLarge")
+    private int localContrastLarge;
+
     // Non persisted setting properties that are passed to the frontend.
     private String operation;
     private String rootFolder;

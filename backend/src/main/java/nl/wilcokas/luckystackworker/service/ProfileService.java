@@ -46,6 +46,10 @@ public class ProfileService {
         result.setContrast(profile.getContrast());
         result.setBrightness(profile.getBrightness());
         result.setBackground(profile.getBackground());
+        result.setLocalContrastMode(profile.getLocalContrastMode());
+        result.setLocalContrastFine(profile.getLocalContrastFine());
+        result.setLocalContrastMedium(profile.getLocalContrastMedium());
+        result.setLocalContrastLarge(profile.getLocalContrastLarge());
         profileRepository.save(result);
         LuckyStackWorkerContext.updateWorkerForProfile(profile);
     }

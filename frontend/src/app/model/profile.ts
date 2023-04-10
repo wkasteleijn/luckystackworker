@@ -12,6 +12,10 @@ export class Profile {
   contrast: number;
   brightness: number;
   background: number;
+  localContrastMode: string;
+  localContrastFine: number;
+  localContrastMedium: number;
+  localContrastLarge: number;
   red: number;
   green: number;
   blue: number;

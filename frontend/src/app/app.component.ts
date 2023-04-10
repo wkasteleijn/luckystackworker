@@ -45,6 +45,7 @@ export class AppComponent implements OnInit {
   deringRadius: number;
   deringStrength: number;
 
+  // denoise
   denoiseAmount: number;
   denoiseSigma: string;
   denoiseRadius: number;
@@ -52,16 +53,24 @@ export class AppComponent implements OnInit {
   savitzkyGolaySize: string;
   savitzkyGolayAmount: number;
   savitzkyGolayIterations: number;
+  denoiseAlgorithm: string;
+
+  //  light
   gamma: number;
   contrast: number;
   brightness: number;
   background: number;
   saturation: number;
+  localContrastMode: string;
+  localContrastFine: number;
+  localContrastMedium: number;
+  localContrastLarge: number;
+
+  // color
   red: number;
   green: number;
   blue: number;
   profile: Profile;
-  denoiseAlgorithm: string;
 
   selectedProfile: string;
   rootFolder: string = 'C:\\';
@@ -234,6 +243,16 @@ export class AppComponent implements OnInit {
     }
   }
 
+  localContrastModeChanged(event: any, update: boolean) {
+    this.profile.localContrastMode = event.value;
+    this.localContrastMode = event.value;
+    this.profile.operation = 'localContrastMode';
+    console.log('localContrastMode called: ' + this.profile.localContrastMode);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
   edgeArtefactSupressionModeChanged(event: any, update: boolean) {
     if (event.value === 'CLIPPING') {
       this.profile.deringStrength = 0;
@@ -320,6 +339,40 @@ export class AppComponent implements OnInit {
     this.contrast = event.value;
     this.profile.operation = 'contrast';
     console.log('contrastChanged called: ' + this.profile.contrast);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  localContrastFineChanged(event: any, update: boolean) {
+    this.profile.localContrastFine = event.value;
+    this.localContrastFine = event.value;
+    this.profile.operation = 'localContrastFine';
+    console.log('localContrastFine called: ' + this.profile.localContrastFine);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  localContrastMediumChanged(event: any, update: boolean) {
+    this.profile.localContrastMedium = event.value;
+    this.localContrastMedium = event.value;
+    this.profile.operation = 'localContrastMedium';
+    console.log(
+      'localContrastMedium called: ' + this.profile.localContrastMedium
+    );
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  localContrastLargeChanged(event: any, update: boolean) {
+    this.profile.localContrastLarge = event.value;
+    this.localContrastLarge = event.value;
+    this.profile.operation = 'localContrastLarge';
+    console.log(
+      'localContrastLarge called: ' + this.profile.localContrastLarge
+    );
     if (update) {
       this.updateProfile();
     }
@@ -605,6 +658,10 @@ export class AppComponent implements OnInit {
     this.contrast = this.profile.contrast;
     this.brightness = this.profile.brightness;
     this.background = this.profile.background;
+    this.localContrastMode = this.profile.localContrastMode;
+    this.localContrastFine = this.profile.localContrastFine;
+    this.localContrastMedium = this.profile.localContrastMedium;
+    this.localContrastLarge = this.profile.localContrastLarge;
     this.red = this.profile.red;
     this.green = this.profile.green;
     this.blue = this.profile.blue;

@@ -30,5 +30,8 @@ public class Constants {
     public static final int MAX_OPERATION_TIME_BEFORE_RESUMING = 5; // seconds
     public static final String SYSTEM_PROFILE_WINDOWS = "win";
     public static final String SYSTEM_PROFILE_MAC = "mac";
+    public static final BigDecimal LOCAL_CONTRAST_FINE_RADIUS = BigDecimal.valueOf(4);
+    public static final BigDecimal LOCAL_CONTRAST_MEDIUM_RADIUS = BigDecimal.valueOf(16);
+    public static final BigDecimal LOCAL_CONTRAST_LARGE_RADIUS = BigDecimal.valueOf(64);
 
 }

@@ -132,6 +132,10 @@ public class Util {
                 .contrast(Integer.valueOf(getSetting(props, "contrast", profileName))) //
                 .brightness(Integer.valueOf(getSetting(props, "brightness", profileName))) //
                 .background(Integer.valueOf(getSetting(props, "background", profileName))) //
+                .localContrastMode(getSetting(props, "localContrastMode", profileName)) //
+                .localContrastFine(Integer.valueOf(getSetting(props, "localContrastFine", profileName))) //
+                .localContrastMedium(Integer.valueOf(getSetting(props, "localContrastMedium", profileName))) //
+                .localContrastLarge(Integer.valueOf(getSetting(props, "localContrastLarge", profileName))) //
                 .red(new BigDecimal(getSetting(props, "red", profileName))) //
                 .green(new BigDecimal(getSetting(props, "green", profileName))) //
                 .blue(new BigDecimal(getSetting(props, "blue", profileName))) //
@@ -241,9 +245,13 @@ public class Util {
                 Profile profile = new Yaml().load(profileStr);
 
                 // Added since v3.2.0, so older version written yaml needs to stay compatible.
+                if (profile.getLocalContrastMode() == null) {
+                    profile.setLocalContrastMode(LSWSharpenMode.LUMINANCE.toString());
+                }
+
                 if (profile.getDeringStrength() == 0) {
                     profile.setDeringStrength(0);
-                    profile.setDeringRadius(new BigDecimal(3));
+                    profile.setDeringRadius(new BigDecimal(5));
                 }
 
                 // Added since v3.0.0, so older version written yaml needs to stay compatible.

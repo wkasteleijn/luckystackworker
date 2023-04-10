@@ -633,8 +633,99 @@
       </div>
     </mat-tab>
 
-    <!-- Light & Color panel -->
-    <mat-tab label="Light & Color">
+    <!-- Light panel -->
+    <mat-tab label="Light">
+      <div class="sliderRow">
+        <div
+          class="sliderRowCategoryTitle {{
+            nightModeEnabled()
+              ? 'sliderRowCategoryTitleColorNight'
+              : 'sliderRowCategoryTitleColor'
+          }}"
+        >
+          Local Contrast
+        </div>
+        <div class="sigmaRadio">
+          <mat-radio-group
+            [color]="colorTheme()"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [(ngModel)]="localContrastMode"
+            (change)="localContrastModeChanged($event, true)"
+            class="sharpenMode"
+          >
+            <mat-radio-button value="LUMINANCE" class="radioSizeButtonSharpen"
+              >Luminance
+            </mat-radio-button>
+            <mat-radio-button value="RGB" class="radioSizeButton sharpenModeRGB"
+              >RGB</mat-radio-button
+            >
+          </mat-radio-group>
+        </div>
+      </div>
+      <div class="sliderRow">
+        <div class="sliderLabel">Fine Details</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            step="1"
+            min="0"
+            max="99"
+            (input)="localContrastFineChanged($event, false)"
+            (change)="localContrastFineChanged($event, true)"
+            [(ngModel)]="localContrastFine"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ localContrastFine }}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ localContrastFine == 0 ? "Off" : "" }}</span
+          >
+        </div>
+      </div>
+      <div class="sliderRow">
+        <div class="sliderLabel">Medium Details</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            step="1"
+            min="0"
+            max="99"
+            (input)="localContrastMediumChanged($event, false)"
+            (change)="localContrastMediumChanged($event, true)"
+            [(ngModel)]="localContrastMedium"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ localContrastMedium }}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ localContrastMedium == 0 ? "Off" : "" }}</span
+          >
+        </div>
+      </div>
+      <div class="sliderRow">
+        <div class="sliderLabel">Large Details</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            step="1"
+            min="0"
+            max="99"
+            (input)="localContrastLargeChanged($event, false)"
+            (change)="localContrastLargeChanged($event, true)"
+            [(ngModel)]="localContrastLarge"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ localContrastLarge }}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ localContrastLarge == 0 ? "Off" : "" }}</span
+          >
+        </div>
+      </div>
+
       <div
         class="sliderRowCategoryTitle {{
           nightModeEnabled()
@@ -731,18 +822,10 @@
           >
         </div>
       </div>
+    </mat-tab>
 
-      <div class="controlSeperatorColor"></div>
-
-      <div
-        class="sliderRowCategoryTitle {{
-          nightModeEnabled()
-            ? 'sliderRowCategoryTitleColorNight'
-            : 'sliderRowCategoryTitleColor'
-        }}"
-      >
-        Color
-      </div>
+    <!-- Color panel -->
+    <mat-tab label="Color">
       <div class="sliderRow">
         <div class="sliderLabel">Saturation</div>
         <div class="slider">

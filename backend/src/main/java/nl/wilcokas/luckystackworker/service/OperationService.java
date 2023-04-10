@@ -16,6 +16,7 @@ import ij.macro.Interpreter;
 import ij.process.ImageProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
 import nl.wilcokas.luckystackworker.filter.RGBBalanceFilter;
 import nl.wilcokas.luckystackworker.filter.SaturationFilter;
@@ -82,6 +83,11 @@ public class OperationService {
                 && (!excludedOperationList.contains(OperationEnum.SAVITZKYGOLAYSIZE))) {
             applySavitzkyGolayDenoise(image, profile);
         }
+        if ((!excludedOperationList.contains(OperationEnum.LOCALCONTRASTMODE)) && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTFINE))
+                && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTMEDIUM))
+                && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTLARGE))) {
+            applyLocalContrast(image, profile);
+        }
         if ((!excludedOperationList.contains(OperationEnum.CONTRAST)) && (!excludedOperationList.contains(OperationEnum.BRIGHTNESS))
                 && (!excludedOperationList.contains(OperationEnum.BACKGROUND))) {
             applyBrightnessAndContrast(image, profile, true);
@@ -97,6 +103,7 @@ public class OperationService {
         applySharpen(image, profile);
         applyDenoise(image, profile);
         applySavitzkyGolayDenoise(image, profile);
+        applyLocalContrast(image, profile);
         applyBrightnessAndContrast(image, profile, true);
         applyRGBBalance(image, profile);
         applyGamma(image, profile);
@@ -114,7 +121,7 @@ public class OperationService {
             UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radius(profile.getRadius().doubleValue()).amount(amount)
                     .iterations(iterations).clippingStrength(clippingStrength).clippingRange(100 - profile.getClippingRange())
                     .deringRadius(profile.getDeringRadius().doubleValue()).deringStrength(deringStrength).build();
-            LSWSharpenMode mode = LSWSharpenMode.valueOf(profile.getSharpenMode());
+            LSWSharpenMode mode = (profile.getSharpenMode() == null) ? LSWSharpenMode.LUMINANCE : LSWSharpenMode.valueOf(profile.getSharpenMode());
             LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
                     .saturation(1f).unsharpMaskParameters(usParams).mode(mode).build();
             if (profile.getSharpenMode().equals(LSWSharpenMode.RGB.toString()) || !validateRGBStack(image)) {
@@ -130,6 +137,35 @@ public class OperationService {
                     lswSharpenFilter.applyLuminanceMode(image, parameters);
                 }
             }
+        }
+    }
+
+    public void applyLocalContrast(final ImagePlus image, Profile profile) {
+        LSWSharpenMode mode = (profile.getLocalContrastMode() == null) ? LSWSharpenMode.LUMINANCE
+                : LSWSharpenMode.valueOf(profile.getLocalContrastMode());
+        if (profile.getLocalContrastFine() != 0) {
+            applyLocalContrast(image, profile.getLocalContrastFine(), Constants.LOCAL_CONTRAST_FINE_RADIUS, mode);
+        }
+        if (profile.getLocalContrastMedium() != 0) {
+            applyLocalContrast(image, profile.getLocalContrastMedium(), Constants.LOCAL_CONTRAST_MEDIUM_RADIUS, mode);
+        }
+        if (profile.getLocalContrastLarge() != 0) {
+            applyLocalContrast(image, profile.getLocalContrastLarge(), Constants.LOCAL_CONTRAST_LARGE_RADIUS, mode);
+        }
+    }
+
+    private void applyLocalContrast(final ImagePlus image, int amount, BigDecimal radius, LSWSharpenMode localContrastMode) {
+        log.info("Applying local contrast with mode {}, radius {} amount {} to image {}", localContrastMode, radius, amount,
+                image.getID());
+        float famount = (amount) / 100f;
+        UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radius(radius.doubleValue()).amount(famount).iterations(1)
+                .build();
+        LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
+                .saturation(1f).unsharpMaskParameters(usParams).mode(localContrastMode).build();
+        if (localContrastMode == LSWSharpenMode.RGB || !validateRGBStack(image)) {
+            lswSharpenFilter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
+        } else {
+            lswSharpenFilter.applyLuminanceMode(image, parameters);
         }
     }
 

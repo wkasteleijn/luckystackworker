@@ -132,7 +132,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                         OperationEnum.DENOISEAMOUNT,
                         OperationEnum.DENOISERADIUS, OperationEnum.DENOISESIGMA, OperationEnum.DENOISEITERATIONS,
                         OperationEnum.SAVITZKYGOLAYAMOUNT, OperationEnum.SAVITZKYGOLAYITERATIONS,
-                        OperationEnum.SAVITZKYGOLAYSIZE);
+                        OperationEnum.SAVITZKYGOLAYSIZE, OperationEnum.LOCALCONTRASTMODE, OperationEnum.LOCALCONTRASTFINE,
+                        OperationEnum.LOCALCONTRASTMEDIUM, OperationEnum.LOCALCONTRASTLARGE);
             } else {
                 operationService.applyAllOperationsExcept(processedImage, profile, operation);
             }
@@ -145,10 +146,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             operationService.applySharpen(finalResultImage, profile);
             operationService.applyDenoise(finalResultImage, profile);
             operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
+            operationService.applyLocalContrast(finalResultImage, profile);
         } else if (operationService.isDenoiseOperation(operation)) {
             operationService.applyDenoise(finalResultImage, profile);
         } else if (operationService.isSavitzkyGolayDenoiseOperation(operation)) {
             operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
+        } else if ((OperationEnum.LOCALCONTRASTMODE == operation) || (OperationEnum.LOCALCONTRASTFINE == operation)
+                || (OperationEnum.LOCALCONTRASTMEDIUM == operation) || (OperationEnum.LOCALCONTRASTLARGE == operation)) {
+            operationService.applyLocalContrast(finalResultImage, profile);
         } else if ((OperationEnum.CONTRAST == operation) || (OperationEnum.BRIGHTNESS == operation)
                 || (OperationEnum.BACKGROUND == operation)) {
             operationService.applyBrightnessAndContrast(finalResultImage, profile, false);
