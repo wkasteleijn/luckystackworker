@@ -399,6 +399,25 @@
             >Sigma</mat-radio-button
           >
         </mat-radio-group>
+        <div *ngIf="denoiseAlgorithm === 'SIGMA'">
+          <div class="denoiseMode">
+            <mat-radio-group
+              [color]="colorTheme()"
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [(ngModel)]="denoiseSigma"
+              (change)="denoiseSigmaChanged($event, true)"
+            >
+              <mat-radio-button
+                value="2"
+                class="denoiseFirstRadio radioSizeButton"
+                >Mode 1</mat-radio-button
+              >
+              <mat-radio-button value="5" class="radioSizeButton"
+                >Mode 2</mat-radio-button
+              >
+            </mat-radio-group>
+          </div>
+        </div>
       </div>
       <div *ngIf="denoiseAlgorithm === 'SAVGOLAY'">
         <div class="sliderRow">
@@ -506,29 +525,6 @@
       </div>
 
       <div *ngIf="denoiseAlgorithm === 'SIGMA'">
-        <div class="sliderRow">
-          <div class="sliderLabel">Mode</div>
-          <div>
-            <div>
-              <mat-radio-group
-                [color]="colorTheme()"
-                [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-                [(ngModel)]="denoiseSigma"
-                (change)="denoiseSigmaChanged($event, true)"
-              >
-                <mat-radio-button
-                  value="2"
-                  class="denoiseFirstRadio radioSizeButton"
-                  >1</mat-radio-button
-                >
-                <mat-radio-button value="5" class="radioSizeButton"
-                  >2</mat-radio-button
-                >
-              </mat-radio-group>
-            </div>
-          </div>
-        </div>
-
         <div class="sliderRow">
           <div
             class="{{

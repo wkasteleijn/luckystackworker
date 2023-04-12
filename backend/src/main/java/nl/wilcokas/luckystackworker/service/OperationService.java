@@ -83,11 +83,6 @@ public class OperationService {
                 && (!excludedOperationList.contains(OperationEnum.SAVITZKYGOLAYSIZE))) {
             applySavitzkyGolayDenoise(image, profile);
         }
-        if ((!excludedOperationList.contains(OperationEnum.LOCALCONTRASTMODE)) && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTFINE))
-                && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTMEDIUM))
-                && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTLARGE))) {
-            applyLocalContrast(image, profile);
-        }
         if ((!excludedOperationList.contains(OperationEnum.CONTRAST)) && (!excludedOperationList.contains(OperationEnum.BRIGHTNESS))
                 && (!excludedOperationList.contains(OperationEnum.BACKGROUND))) {
             applyBrightnessAndContrast(image, profile, true);
