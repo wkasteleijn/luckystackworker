@@ -66,15 +66,16 @@ public class ReferenceController {
         // Ignoring path received from frontend as it isn't used.
         String realPath = LuckyStackWorkerContext.getWorkerProperties().get("inputFolder");
         JFileChooser jfc = referenceImageService.getJFileChooser(realPath);
-        jfc.setFileFilter(new FileNameExtensionFilter("TIFF", "tif"));
+        jfc.setFileFilter(new FileNameExtensionFilter("TIFF", "JPEG", "tif", "jpg"));
         String fileNameNoExt = Util.getFilename(referenceImageService.getFilePath());
+        String selectedExtension = Util.getFilenameExtension(referenceImageService.getFilePath());
         jfc.setSelectedFile(
-                new File(fileNameNoExt + Constants.OUTPUT_POSTFIX + "." + Constants.SUPPORTED_OUTPUT_FORMAT));
+                new File(fileNameNoExt + Constants.OUTPUT_POSTFIX + "." + selectedExtension));
         int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, "Save reference image", true);
         frame.dispose();
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
-            referenceImageService.saveReferenceImage(selectedFile.getAbsolutePath());
+            referenceImageService.saveReferenceImage(selectedFile.getAbsolutePath(), "jpg".equals(selectedExtension));
         }
     }
 

@@ -63,7 +63,7 @@ public class WorkerService {
                         imp = imp.crop();
                     }
                     Util.saveImage(imp, getOutputFile(file), Util.isPngRgbStack(imp, filePath),
-                            LuckyStackWorkerContext.getSelectedRoi() != null);
+                            LuckyStackWorkerContext.getSelectedRoi() != null, false);
                     return true;
                 }
             } catch (Exception e) {

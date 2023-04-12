@@ -167,12 +167,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         finalResultImage.setTitle(filePath);
     }
 
-    public void saveReferenceImage(String path) throws IOException {
+    public void saveReferenceImage(String path, boolean asJpg) throws IOException {
         String pathNoExt = Util.getPathWithoutExtension(path);
         String savePath = pathNoExt + "." + Constants.SUPPORTED_OUTPUT_FORMAT;
         log.info("Saving image to  {}", savePath);
         Util.saveImage(finalResultImage, savePath,
-                Util.isPngRgbStack(finalResultImage, filePath), roiActive);
+                Util.isPngRgbStack(finalResultImage, filePath), roiActive, asJpg);
         writeProfile(pathNoExt);
     }
 

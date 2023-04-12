@@ -9,13 +9,14 @@ import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenParameters;
 import nl.wilcokas.luckystackworker.filter.settings.UnsharpMaskParameters;
+import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
 public class Probeersels {
     public static void main(String[] args) throws InterruptedException, IOException {
 
         ImagePlus image = new Opener()
-                .openImage("C:\\Users\\wkast\\archive\\Jup\\testsession\\Mars_2023-01-02-1946_1-DeRot_AS_P1_lapl4_ap47.tif");
+                .openImage("C:\\Users\\wkast\\archive\\Jup\\testsession\\Jup_2022-09-29-2130_5-Wilco-DeRot_AS_P25_lapl4_ap245.tif");
         // .openImage("D:\\Jup\\testsession\\Jup_224759_AS_P30_lapl5_ap44.tif");
         // .openImage("D:\\Sun\\220522\\Sun_100434_AS_P1_lapl4_ap1531.tif");
 
@@ -185,9 +186,7 @@ public class Probeersels {
         filter.applyLuminanceMode(image, parameters);
         image.updateAndDraw();
 
-        // Util.saveImage(image,
-        // "C:\\Users\\wkast\\archive\\Jup\\testsession\\noisyimage_denoised_lum.tif",
-        // false, false);
+        Util.saveImage(image, "C:\\Users\\wkast\\archive\\Jup\\testsession\\jup.jpg", false, false, true);
 
         Thread.currentThread().sleep(5000);
         System.exit(0);

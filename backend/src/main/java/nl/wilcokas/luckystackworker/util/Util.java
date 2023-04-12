@@ -163,7 +163,7 @@ public class Util {
         Files.delete(Paths.get(path));
     }
 
-    public static void saveImage(ImagePlus image, String path, boolean isPngRgbStack, boolean crop) throws IOException {
+    public static void saveImage(ImagePlus image, String path, boolean isPngRgbStack, boolean crop, boolean asJpg) throws IOException {
         if (crop) {
             image = image.crop();
         }
@@ -176,7 +176,12 @@ public class Util {
         if (isPngRgbStack) {
             hackIncorrectPngFileInfo(saver);
         }
-        saver.saveAsTiff(path);
+        if (asJpg) {
+            saver.setJpegQuality(100);
+            saver.saveAsJpeg(path);
+        } else {
+            saver.saveAsTiff(path);
+        }
     }
 
     public static ImagePlus fixNonTiffOpeningSettings(ImagePlus image) {
