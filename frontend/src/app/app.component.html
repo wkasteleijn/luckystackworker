@@ -630,7 +630,7 @@
     </mat-tab>
 
     <!-- Light panel -->
-    <mat-tab label="Light">
+    <mat-tab label="Contrast & Light">
       <div class="sliderRow">
         <div
           class="sliderRowCategoryTitle {{
@@ -640,22 +640,6 @@
           }}"
         >
           Local Contrast
-        </div>
-        <div class="sigmaRadio">
-          <mat-radio-group
-            [color]="colorTheme()"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            [(ngModel)]="localContrastMode"
-            (change)="localContrastModeChanged($event, true)"
-            class="sharpenMode"
-          >
-            <mat-radio-button value="LUMINANCE" class="radioSizeButtonSharpen"
-              >Luminance
-            </mat-radio-button>
-            <mat-radio-button value="RGB" class="radioSizeButton sharpenModeRGB"
-              >RGB</mat-radio-button
-            >
-          </mat-radio-group>
         </div>
       </div>
       <div class="sliderRow">
@@ -821,7 +805,7 @@
     </mat-tab>
 
     <!-- Color panel -->
-    <mat-tab label="Color">
+    <mat-tab label="Color & Dispersion">
       <div class="sliderRow">
         <div class="sliderLabel">Saturation</div>
         <div class="slider">
@@ -905,6 +889,140 @@
             class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
             >{{ blue == 0 ? "Off" : "" }}</span
           >
+        </div>
+      </div>
+      <p></p>
+      <div class="sliderRow">
+        <div class="sliderLabel">Disperion Correction</div>
+        <div class="slider">
+          <section>
+            <div class="dispersionPanelRow">
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="(true)"
+                >
+                  <img
+                    src="assets/images/left-up.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="(true)"
+                >
+                  <img src="assets/images/up.png" class="dispersionArrow" />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="(true)"
+                >
+                  <img
+                    src="assets/images/right-up.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+            </div>
+            <div class="dispersionPanelRow">
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="(true)"
+                >
+                  <img src="assets/images/left.png" class="dispersionArrow" />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="buttonAuto button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="(true)"
+                >
+                  Auto
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="(true)"
+                >
+                  <img src="assets/images/right.png" class="dispersionArrow" />
+                </button>
+              </div>
+            </div>
+            <div class="dispersionPanelRow">
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="(true)"
+                >
+                  <img
+                    src="assets/images/left-down.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="(true)"
+                >
+                  <img src="assets/images/down.png" class="dispersionArrow" />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="(true)"
+                >
+                  <img
+                    src="assets/images/right-down.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </mat-tab>

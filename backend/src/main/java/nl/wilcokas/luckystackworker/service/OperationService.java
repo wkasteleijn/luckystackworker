@@ -157,11 +157,7 @@ public class OperationService {
                 .build();
         LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
                 .saturation(1f).unsharpMaskParameters(usParams).mode(localContrastMode).build();
-        if (localContrastMode == LSWSharpenMode.RGB || !validateRGBStack(image)) {
-            lswSharpenFilter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
-        } else {
-            lswSharpenFilter.applyLuminanceMode(image, parameters);
-        }
+        lswSharpenFilter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
     }
 
     public void applyDenoise(final ImagePlus image, final Profile profile) {
