@@ -71,6 +71,7 @@ export class AppComponent implements OnInit {
   green: number;
   blue: number;
   profile: Profile;
+  dispersionCorrectionEnabled: boolean = false;
 
   selectedProfile: string;
   rootFolder: string = 'C:\\';
@@ -534,6 +535,86 @@ export class AppComponent implements OnInit {
           console.log(error);
         }
       );
+  }
+
+  dispersionCorrectionEnabledChanged() {
+    console.log(
+      'dispersionCorrectionEnabledChanged called: ' +
+        this.dispersionCorrectionEnabled
+    );
+    this.profile.operation = 'dispersionCorrection';
+    this.profile.dispersionCorrectionEnabled = this.dispersionCorrectionEnabled;
+    this.updateProfile();
+  }
+
+  dispersionCorrectionClicked(direction: string, color: string) {
+    console.log('dispersionCorrectionClicked: ' + direction);
+    this.profile.operation = 'dispersionCorrection';
+    if (color === 'RED') {
+      switch (direction) {
+        case 'LEFT-UP':
+          this.profile.dispersionCorrectionRedX -= 1;
+          this.profile.dispersionCorrectionRedY -= 1;
+          break;
+        case 'UP':
+          this.profile.dispersionCorrectionRedY -= 1;
+          break;
+        case 'RIGHT-UP':
+          this.profile.dispersionCorrectionRedX += 1;
+          this.profile.dispersionCorrectionRedY -= 1;
+          break;
+        case 'LEFT':
+          this.profile.dispersionCorrectionRedX -= 1;
+          break;
+        case 'RIGHT':
+          this.profile.dispersionCorrectionRedX += 1;
+          break;
+        case 'LEFT-DOWN':
+          this.profile.dispersionCorrectionRedX -= 1;
+          this.profile.dispersionCorrectionRedY += 1;
+          break;
+        case 'DOWN':
+          this.profile.dispersionCorrectionRedY += 1;
+          break;
+        case 'RIGHT-DOWN':
+          this.profile.dispersionCorrectionRedX += 1;
+          this.profile.dispersionCorrectionRedY += 1;
+          break;
+      }
+      this.profile.dispersionCorrectionRedX;
+    } else if (color === 'BLUE') {
+      switch (direction) {
+        case 'LEFT-UP':
+          this.profile.dispersionCorrectionBlueX -= 1;
+          this.profile.dispersionCorrectionBlueY -= 1;
+          break;
+        case 'UP':
+          this.profile.dispersionCorrectionBlueY -= 1;
+          break;
+        case 'RIGHT-UP':
+          this.profile.dispersionCorrectionBlueX += 1;
+          this.profile.dispersionCorrectionBlueY -= 1;
+          break;
+        case 'LEFT':
+          this.profile.dispersionCorrectionBlueX -= 1;
+          break;
+        case 'RIGHT':
+          this.profile.dispersionCorrectionBlueX += 1;
+          break;
+        case 'LEFT-DOWN':
+          this.profile.dispersionCorrectionBlueX -= 1;
+          this.profile.dispersionCorrectionBlueY += 1;
+          break;
+        case 'DOWN':
+          this.profile.dispersionCorrectionBlueY += 1;
+          break;
+        case 'RIGHT-DOWN':
+          this.profile.dispersionCorrectionBlueX += 1;
+          this.profile.dispersionCorrectionBlueY += 1;
+          break;
+      }
+    }
+    this.updateProfile();
   }
 
   get savitzkyGolaySizeDisplayValue(): number {

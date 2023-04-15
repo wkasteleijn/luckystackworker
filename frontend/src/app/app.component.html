@@ -926,7 +926,7 @@
                   }} {{
                     nightModeEnabled() ? ' activeColorNight' : ' activeColor'
                   }}"
-                  (click)="(true)"
+                  (click)="dispersionCorrectionClicked('LEFT-UP', 'RED')"
                 >
                   <img
                     src="assets/images/left-up.png"
@@ -941,7 +941,7 @@
                   class="button {{
                     nightModeEnabled() ? 'activeColorNight' : 'activeColor'
                   }}"
-                  (click)="(true)"
+                  (click)="dispersionCorrectionClicked('UP', 'RED')"
                 >
                   <img src="assets/images/up.png" class="dispersionArrow" />
                 </button>
@@ -953,7 +953,7 @@
                   class="button {{
                     nightModeEnabled() ? 'activeColorNight' : 'activeColor'
                   }}"
-                  (click)="(true)"
+                  (click)="dispersionCorrectionClicked('RIGHT-UP', 'RED')"
                 >
                   <img
                     src="assets/images/right-up.png"
@@ -970,22 +970,13 @@
                   class="button {{
                     nightModeEnabled() ? 'activeColorNight' : 'activeColor'
                   }}"
-                  (click)="(true)"
+                  (click)="dispersionCorrectionClicked('LEFT', 'RED')"
                 >
                   <img src="assets/images/left.png" class="dispersionArrow" />
                 </button>
               </div>
               <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="(true)"
-                >
-                  <div class="buttonAuto">Auto</div>
-                </button>
+                <div class="buttonAuto">Red</div>
               </div>
               <div class="dispersionPanelColumn">
                 <button
@@ -994,7 +985,7 @@
                   class="button {{
                     nightModeEnabled() ? 'activeColorNight' : 'activeColor'
                   }}"
-                  (click)="(true)"
+                  (click)="dispersionCorrectionClicked('RIGHT', 'RED')"
                 >
                   <img src="assets/images/right.png" class="dispersionArrow" />
                 </button>
@@ -1008,7 +999,7 @@
                   class="button {{
                     nightModeEnabled() ? 'activeColorNight' : 'activeColor'
                   }}"
-                  (click)="(true)"
+                  (click)="dispersionCorrectionClicked('LEFT-DOWN', 'RED')"
                 >
                   <img
                     src="assets/images/left-down.png"
@@ -1023,7 +1014,7 @@
                   class="button {{
                     nightModeEnabled() ? 'activeColorNight' : 'activeColor'
                   }}"
-                  (click)="(true)"
+                  (click)="dispersionCorrectionClicked('DOWN', 'RED')"
                 >
                   <img src="assets/images/down.png" class="dispersionArrow" />
                 </button>
@@ -1035,7 +1026,7 @@
                   class="button {{
                     nightModeEnabled() ? 'activeColorNight' : 'activeColor'
                   }}"
-                  (click)="(true)"
+                  (click)="dispersionCorrectionClicked('RIGHT-DOWN', 'RED')"
                 >
                   <img
                     src="assets/images/right-down.png"
@@ -1096,14 +1087,234 @@
                 </button>
               </div>
               <div class="dispersionPanelColumn">
+                <div class="buttonAuto">Red</div>
+              </div>
+              <div class="dispersionPanelColumn">
                 <button
                   type="button"
                   mat-button
                   disabled
                   class="button_disabled"
                 >
-                  <div class="buttonAuto">Auto</div>
+                  <img src="assets/images/right.png" class="dispersionArrow" />
                 </button>
+              </div>
+            </div>
+            <div class="dispersionPanelRow">
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <img
+                    src="assets/images/left-down.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <img src="assets/images/down.png" class="dispersionArrow" />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <img
+                    src="assets/images/right-down.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="dispersionGutter"></div>
+        <div class="dispersionPanel">
+          <section *ngIf="dispersionCorrectionEnabled">
+            <div class="dispersionPanelRow">
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="{{
+                    dispersionCorrectionEnabled ? 'button' : 'button_disabled'
+                  }} {{
+                    nightModeEnabled() ? ' activeColorNight' : ' activeColor'
+                  }}"
+                  (click)="dispersionCorrectionClicked('LEFT-UP', 'BLUE')"
+                >
+                  <img
+                    src="assets/images/left-up.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="dispersionCorrectionClicked('UP', 'BLUE')"
+                >
+                  <img src="assets/images/up.png" class="dispersionArrow" />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="dispersionCorrectionClicked('RIGHT-UP', 'BLUE')"
+                >
+                  <img
+                    src="assets/images/right-up.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+            </div>
+            <div class="dispersionPanelRow">
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="dispersionCorrectionClicked('LEFT', 'BLUE')"
+                >
+                  <img src="assets/images/left.png" class="dispersionArrow" />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <div class="buttonAuto">Blue</div>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="dispersionCorrectionClicked('RIGHT', 'BLUE')"
+                >
+                  <img src="assets/images/right.png" class="dispersionArrow" />
+                </button>
+              </div>
+            </div>
+            <div class="dispersionPanelRow">
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="dispersionCorrectionClicked('LEFT-DOWN', 'BLUE')"
+                >
+                  <img
+                    src="assets/images/left-down.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="dispersionCorrectionClicked('DOWN', 'BLUE')"
+                >
+                  <img src="assets/images/down.png" class="dispersionArrow" />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  class="button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="dispersionCorrectionClicked('RIGHT-DOWN', 'BLUE')"
+                >
+                  <img
+                    src="assets/images/right-down.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+            </div>
+          </section>
+          <section *ngIf="!dispersionCorrectionEnabled">
+            <div class="dispersionPanelRow">
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <img
+                    src="assets/images/left-up.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <img src="assets/images/up.png" class="dispersionArrow" />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <img
+                    src="assets/images/right-up.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+            </div>
+            <div class="dispersionPanelRow">
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <img src="assets/images/left.png" class="dispersionArrow" />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <div class="buttonAuto">Blue</div>
               </div>
               <div class="dispersionPanelColumn">
                 <button

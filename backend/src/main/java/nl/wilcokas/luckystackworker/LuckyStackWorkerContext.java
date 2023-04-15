@@ -96,6 +96,11 @@ public class LuckyStackWorkerContext {
         workerProperties.put(name + ".green", String.valueOf(profile.getGreen()));
         workerProperties.put(name + ".blue", String.valueOf(profile.getBlue()));
         workerProperties.put(name + ".saturation", String.valueOf(profile.getSaturation()));
+        workerProperties.put(name + ".dispersionCorrectionEnabled", Boolean.toString(profile.isDispersionCorrectionEnabled()));
+        workerProperties.put(name + ".dispersionCorrectionRedX", String.valueOf(profile.getDispersionCorrectionRedX()));
+        workerProperties.put(name + ".dispersionCorrectionRedY", String.valueOf(profile.getDispersionCorrectionRedY()));
+        workerProperties.put(name + ".dispersionCorrectionBlueX", String.valueOf(profile.getDispersionCorrectionBlueX()));
+        workerProperties.put(name + ".dispersionCorrectionBlueY", String.valueOf(profile.getDispersionCorrectionBlueY()));
     }
 
     public static String getSelectedProfile() {

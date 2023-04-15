@@ -17,6 +17,7 @@ import ij.process.ImageProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.filter.DispersionCorrectionFilter;
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
 import nl.wilcokas.luckystackworker.filter.RGBBalanceFilter;
 import nl.wilcokas.luckystackworker.filter.SaturationFilter;
@@ -42,6 +43,7 @@ public class OperationService {
     private final SaturationFilter saturationFilter;
     private final SavitzkyGolayFilter savitzkyGolayFilter;
     private final SigmaFilterPlus sigmaFilterPlusFilter;
+    private final DispersionCorrectionFilter dispersionCorrectionFilter;
 
     public void correctExposure(ImagePlus image) throws IOException {
         image.setDefault16bitRange(16);
@@ -87,6 +89,9 @@ public class OperationService {
                 && (!excludedOperationList.contains(OperationEnum.BACKGROUND))) {
             applyBrightnessAndContrast(image, profile, true);
         }
+        if ((!excludedOperationList.contains(OperationEnum.DISPERSIONCORRECTION))) {
+            this.applyDispersionCorrection(image, profile);
+        }
     }
 
     public void applyAllOperations(ImagePlus image, final Map<String, String> profileSettings, String profileName) {
@@ -99,6 +104,7 @@ public class OperationService {
         applyDenoise(image, profile);
         applySavitzkyGolayDenoise(image, profile);
         applyLocalContrast(image, profile);
+        applyDispersionCorrection(image, profile);
         applyBrightnessAndContrast(image, profile, true);
         applyRGBBalance(image, profile);
         applyGamma(image, profile);
@@ -147,17 +153,6 @@ public class OperationService {
         if (profile.getLocalContrastLarge() != 0) {
             applyLocalContrast(image, profile.getLocalContrastLarge(), Constants.LOCAL_CONTRAST_LARGE_RADIUS, mode);
         }
-    }
-
-    private void applyLocalContrast(final ImagePlus image, int amount, BigDecimal radius, LSWSharpenMode localContrastMode) {
-        log.info("Applying local contrast with mode {}, radius {} amount {} to image {}", localContrastMode, radius, amount,
-                image.getID());
-        float famount = (amount) / 100f;
-        UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radius(radius.doubleValue()).amount(famount).iterations(1)
-                .build();
-        LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
-                .saturation(1f).unsharpMaskParameters(usParams).mode(localContrastMode).build();
-        lswSharpenFilter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
     }
 
     public void applyDenoise(final ImagePlus image, final Profile profile) {
@@ -243,6 +238,22 @@ public class OperationService {
                 savitzkyGolayFilter.apply(image, SavitzkyGolayRadius.valueOf(profile.getSavitzkyGolaySize()), profile.getSavitzkyGolayAmount());
             }
         }
+    }
+
+    public void applyDispersionCorrection(final ImagePlus image, final Profile profile) {
+        if (profile.isDispersionCorrectionEnabled() && validateRGBStack(image)) {
+            log.info("Applying dispersion correction");
+            dispersionCorrectionFilter.apply(image, profile);
+        }
+    }
+
+    private void applyLocalContrast(final ImagePlus image, int amount, BigDecimal radius, LSWSharpenMode localContrastMode) {
+        log.info("Applying local contrast with mode {}, radius {} amount {} to image {}", localContrastMode, radius, amount, image.getID());
+        float famount = (amount) / 100f;
+        UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radius(radius.doubleValue()).amount(famount).iterations(1).build();
+        LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
+                .saturation(1f).unsharpMaskParameters(usParams).mode(localContrastMode).build();
+        lswSharpenFilter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
     }
 
     private ImageProcessor getImageStackProcessor(final ImagePlus img, final int stackPosition) {

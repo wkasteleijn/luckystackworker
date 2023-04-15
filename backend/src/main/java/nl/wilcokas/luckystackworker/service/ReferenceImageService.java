@@ -149,11 +149,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             operationService.applyDenoise(finalResultImage, profile);
         } else if (operationService.isSavitzkyGolayDenoiseOperation(operation)) {
             operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
+        } else if ((OperationEnum.DISPERSIONCORRECTION == operation)) {
+            operationService.applyDispersionCorrection(finalResultImage, profile);
         } else if ((OperationEnum.CONTRAST == operation) || (OperationEnum.BRIGHTNESS == operation)
                 || (OperationEnum.BACKGROUND == operation)) {
             operationService.applyBrightnessAndContrast(finalResultImage, profile, false);
         }
-
 
         // Always apply the following last and only on the final result as it messes up
         // the sharpening.

@@ -31,4 +31,9 @@ export class Profile {
   operation: string;
   rootFolder: string;
   largeImage: boolean;
+  dispersionCorrectionEnabled: boolean;
+  dispersionCorrectionRedX: number;
+  dispersionCorrectionBlueX: number;
+  dispersionCorrectionRedY: number;
+  dispersionCorrectionBlueY: number;
 }

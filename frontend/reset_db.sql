@@ -21,8 +21,15 @@ update profiles set local_contrast_medium=0;
 update profiles set local_contrast_large=0;
 update profiles set local_contrast_mode='LUMINANCE';
 update profiles set sharpen_mode='LUMINANCE';
+update profiles set dispersion_correction_enabled=false;
+update profiles set dispersion_correction_redx=0;
+update profiles set dispersion_correction_bluex=0;
+update profiles set dispersion_correction_redy=0;
+update profiles set dispersion_correction_bluey=0;
+
 select * from profiles;
 update settings set latest_known_version='3.2.0';
 update settings set latest_known_version_checked=null; --TIMESTAMP '2023-01-24 10.00.00';
 update settings set root_folder='C:/';
+
 select * from settings;

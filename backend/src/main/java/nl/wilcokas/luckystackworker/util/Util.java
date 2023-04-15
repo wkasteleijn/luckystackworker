@@ -140,6 +140,11 @@ public class Util {
                 .green(new BigDecimal(getSetting(props, "green", profileName))) //
                 .blue(new BigDecimal(getSetting(props, "blue", profileName))) //
                 .saturation(new BigDecimal(getSetting(props, "saturation", profileName))) //
+                .dispersionCorrectionEnabled(Boolean.parseBoolean(getSetting(props, "dispersionCorrectionEnabled", profileName))) //
+                .dispersionCorrectionRedX(Integer.valueOf(getSetting(props, "dispersionCorrectionRedX", profileName))) //
+                .dispersionCorrectionRedY(Integer.valueOf(getSetting(props, "dispersionCorrectionRedY", profileName))) //
+                .dispersionCorrectionBlueX(Integer.valueOf(getSetting(props, "dispersionCorrectionBlueX", profileName))) //
+                .dispersionCorrectionBlueX(Integer.valueOf(getSetting(props, "dispersionCorrectionBlueY", profileName))) //
                 .name(profileName).build();
     }
 

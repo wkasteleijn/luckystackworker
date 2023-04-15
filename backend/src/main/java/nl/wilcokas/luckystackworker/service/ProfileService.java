@@ -50,6 +50,11 @@ public class ProfileService {
         result.setLocalContrastFine(profile.getLocalContrastFine());
         result.setLocalContrastMedium(profile.getLocalContrastMedium());
         result.setLocalContrastLarge(profile.getLocalContrastLarge());
+        result.setDispersionCorrectionEnabled(profile.isDispersionCorrectionEnabled());
+        result.setDispersionCorrectionRedX(profile.getDispersionCorrectionRedX());
+        result.setDispersionCorrectionRedY(profile.getDispersionCorrectionRedY());
+        result.setDispersionCorrectionBlueX(profile.getDispersionCorrectionBlueX());
+        result.setDispersionCorrectionBlueY(profile.getDispersionCorrectionBlueY());
         profileRepository.save(result);
         LuckyStackWorkerContext.updateWorkerForProfile(profile);
     }

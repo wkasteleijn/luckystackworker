@@ -10,6 +10,7 @@ import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.filter.DispersionCorrectionFilter;
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
 import nl.wilcokas.luckystackworker.filter.RGBBalanceFilter;
 import nl.wilcokas.luckystackworker.filter.SaturationFilter;
@@ -30,8 +31,9 @@ public class WorkerService {
         final SaturationFilter saturationFilter = new SaturationFilter();
         final SavitzkyGolayFilter savitzkyGolayFilter = new SavitzkyGolayFilter();
         final SigmaFilterPlus sigmaFilterPlusFilter = new SigmaFilterPlus();
+        final DispersionCorrectionFilter dispersionCorrectionFilter = new DispersionCorrectionFilter();
         operationService = new OperationService(lswSharpenFilter, rgbBalanceFilter, saturationFilter,
-                savitzkyGolayFilter, sigmaFilterPlusFilter);
+                savitzkyGolayFilter, sigmaFilterPlusFilter, dispersionCorrectionFilter);
     }
 
     public boolean processFile(final File file, boolean realtime) {

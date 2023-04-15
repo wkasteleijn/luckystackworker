@@ -299,9 +299,11 @@
   flex: 1;
 }
 .buttonAuto {
+  color: rgb(168, 168, 168);
   width: 24px;
   height: 21px;
-  margin-top: 6px;
+  margin-top: 10px;
+  margin-left: 14px;
 }
 .dispersionPanel {
   margin-top: 8px;
@@ -309,6 +311,9 @@
 }
 .dispersionLabel {
   margin-left: 8px;
+}
+.dispersionGutter {
+  margin: 8px;
 }
 .labelColor {
   color: rgb(168, 168, 168);

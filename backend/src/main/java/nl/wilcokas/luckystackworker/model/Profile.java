@@ -114,6 +114,21 @@ public class Profile {
     @Column(name = "localContrastLarge")
     private int localContrastLarge;
 
+    @Column(name = "dispersionCorrectionEnabled")
+    private boolean dispersionCorrectionEnabled;
+
+    @Column(name = "dispersionCorrectionRedX")
+    private int dispersionCorrectionRedX;
+
+    @Column(name = "dispersionCorrectionBlueX")
+    private int dispersionCorrectionBlueX;
+
+    @Column(name = "dispersionCorrectionRedY")
+    private int dispersionCorrectionRedY;
+
+    @Column(name = "dispersionCorrectionBlueY")
+    private int dispersionCorrectionBlueY;
+
     // Non persisted setting properties that are passed to the frontend.
     private String operation;
     private String rootFolder;
