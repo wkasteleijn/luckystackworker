@@ -104,4 +104,16 @@ public class ReferenceController {
             LuckyStackWorkerContext.disableRealTimeEnabled();
         }
     }
+
+    @PutMapping("/dispersion")
+    public void dispersionCorrectionChanged(@RequestBody boolean dispersionCorrection) {
+        if (dispersionCorrection) {
+            log.info("Enabling dispersion correction");
+            // referenceImageService.enableDispersionCorrection();
+        } else {
+            log.info("Disabling dispersion correction");
+            // referenceImageService.disableDispersionCorrection();
+        }
+    }
+
 }

@@ -893,16 +893,38 @@
       </div>
       <p></p>
       <div class="sliderRow">
-        <div class="sliderLabel">Disperion Correction</div>
-        <div class="slider">
-          <section>
+        <div class="sliderLabel"></div>
+        <div class="dispersionPanel">
+          <mat-checkbox
+            [(ngModel)]="dispersionCorrectionEnabled"
+            (change)="dispersionCorrectionEnabledChanged()"
+            [color]="colorTheme()"
+          ></mat-checkbox
+          ><span
+            class="dispersionLabel {{
+              dispersionCorrectionEnabled
+                ? nightModeEnabled()
+                  ? 'sliderRowCategoryTitleColorNight'
+                  : 'sliderRowCategoryTitleColor'
+                : 'labelColor'
+            }}"
+            >Correct Disperion</span
+          >
+        </div>
+      </div>
+      <div class="sliderRow">
+        <div class="sliderLabel"></div>
+        <div class="dispersionPanel">
+          <section *ngIf="dispersionCorrectionEnabled">
             <div class="dispersionPanelRow">
               <div class="dispersionPanelColumn">
                 <button
                   type="button"
                   mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  class="{{
+                    dispersionCorrectionEnabled ? 'button' : 'button_disabled'
+                  }} {{
+                    nightModeEnabled() ? ' activeColorNight' : ' activeColor'
                   }}"
                   (click)="(true)"
                 >
@@ -955,14 +977,14 @@
               </div>
               <div class="dispersionPanelColumn">
                 <button
-                  type="buttonAuto button"
+                  type="button"
                   mat-button
                   class="button {{
                     nightModeEnabled() ? 'activeColorNight' : 'activeColor'
                   }}"
                   (click)="(true)"
                 >
-                  Auto
+                  <div class="buttonAuto">Auto</div>
                 </button>
               </div>
               <div class="dispersionPanelColumn">
@@ -1014,6 +1036,116 @@
                     nightModeEnabled() ? 'activeColorNight' : 'activeColor'
                   }}"
                   (click)="(true)"
+                >
+                  <img
+                    src="assets/images/right-down.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+            </div>
+          </section>
+          <section *ngIf="!dispersionCorrectionEnabled">
+            <div class="dispersionPanelRow">
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <img
+                    src="assets/images/left-up.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <img src="assets/images/up.png" class="dispersionArrow" />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <img
+                    src="assets/images/right-up.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+            </div>
+            <div class="dispersionPanelRow">
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <img src="assets/images/left.png" class="dispersionArrow" />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <div class="buttonAuto">Auto</div>
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <img src="assets/images/right.png" class="dispersionArrow" />
+                </button>
+              </div>
+            </div>
+            <div class="dispersionPanelRow">
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <img
+                    src="assets/images/left-down.png"
+                    class="dispersionArrow"
+                  />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
+                >
+                  <img src="assets/images/down.png" class="dispersionArrow" />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  type="button"
+                  mat-button
+                  disabled
+                  class="button_disabled"
                 >
                   <img
                     src="assets/images/right-down.png"

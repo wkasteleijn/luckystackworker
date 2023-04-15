@@ -288,14 +288,28 @@
   margin-left: 7px;
 }
 .dispersionArrow {
-  width: 32px;
+  width: 24px;
 }
 .dispersionPanelRow {
   display: flex;
+  gap: 4px;
+  margin-top: 4px;
 }
 .dispersionPanelColumn {
   flex: 1;
 }
 .buttonAuto {
-  height: 32px;
+  width: 24px;
+  height: 21px;
+  margin-top: 6px;
+}
+.dispersionPanel {
+  margin-top: 8px;
+  margin-left: 14px;
+}
+.dispersionLabel {
+  margin-left: 8px;
+}
+.labelColor {
+  color: rgb(168, 168, 168);
 }
