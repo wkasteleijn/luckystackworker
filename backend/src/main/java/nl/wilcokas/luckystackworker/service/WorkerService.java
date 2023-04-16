@@ -77,6 +77,6 @@ public class WorkerService {
 
     private String getOutputFile(final File file) {
         return Util.getPathWithoutExtension(file.getAbsolutePath()) + Constants.OUTPUT_POSTFIX + "."
-                + Constants.SUPPORTED_OUTPUT_FORMAT;
+                + Constants.DEFAULT_OUTPUT_FORMAT;
     }
 }
