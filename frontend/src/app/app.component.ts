@@ -544,7 +544,7 @@ export class AppComponent implements OnInit {
     );
     this.profile.operation = 'dispersionCorrection';
     this.profile.dispersionCorrectionEnabled = this.dispersionCorrectionEnabled;
-    this.updateProfile();
+    this.resetDispersionCorrection();
   }
 
   resetDispersionCorrection() {
@@ -642,6 +642,14 @@ export class AppComponent implements OnInit {
       return 169;
     }
     return 0;
+  }
+
+  get dispersionCorrectorTitle() {
+    return (
+      'You should always use a atmospheric dispersion corrector (ADC) with an OSC camera. This dispersion correction function is only meant for minimal corrections,' +
+      ' in case you have any left over dispersion in your recordings. The dispersion correction is also not persisted with the object profile' +
+      ' since it will be different each time.'
+    );
   }
 
   selectRootFolder() {
@@ -757,6 +765,8 @@ export class AppComponent implements OnInit {
     this.green = this.profile.green;
     this.blue = this.profile.blue;
     this.isLargeImage = this.profile.largeImage;
+    this.profile.dispersionCorrectionEnabled = false;
+    this.dispersionCorrectionEnabled = false;
   }
 
   private updateProfile() {

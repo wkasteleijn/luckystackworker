@@ -111,6 +111,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                     profileService.updateProfile(profile);
                     log.info("Profile file found, profile was loaded from there.");
                 }
+                profile.setDispersionCorrectionEnabled(false); // dispersion correction is not meant to be persisted.
                 this.isLargeImage = openReferenceImage(selectedFilePath, profile);
 
                 final String rootFolder = Util.getFileDirectory(selectedFilePath);

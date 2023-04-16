@@ -891,8 +891,10 @@
           >
         </div>
       </div>
+
+      <!-- Dispersion corrector-->
       <p></p>
-      <div class="sliderRow">
+      <div class="sliderRow" title="{{ dispersionCorrectorTitle }}">
         <div class="sliderLabel"></div>
         <div class="dispersionPanel">
           <mat-checkbox
@@ -932,7 +934,7 @@
           </button>
         </div>
       </div>
-      <div class="sliderRow">
+      <div class="sliderRow" title="{{ dispersionCorrectorTitle }}">
         <div class="sliderLabel"></div>
         <div class="dispersionPanel">
           <section *ngIf="dispersionCorrectionEnabled">

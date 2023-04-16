@@ -96,6 +96,7 @@ public class ProfileController {
             Profile profile = Util.readProfile(filePathNoExt);
             if (profile != null) {
                 profile.setLargeImage(referenceImageService.isLargeImage());
+                profile.setDispersionCorrectionEnabled(false); // Dispersion correction is not meant to be persisted.
                 updateProfile(profile);
                 LuckyStackWorkerContext.setSelectedProfile(profile.getName());
                 return profile;
@@ -111,7 +112,7 @@ public class ProfileController {
         LocalDateTime activeOperationTime = LuckyStackWorkerContext.getActiveOperationTime();
         if (activeOperationTime == null
                 || LocalDateTime.now()
-                        .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
+                .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
             LuckyStackWorkerContext.setActiveOperationTime(LocalDateTime.now());
             profileService.updateProfile(profile);
             referenceImageService.updateProcessing(profile);
