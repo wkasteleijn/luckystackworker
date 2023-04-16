@@ -38,7 +38,9 @@ public class DispersionCorrectionFilter {
                 }
             }
         }
-        ip.setPixels(pixelsNew);
+        for (int i = 0; i < pixels.length; i++) {
+            pixels[i] = pixelsNew[i];
+        }
     }
 
 }

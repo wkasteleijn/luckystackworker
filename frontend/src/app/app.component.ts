@@ -547,8 +547,18 @@ export class AppComponent implements OnInit {
     this.updateProfile();
   }
 
+  resetDispersionCorrection() {
+    console.log('resetDispersionCorrection called');
+    this.profile.operation = 'dispersionCorrection';
+    this.profile.dispersionCorrectionRedX = 0;
+    this.profile.dispersionCorrectionRedY = 0;
+    this.profile.dispersionCorrectionBlueX = 0;
+    this.profile.dispersionCorrectionBlueY = 0;
+    this.updateProfile();
+  }
+
   dispersionCorrectionClicked(direction: string, color: string) {
-    console.log('dispersionCorrectionClicked: ' + direction);
+    console.log('dispersionCorrectionClicked called: ' + direction);
     this.profile.operation = 'dispersionCorrection';
     if (color === 'RED') {
       switch (direction) {

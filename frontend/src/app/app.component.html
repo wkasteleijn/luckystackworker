@@ -910,6 +910,26 @@
             }}"
             >Correct Disperion</span
           >
+          <button
+            *ngIf="dispersionCorrectionEnabled"
+            type="button"
+            mat-button
+            class="dispersionRestButton button {{
+              nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+            }}"
+            (click)="resetDispersionCorrection()"
+          >
+            Reset
+          </button>
+          <button
+            *ngIf="!dispersionCorrectionEnabled"
+            type="button"
+            disabled
+            mat-button
+            class="dispersionRestButton button_disabled"
+          >
+            Reset
+          </button>
         </div>
       </div>
       <div class="sliderRow">
