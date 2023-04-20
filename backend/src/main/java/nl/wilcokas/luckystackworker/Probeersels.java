@@ -178,15 +178,19 @@ public class Probeersels {
 
         // De-ringing
         LSWSharpenFilter filter = new LSWSharpenFilter();
-        UnsharpMaskParameters unsharpMaskParameters = UnsharpMaskParameters.builder().amount(0.995f).radius(1).iterations(1).deringRadius(4)
-                .deringStrength(0.13f)
-                .build();
+        UnsharpMaskParameters unsharpMaskParameters = UnsharpMaskParameters.builder().amount(0.9f).radius(1).iterations(3).build();
         LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
                 .saturation(1f).unsharpMaskParameters(unsharpMaskParameters).mode(LSWSharpenMode.LUMINANCE).build();
         filter.applyLuminanceMode(image, parameters);
+
+        unsharpMaskParameters = UnsharpMaskParameters.builder().amount(-0.9f).radius(0.75).iterations(3).build();
+        parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false).saturation(1f)
+                .unsharpMaskParameters(unsharpMaskParameters).mode(LSWSharpenMode.LUMINANCE).build();
+        filter.applyLuminanceMode(image, parameters);
+
         image.updateAndDraw();
 
-        Util.saveImage(image, "C:\\Users\\wkast\\archive\\Jup\\testsession\\jup.jpg", false, false, true);
+        Util.saveImage(image, "C:\\Users\\wkast\\archive\\Jup\\testsession\\jup4.jpg", false, false, true);
 
         Thread.currentThread().sleep(5000);
         System.exit(0);

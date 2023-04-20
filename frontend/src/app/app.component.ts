@@ -495,10 +495,10 @@ export class AppComponent implements OnInit {
       if (!this.profile.savitzkyGolaySize) {
         // If not set, start with the defaults
         this.profile.savitzkyGolaySize = 3;
-        this.profile.savitzkyGolayAmount = 75;
+        this.profile.savitzkyGolayAmount = 100;
         this.profile.savitzkyGolayIterations = 1;
         this.savitzkyGolaySize = '3';
-        this.savitzkyGolayAmount = 75;
+        this.savitzkyGolayAmount = 100;
         this.savitzkyGolayIterations = 1;
       }
     } else if (event.value === 'SIGMA') {

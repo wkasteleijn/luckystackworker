@@ -28,7 +28,7 @@ update profiles set dispersion_correction_red_y=0;
 update profiles set dispersion_correction_blue_y=0;
 
 select * from profiles;
-update settings set latest_known_version='3.1.1';
+update settings set latest_known_version='4.0.0-beta';
 update settings set latest_known_version_checked=null; --TIMESTAMP '2023-01-24 10.00.00';
 update settings set root_folder='~';
 select * from settings;

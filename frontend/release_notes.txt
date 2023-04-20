@@ -1,5 +1,12 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+21/04/2023 major release 4.0.0-beta:
+- Added new method for removal of the edge ring artefact happening on planet surfaces.
+- Added new sliders to control local contrast on fine, medium and large details
+- Splitted up the tabs in 3: Sharpen & Denoise, Contrast & Light, Color & Dispersion.
+- Added a Dispersion Correction tool.
+- Added ability to save individual images in 100% quality JPG format.
+
 11/03/2023 revision release 3.1.1:
 - Fixed broken 16-bit PNG file opening
 - Fixed issues on MacOS with window focus and minimizing
