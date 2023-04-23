@@ -647,7 +647,7 @@ export class AppComponent implements OnInit {
   get dispersionCorrectorTitle() {
     return (
       'You should always use a atmospheric dispersion corrector (ADC) with an OSC camera. This dispersion correction function is only meant for minimal corrections,' +
-      ' in case you have any left over dispersion in your recordings. The dispersion correction is also not persisted with the object profile' +
+      ' in case you have any left over dispersion in your recordings. The dispersion correction is not persisted with the object profile' +
       ' since it will be different each time.'
     );
   }
