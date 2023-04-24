@@ -144,7 +144,7 @@ public class Util {
                 .dispersionCorrectionRedX(Integer.valueOf(getSetting(props, "dispersionCorrectionRedX", profileName))) //
                 .dispersionCorrectionRedY(Integer.valueOf(getSetting(props, "dispersionCorrectionRedY", profileName))) //
                 .dispersionCorrectionBlueX(Integer.valueOf(getSetting(props, "dispersionCorrectionBlueX", profileName))) //
-                .dispersionCorrectionBlueX(Integer.valueOf(getSetting(props, "dispersionCorrectionBlueY", profileName))) //
+                .dispersionCorrectionBlueY(Integer.valueOf(getSetting(props, "dispersionCorrectionBlueY", profileName))) //
                 .name(profileName).build();
     }
 

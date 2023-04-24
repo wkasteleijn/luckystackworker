@@ -89,7 +89,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     public Profile selectReferenceImage(String filePath) throws IOException {
         JFrame frame = getParentFrame();
         JFileChooser jfc = getJFileChooser(filePath);
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "png");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
         jfc.setFileFilter(filter);
         int returnValue = getFilenameFromDialog(frame, jfc, false);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
