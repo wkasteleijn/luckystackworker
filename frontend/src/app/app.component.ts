@@ -276,6 +276,7 @@ export class AppComponent implements OnInit {
       }
     } else {
       // Off
+      this.profile.operation = 'deringStrength';
       this.profile.clippingStrength = 0;
       this.profile.deringStrength = 0;
     }
@@ -516,6 +517,7 @@ export class AppComponent implements OnInit {
       }
     } else {
       // Off
+      this.profile.operation = 'savitzkyGolaySize';
       this.profile.denoiseSigma = 0;
       this.profile.savitzkyGolaySize = 0;
     }

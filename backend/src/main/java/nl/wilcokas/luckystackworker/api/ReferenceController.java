@@ -66,7 +66,7 @@ public class ReferenceController {
         // Ignoring path received from frontend as it isn't used.
         String realPath = LuckyStackWorkerContext.getWorkerProperties().get("inputFolder");
         JFileChooser jfc = referenceImageService.getJFileChooser(realPath);
-        jfc.setFileFilter(new FileNameExtensionFilter("TIFF, JPG", "tif", "jpg"));
+        jfc.setFileFilter(new FileNameExtensionFilter("TIFF, JPG", "tif", "tiff", "jpg", "jpeg"));
         String fileNameNoExt = Util.getFilename(referenceImageService.getFilePath());
         jfc.setSelectedFile(
                 new File(fileNameNoExt + Constants.OUTPUT_POSTFIX + "." + Constants.DEFAULT_OUTPUT_FORMAT));
@@ -74,7 +74,7 @@ public class ReferenceController {
         frame.dispose();
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
-            referenceImageService.saveReferenceImage(selectedFile.getAbsolutePath(), "jpg".equalsIgnoreCase(Util.getFilenameExtension(selectedFile)));
+            referenceImageService.saveReferenceImage(selectedFile.getAbsolutePath(), asJpeg(selectedFile));
         }
     }
 
@@ -102,5 +102,10 @@ public class ReferenceController {
             log.info("Disabling realtime processing");
             LuckyStackWorkerContext.disableRealTimeEnabled();
         }
+    }
+
+    private boolean asJpeg(File selectedFile) {
+        String fileExtension = Util.getFilenameExtension(selectedFile).toLowerCase();
+        return "jpg".equals(fileExtension) || "jpeg".equals(fileExtension);
     }
 }
