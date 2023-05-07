@@ -1,5 +1,11 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+07/05/2023 revision release 4.0.1:
+- Fixed ".tiff" not being accepted as valid extension.
+- Fixed dispersion correction issue.
+- Fixed switching denoise or edge artefact switch off not always switching off.
+- Added ".jpeg" as an allowed extension (common on MacOS).
+
 21/04/2023 major release 4.0.0-beta:
 - Added new method for removal of the edge ring artefact happening on planet surfaces.
 - Added new sliders to control local contrast on fine, medium and large details
