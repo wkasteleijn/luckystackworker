@@ -63,6 +63,10 @@ export class LuckyStackWorkerService {
     return this.http.put(`${this.baseUrl}/reference/crop`, null);
   }
 
+  histogramSelectionChanged(): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/reference/histogram`, null);
+  }
+
   getLatestVersion(): Observable<any> {
     return this.http.get(`${this.baseUrl}/profiles/version`);
   }

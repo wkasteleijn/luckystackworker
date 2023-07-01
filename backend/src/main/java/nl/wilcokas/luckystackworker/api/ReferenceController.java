@@ -93,6 +93,11 @@ public class ReferenceController {
         referenceImageService.crop();
     }
 
+    @PutMapping("/histogram")
+    public void histogram() {
+        referenceImageService.histogram();
+    }
+
     @PutMapping("/realtime")
     public void realTimeChanged(@RequestBody boolean realtime) {
         if (realtime) {

@@ -78,24 +78,6 @@
       Load Profile
     </button>
 
-    <mat-slide-toggle
-      *ngIf="openRefImageEnabled()"
-      class="crop"
-      [(ngModel)]="crop"
-      [color]="colorTheme()"
-      (change)="cropSelectionChanged()"
-      ><span class="sliderLabel">Crop</span></mat-slide-toggle
-    >
-    <mat-slide-toggle
-      *ngIf="!openRefImageEnabled()"
-      class="crop"
-      [(ngModel)]="crop"
-      disabled
-      [color]="colorTheme()"
-      (change)="cropSelectionChanged()"
-      ><span class="sliderLabel">Crop</span></mat-slide-toggle
-    >
-
     <button
       *ngIf="openRefImageEnabled()"
       type="button"
@@ -143,6 +125,24 @@
     >
       &nbsp;&nbsp;-&nbsp;&nbsp;
     </button>
+
+    <mat-slide-toggle
+      *ngIf="openRefImageEnabled()"
+      class="crop"
+      [(ngModel)]="crop"
+      [color]="colorTheme()"
+      (change)="cropSelectionChanged()"
+      ><span class="sliderLabel">Crop</span></mat-slide-toggle
+    >
+    <mat-slide-toggle
+      *ngIf="!openRefImageEnabled()"
+      class="crop"
+      [(ngModel)]="crop"
+      disabled
+      [color]="colorTheme()"
+      (change)="cropSelectionChanged()"
+      ><span class="sliderLabel">Crop</span></mat-slide-toggle
+    >
   </div>
 
   <div class="button_container_top button_container">
@@ -167,6 +167,14 @@
     <span class="buttonDivider">&nbsp;</span>
     <mat-slide-toggle [(ngModel)]="nightMode" [color]="colorTheme()"
       ><span class="sliderLabel">Night Mode</span></mat-slide-toggle
+    >
+  </div>
+  <div class="histogramToggle">
+    <mat-slide-toggle
+      [(ngModel)]="showHistogram"
+      [color]="colorTheme()"
+      (change)="histogramSelectionChanged()"
+      ><span class="sliderLabel">Histogram</span></mat-slide-toggle
     >
   </div>
   <mat-tab-group class="sliderTabs" selectedIndex="0">
@@ -221,7 +229,7 @@
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="10"
-            min="5000"
+            min="0"
             max="9999"
             (input)="amountChanged($event, false)"
             (change)="amountChanged($event, true)"

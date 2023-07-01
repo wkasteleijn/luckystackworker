@@ -87,7 +87,8 @@ export class AppComponent implements OnInit {
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
 
-  realtimeEnabled: boolean = true;
+  realtimeEnabled: boolean = false;
+  showHistogram: boolean = false;
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
@@ -886,6 +887,16 @@ export class AppComponent implements OnInit {
   cropSelectionChanged() {
     console.log('cropSelectionChanged called');
     this.luckyStackWorkerService.cropSelectionChanged().subscribe(
+      (data) => {
+        console.log('Response');
+      },
+      (error) => console.log(error)
+    );
+  }
+
+  histogramSelectionChanged() {
+    console.log('cropSelectionChanged called');
+    this.luckyStackWorkerService.histogramSelectionChanged().subscribe(
       (data) => {
         console.log('Response');
       },

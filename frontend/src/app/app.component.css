@@ -193,7 +193,7 @@
 }
 
 .plusZoom {
-  margin-left: 56px;
+  margin-left: 16px;
 }
 
 .buttonDisabledZoom {
@@ -320,4 +320,10 @@
 }
 .dispersionRestButton {
   margin-left: 83px;
+}
+.histogramToggle {
+  position: fixed;
+  top: 116px;
+  right: 32px;
+  z-index: 100;
 }

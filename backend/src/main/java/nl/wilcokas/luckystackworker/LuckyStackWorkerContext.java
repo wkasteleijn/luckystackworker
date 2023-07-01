@@ -25,7 +25,7 @@ public class LuckyStackWorkerContext {
     private static String status = Constants.STATUS_WORKING;
     private static int filesProcessedCount = 0;
     private static int totalfilesCount = 0;
-    private static boolean realTimeEnabled = true;
+    private static boolean realTimeEnabled = false;
     private static boolean rootFolderSelected = false;
 
     @Getter

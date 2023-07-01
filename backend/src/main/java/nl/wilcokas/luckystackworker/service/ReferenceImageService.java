@@ -31,9 +31,13 @@ import org.springframework.stereotype.Service;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
+import ij.gui.Plot;
+import ij.gui.PlotWindow;
 import ij.gui.RoiListener;
 import ij.gui.Toolbar;
 import ij.io.Opener;
+import ij.measure.Measurements;
+import ij.process.ImageStatistics;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
@@ -66,6 +70,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private boolean roiActive = false;
     private JFrame roiIndicatorFrame = null;
     private JTextField roiIndicatorTextField = null;
+
+    private boolean showHistogram = false;
+    private PlotWindow plotWindow = null;
+    private Plot histogramPlot = null;
 
     private int zoomFactor = 0;
 
@@ -167,6 +175,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         finalResultImage.updateAndDraw();
 
         finalResultImage.setTitle(filePath);
+        if (this.showHistogram) {
+            plotWindow.setVisible(false);
+            updateHistogram();
+        }
     }
 
     public void saveReferenceImage(String path, boolean asJpg) throws IOException {
@@ -234,6 +246,18 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             new Toolbar().setTool(Toolbar.HAND);
             LuckyStackWorkerContext.setSelectedRoi(null);
             hideRoiIndicator();
+        }
+    }
+
+    public void histogram() {
+        if (!showHistogram) {
+            updateHistogram();
+            showHistogram = true;
+        } else {
+            showHistogram = false;
+            if (plotWindow != null) {
+                plotWindow.setVisible(false);
+            }
         }
     }
 
@@ -364,6 +388,41 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     @Override
     public void componentHidden(ComponentEvent e) {
         roiIndicatorFrame.setVisible(false);
+    }
+
+    private void updateHistogram() {
+        ImageStatistics stats = finalResultImage.getStatistics(Measurements.AREA + Measurements.MEAN + Measurements.MODE + Measurements.MIN_MAX, 256);
+        histogramPlot = new Plot("Histogram", "Value", "Frequency");
+        histogramPlot.setColor(Color.GREEN, Color.GREEN);
+        histogramPlot.setBackgroundColor(Color.DARK_GRAY);
+        histogramPlot.setImagePlus(finalResultImage);
+        histogramPlot.setWindowSize(256, 128);
+        histogramPlot.setLimits(0, 65535, 0, 2000);
+        histogramPlot.setXYLabels(null, null);
+        histogramPlot.setXTicks(false);
+        histogramPlot.setYTicks(false);
+        histogramPlot.setXMinorTicks(false);
+        histogramPlot.setYMinorTicks(false);
+        double[] y = stats.histogram();
+        int n = y.length;
+        double[] x = new double[n];
+        double min = 0;
+        for (int i = 0; i < n; i++) {
+            x[i] = min + i * stats.binSize;
+        }
+        histogramPlot.add("bar", x, y);
+        histogramPlot.update();
+        plotWindow = histogramPlot.show();
+        plotWindow.setBackground(Color.DARK_GRAY);
+        plotWindow.setForeground(Color.BLACK);
+        plotWindow.setIconImage(iconImage);
+        plotWindow.getCanvas().setSize(256, 176);
+        plotWindow.setSize(230, 218);
+        if (Constants.SYSTEM_PROFILE_MAC.equals(activeProfile)) {
+            Taskbar.getTaskbar().setIconImage(iconImage);
+        }
+        plotWindow.setLocation(new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y + 512));
+        plotWindow.remove(1);
     }
 
     private void createRoiIndicator() {
