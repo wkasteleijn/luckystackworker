@@ -165,7 +165,10 @@
     </mat-form-field>
 
     <span class="buttonDivider">&nbsp;</span>
-    <mat-slide-toggle [(ngModel)]="nightMode" [color]="colorTheme()"
+    <mat-slide-toggle
+      [(ngModel)]="nightMode"
+      (change)="nightModeChanged()"
+      [color]="colorTheme()"
       ><span class="sliderLabel">Night Mode</span></mat-slide-toggle
     >
   </div>

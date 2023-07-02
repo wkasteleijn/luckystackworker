@@ -98,6 +98,11 @@ public class ReferenceController {
         referenceImageService.histogram();
     }
 
+    @PutMapping("/night")
+    public void nightMode(@RequestParam boolean on) {
+        referenceImageService.night(on);
+    }
+
     @PutMapping("/realtime")
     public void realTimeChanged(@RequestBody boolean realtime) {
         if (realtime) {

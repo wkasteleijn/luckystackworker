@@ -63,6 +63,13 @@ export class LuckyStackWorkerService {
     return this.http.put(`${this.baseUrl}/reference/crop`, null);
   }
 
+  nightModeChanged(nightMode: boolean): Observable<Object> {
+    return this.http.put(
+      `${this.baseUrl}/reference/night?on=${nightMode}`,
+      null
+    );
+  }
+
   histogramSelectionChanged(): Observable<Object> {
     return this.http.put(`${this.baseUrl}/reference/histogram`, null);
   }

@@ -24,6 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -176,8 +177,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
         finalResultImage.setTitle(filePath);
         if (this.showHistogram) {
-            plotWindow.setVisible(false);
-            updateHistogram();
+            drawHistogram(false);
         }
     }
 
@@ -251,13 +251,29 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     public void histogram() {
         if (!showHistogram) {
-            updateHistogram();
+            if (plotWindow != null) {
+                plotWindow.setVisible(true);
+                drawHistogram(isLargeImage);
+            } else {
+                createHistogram();
+            }
             showHistogram = true;
         } else {
             showHistogram = false;
             if (plotWindow != null) {
                 plotWindow.setVisible(false);
             }
+        }
+    }
+
+    public void night(boolean on) {
+        if (showHistogram && plotWindow != null && plotWindow.isVisible()) {
+            if (on) {
+                histogramPlot.setColor(Color.RED, Color.RED);
+            } else {
+                histogramPlot.setColor(Color.GREEN, Color.GREEN);
+            }
+            this.drawHistogram(false);
         }
     }
 
@@ -390,19 +406,71 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         roiIndicatorFrame.setVisible(false);
     }
 
-    private void updateHistogram() {
-        ImageStatistics stats = finalResultImage.getStatistics(Measurements.AREA + Measurements.MEAN + Measurements.MODE + Measurements.MIN_MAX, 256);
+    private void createHistogram() {
+        createHistogramWindow();
+        drawHistogram(true);
+    }
+
+    private void createHistogramWindow() {
+        Point windowLocation = null;
+        if (plotWindow != null && plotWindow.isVisible()) {
+            plotWindow.setVisible(false);
+            plotWindow.dispose();
+            histogramPlot.dispose();
+            windowLocation = plotWindow.getLocation();
+        }
         histogramPlot = new Plot("Histogram", "Value", "Frequency");
         histogramPlot.setColor(Color.GREEN, Color.GREEN);
         histogramPlot.setBackgroundColor(Color.DARK_GRAY);
         histogramPlot.setImagePlus(finalResultImage);
-        histogramPlot.setWindowSize(256, 128);
-        histogramPlot.setLimits(0, 65535, 0, 2000);
+        histogramPlot.setWindowSize(Constants.DEFAULT_HISTOGRAM_WINDOW_WIDTH, Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT);
         histogramPlot.setXYLabels(null, null);
         histogramPlot.setXTicks(false);
         histogramPlot.setYTicks(false);
         histogramPlot.setXMinorTicks(false);
         histogramPlot.setYMinorTicks(false);
+        plotWindow = histogramPlot.show();
+        plotWindow.setBackground(Color.DARK_GRAY);
+        plotWindow.setForeground(Color.BLACK);
+        plotWindow.setIconImage(iconImage);
+        plotWindow.getCanvas().setSize(Constants.DEFAULT_HISTOGRAM_WINDOW_WIDTH, Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT + 48);
+        plotWindow.setSize(Constants.DEFAULT_HISTOGRAM_WINDOW_WIDTH - 26, Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT + 90);
+        if (Constants.SYSTEM_PROFILE_MAC.equals(activeProfile)) {
+            Taskbar.getTaskbar().setIconImage(iconImage);
+        }
+        plotWindow.setLocation(determineHistogramWindowLocation(windowLocation));
+        plotWindow.remove(1);
+    }
+
+    private Point determineHistogramWindowLocation(Point windowLocation) {
+        Point imageWindowLocation = finalResultImage.getWindow().getLocation();
+        int imageWindowLocationX = (int) Math.round(imageWindowLocation.getX());
+        int imageWindowLocationY = (int) Math.round(imageWindowLocation.getY());
+        if (finalResultImage.getHeight() < (Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT * 3)) {
+            return new Point(imageWindowLocationX, imageWindowLocationY + finalResultImage.getHeight() + 74);
+        } else {
+            if (windowLocation != null) {
+                return windowLocation;
+            }
+            return new Point(imageWindowLocationX, imageWindowLocationY);
+        }
+    }
+
+    private void drawHistogram(boolean isNew) {
+        Pair<double[], double[]> histogram = getHistogram();
+        double[] x = histogram.getLeft();
+        double[] y = histogram.getRight();
+        histogramPlot.setLimits(0, 65535, 0, getYLimit(y));
+        if (isNew) {
+            histogramPlot.add("bar", x, y);
+        } else {
+            histogramPlot.replace(0, "bar", x, y);
+        }
+        histogramPlot.update();
+    }
+
+    private Pair<double[], double[]> getHistogram() {
+        ImageStatistics stats = finalResultImage.getStatistics(Measurements.AREA + Measurements.MEAN + Measurements.MODE + Measurements.MIN_MAX, 256);
         double[] y = stats.histogram();
         int n = y.length;
         double[] x = new double[n];
@@ -410,19 +478,21 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         for (int i = 0; i < n; i++) {
             x[i] = min + i * stats.binSize;
         }
-        histogramPlot.add("bar", x, y);
-        histogramPlot.update();
-        plotWindow = histogramPlot.show();
-        plotWindow.setBackground(Color.DARK_GRAY);
-        plotWindow.setForeground(Color.BLACK);
-        plotWindow.setIconImage(iconImage);
-        plotWindow.getCanvas().setSize(256, 176);
-        plotWindow.setSize(230, 218);
-        if (Constants.SYSTEM_PROFILE_MAC.equals(activeProfile)) {
-            Taskbar.getTaskbar().setIconImage(iconImage);
+        return Pair.of(x, y);
+    }
+
+    private double getYLimit(double[] y) {
+        int n = y.length;
+        int lowerBound = (int) Math.round(n * 0.1); // disregard the lowest and highest 10% of the histogram to determine maximum
+        // displayed.
+        int upperBound = (int) Math.round(n * 0.9);
+        double max = 0.0;
+        for (int i = lowerBound; i < upperBound; i++) {
+            if (y[i] > max) {
+                max = y[i];
+            }
         }
-        plotWindow.setLocation(new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y + 512));
-        plotWindow.remove(1);
+        return max;
     }
 
     private void createRoiIndicator() {
@@ -559,6 +629,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             }
 
             finalResultImage.setTitle(this.filePath);
+
+            if (showHistogram) {
+                createHistogram();
+            }
         }
         return isLargeImage;
     }

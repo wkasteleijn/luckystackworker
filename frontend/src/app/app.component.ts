@@ -884,6 +884,16 @@ export class AppComponent implements OnInit {
     return this.nightMode;
   }
 
+  nightModeChanged() {
+    console.log('nightModeChanged called');
+    this.luckyStackWorkerService.nightModeChanged(this.nightMode).subscribe(
+      (data) => {
+        console.log('Response');
+      },
+      (error) => console.log(error)
+    );
+  }
+
   cropSelectionChanged() {
     console.log('cropSelectionChanged called');
     this.luckyStackWorkerService.cropSelectionChanged().subscribe(
