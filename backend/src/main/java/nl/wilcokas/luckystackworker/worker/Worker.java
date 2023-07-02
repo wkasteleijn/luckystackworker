@@ -19,7 +19,7 @@ import nl.wilcokas.luckystackworker.util.Util;
 public class Worker extends Thread {
 
     private static final int WAIT_DELAY = 4000;
-    private static final int REALTIME_WAIT_LOOP = 7;
+    private static final int REALTIME_WAIT_LOOP = 1;
 
     private Map<String, String> properties;
     private WorkerService workerService;
@@ -38,9 +38,9 @@ public class Worker extends Thread {
         log.info("Worker started");
         while (running) {
             try {
-                String activeProfile = LuckyStackWorkerContext.getActiveProfile();
-                if (activeProfile != null) {
-                    applyProfile(activeProfile);
+                String profile = LuckyStackWorkerContext.getSelectedProfile();
+                if (LuckyStackWorkerContext.isProfileBeingApplied()) {
+                    applyProfile(profile);
                 } else {
                     log.debug("Waiting for a profile to be applied...");
                     if (LuckyStackWorkerContext.isRealTimeEnabled() && LuckyStackWorkerContext.isRootFolderSelected()) {
@@ -55,10 +55,10 @@ public class Worker extends Thread {
                 Util.pause(WAIT_DELAY);
             } catch (Exception e) {
                 log.error("Error:", e);
-                LuckyStackWorkerContext.inactivateProfile();
                 LuckyStackWorkerContext.statusUpdate(Constants.STATUS_IDLE);
                 LuckyStackWorkerContext.setFilesProcessedCount(0);
                 LuckyStackWorkerContext.setTotalfilesCount(0);
+                LuckyStackWorkerContext.setProfileBeingApplied(false);
             }
         }
     }
@@ -75,10 +75,10 @@ public class Worker extends Thread {
         if (!processFiles(files)) {
             log.warn("Worker did not process any file from {}, active profile {} not matching with any files", getInputFolder(), activeProfile);
         }
-        LuckyStackWorkerContext.inactivateProfile();
         LuckyStackWorkerContext.statusUpdate(Constants.STATUS_IDLE);
         LuckyStackWorkerContext.setFilesProcessedCount(0);
         LuckyStackWorkerContext.setTotalfilesCount(0);
+        LuckyStackWorkerContext.setProfileBeingApplied(false);
     }
 
     private Collection<File> getImages(boolean recursive) {
@@ -88,9 +88,9 @@ public class Worker extends Thread {
     private void realtimeProcess() {
         log.debug("Checking if there is any file to process...");
         try {
-            Collection<File> files = getImages(false);
+            Collection<File> files = getImages(true);
             for (File file : files) {
-                String name = Util.getFilename(file);
+                String name = Util.getFilename(Util.getIJFileFormat(file.getAbsolutePath()));
                 String extension = Util.getFilenameExtension(file);
                 if (!name.endsWith(Constants.OUTPUT_POSTFIX) && Arrays.asList(getExtensions()).contains(extension)
                         && !isInFileList(files, name + Constants.OUTPUT_POSTFIX)) {
@@ -108,7 +108,7 @@ public class Worker extends Thread {
     }
 
     private boolean isInFileList(Collection<File> files, String filename) {
-        return files.stream().map(f -> Util.getFilename(f)).anyMatch(filename::equals);
+        return files.stream().map(f -> Util.getFilename(Util.getIJFileFormat(f.getAbsolutePath()))).anyMatch(filename::equals);
     }
 
     private boolean processFiles(Collection<File> files) {

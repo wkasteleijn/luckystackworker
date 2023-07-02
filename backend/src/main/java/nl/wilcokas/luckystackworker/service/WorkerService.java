@@ -44,7 +44,7 @@ public class WorkerService {
             return false;
         }
         String profile = profileOpt.get();
-        if (realtime || profile.equals(LuckyStackWorkerContext.getActiveProfile())) {
+        if (realtime || profile.equals(LuckyStackWorkerContext.getSelectedProfile())) {
             try {
                 final String filename = Util.getImageName(Util.getIJFileFormat(filePath));
                 log.info("Applying profile '{}' to: {}", profile, filename);
@@ -64,8 +64,8 @@ public class WorkerService {
                         imp.setRoi(LuckyStackWorkerContext.getSelectedRoi());
                         imp = imp.crop();
                     }
-                    Util.saveImage(imp, getOutputFile(file), Util.isPngRgbStack(imp, filePath),
-                            LuckyStackWorkerContext.getSelectedRoi() != null, false);
+                    Util.saveImage(imp, profile, getOutputFile(file), Util.isPngRgbStack(imp, filePath),
+                            LuckyStackWorkerContext.getSelectedRoi() != null, false, true);
                     return true;
                 }
             } catch (Exception e) {

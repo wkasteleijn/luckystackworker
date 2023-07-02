@@ -88,7 +88,7 @@ export class AppComponent implements OnInit {
   componentColorNight: ThemePalette = 'warn';
 
   realtimeEnabled: boolean = false;
-  showHistogram: boolean = false;
+  showHistogram: boolean = true;
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,

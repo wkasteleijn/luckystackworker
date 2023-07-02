@@ -21,12 +21,12 @@ import nl.wilcokas.luckystackworker.worker.WorkerException;
 public class LuckyStackWorkerContext {
     private static Worker worker;
     private static Map<String, String> workerProperties;
-    private static String activeProfile;
     private static String status = Constants.STATUS_WORKING;
     private static int filesProcessedCount = 0;
     private static int totalfilesCount = 0;
     private static boolean realTimeEnabled = false;
     private static boolean rootFolderSelected = false;
+    private static boolean profileBeingApplied = false;
 
     @Getter
     @Setter
@@ -123,18 +123,6 @@ public class LuckyStackWorkerContext {
         workerProperties.put("inputFolder", rootFolder);
     }
 
-    public static String getActiveProfile() {
-        return activeProfile;
-    }
-
-    public static void setActiveProfile(String profile) {
-        activeProfile = profile;
-    }
-
-    public static void inactivateProfile() {
-        activeProfile = null;
-    }
-
     public static void statusUpdate(String message) {
         status = message;
     }
@@ -166,6 +154,14 @@ public class LuckyStackWorkerContext {
 
     public static boolean isRootFolderSelected() {
         return rootFolderSelected;
+    }
+
+    public static boolean isProfileBeingApplied() {
+        return profileBeingApplied;
+    }
+
+    public static void setProfileBeingApplied(boolean profileBeingApplied) {
+        LuckyStackWorkerContext.profileBeingApplied = profileBeingApplied;
     }
 
 }

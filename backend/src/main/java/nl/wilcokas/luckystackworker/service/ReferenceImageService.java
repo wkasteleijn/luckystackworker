@@ -72,7 +72,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private JFrame roiIndicatorFrame = null;
     private JTextField roiIndicatorTextField = null;
 
-    private boolean showHistogram = false;
+    private boolean showHistogram = true;
     private PlotWindow plotWindow = null;
     private Plot histogramPlot = null;
 
@@ -176,7 +176,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         finalResultImage.updateAndDraw();
 
         finalResultImage.setTitle(filePath);
-        if (this.showHistogram) {
+        if (showHistogram && plotWindow != null) {
             drawHistogram(false);
         }
     }
@@ -185,8 +185,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         String pathNoExt = Util.getPathWithoutExtension(path);
         String savePath = pathNoExt + "." + (asJpg ? "jpg" : Constants.DEFAULT_OUTPUT_FORMAT);
         log.info("Saving image to  {}", savePath);
-        Util.saveImage(finalResultImage, savePath,
-                Util.isPngRgbStack(finalResultImage, filePath), roiActive, asJpg);
+        Util.saveImage(finalResultImage, null, savePath,
+                Util.isPngRgbStack(finalResultImage, filePath), roiActive, asJpg, false);
         writeProfile(pathNoExt);
     }
 

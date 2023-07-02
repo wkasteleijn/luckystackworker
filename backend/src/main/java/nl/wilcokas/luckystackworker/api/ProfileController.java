@@ -130,8 +130,9 @@ public class ProfileController {
             LuckyStackWorkerContext.statusUpdate(Constants.STATUS_WORKING);
             LuckyStackWorkerContext.updateWorkerForProfile(profile);
             LuckyStackWorkerContext.setSelectedRoi(referenceImageService.getFinalResultImage().getRoi());
-            LuckyStackWorkerContext.setActiveProfile(profileName);
+            LuckyStackWorkerContext.setSelectedProfile(profileName);
             referenceImageService.writeProfile();
+            LuckyStackWorkerContext.setProfileBeingApplied(true);
         } else {
             log.warn("Attempt to apply profile while nothing was selected");
             LuckyStackWorkerContext.statusUpdate(Constants.STATUS_IDLE);

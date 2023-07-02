@@ -168,7 +168,7 @@ public class Util {
         Files.delete(Paths.get(path));
     }
 
-    public static void saveImage(ImagePlus image, String path, boolean isPngRgbStack, boolean crop, boolean asJpg) throws IOException {
+    public static void saveImage(ImagePlus image, String profileName, String path, boolean isPngRgbStack, boolean crop, boolean asJpg, boolean fromWorker) throws IOException {
         if (crop) {
             image = image.crop();
         }
@@ -180,6 +180,14 @@ public class Util {
         FileSaver saver = new FileSaver(image);
         if (isPngRgbStack) {
             hackIncorrectPngFileInfo(saver);
+        }
+        if (fromWorker) {
+            String folder = getFileDirectory(path);
+            if (!folder.endsWith(profileName + Constants.WORKER_FOLDER_POSTFIX)) {
+                String newFolder = folder + "/" + profileName + Constants.WORKER_FOLDER_POSTFIX;
+                Files.createDirectories(Paths.get(newFolder));
+                path = newFolder + "/" + getFilenameFromPath(getIJFileFormat(path));
+            }
         }
         if (asJpg) {
             saver.setJpegQuality(100);
@@ -456,18 +464,6 @@ public class Util {
 
     public static String getLswVersion() {
         return System.getProperty("lsw.version");
-        // URLClassLoader classloader = (URLClassLoader) Util.class.getClassLoader();
-        // URL url = classloader.findResource("/META-INF/MANIFEST.MF");
-        // try {
-        // Manifest manifest = new Manifest(url.openStream());
-        // return (String) manifest
-        // .getMainAttributes()
-        // .get(Attributes.Name.IMPLEMENTATION_VERSION);
-        // } catch (IOException e) {
-        // log.warn("App version could not be determined due to missing
-        // implementation-version in manifest file!");
-        // return null;
-        // }
     }
 
     public static int convertToUnsignedInt(final short value) {
