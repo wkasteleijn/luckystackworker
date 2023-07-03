@@ -69,7 +69,7 @@ public class ReferenceController {
         jfc.setFileFilter(new FileNameExtensionFilter("TIFF, JPG", "tif", "tiff", "jpg", "jpeg"));
         String fileNameNoExt = Util.getFilename(referenceImageService.getFilePath());
         jfc.setSelectedFile(
-                new File(fileNameNoExt + Constants.OUTPUT_POSTFIX + "." + Constants.DEFAULT_OUTPUT_FORMAT));
+                new File(fileNameNoExt + Constants.OUTPUT_POSTFIX_SAVE + "." + Constants.DEFAULT_OUTPUT_FORMAT));
         int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, "Save reference image", true);
         frame.dispose();
         if (returnValue == JFileChooser.APPROVE_OPTION) {

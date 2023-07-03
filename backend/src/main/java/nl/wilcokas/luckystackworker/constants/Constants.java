@@ -8,6 +8,7 @@ public class Constants {
     }
 
     public static final String OUTPUT_POSTFIX = "_LSW";
+    public static final String OUTPUT_POSTFIX_SAVE = "_REF";
     public static final String WORKER_FOLDER_POSTFIX = "_lsw";
     public static final String STATUS_IDLE = "Idle";
     public static final String STATUS_WORKING = "Working";

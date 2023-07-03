@@ -92,7 +92,7 @@ public class Worker extends Thread {
             for (File file : files) {
                 String name = Util.getFilename(Util.getIJFileFormat(file.getAbsolutePath()));
                 String extension = Util.getFilenameExtension(file);
-                if (!name.endsWith(Constants.OUTPUT_POSTFIX) && Arrays.asList(getExtensions()).contains(extension)
+                if (!name.contains(Constants.OUTPUT_POSTFIX) && Arrays.asList(getExtensions()).contains(extension)
                         && !isInFileList(files, name + Constants.OUTPUT_POSTFIX)) {
                     log.info("Realtime processing file {}", name);
                     if (workerService.processFile(file, true)) {
@@ -117,7 +117,7 @@ public class Worker extends Thread {
         for (File file : files) {
             String name = Util.getFilename(file);
             String extension = Util.getFilenameExtension(file);
-            if (!name.endsWith(Constants.OUTPUT_POSTFIX) && Arrays.asList(getExtensions()).contains(extension)) {
+            if (!name.contains(Constants.OUTPUT_POSTFIX) && Arrays.asList(getExtensions()).contains(extension)) {
                 filesProcessed = filesProcessed | workerService.processFile(file, false);
             }
             LuckyStackWorkerContext.setFilesProcessedCount(++count);

@@ -427,6 +427,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         histogramPlot.setXYLabels(null, null);
         histogramPlot.setXTicks(false);
         histogramPlot.setYTicks(false);
+        histogramPlot.setAxisXLog(false);
+        histogramPlot.setAxisYLog(false);
         histogramPlot.setXMinorTicks(false);
         histogramPlot.setYMinorTicks(false);
         plotWindow = histogramPlot.show();
@@ -440,6 +442,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
         plotWindow.setLocation(determineHistogramWindowLocation(windowLocation));
         plotWindow.remove(1);
+        plotWindow.setResizable(false);
     }
 
     private Point determineHistogramWindowLocation(Point windowLocation) {
