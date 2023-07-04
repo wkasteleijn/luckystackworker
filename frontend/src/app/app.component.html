@@ -201,13 +201,44 @@
             (change)="sharpenModeChanged($event, true)"
             class="sharpenMode"
           >
-            <mat-radio-button value="LUMINANCE" class="radioSizeButtonSharpen"
-              >Luminance
-            </mat-radio-button>
-            <mat-radio-button value="RGB" class="radioSizeButton sharpenModeRGB"
+            <mat-radio-button value="RGB" class="radioSizeButtonSharpen"
               >RGB</mat-radio-button
             >
+            <mat-radio-button
+              value="LUMINANCE"
+              class="radioSizeButton sharpenModeRGB"
+              >Luminance
+            </mat-radio-button>
           </mat-radio-group>
+        </div>
+        <div *ngIf="sharpenMode === 'LUMINANCE'">
+          <mat-checkbox
+            [(ngModel)]="luminanceIncludeRed"
+            (change)="luminanceIncludeChanged($event, true)"
+            [color]="colorTheme()"
+            >Red</mat-checkbox
+          >
+          <mat-checkbox
+            [(ngModel)]="luminanceIncludeGreen"
+            (change)="luminanceIncludeChanged($event, true)"
+            [color]="colorTheme()"
+            class="luminanceIncludeBox"
+            >Green</mat-checkbox
+          >
+          <mat-checkbox
+            [(ngModel)]="luminanceIncludeBlue"
+            (change)="luminanceIncludeChanged($event, true)"
+            [color]="colorTheme()"
+            class="luminanceIncludeBox"
+            >Blue</mat-checkbox
+          >
+          <mat-checkbox
+            [(ngModel)]="luminanceIncludeColor"
+            (change)="luminanceIncludeChanged()"
+            [color]="colorTheme()"
+            class="luminanceIncludeBox"
+            >Color</mat-checkbox
+          >
         </div>
       </div>
       <div class="sliderRow">

@@ -8,6 +8,10 @@ export class Profile {
   denoiseSigma: number;
   denoiseRadius: number;
   denoiseIterations: number;
+  luminanceIncludeRed: boolean;
+  luminanceIncludeGreen: boolean;
+  luminanceIncludeBlue: boolean;
+  luminanceIncludeColor: boolean;
   gamma: number;
   contrast: number;
   brightness: number;

@@ -58,6 +58,7 @@
   flex-wrap: nowrap;
   align-items: baseline;
   max-height: 32px;
+  color: rgb(168, 168, 168);
 }
 
 .sliderRowCategoryTitle {
@@ -226,6 +227,9 @@
 }
 .radioSizeButtonSharpen {
   margin-left: 46px;
+}
+.luminanceIncludeBox {
+  margin-left: 24px;
 }
 .denoiseMode {
   margin-left: 24px;

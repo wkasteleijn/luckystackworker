@@ -44,6 +44,10 @@ export class AppComponent implements OnInit {
   clippingRange: number;
   deringRadius: number;
   deringStrength: number;
+  luminanceIncludeRed: boolean = true;
+  luminanceIncludeGreen: boolean = true;
+  luminanceIncludeBlue: boolean = true;
+  luminanceIncludeColor: boolean = true;
 
   // denoise
   denoiseAmount: number;
@@ -243,6 +247,17 @@ export class AppComponent implements OnInit {
     if (update) {
       this.updateProfile();
     }
+  }
+
+  luminanceIncludeChanged() {
+    this.profile.luminanceIncludeRed = this.luminanceIncludeRed;
+    this.profile.luminanceIncludeGreen = this.luminanceIncludeGreen;
+    this.profile.luminanceIncludeBlue = this.luminanceIncludeBlue;
+    this.profile.operation = 'sharpenMode';
+    console.log(
+      `luminanceInclude called: red ${this.luminanceIncludeRed}, green ${this.luminanceIncludeGreen}, blue ${this.luminanceIncludeBlue}, color ${this.luminanceIncludeColor}`
+    );
+    this.updateProfile();
   }
 
   localContrastModeChanged(event: any, update: boolean) {
