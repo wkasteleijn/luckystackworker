@@ -240,24 +240,26 @@ export class AppComponent implements OnInit {
   }
 
   sharpenModeChanged(event: any, update: boolean) {
-    this.profile.sharpenMode = event.value;
-    this.sharpenMode = event.value;
+    this.profile.sharpenMode = event ? event.value : this.sharpenMode;
+    this.sharpenMode = event ? event.value : this.sharpenMode;
+    if (
+      !this.luminanceIncludeRed &&
+      !this.luminanceIncludeGreen &&
+      !this.luminanceIncludeBlue
+    ) {
+      this.luminanceIncludeRed = true;
+      this.luminanceIncludeGreen = true;
+      this.luminanceIncludeBlue = true;
+    }
+    this.profile.luminanceIncludeRed = this.luminanceIncludeRed;
+    this.profile.luminanceIncludeGreen = this.luminanceIncludeGreen;
+    this.profile.luminanceIncludeBlue = this.luminanceIncludeBlue;
+    this.profile.luminanceIncludeColor = this.luminanceIncludeColor;
     this.profile.operation = 'sharpenMode';
     console.log('sharpenMode called: ' + this.profile.sharpenMode);
     if (update) {
       this.updateProfile();
     }
-  }
-
-  luminanceIncludeChanged() {
-    this.profile.luminanceIncludeRed = this.luminanceIncludeRed;
-    this.profile.luminanceIncludeGreen = this.luminanceIncludeGreen;
-    this.profile.luminanceIncludeBlue = this.luminanceIncludeBlue;
-    this.profile.operation = 'sharpenMode';
-    console.log(
-      `luminanceInclude called: red ${this.luminanceIncludeRed}, green ${this.luminanceIncludeGreen}, blue ${this.luminanceIncludeBlue}, color ${this.luminanceIncludeColor}`
-    );
-    this.updateProfile();
   }
 
   localContrastModeChanged(event: any, update: boolean) {

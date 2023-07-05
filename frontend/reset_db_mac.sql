@@ -26,6 +26,10 @@ update profiles set dispersion_correction_redx=0;
 update profiles set dispersion_correction_bluex=0;
 update profiles set dispersion_correction_redy=0;
 update profiles set dispersion_correction_bluey=0;
+update profiles set luminance_include_red=true;
+update profiles set luminance_include_green=true;
+update profiles set luminance_include_blue=true;
+update profiles set luminance_include_color=true;
 
 select * from profiles;
 update settings set latest_known_version='4.0.1';

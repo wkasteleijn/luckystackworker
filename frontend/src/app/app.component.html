@@ -214,27 +214,27 @@
         <div *ngIf="sharpenMode === 'LUMINANCE'">
           <mat-checkbox
             [(ngModel)]="luminanceIncludeRed"
-            (change)="luminanceIncludeChanged($event, true)"
+            (change)="sharpenModeChanged(undefined, true)"
             [color]="colorTheme()"
             >Red</mat-checkbox
           >
           <mat-checkbox
             [(ngModel)]="luminanceIncludeGreen"
-            (change)="luminanceIncludeChanged($event, true)"
+            (change)="sharpenModeChanged(undefined, true)"
             [color]="colorTheme()"
             class="luminanceIncludeBox"
             >Green</mat-checkbox
           >
           <mat-checkbox
             [(ngModel)]="luminanceIncludeBlue"
-            (change)="luminanceIncludeChanged($event, true)"
+            (change)="sharpenModeChanged(undefined, true)"
             [color]="colorTheme()"
             class="luminanceIncludeBox"
             >Blue</mat-checkbox
           >
           <mat-checkbox
             [(ngModel)]="luminanceIncludeColor"
-            (change)="luminanceIncludeChanged()"
+            (change)="sharpenModeChanged(undefined, true)"
             [color]="colorTheme()"
             class="luminanceIncludeBox"
             >Color</mat-checkbox

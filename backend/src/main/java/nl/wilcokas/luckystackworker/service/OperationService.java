@@ -123,7 +123,9 @@ public class OperationService {
                     .iterations(iterations).clippingStrength(clippingStrength).clippingRange(100 - profile.getClippingRange())
                     .deringRadius(profile.getDeringRadius().doubleValue()).deringStrength(deringStrength).build();
             LSWSharpenMode mode = (profile.getSharpenMode() == null) ? LSWSharpenMode.LUMINANCE : LSWSharpenMode.valueOf(profile.getSharpenMode());
-            LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
+            LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(profile.isLuminanceIncludeBlue())
+                    .includeGreen(profile.isLuminanceIncludeGreen()) //
+                    .includeRed(profile.isLuminanceIncludeRed()).includeColor(profile.isLuminanceIncludeColor())
                     .saturation(1f).unsharpMaskParameters(usParams).mode(mode).build();
             if (profile.getSharpenMode().equals(LSWSharpenMode.RGB.toString()) || !validateRGBStack(image)) {
                 if (profile.getClippingStrength() > 0) {
@@ -193,6 +195,8 @@ public class OperationService {
     }
 
     public void applySaturation(final ImagePlus image, final Profile profile) {
+        // TODO: works if "&& (profile.getSaturation().compareTo(BigDecimal.ONE) > 0)"
+        // is excluded, but should not be needed
         if (profile.getSaturation() != null && (profile.getSaturation().compareTo(BigDecimal.ONE) > 0)) {
             if (validateRGBStack(image)) {
                 log.info("Applying saturation increase with factor {} to image {}", profile.getSaturation(),

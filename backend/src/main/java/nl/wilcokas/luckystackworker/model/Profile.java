@@ -129,6 +129,18 @@ public class Profile {
     @Column(name = "dispersionCorrectionBlueY")
     private int dispersionCorrectionBlueY;
 
+    @Column(name = "luminanceIncludeRed")
+    private boolean luminanceIncludeRed;
+
+    @Column(name = "luminanceIncludeGreen")
+    private boolean luminanceIncludeGreen;
+
+    @Column(name = "luminanceIncludeBlue")
+    private boolean luminanceIncludeBlue;
+
+    @Column(name = "luminanceIncludeColor")
+    private boolean luminanceIncludeColor;
+
     // Non persisted setting properties that are passed to the frontend.
     private String operation;
     private String rootFolder;

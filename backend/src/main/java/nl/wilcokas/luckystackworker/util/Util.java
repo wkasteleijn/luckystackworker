@@ -145,6 +145,10 @@ public class Util {
                 .dispersionCorrectionRedY(Integer.valueOf(getSetting(props, "dispersionCorrectionRedY", profileName))) //
                 .dispersionCorrectionBlueX(Integer.valueOf(getSetting(props, "dispersionCorrectionBlueX", profileName))) //
                 .dispersionCorrectionBlueY(Integer.valueOf(getSetting(props, "dispersionCorrectionBlueY", profileName))) //
+                .luminanceIncludeRed(Boolean.valueOf(getSetting(props, "luminanceIncludeRed", profileName)))
+                .luminanceIncludeGreen(Boolean.valueOf(getSetting(props, "luminanceIncludeGreen", profileName)))
+                .luminanceIncludeBlue(Boolean.valueOf(getSetting(props, "luminanceIncludeBlue", profileName)))
+                .luminanceIncludeColor(Boolean.valueOf(getSetting(props, "luminanceIncludeColor", profileName)))
                 .name(profileName).build();
     }
 
@@ -344,7 +348,7 @@ public class Util {
     }
 
     public static float[] rgbToHsl(float red, float green, float blue, boolean includeRed, boolean includeGreen,
-            boolean includeBlue,
+            boolean includeBlue, boolean includeColor,
             LSWSharpenMode mode) {
         float max = Math.max(Math.max(red, green), blue);
         float min = Math.min(Math.min(red, green), blue);
@@ -373,11 +377,13 @@ public class Util {
             luminance = (max + min) * 0.5f;
         }
 
-        float saturation;
-        if (c == 0) {
-            saturation = 0.f;
-        } else {
-            saturation = c / (1 - Math.abs(2.f * luminance - 1.f));
+        float saturation = 0f;
+        if (includeColor) {
+            if (c == 0) {
+                saturation = 0.f;
+            } else {
+                saturation = c / (1 - Math.abs(2.f * luminance - 1.f));
+            }
         }
 
         float[] hsl = new float[3];

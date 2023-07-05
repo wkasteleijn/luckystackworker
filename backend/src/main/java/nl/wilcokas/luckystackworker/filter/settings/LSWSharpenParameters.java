@@ -20,6 +20,7 @@ public class LSWSharpenParameters {
     private boolean includeRed;
     private boolean includeGreen;
     private boolean includeBlue;
+    private boolean includeColor;
 
     private float saturation;
 

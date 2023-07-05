@@ -55,6 +55,10 @@ public class ProfileService {
         result.setDispersionCorrectionRedY(profile.getDispersionCorrectionRedY());
         result.setDispersionCorrectionBlueX(profile.getDispersionCorrectionBlueX());
         result.setDispersionCorrectionBlueY(profile.getDispersionCorrectionBlueY());
+        result.setLuminanceIncludeRed(profile.isLuminanceIncludeRed());
+        result.setLuminanceIncludeGreen(profile.isLuminanceIncludeGreen());
+        result.setLuminanceIncludeBlue(profile.isLuminanceIncludeBlue());
+        result.setLuminanceIncludeColor(profile.isLuminanceIncludeColor());
         profileRepository.save(result);
         LuckyStackWorkerContext.updateWorkerForProfile(profile);
     }

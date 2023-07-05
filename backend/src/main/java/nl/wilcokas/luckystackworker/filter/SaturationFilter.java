@@ -33,7 +33,7 @@ public class SaturationFilter {
         float[] pixelsLum = new float[pixelsRed.length];
         for (int i = 0; i < pixelsRed.length; i++) {
             LSWSharpenMode mode = LSWSharpenMode.valueOf(profile.getSharpenMode());
-            float[] hsl = Util.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], true, true, true, mode);
+            float[] hsl = Util.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], true, true, true, profile.isLuminanceIncludeColor(), mode);
             pixelsHue[i] = hsl[0];
             pixelsSat[i] = hsl[1] * profile.getSaturation().floatValue();
             pixelsLum[i] = hsl[2];
