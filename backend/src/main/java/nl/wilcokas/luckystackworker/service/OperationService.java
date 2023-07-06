@@ -195,9 +195,7 @@ public class OperationService {
     }
 
     public void applySaturation(final ImagePlus image, final Profile profile) {
-        // TODO: works if "&& (profile.getSaturation().compareTo(BigDecimal.ONE) > 0)"
-        // is excluded, but should not be needed
-        if (profile.getSaturation() != null && (profile.getSaturation().compareTo(BigDecimal.ONE) > 0)) {
+        if (profile.getSaturation() != null) {
             if (validateRGBStack(image)) {
                 log.info("Applying saturation increase with factor {} to image {}", profile.getSaturation(),
                         image.getID());

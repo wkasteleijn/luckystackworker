@@ -37,4 +37,5 @@ public class Constants {
     public static final BigDecimal LOCAL_CONTRAST_LARGE_RADIUS = BigDecimal.valueOf(64);
     public static final int DEFAULT_HISTOGRAM_WINDOW_WIDTH = 272;
     public static final int DEFAULT_HISTOGRAM_WINDOW_HEIGHT = 128;
+    public static final int MAX_IMAGE_WIDTH_HISTOGRAM = 800;
 }

@@ -451,10 +451,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         int imageWindowLocationY = (int) Math.round(imageWindowLocation.getY());
         if (finalResultImage.getHeight() < (Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT * 3)) {
             return new Point(imageWindowLocationX, imageWindowLocationY + finalResultImage.getHeight() + 74);
+        } else if (finalResultImage.getWidth() < Constants.MAX_IMAGE_WIDTH_HISTOGRAM) {
+            return new Point(imageWindowLocationX + finalResultImage.getWidth() + 10, imageWindowLocationY);
         } else {
-            if (windowLocation != null) {
-                return windowLocation;
-            }
             return new Point(imageWindowLocationX, imageWindowLocationY);
         }
     }

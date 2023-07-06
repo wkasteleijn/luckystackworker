@@ -377,7 +377,7 @@ public class Util {
             luminance = (max + min) * 0.5f;
         }
 
-        float saturation = 0f;
+        float saturation = 0.f;
         if (includeColor) {
             if (c == 0) {
                 saturation = 0.f;
