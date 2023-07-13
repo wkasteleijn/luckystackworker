@@ -785,8 +785,15 @@ export class AppComponent implements OnInit {
     this.green = this.profile.green;
     this.blue = this.profile.blue;
     this.isLargeImage = this.profile.largeImage;
-    this.profile.dispersionCorrectionEnabled = false;
+    this.setNonPersistentSettings();
+  }
+
+  private setNonPersistentSettings() {
     this.dispersionCorrectionEnabled = false;
+    this.luminanceIncludeRed = true;
+    this.luminanceIncludeGreen = true;
+    this.luminanceIncludeBlue = true;
+    this.luminanceIncludeColor = true;
   }
 
   private updateProfile() {

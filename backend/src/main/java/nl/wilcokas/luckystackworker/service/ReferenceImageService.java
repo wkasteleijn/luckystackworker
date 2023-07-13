@@ -117,10 +117,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                     profile = profileService.findByName(profileName)
                             .orElseThrow(() -> new ResourceNotFoundException("Unknown profile!"));
                 } else {
-                    profileService.updateProfile(profile);
                     log.info("Profile file found, profile was loaded from there.");
                 }
-                profile.setDispersionCorrectionEnabled(false); // dispersion correction is not meant to be persisted.
+                setNonPersistentSettings(profile);
+                profileService.updateProfile(profile);
+
                 this.isLargeImage = openReferenceImage(selectedFilePath, profile);
 
                 final String rootFolder = Util.getFileDirectory(selectedFilePath);
@@ -253,10 +254,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         if (!showHistogram) {
             if (plotWindow != null) {
                 plotWindow.setVisible(true);
-                drawHistogram(isLargeImage);
-            } else {
-                createHistogram();
             }
+            createHistogram();
             showHistogram = true;
         } else {
             showHistogram = false;
@@ -409,6 +408,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private void createHistogram() {
         createHistogramWindow();
         drawHistogram(true);
+    }
+
+    private void setNonPersistentSettings(Profile profile) {
+        profile.setDispersionCorrectionEnabled(false); // dispersion correction is not meant to be persisted.
+        profile.setLuminanceIncludeRed(true);
+        profile.setLuminanceIncludeGreen(true);
+        profile.setLuminanceIncludeBlue(true);
+        profile.setLuminanceIncludeColor(true);
     }
 
     private void createHistogramWindow() {
