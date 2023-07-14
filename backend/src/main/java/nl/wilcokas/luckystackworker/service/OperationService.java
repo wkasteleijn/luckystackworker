@@ -127,6 +127,12 @@ public class OperationService {
                     .includeGreen(profile.isLuminanceIncludeGreen()) //
                     .includeRed(profile.isLuminanceIncludeRed()).includeColor(profile.isLuminanceIncludeColor())
                     .saturation(1f).unsharpMaskParameters(usParams).mode(mode).build();
+            if (!validateLuminanceInclusion(parameters)) {
+                log.warn("Attempt to exclude all channels from luminance sharpen!");
+                parameters.setIncludeRed(true);
+                parameters.setIncludeGreen(true);
+                parameters.setIncludeBlue(true);
+            }
             if (profile.getSharpenMode().equals(LSWSharpenMode.RGB.toString()) || !validateRGBStack(image)) {
                 if (profile.getClippingStrength() > 0) {
                     lswSharpenFilter.applyRGBModeClippingPrevention(image, parameters.getUnsharpMaskParameters());
@@ -201,7 +207,7 @@ public class OperationService {
                         image.getID());
                 saturationFilter.apply(image, profile);
             } else {
-                log.warn("Attemping to apply saturation increase to a non RGB image {}", image.getFileInfo());
+                log.debug("Attemping to apply saturation increase to a non RGB image {}", image.getFileInfo());
             }
         }
     }
@@ -247,6 +253,10 @@ public class OperationService {
             log.info("Applying dispersion correction");
             dispersionCorrectionFilter.apply(image, profile);
         }
+    }
+
+    private boolean validateLuminanceInclusion(LSWSharpenParameters parameters) {
+        return parameters.isIncludeRed() || parameters.isIncludeGreen() || parameters.isIncludeBlue();
     }
 
     private void applyLocalContrast(final ImagePlus image, int amount, BigDecimal radius, LSWSharpenMode localContrastMode) {

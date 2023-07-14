@@ -216,12 +216,14 @@
             [(ngModel)]="luminanceIncludeRed"
             (change)="sharpenModeChanged(undefined, true)"
             [color]="colorTheme()"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             >Red</mat-checkbox
           >
           <mat-checkbox
             [(ngModel)]="luminanceIncludeGreen"
             (change)="sharpenModeChanged(undefined, true)"
             [color]="colorTheme()"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             class="luminanceIncludeBox"
             >Green</mat-checkbox
           >
@@ -230,6 +232,7 @@
             (change)="sharpenModeChanged(undefined, true)"
             [color]="colorTheme()"
             class="luminanceIncludeBox"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             >Blue</mat-checkbox
           >
           <mat-checkbox
@@ -237,6 +240,7 @@
             (change)="sharpenModeChanged(undefined, true)"
             [color]="colorTheme()"
             class="luminanceIncludeBox"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             >Color</mat-checkbox
           >
         </div>
