@@ -62,6 +62,11 @@ public class OperationService {
                 || (OperationEnum.DENOISEITERATIONS == operation);
     }
 
+    public boolean isLocalContrastOperation(final OperationEnum operation) {
+        return (OperationEnum.LOCALCONTRASTFINE == operation) || (OperationEnum.LOCALCONTRASTMEDIUM == operation)
+                || (OperationEnum.LOCALCONTRASTLARGE == operation);
+    }
+
     public boolean isSavitzkyGolayDenoiseOperation(final OperationEnum operation) {
         return (OperationEnum.SAVITZKYGOLAYAMOUNT == operation) || (OperationEnum.SAVITZKYGOLAYITERATIONS == operation)
                 || (OperationEnum.SAVITZKYGOLAYSIZE == operation);
@@ -85,12 +90,16 @@ public class OperationService {
                 && (!excludedOperationList.contains(OperationEnum.SAVITZKYGOLAYSIZE))) {
             applySavitzkyGolayDenoise(image, profile);
         }
+        if ((!excludedOperationList.contains(OperationEnum.LOCALCONTRASTFINE)) && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTMEDIUM))
+                && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTLARGE))) {
+            applyLocalContrast(image, profile);
+        }
         if ((!excludedOperationList.contains(OperationEnum.CONTRAST)) && (!excludedOperationList.contains(OperationEnum.BRIGHTNESS))
                 && (!excludedOperationList.contains(OperationEnum.BACKGROUND))) {
             applyBrightnessAndContrast(image, profile, true);
         }
         if ((!excludedOperationList.contains(OperationEnum.DISPERSIONCORRECTION))) {
-            this.applyDispersionCorrection(image, profile);
+            applyDispersionCorrection(image, profile);
         }
     }
 

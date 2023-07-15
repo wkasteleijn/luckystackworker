@@ -143,7 +143,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                         OperationEnum.DENOISEAMOUNT,
                         OperationEnum.DENOISERADIUS, OperationEnum.DENOISESIGMA, OperationEnum.DENOISEITERATIONS,
                         OperationEnum.SAVITZKYGOLAYAMOUNT, OperationEnum.SAVITZKYGOLAYITERATIONS,
-                        OperationEnum.SAVITZKYGOLAYSIZE);
+                        OperationEnum.SAVITZKYGOLAYSIZE, OperationEnum.LOCALCONTRASTFINE, OperationEnum.LOCALCONTRASTMEDIUM,
+                        OperationEnum.LOCALCONTRASTLARGE);
             } else {
                 operationService.applyAllOperationsExcept(processedImage, profile, operation);
             }
@@ -156,10 +157,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             operationService.applySharpen(finalResultImage, profile);
             operationService.applyDenoise(finalResultImage, profile);
             operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
+            operationService.applyLocalContrast(finalResultImage, profile);
         } else if (operationService.isDenoiseOperation(operation)) {
             operationService.applyDenoise(finalResultImage, profile);
         } else if (operationService.isSavitzkyGolayDenoiseOperation(operation)) {
             operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
+        } else if (operationService.isLocalContrastOperation(operation)) {
+            operationService.applyLocalContrast(finalResultImage, profile);
         } else if ((OperationEnum.DISPERSIONCORRECTION == operation)) {
             operationService.applyDispersionCorrection(finalResultImage, profile);
         } else if ((OperationEnum.CONTRAST == operation) || (OperationEnum.BRIGHTNESS == operation)
@@ -172,7 +176,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         operationService.applyRGBBalance(finalResultImage, profile);
         operationService.applyGamma(finalResultImage, profile);
         operationService.applySaturation(finalResultImage, profile);
-        operationService.applyLocalContrast(finalResultImage, profile);
 
         finalResultImage.updateAndDraw();
 
