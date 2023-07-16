@@ -164,8 +164,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
         } else if (operationService.isLocalContrastOperation(operation)) {
             operationService.applyLocalContrast(finalResultImage, profile);
-        } else if ((OperationEnum.DISPERSIONCORRECTION == operation)) {
-            operationService.applyDispersionCorrection(finalResultImage, profile);
         } else if ((OperationEnum.CONTRAST == operation) || (OperationEnum.BRIGHTNESS == operation)
                 || (OperationEnum.BACKGROUND == operation)) {
             operationService.applyBrightnessAndContrast(finalResultImage, profile, false);
@@ -173,6 +171,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
         // Always apply the following last and only on the final result as it messes up
         // the sharpening.
+        operationService.applyDispersionCorrection(finalResultImage, profile);
         operationService.applyRGBBalance(finalResultImage, profile);
         operationService.applyGamma(finalResultImage, profile);
         operationService.applySaturation(finalResultImage, profile);

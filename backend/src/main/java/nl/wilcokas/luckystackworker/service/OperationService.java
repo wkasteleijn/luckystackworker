@@ -98,9 +98,6 @@ public class OperationService {
                 && (!excludedOperationList.contains(OperationEnum.BACKGROUND))) {
             applyBrightnessAndContrast(image, profile, true);
         }
-        if ((!excludedOperationList.contains(OperationEnum.DISPERSIONCORRECTION))) {
-            applyDispersionCorrection(image, profile);
-        }
     }
 
     public void applyAllOperations(ImagePlus image, final Map<String, String> profileSettings, String profileName) {
