@@ -25,7 +25,6 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -44,10 +43,10 @@ import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.dto.Version;
+import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
-import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
@@ -80,15 +79,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     private Image iconImage = new ImageIcon(getClass().getResource("/luckystackworker_icon.png")).getImage();
 
-    private SettingsRepository settingsRepository;
-    private HttpService httpService;
-    private ProfileService profileService;
-    private OperationService operationService;
+    private final SettingsService settingsService;
+    private final HttpService httpService;
+    private final ProfileService profileService;
+    private final OperationService operationService;
 
-    public ReferenceImageService(SettingsRepository settingsRepository, HttpService httpService,
-            ProfileService profileService,
-            OperationService operationService) {
-        this.settingsRepository = settingsRepository;
+    public ReferenceImageService(final SettingsService settingsService, final HttpService httpService, final ProfileService profileService,
+            final OperationService operationService) {
+        this.settingsService = settingsService;
         this.httpService = httpService;
         this.profileService = profileService;
         this.operationService = operationService;
@@ -112,10 +110,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                     String profileName = Util.deriveProfileFromImageName(selectedFilePath);
                     if (profileName == null) {
                         log.info("Profile not found for reference image, taking the default, {}", profileName);
-                        profileName = getSettings().getDefaultProfile();
+                        profileName = settingsService.getDefaultProfile();
                     }
                     profile = profileService.findByName(profileName)
-                            .orElseThrow(() -> new ResourceNotFoundException("Unknown profile!"));
+                            .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
                 } else {
                     log.info("Profile file found, profile was loaded from there.");
                 }
@@ -211,10 +209,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     public void updateSettings(String rootFolder, Profile profile) {
         log.info("Setting the root folder to {}", rootFolder);
-        Settings settings = getSettings();
+        Settings settings = settingsService.getSettings();
         settings.setRootFolder(rootFolder);
-        settingsRepository.save(settings);
-        LuckyStackWorkerContext.updateWorkerForRootFolder(rootFolder);
+        settingsService.saveSettings(settings);
         profile.setRootFolder(rootFolder);
         String selectedProfile = profile.getName();
         if (selectedProfile != null) {
@@ -278,10 +275,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
     }
 
-    public Settings getSettings() {
-        return settingsRepository.findAll().iterator().next();
-    }
-
     public void writeProfile() throws IOException {
         String fileNameNoExt = Util.getPathWithoutExtension(filePath);
         writeProfile(fileNameNoExt);
@@ -291,7 +284,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         String profileName = LuckyStackWorkerContext.getSelectedProfile();
         if (profileName != null) {
             Profile profile = profileService.findByName(profileName)
-                    .orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
+                    .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName)));
             Util.writeProfile(profile, pathNoExt);
         } else {
             log.warn("Profile not saved, could not find the selected profile for file {}", pathNoExt);
@@ -303,7 +296,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public Version getLatestVersion(LocalDateTime currentDate) {
-        Settings settings = getSettings();
+        Settings settings = settingsService.getSettings();
         String latestKnowVersion = settings.getLatestKnownVersion();
         if (settings.getLatestKnownVersionChecked() == null || currentDate
                 .isAfter(settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
@@ -312,7 +305,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 settings.setLatestKnownVersion(latestVersionFromSite);
             }
             settings.setLatestKnownVersionChecked(currentDate);
-            settingsRepository.save(settings);
+            settingsService.saveSettings(settings);
 
             if (latestVersionFromSite != null && !latestVersionFromSite.equals(latestKnowVersion)) {
                 return Version.builder().latestVersion(latestVersionFromSite).isNewVersion(true).build();
@@ -686,7 +679,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     private boolean validateSelectedFile(String path) {
         String extension = Util.getFilenameExtension(path);
-        if (!getSettings().getExtensions().contains(extension)) {
+        if (!settingsService.getSettings().getExtensions().contains(extension)) {
             JOptionPane.showMessageDialog(getParentFrame(),
                     String.format(
                             "The selected file with extension %s is not supported. %nYou can only open 16-bit RGB and Gray PNG and TIFF images.",

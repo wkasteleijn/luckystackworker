@@ -100,11 +100,6 @@ public class OperationService {
         }
     }
 
-    public void applyAllOperations(ImagePlus image, final Map<String, String> profileSettings, String profileName) {
-        final Profile profile = Util.toProfile(profileSettings, profileName);
-        applyAllOperations(image, profile);
-    }
-
     public void applyAllOperations(ImagePlus image, Profile profile) {
         applySharpen(image, profile);
         applyDenoise(image, profile);

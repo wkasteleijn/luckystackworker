@@ -112,46 +112,6 @@ public class Util {
         return path.substring(path.lastIndexOf("/") + 1);
     }
 
-    public static Profile toProfile(Map<String, String> props, final String profileName) {
-        return Profile.builder().amount(new BigDecimal(getSetting(props, "amount", profileName))) //
-                .radius(new BigDecimal(getSetting(props, "radius", profileName))) //
-                .iterations(Integer.valueOf(getSetting(props, "iterations", profileName))) //
-                .denoise(new BigDecimal(getSetting(props, "denoise", profileName))) //
-                .denoiseSigma(new BigDecimal(getSetting(props, "denoiseSigma", profileName))) //
-                .denoiseRadius(new BigDecimal(getSetting(props, "denoiseRadius", profileName))) //
-                .denoiseIterations(Integer.valueOf(getSetting(props, "denoiseIterations", profileName))) //
-                .savitzkyGolayAmount(Integer.valueOf(getSetting(props, "savitzkyGolayAmount", profileName))) //
-                .savitzkyGolayIterations(Integer.valueOf(getSetting(props, "savitzkyGolayIterations", profileName))) //
-                .savitzkyGolaySize(Integer.valueOf(getSetting(props, "savitzkyGolaySize", profileName))) //
-                .clippingStrength(Integer.valueOf(getSetting(props, "clippingStrength", profileName))) //
-                .clippingRange(Integer.valueOf(getSetting(props, "clippingRange", profileName))) //
-                .deringRadius(new BigDecimal(getSetting(props, "deringRadius", profileName))) //
-                .deringStrength(Integer.valueOf(getSetting(props, "deringStrength", profileName))) //
-                .sharpenMode(getSetting(props, "sharpenMode", profileName)) //
-                .gamma(new BigDecimal(getSetting(props, "gamma", profileName))) //
-                .contrast(Integer.valueOf(getSetting(props, "contrast", profileName))) //
-                .brightness(Integer.valueOf(getSetting(props, "brightness", profileName))) //
-                .background(Integer.valueOf(getSetting(props, "background", profileName))) //
-                .localContrastMode(getSetting(props, "localContrastMode", profileName)) //
-                .localContrastFine(Integer.valueOf(getSetting(props, "localContrastFine", profileName))) //
-                .localContrastMedium(Integer.valueOf(getSetting(props, "localContrastMedium", profileName))) //
-                .localContrastLarge(Integer.valueOf(getSetting(props, "localContrastLarge", profileName))) //
-                .red(new BigDecimal(getSetting(props, "red", profileName))) //
-                .green(new BigDecimal(getSetting(props, "green", profileName))) //
-                .blue(new BigDecimal(getSetting(props, "blue", profileName))) //
-                .saturation(new BigDecimal(getSetting(props, "saturation", profileName))) //
-                .dispersionCorrectionEnabled(Boolean.parseBoolean(getSetting(props, "dispersionCorrectionEnabled", profileName))) //
-                .dispersionCorrectionRedX(Integer.valueOf(getSetting(props, "dispersionCorrectionRedX", profileName))) //
-                .dispersionCorrectionRedY(Integer.valueOf(getSetting(props, "dispersionCorrectionRedY", profileName))) //
-                .dispersionCorrectionBlueX(Integer.valueOf(getSetting(props, "dispersionCorrectionBlueX", profileName))) //
-                .dispersionCorrectionBlueY(Integer.valueOf(getSetting(props, "dispersionCorrectionBlueY", profileName))) //
-                .luminanceIncludeRed(Boolean.valueOf(getSetting(props, "luminanceIncludeRed", profileName)))
-                .luminanceIncludeGreen(Boolean.valueOf(getSetting(props, "luminanceIncludeGreen", profileName)))
-                .luminanceIncludeBlue(Boolean.valueOf(getSetting(props, "luminanceIncludeBlue", profileName)))
-                .luminanceIncludeColor(Boolean.valueOf(getSetting(props, "luminanceIncludeColor", profileName)))
-                .name(profileName).build();
-    }
-
     public static String readFromInputStream(InputStream inputStream) {
         try {
             StringBuilder resultStringBuilder = new StringBuilder();

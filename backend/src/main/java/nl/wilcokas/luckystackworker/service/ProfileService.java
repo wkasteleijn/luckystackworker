@@ -1,13 +1,14 @@
 package nl.wilcokas.luckystackworker.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
-import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
+import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 
@@ -21,7 +22,7 @@ public class ProfileService {
     public void updateProfile(Profile profile) {
         log.info("updateProfile called with profile {}", profile);
         Profile result = profileRepository.findByName(profile.getName()).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Unknown profile %s", profile.getName())));
+                () -> new ProfileNotFoundException(String.format("Unknown profile %s", profile.getName())));
         result.setRadius(profile.getRadius());
         result.setAmount(profile.getAmount());
         result.setIterations(profile.getIterations());
@@ -60,10 +61,13 @@ public class ProfileService {
         result.setLuminanceIncludeBlue(profile.isLuminanceIncludeBlue());
         result.setLuminanceIncludeColor(profile.isLuminanceIncludeColor());
         profileRepository.save(result);
-        LuckyStackWorkerContext.updateWorkerForProfile(profile);
     }
 
     public Optional<Profile> findByName(String profileName) {
         return profileRepository.findByName(profileName);
+    }
+
+    public List<Profile> getAllProfiles() {
+        return StreamSupport.stream(profileRepository.findAll().spliterator(), false).toList();
     }
 }

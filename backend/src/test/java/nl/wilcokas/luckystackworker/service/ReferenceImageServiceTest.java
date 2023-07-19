@@ -2,9 +2,9 @@ package nl.wilcokas.luckystackworker.service;
 
 import java.net.http.HttpClient;
 import java.time.LocalDateTime;
-import java.util.Collections;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,173 +18,183 @@ import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class ReferenceImageServiceTest {
+class ReferenceImageServiceTest {
 
-	private static final String LATESTVERSIONLOCAL = "1.5.0";
-	private static final String NEWERVERSIONSERVER = "1.6.1";
-	private static final LocalDateTime TODAY = LocalDateTime.now();
-	private static final LocalDateTime MORE_THAN_2_WEEKS_AGO = TODAY.minusDays(15);
-	private static final LocalDateTime LESS_THAN_2_WEEKS_AGO = TODAY.minusDays(13);
+    private static final String LATESTVERSIONLOCAL = "1.5.0";
+    private static final String NEWERVERSIONSERVER = "1.6.1";
+    private static final LocalDateTime TODAY = LocalDateTime.now();
+    private static final LocalDateTime MORE_THAN_2_WEEKS_AGO = TODAY.minusDays(15);
+    private static final LocalDateTime LESS_THAN_2_WEEKS_AGO = TODAY.minusDays(13);
 
-	@Mock
-	private HttpService httpService;
+    @Mock
+    private SettingsService settingsService;
+    @Mock
+    private HttpService httpService;
+    @Mock
+    private SettingsRepository settingsRepository;
+    @Mock
+    private ProfileService profileService;
+    @Mock
+    private OperationService operationService;
 
-	@Mock
-	private SettingsRepository settingsRepository;
+    @InjectMocks
+    private ReferenceImageService referenceImageService;
 
-	@InjectMocks
-	private ReferenceImageService referenceImageService;
+    @BeforeEach
+    void setup() {
+        referenceImageService = new ReferenceImageService(settingsService, httpService, profileService, operationService);
+    }
 
-	@Test
-	void testGetLatestVersion_firstUsage_noLatestVersionFromServer() {
+    @Test
+    void testGetLatestVersion_firstUsage_noLatestVersionFromServer() {
 
-		Settings settings = mockSettings(LATESTVERSIONLOCAL, null);
+        Settings settings = mockSettings(LATESTVERSIONLOCAL, null);
 
-		Version result = referenceImageService.getLatestVersion(TODAY);
+        Version result = referenceImageService.getLatestVersion(TODAY);
 
-		Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
-		Assertions.assertFalse(result.isNewVersion());
-		Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-		Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
-	}
+        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        Assertions.assertFalse(result.isNewVersion());
+        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+    }
 
-	@Test
-	void testGetLatestVersion_firstUsage_receivedLatestVersionFromServer() {
+    @Test
+    void testGetLatestVersion_firstUsage_receivedLatestVersionFromServer() {
 
-		Settings settings = mockSettings(null, null);
-		mockServerResponse(NEWERVERSIONSERVER);
+        Settings settings = mockSettings(null, null);
+        mockServerResponse(NEWERVERSIONSERVER);
 
-		Version result = referenceImageService.getLatestVersion(TODAY);
+        Version result = referenceImageService.getLatestVersion(TODAY);
 
-		Assertions.assertEquals(NEWERVERSIONSERVER, result.getLatestVersion());
-		Assertions.assertTrue(result.isNewVersion());
-		Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-		Assertions.assertEquals(NEWERVERSIONSERVER, settings.getLatestKnownVersion());
-	}
+        Assertions.assertEquals(NEWERVERSIONSERVER, result.getLatestVersion());
+        Assertions.assertTrue(result.isNewVersion());
+        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        Assertions.assertEquals(NEWERVERSIONSERVER, settings.getLatestKnownVersion());
+    }
 
-	@Test
-	void testGetLatestVersion_moreThan2WeeksLater_noLatestVersionFromServer() {
+    @Test
+    void testGetLatestVersion_moreThan2WeeksLater_noLatestVersionFromServer() {
 
-		Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
+        Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
 
-		Version result = referenceImageService.getLatestVersion(TODAY);
+        Version result = referenceImageService.getLatestVersion(TODAY);
 
-		Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
-		Assertions.assertFalse(result.isNewVersion());
-		Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-		Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
-	}
+        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        Assertions.assertFalse(result.isNewVersion());
+        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+    }
 
-	@Test
-	void testGetLatestVersion_moreThan2WeeksLater_receivedLatestVersionFromServer() {
+    @Test
+    void testGetLatestVersion_moreThan2WeeksLater_receivedLatestVersionFromServer() {
 
-		Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
-		mockServerResponse(NEWERVERSIONSERVER);
+        Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
+        mockServerResponse(NEWERVERSIONSERVER);
 
-		Version result = referenceImageService.getLatestVersion(TODAY);
+        Version result = referenceImageService.getLatestVersion(TODAY);
 
-		Assertions.assertEquals(NEWERVERSIONSERVER, result.getLatestVersion());
-		Assertions.assertTrue(result.isNewVersion());
-		Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-		Assertions.assertEquals(NEWERVERSIONSERVER, settings.getLatestKnownVersion());
-	}
+        Assertions.assertEquals(NEWERVERSIONSERVER, result.getLatestVersion());
+        Assertions.assertTrue(result.isNewVersion());
+        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        Assertions.assertEquals(NEWERVERSIONSERVER, settings.getLatestKnownVersion());
+    }
 
-	@Test
-	void testGetLatestVersion_moreThan2WeeksLater_receivedSameVersionFromServer() {
+    @Test
+    void testGetLatestVersion_moreThan2WeeksLater_receivedSameVersionFromServer() {
 
-		Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
-		mockServerResponse(LATESTVERSIONLOCAL);
+        Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
+        mockServerResponse(LATESTVERSIONLOCAL);
 
-		Version result = referenceImageService.getLatestVersion(TODAY);
+        Version result = referenceImageService.getLatestVersion(TODAY);
 
-		Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
-		Assertions.assertFalse(result.isNewVersion());
-		Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-		Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
-	}
+        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        Assertions.assertFalse(result.isNewVersion());
+        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+    }
 
-	@Test
-	void testGetLatestVersion_lessThan2WeeksAgo() {
+    @Test
+    void testGetLatestVersion_lessThan2WeeksAgo() {
 
-		Settings settings = mockSettings(LATESTVERSIONLOCAL, LESS_THAN_2_WEEKS_AGO);
+        Settings settings = mockSettings(LATESTVERSIONLOCAL, LESS_THAN_2_WEEKS_AGO);
 
-		Version result = referenceImageService.getLatestVersion(TODAY);
+        Version result = referenceImageService.getLatestVersion(TODAY);
 
-		Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
-		Assertions.assertFalse(result.isNewVersion());
-		Assertions.assertEquals(LESS_THAN_2_WEEKS_AGO, settings.getLatestKnownVersionChecked());
-		Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
-		Mockito.verifyNoInteractions(httpService);
-	}
+        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        Assertions.assertFalse(result.isNewVersion());
+        Assertions.assertEquals(LESS_THAN_2_WEEKS_AGO, settings.getLatestKnownVersionChecked());
+        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        Mockito.verifyNoInteractions(httpService);
+    }
 
-	@Test
-	void testGetLatestVersion_receivedUnrecognizedResponseFromServer() {
+    @Test
+    void testGetLatestVersion_receivedUnrecognizedResponseFromServer() {
 
-		Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
-		Mockito.when(httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, Constants.VERSION_URL,
-				Constants.VERSION_REQUEST_TIMEOUT)).thenReturn("<html><body>nothing</body></html>");
+        Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
+        Mockito.when(httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, Constants.VERSION_URL,
+                Constants.VERSION_REQUEST_TIMEOUT)).thenReturn("<html><body>nothing</body></html>");
 
-		Version result = referenceImageService.getLatestVersion(TODAY);
+        Version result = referenceImageService.getLatestVersion(TODAY);
 
-		Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
-		Assertions.assertFalse(result.isNewVersion());
-		Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-		Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
-	}
+        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        Assertions.assertFalse(result.isNewVersion());
+        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+    }
 
-	@Test
-	void testGetLatestVersion_receivedEmptyVersionResponseFromServer() {
+    @Test
+    void testGetLatestVersion_receivedEmptyVersionResponseFromServer() {
 
-		Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
-		mockServerResponse("");
+        Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
+        mockServerResponse("");
 
-		Version result = referenceImageService.getLatestVersion(TODAY);
+        Version result = referenceImageService.getLatestVersion(TODAY);
 
-		Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
-		Assertions.assertFalse(result.isNewVersion());
-		Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-		Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
-	}
+        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        Assertions.assertFalse(result.isNewVersion());
+        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+    }
 
-	@Test
-	void testGetLatestVersion_receivedMissingEndMarkerResponseFromServer() {
+    @Test
+    void testGetLatestVersion_receivedMissingEndMarkerResponseFromServer() {
 
-		Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
-		Mockito.when(httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, Constants.VERSION_URL,
-				Constants.VERSION_REQUEST_TIMEOUT)).thenReturn("<html><body>{lswVersion:%s</body></html>");
+        Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
+        Mockito.when(httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, Constants.VERSION_URL,
+                Constants.VERSION_REQUEST_TIMEOUT)).thenReturn("<html><body>{lswVersion:%s</body></html>");
 
-		Version result = referenceImageService.getLatestVersion(TODAY);
+        Version result = referenceImageService.getLatestVersion(TODAY);
 
-		Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
-		Assertions.assertFalse(result.isNewVersion());
-		Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-		Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
-	}
+        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        Assertions.assertFalse(result.isNewVersion());
+        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+    }
 
-	@Test
-	void testGetLatestVersion_receivedInvalidVersionResponseFromServer() {
+    @Test
+    void testGetLatestVersion_receivedInvalidVersionResponseFromServer() {
 
-		Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
-		mockServerResponse("100.100.100");
+        Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
+        mockServerResponse("100.100.100");
 
-		Version result = referenceImageService.getLatestVersion(TODAY);
+        Version result = referenceImageService.getLatestVersion(TODAY);
 
-		Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
-		Assertions.assertFalse(result.isNewVersion());
-		Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-		Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
-	}
+        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        Assertions.assertFalse(result.isNewVersion());
+        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+    }
 
-	private Settings mockSettings(String version, LocalDateTime lastChecked) {
-		Settings settings = Settings.builder().latestKnownVersion(version).latestKnownVersionChecked(lastChecked)
-				.build();
-		Mockito.when(settingsRepository.findAll()).thenReturn(Collections.singletonList(settings));
-		return settings;
-	}
+    private Settings mockSettings(String version, LocalDateTime lastChecked) {
+        Settings settings = Settings.builder().latestKnownVersion(version).latestKnownVersionChecked(lastChecked)
+                .build();
+        Mockito.when(settingsService.getSettings()).thenReturn(settings);
+        return settings;
+    }
 
-	private void mockServerResponse(String version) {
-		Mockito.when(httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, Constants.VERSION_URL,
-				Constants.VERSION_REQUEST_TIMEOUT)).thenReturn(String.format("<html>{lswVersion:%s}</html>", version));
-	}
+    private void mockServerResponse(String version) {
+        Mockito.when(httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, Constants.VERSION_URL,
+                Constants.VERSION_REQUEST_TIMEOUT)).thenReturn(String.format("<html>{lswVersion:%s}</html>", version));
+    }
 
 }
