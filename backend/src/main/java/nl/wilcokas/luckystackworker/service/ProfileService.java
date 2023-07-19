@@ -4,20 +4,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class ProfileService {
 
-    @Autowired
-    private ProfileRepository profileRepository;
+    private final ProfileRepository profileRepository;
 
     public void updateProfile(Profile profile) {
         log.info("updateProfile called with profile {}", profile);
