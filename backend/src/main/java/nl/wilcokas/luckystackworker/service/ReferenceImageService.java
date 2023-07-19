@@ -212,6 +212,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         Settings settings = settingsService.getSettings();
         settings.setRootFolder(rootFolder);
         settingsService.saveSettings(settings);
+        LuckyStackWorkerContext.setRootFolderIsSelected();
         profile.setRootFolder(rootFolder);
         String selectedProfile = profile.getName();
         if (selectedProfile != null) {
