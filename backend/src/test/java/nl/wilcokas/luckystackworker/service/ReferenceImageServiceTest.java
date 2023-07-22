@@ -13,7 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.dto.Version;
+import nl.wilcokas.luckystackworker.dto.VersionDTO;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 
@@ -50,7 +50,7 @@ class ReferenceImageServiceTest {
 
         Settings settings = mockSettings(LATESTVERSIONLOCAL, null);
 
-        Version result = referenceImageService.getLatestVersion(TODAY);
+        VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
         Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());
@@ -64,7 +64,7 @@ class ReferenceImageServiceTest {
         Settings settings = mockSettings(null, null);
         mockServerResponse(NEWERVERSIONSERVER);
 
-        Version result = referenceImageService.getLatestVersion(TODAY);
+        VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
         Assertions.assertEquals(NEWERVERSIONSERVER, result.getLatestVersion());
         Assertions.assertTrue(result.isNewVersion());
@@ -77,7 +77,7 @@ class ReferenceImageServiceTest {
 
         Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
 
-        Version result = referenceImageService.getLatestVersion(TODAY);
+        VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
         Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());
@@ -91,7 +91,7 @@ class ReferenceImageServiceTest {
         Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
         mockServerResponse(NEWERVERSIONSERVER);
 
-        Version result = referenceImageService.getLatestVersion(TODAY);
+        VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
         Assertions.assertEquals(NEWERVERSIONSERVER, result.getLatestVersion());
         Assertions.assertTrue(result.isNewVersion());
@@ -105,7 +105,7 @@ class ReferenceImageServiceTest {
         Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
         mockServerResponse(LATESTVERSIONLOCAL);
 
-        Version result = referenceImageService.getLatestVersion(TODAY);
+        VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
         Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());
@@ -118,7 +118,7 @@ class ReferenceImageServiceTest {
 
         Settings settings = mockSettings(LATESTVERSIONLOCAL, LESS_THAN_2_WEEKS_AGO);
 
-        Version result = referenceImageService.getLatestVersion(TODAY);
+        VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
         Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());
@@ -134,7 +134,7 @@ class ReferenceImageServiceTest {
         Mockito.when(httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, Constants.VERSION_URL,
                 Constants.VERSION_REQUEST_TIMEOUT)).thenReturn("<html><body>nothing</body></html>");
 
-        Version result = referenceImageService.getLatestVersion(TODAY);
+        VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
         Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());
@@ -148,7 +148,7 @@ class ReferenceImageServiceTest {
         Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
         mockServerResponse("");
 
-        Version result = referenceImageService.getLatestVersion(TODAY);
+        VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
         Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());
@@ -163,7 +163,7 @@ class ReferenceImageServiceTest {
         Mockito.when(httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, Constants.VERSION_URL,
                 Constants.VERSION_REQUEST_TIMEOUT)).thenReturn("<html><body>{lswVersion:%s</body></html>");
 
-        Version result = referenceImageService.getLatestVersion(TODAY);
+        VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
         Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());
@@ -177,7 +177,7 @@ class ReferenceImageServiceTest {
         Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
         mockServerResponse("100.100.100");
 
-        Version result = referenceImageService.getLatestVersion(TODAY);
+        VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
         Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());

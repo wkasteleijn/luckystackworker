@@ -14,7 +14,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.dto.DataInfo;
+import nl.wilcokas.luckystackworker.dto.DataInfoDTO;
 import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
@@ -41,7 +41,7 @@ public class LuckystackWorkerApplication {
             log.info("Current app version is {}", lswVersion);
             String dataFolder = getDataFolder(profile);
             createDataFolderWhenMissing(dataFolder);
-            DataInfo dataInfo = getDataInfo(dataFolder);
+            DataInfoDTO dataInfo = getDataInfo(dataFolder);
             if (dataInfo != null) {
                 if (!dataInfo.getVersion().equals(lswVersion)) {
                     log.info(
@@ -63,8 +63,8 @@ public class LuckystackWorkerApplication {
         SpringApplication.run(LuckystackWorkerApplication.class, args);
     }
 
-    private static DataInfo getDataInfo(String dataFolder) {
-        DataInfo dataInfo = null;
+    private static DataInfoDTO getDataInfo(String dataFolder) {
+        DataInfoDTO dataInfo = null;
         try {
             String dataInfoStr = Files.readString(Paths.get(dataFolder + "/data-info.yml"));
             dataInfo = new Yaml().load(dataInfoStr);
@@ -93,8 +93,8 @@ public class LuckystackWorkerApplication {
     }
 
     private static void writeDataInfoFile(String lswVersion, String dataFolder) throws IOException {
-        DataInfo dataInfo;
-        dataInfo = DataInfo.builder().version(lswVersion).instalationDate(LocalDate.now().toString())
+        DataInfoDTO dataInfo;
+        dataInfo = DataInfoDTO.builder().version(lswVersion).instalationDate(LocalDate.now().toString())
                 .build();
         String dataInfoStr = new Yaml().dump(dataInfo);
         Files.writeString(Paths.get(dataFolder + "/data-info.yml"), dataInfoStr);

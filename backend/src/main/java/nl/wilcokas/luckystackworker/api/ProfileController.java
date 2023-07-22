@@ -24,8 +24,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.dto.StatusUpdate;
-import nl.wilcokas.luckystackworker.dto.Version;
+import nl.wilcokas.luckystackworker.dto.ProfileDTO;
+import nl.wilcokas.luckystackworker.dto.ResponseDTO;
+import nl.wilcokas.luckystackworker.dto.SettingsDTO;
+import nl.wilcokas.luckystackworker.dto.StatusUpdateDTO;
+import nl.wilcokas.luckystackworker.dto.VersionDTO;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.service.ProfileService;
@@ -51,31 +54,29 @@ public class ProfileController {
     }
 
     @GetMapping("/selected")
-    public Profile getSelectedProfile() {
+    public ResponseDTO getSelectedProfile() {
         log.info("getSelectedProfile called");
-        Profile profile = new Profile();
+        ProfileDTO profile = new ProfileDTO();
         String profileName = LuckyStackWorkerContext.getSelectedProfile();
         if (profileName != null) {
-            profile = profileService.findByName(profileName)
-                    .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName)));
+            profile = new ProfileDTO(profileService.findByName(profileName)
+                    .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName))));
         }
-
-        // This is not persisted, so get state from ref.service
-        profile.setRootFolder(settingsService.getRootFolder());
-        profile.setLargeImage(referenceImageService.isLargeImage());
-
-        return profile;
+        SettingsDTO settings = new SettingsDTO(settingsService.getSettings());
+        settings.setRootFolder(settingsService.getRootFolder());
+        settings.setLargeImage(referenceImageService.isLargeImage());
+        return new ResponseDTO(profile, settings);
     }
 
     @GetMapping("/{profile}")
-    public Profile getProfile(@PathVariable(value = "profile") String profileName) {
+    public ProfileDTO getProfile(@PathVariable(value = "profile") String profileName) {
         log.info("getProfile called with profile {}", profileName);
-        return profileService.findByName(profileName)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
+        return new ProfileDTO(profileService.findByName(profileName)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName))));
     }
 
     @GetMapping("/load")
-    public Profile loadProfile() {
+    public ResponseDTO loadProfile() {
         log.info("loadProfile called");
         JFrame frame = referenceImageService.getParentFrame();
         JFileChooser jfc = referenceImageService
@@ -89,18 +90,20 @@ public class ProfileController {
             String filePathNoExt = Util.getPathWithoutExtension(selectedFilePath);
             Profile profile = Util.readProfile(filePathNoExt);
             if (profile != null) {
-                profile.setLargeImage(referenceImageService.isLargeImage());
+                SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
+                settingsDTO.setLargeImage(referenceImageService.isLargeImage());
                 profile.setDispersionCorrectionEnabled(false); // Dispersion correction is not meant to be persisted.
-                updateProfile(profile);
+                ProfileDTO profileDTO = new ProfileDTO(profile);
+                updateProfile(profileDTO, null);
                 LuckyStackWorkerContext.setSelectedProfile(profile.getName());
-                return profile;
+                return new ResponseDTO(profileDTO, settingsDTO);
             }
         }
         return null;
     }
 
     @PutMapping
-    public ResponseEntity<String> updateProfile(@RequestBody Profile profile) {
+    public ResponseEntity<String> updateProfile(@RequestBody ProfileDTO profile, @RequestBody String operation) {
         // Rate limiting added to prevent overloading whenever scroll keys are held down
         // or pressed very quickly.
         LocalDateTime activeOperationTime = LuckyStackWorkerContext.getActiveOperationTime();
@@ -109,7 +112,7 @@ public class ProfileController {
                 .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
             LuckyStackWorkerContext.setActiveOperationTime(LocalDateTime.now());
             profileService.updateProfile(profile);
-            referenceImageService.updateProcessing(profile);
+            referenceImageService.updateProcessing(new Profile(profile), operation);
             LuckyStackWorkerContext.setActiveOperationTime(null);
         } else {
             log.warn("Attempt to update image while another operation was in progress");
@@ -118,7 +121,7 @@ public class ProfileController {
     }
 
     @PutMapping("/apply")
-    public void applyProfile(@RequestBody Profile profile) throws IOException {
+    public void applyProfile(@RequestBody ProfileDTO profile) throws IOException {
         String profileName = profile.getName();
         if (profileName != null) {
             LuckyStackWorkerContext.statusUpdate(Constants.STATUS_WORKING);
@@ -133,13 +136,13 @@ public class ProfileController {
     }
 
     @GetMapping("/status")
-    public StatusUpdate getStatus() {
+    public StatusUpdateDTO getStatus() {
         log.info("getStatus called");
         return LuckyStackWorkerContext.getStatus();
     }
 
     @GetMapping("/version")
-    public Version getLatestVersion() {
+    public VersionDTO getLatestVersion() {
         log.info("getLatestVersion called");
         return referenceImageService.getLatestVersion(LocalDateTime.now());
     }

@@ -6,7 +6,7 @@ import ij.gui.Roi;
 import lombok.Getter;
 import lombok.Setter;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.dto.StatusUpdate;
+import nl.wilcokas.luckystackworker.dto.StatusUpdateDTO;
 
 public class LuckyStackWorkerContext {
     private static String status = Constants.STATUS_WORKING;
@@ -40,8 +40,8 @@ public class LuckyStackWorkerContext {
         totalfilesCount = aTotalfilesCount;
     }
 
-    public static StatusUpdate getStatus() {
-        return StatusUpdate.builder().message(status).filesProcessedCount(filesProcessedCount)
+    public static StatusUpdateDTO getStatus() {
+        return StatusUpdateDTO.builder().message(status).filesProcessedCount(filesProcessedCount)
                 .totalfilesCount(totalfilesCount).build();
     }
 

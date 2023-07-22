@@ -8,12 +8,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import nl.wilcokas.luckystackworker.dto.ProfileDTO;
 
 @Data
 @Entity
@@ -22,6 +22,48 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class Profile {
+
+    public Profile(ProfileDTO profile) {
+        this.name = profile.getName();
+        this.radius = profile.getRadius();
+        this.amount = profile.getAmount();
+        this.iterations = profile.getIterations();
+        this.level = profile.getLevel();
+        this.denoise = profile.getDenoise();
+        this.denoiseSigma = profile.getDenoiseSigma();
+        this.denoiseRadius = profile.getDenoiseRadius();
+        this.denoiseIterations = profile.getDenoiseIterations();
+        this.gamma = profile.getGamma();
+        this.red = profile.getRed();
+        this.green = profile.getGreen();
+        this.blue = profile.getBlue();
+        this.saturation = profile.getSaturation();
+        this.contrast = profile.getContrast();
+        this.brightness = profile.getBrightness();
+        this.background = profile.getBackground();
+        this.savitzkyGolaySize = profile.getSavitzkyGolaySize();
+        this.savitzkyGolayAmount = profile.getSavitzkyGolayAmount();
+        this.savitzkyGolayIterations = profile.getSavitzkyGolayIterations();
+        this.clippingStrength = profile.getClippingStrength();
+        this.clippingRange = profile.getClippingRange();
+        this.deringRadius = profile.getDeringRadius();
+        this.deringStrength = profile.getDeringStrength();
+        this.sharpenMode = profile.getSharpenMode();
+        this.localContrastMode = profile.getLocalContrastMode();
+        this.localContrastFine = profile.getLocalContrastFine();
+        this.localContrastMedium = profile.getLocalContrastMedium();
+        this.localContrastLarge = profile.getLocalContrastLarge();
+        this.dispersionCorrectionEnabled = profile.isDispersionCorrectionEnabled();
+        this.dispersionCorrectionRedX = profile.getDispersionCorrectionRedX();
+        this.dispersionCorrectionBlueX = profile.getDispersionCorrectionBlueX();
+        this.dispersionCorrectionRedY = profile.getDispersionCorrectionRedY();
+        this.dispersionCorrectionBlueY = profile.getDispersionCorrectionBlueY();
+        this.luminanceIncludeRed = profile.isLuminanceIncludeRed();
+        this.luminanceIncludeGreen = profile.isLuminanceIncludeGreen();
+        this.luminanceIncludeBlue = profile.isLuminanceIncludeBlue();
+        this.luminanceIncludeColor = profile.isLuminanceIncludeColor();
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -140,10 +182,4 @@ public class Profile {
 
     @Column(name = "luminanceIncludeColor")
     private boolean luminanceIncludeColor;
-
-    // Non persisted setting properties that are passed to the frontend.
-    private String operation;
-    private String rootFolder;
-    @Transient
-    private boolean isLargeImage;
 }

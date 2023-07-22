@@ -42,7 +42,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.dto.Version;
+import nl.wilcokas.luckystackworker.dto.ProfileDTO;
+import nl.wilcokas.luckystackworker.dto.VersionDTO;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
@@ -93,7 +94,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         createRoiIndicator();
     }
 
-    public Profile selectReferenceImage(String filePath) throws IOException {
+    public Pair<Profile, Boolean> selectReferenceImage(String filePath) throws IOException {
         JFrame frame = getParentFrame();
         JFileChooser jfc = getJFileChooser(filePath);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
@@ -118,22 +119,21 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                     log.info("Profile file found, profile was loaded from there.");
                 }
                 setNonPersistentSettings(profile);
-                profileService.updateProfile(profile);
+                profileService.updateProfile(new ProfileDTO(profile));
 
                 this.isLargeImage = openReferenceImage(selectedFilePath, profile);
 
                 final String rootFolder = Util.getFileDirectory(selectedFilePath);
-                updateSettings(rootFolder, profile);
-                profile.setLargeImage(this.isLargeImage);
-                return profile;
+                updateSettingsForRootFolder(rootFolder);
+                LuckyStackWorkerContext.setSelectedProfile(profile.getName());
+                return Pair.of(profile, this.isLargeImage);
             }
         }
-        return new Profile();
+        return Pair.of(new Profile(), false);
     }
 
-    public void updateProcessing(Profile profile) {
-        final OperationEnum operation = profile.getOperation() == null ? null
-                : OperationEnum.valueOf(profile.getOperation().toUpperCase());
+    public void updateProcessing(Profile profile, String operationValue) {
+        final OperationEnum operation = operationValue == null ? null : OperationEnum.valueOf(operationValue.toUpperCase());
         if (previousOperation == null || previousOperation != operation) {
             Util.copyInto(referenceImage, processedImage, finalResultImage.getRoi(), profile, false);
             if (operationService.isSharpenOperation(operation)) {
@@ -207,17 +207,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return frame;
     }
 
-    public void updateSettings(String rootFolder, Profile profile) {
+    public void updateSettingsForRootFolder(String rootFolder) {
         log.info("Setting the root folder to {}", rootFolder);
         Settings settings = settingsService.getSettings();
         settings.setRootFolder(rootFolder);
         settingsService.saveSettings(settings);
         LuckyStackWorkerContext.setRootFolderIsSelected();
-        profile.setRootFolder(rootFolder);
-        String selectedProfile = profile.getName();
-        if (selectedProfile != null) {
-            LuckyStackWorkerContext.setSelectedProfile(selectedProfile);
-        }
     }
 
     public void zoomIn() {
@@ -296,7 +291,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return filePath;
     }
 
-    public Version getLatestVersion(LocalDateTime currentDate) {
+    public VersionDTO getLatestVersion(LocalDateTime currentDate) {
         Settings settings = settingsService.getSettings();
         String latestKnowVersion = settings.getLatestKnownVersion();
         if (settings.getLatestKnownVersionChecked() == null || currentDate
@@ -309,10 +304,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             settingsService.saveSettings(settings);
 
             if (latestVersionFromSite != null && !latestVersionFromSite.equals(latestKnowVersion)) {
-                return Version.builder().latestVersion(latestVersionFromSite).isNewVersion(true).build();
+                return VersionDTO.builder().latestVersion(latestVersionFromSite).isNewVersion(true).build();
             }
         }
-        return Version.builder().latestVersion(latestKnowVersion).isNewVersion(false).build();
+        return VersionDTO.builder().latestVersion(latestKnowVersion).isNewVersion(false).build();
     }
 
     public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, boolean isSaveDialog) {
@@ -630,7 +625,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             log.info("Opened reference image image with id {}", referenceImage.getID());
 
             if (profile != null) {
-                updateProcessing(profile);
+                updateProcessing(profile, null);
             }
 
             finalResultImage.setTitle(this.filePath);
