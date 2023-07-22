@@ -32,9 +32,6 @@ export class Profile {
   deringRadius: number;
   deringStrength: number;
   sharpenMode: string;
-  operation: string;
-  rootFolder: string;
-  largeImage: boolean;
   dispersionCorrectionEnabled: boolean;
   dispersionCorrectionRedX: number;
   dispersionCorrectionBlueX: number;

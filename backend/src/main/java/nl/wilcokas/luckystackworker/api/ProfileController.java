@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -48,9 +49,9 @@ public class ProfileController {
     private final SettingsService settingsService;
 
     @GetMapping
-    public List<Profile> getProfiles() {
+    public List<ProfileDTO> getProfiles() {
         log.info("getProfiles called");
-        return profileService.getAllProfiles();
+        return profileService.getAllProfiles().stream().map(ProfileDTO::new).toList();
     }
 
     @GetMapping("/selected")
@@ -103,7 +104,7 @@ public class ProfileController {
     }
 
     @PutMapping
-    public ResponseEntity<String> updateProfile(@RequestBody ProfileDTO profile, @RequestBody String operation) {
+    public ResponseEntity<String> updateProfile(@RequestBody ProfileDTO profile, @RequestParam String operation) {
         // Rate limiting added to prevent overloading whenever scroll keys are held down
         // or pressed very quickly.
         LocalDateTime activeOperationTime = LuckyStackWorkerContext.getActiveOperationTime();

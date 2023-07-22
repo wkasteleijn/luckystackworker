@@ -21,7 +21,6 @@ public class SettingsDTO {
         this.latestKnownVersionChecked = settings.getLatestKnownVersionChecked();
     }
 
-    private int id;
     private String rootFolder;
     private String extensions;
     private String outputFormat;
