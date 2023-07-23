@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -182,4 +183,13 @@ public class Profile {
 
     @Column(name = "luminanceIncludeColor")
     private boolean luminanceIncludeColor;
+
+    // Not used any longer, needed for historical reasons. Removing this would now
+    // break the profile loading of old yaml files created prior to 4.1.0.
+    @Transient
+    private String operation;
+    @Transient
+    private String rootFolder;
+    @Transient
+    private boolean isLargeImage;
 }

@@ -440,6 +440,14 @@ public class Util {
         return (short) (value >= Constants.SHORT_HALF_SIZE ? value - Constants.UNSIGNED_INT_SIZE : value);
     }
 
+    public static void setNonPersistentSettings(Profile profile) {
+        profile.setDispersionCorrectionEnabled(false); // dispersion correction is not meant to be persisted.
+        profile.setLuminanceIncludeRed(true);
+        profile.setLuminanceIncludeGreen(true);
+        profile.setLuminanceIncludeBlue(true);
+        profile.setLuminanceIncludeColor(true);
+    }
+
     private static String getSetting(Map<String, String> props, String setting, String name) {
         return props.get(name + "." + setting);
     }

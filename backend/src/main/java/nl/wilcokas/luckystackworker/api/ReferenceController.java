@@ -9,7 +9,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,10 +21,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.dto.ProfileDTO;
 import nl.wilcokas.luckystackworker.dto.ResponseDTO;
 import nl.wilcokas.luckystackworker.dto.SettingsDTO;
-import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.service.SettingsService;
 import nl.wilcokas.luckystackworker.util.Util;
@@ -43,8 +40,7 @@ public class ReferenceController {
     @GetMapping("/open")
     public ResponseDTO openReferenceImage(@RequestParam String path) throws IOException {
         final String base64DecodedPath = new String(Base64.getDecoder().decode(path));
-        Pair<Profile, Boolean> imageData = referenceImageService.selectReferenceImage(base64DecodedPath);
-        return new ResponseDTO(new ProfileDTO(imageData.getLeft()), SettingsDTO.builder().isLargeImage(imageData.getRight()).build());
+        return referenceImageService.selectReferenceImage(base64DecodedPath);
     }
 
     @GetMapping("/rootfolder")
@@ -57,10 +53,9 @@ public class ReferenceController {
         int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, false);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFolder = jfc.getSelectedFile();
-            String rootFolder = selectedFolder.getAbsolutePath();
+            String rootFolder = Util.getIJFileFormat(selectedFolder.getAbsolutePath());
             log.info("RootFolder selected {} ", rootFolder);
-            referenceImageService.updateSettingsForRootFolder(rootFolder);
-            settingsDTO.setRootFolder(rootFolder);
+            settingsDTO = new SettingsDTO(referenceImageService.updateSettingsForRootFolder(rootFolder));
         }
         return settingsDTO;
     }

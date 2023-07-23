@@ -93,7 +93,7 @@ public class ProfileController {
             if (profile != null) {
                 SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
                 settingsDTO.setLargeImage(referenceImageService.isLargeImage());
-                profile.setDispersionCorrectionEnabled(false); // Dispersion correction is not meant to be persisted.
+                Util.setNonPersistentSettings(profile);
                 ProfileDTO profileDTO = new ProfileDTO(profile);
                 updateProfile(profileDTO, null);
                 LuckyStackWorkerContext.setSelectedProfile(profile.getName());

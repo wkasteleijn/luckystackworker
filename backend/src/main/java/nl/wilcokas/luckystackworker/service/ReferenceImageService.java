@@ -43,6 +43,8 @@ import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.dto.ProfileDTO;
+import nl.wilcokas.luckystackworker.dto.ResponseDTO;
+import nl.wilcokas.luckystackworker.dto.SettingsDTO;
 import nl.wilcokas.luckystackworker.dto.VersionDTO;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
@@ -94,7 +96,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         createRoiIndicator();
     }
 
-    public Pair<Profile, Boolean> selectReferenceImage(String filePath) throws IOException {
+    public ResponseDTO selectReferenceImage(String filePath) throws IOException {
         JFrame frame = getParentFrame();
         JFileChooser jfc = getJFileChooser(filePath);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
@@ -118,18 +120,18 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 } else {
                     log.info("Profile file found, profile was loaded from there.");
                 }
-                setNonPersistentSettings(profile);
+                Util.setNonPersistentSettings(profile);
                 profileService.updateProfile(new ProfileDTO(profile));
 
                 this.isLargeImage = openReferenceImage(selectedFilePath, profile);
 
                 final String rootFolder = Util.getFileDirectory(selectedFilePath);
-                updateSettingsForRootFolder(rootFolder);
+                SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
                 LuckyStackWorkerContext.setSelectedProfile(profile.getName());
-                return Pair.of(profile, this.isLargeImage);
+                return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
             }
         }
-        return Pair.of(new Profile(), false);
+        return null;
     }
 
     public void updateProcessing(Profile profile, String operationValue) {
@@ -207,12 +209,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return frame;
     }
 
-    public void updateSettingsForRootFolder(String rootFolder) {
+    public Settings updateSettingsForRootFolder(String rootFolder) {
         log.info("Setting the root folder to {}", rootFolder);
         Settings settings = settingsService.getSettings();
         settings.setRootFolder(rootFolder);
         settingsService.saveSettings(settings);
         LuckyStackWorkerContext.setRootFolderIsSelected();
+        return settings;
     }
 
     public void zoomIn() {
@@ -399,14 +402,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private void createHistogram() {
         createHistogramWindow();
         drawHistogram(true);
-    }
-
-    private void setNonPersistentSettings(Profile profile) {
-        profile.setDispersionCorrectionEnabled(false); // dispersion correction is not meant to be persisted.
-        profile.setLuminanceIncludeRed(true);
-        profile.setLuminanceIncludeGreen(true);
-        profile.setLuminanceIncludeBlue(true);
-        profile.setLuminanceIncludeColor(true);
     }
 
     private void createHistogramWindow() {

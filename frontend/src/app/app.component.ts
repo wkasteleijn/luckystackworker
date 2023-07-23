@@ -123,7 +123,7 @@ export class AppComponent implements OnInit {
           console.log(data);
           this.refImageSelected = true;
           this.crop = false;
-          if (data && data.amount > 0) {
+          if (data && data.profile.amount > 0) {
             this.profile = data.profile;
             this.settings = data.settings;
             this.selectedProfile = this.profile.name;
