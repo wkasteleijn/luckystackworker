@@ -597,7 +597,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
         boolean isLargeImage = false;
         if (finalResultImage != null) {
-            if (Util.isPngRgbStack(finalResultImage, filePath)) {
+            if (Util.isPng(finalResultImage, filePath)) {
                 finalResultImage = Util.fixNonTiffOpeningSettings(finalResultImage);
             }
             operationService.correctExposure(finalResultImage);

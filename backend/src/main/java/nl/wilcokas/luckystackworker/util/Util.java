@@ -162,19 +162,24 @@ public class Util {
     }
 
     public static ImagePlus fixNonTiffOpeningSettings(ImagePlus image) {
-        log.info("Applying workaround for correctly opening PNG RGB stack");
-        ImagePlus result = new CompositeImage(image, IJ.COMPOSITE);
-        result.getStack().setSliceLabel("red", 1);
-        result.getStack().setSliceLabel("green", 2);
-        result.getStack().setSliceLabel("blue", 3);
-        result.getStack().setColorModel(ColorModel.getRGBdefault());
-        result.setActiveChannels("111");
-        result.setC(1);
-        result.setZ(1);
-        result.setDisplayMode(IJ.COMPOSITE);
-        result.setOpenAsHyperStack(true);
-        result.getFileInfo().fileType = FileInfo.RGB48;
-        return result;
+        if (isStack(image)) {
+            log.info("Applying workaround for correctly opening PNG RGB stack");
+            ImagePlus result = new CompositeImage(image, IJ.COMPOSITE);
+            result.getStack().setSliceLabel("red", 1);
+            result.getStack().setSliceLabel("green", 2);
+            result.getStack().setSliceLabel("blue", 3);
+            result.getStack().setColorModel(ColorModel.getRGBdefault());
+            result.setActiveChannels("111");
+            result.setC(1);
+            result.setZ(1);
+            result.setDisplayMode(IJ.COMPOSITE);
+            result.setOpenAsHyperStack(true);
+            result.getFileInfo().fileType = FileInfo.RGB48;
+            return result;
+        } else {
+            image.setDisplayMode(IJ.GRAYSCALE);
+            return image;
+        }
     }
 
     public static int getMaxHistogramPercentage(ImagePlus image) {
@@ -212,7 +217,14 @@ public class Util {
     }
 
     public static boolean isPngRgbStack(ImagePlus image, String filePath) {
-        return filePath.toLowerCase().endsWith(".png") && image.isStack() && image.getStack().getSize() > 1;
+        return isPng(image, filePath) && isStack(image);
+    }
+    public static boolean isPng(ImagePlus image, String filePath) {
+        return filePath.toLowerCase().endsWith(".png");
+    }
+
+    public static boolean isStack(ImagePlus image) {
+        return image.hasImageStack() && image.getStack().getSize() > 1;
     }
 
     public static void writeProfile(Profile profile, String path) throws IOException {

@@ -2,12 +2,12 @@ package nl.wilcokas.luckystackworker;
 
 import java.io.IOException;
 
-import javax.annotation.PostConstruct;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
