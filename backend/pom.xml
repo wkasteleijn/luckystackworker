@@ -21,7 +21,7 @@
 		<commons-io.version>2.13.0</commons-io.version>
 		<velocity.version>2.3</velocity.version>
 		<commons-text.version>1.10.0</commons-text.version>
-		<imagej.version>1.54d</imagej.version>
+		<imagej.version>1.54f</imagej.version>
 	</properties>
 
 	<dependencies>
