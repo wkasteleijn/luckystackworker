@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "LuckyStackWorker"
-#define MyAppVersion "4.0.1"
+#define MyAppVersion "4.3.0-beta"
 #define MyAppPublisher "Wilco Kasteleijn"
 #define MyAppURL "https://www.wilcokas.com/luckystackworker"
 #define MyAppExeName "LuckyStackWorker.exe"
