@@ -1,22 +1,25 @@
 package nl.wilcokas.luckystackworker;
 
+import java.awt.Color;
 import java.io.IOException;
 
 import ij.ImagePlus;
+import ij.gui.Plot;
 import ij.io.Opener;
+import ij.measure.Measurements;
+import ij.process.ImageStatistics;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenParameters;
 import nl.wilcokas.luckystackworker.filter.settings.UnsharpMaskParameters;
-import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
 public class Probeersels {
     public static void main(String[] args) throws InterruptedException, IOException {
 
         ImagePlus image = new Opener()
-                .openImage("C:\\Users\\wkast\\archive\\Jup\\testsession\\Jup_2022-09-29-2130_5-Wilco-DeRot_AS_P25_lapl4_ap245.tif");
+                .openImage("C:\\Users\\wkast\\archive\\Jup\\testsession\\Mars_2022-12-12-2045_3-DeRot_AS_P1_lapl4_ap97_LSW.tif");
         // .openImage("D:\\Jup\\testsession\\Jup_224759_AS_P30_lapl5_ap44.tif");
         // .openImage("D:\\Sun\\220522\\Sun_100434_AS_P1_lapl4_ap1531.tif");
 
@@ -188,11 +191,29 @@ public class Probeersels {
                 .unsharpMaskParameters(unsharpMaskParameters).mode(LSWSharpenMode.LUMINANCE).build();
         filter.applyLuminanceMode(image, parameters);
 
-        image.updateAndDraw();
+        // Histogram
+        ImageStatistics stats = image.getStatistics(Measurements.AREA + Measurements.MEAN + Measurements.MODE + Measurements.MIN_MAX, 256);
+        Plot plot = new Plot("Histogram", "Value", "Frequency");
+        plot.setColor(Color.GRAY, Color.GRAY);
+        plot.setBackgroundColor(Color.DARK_GRAY);
+        plot.setImagePlus(image);
+        plot.setWindowSize(512, 128);
+        double[] y = stats.histogram();
+        int n = y.length;
+        double[] x = new double[n];
+        double min = 0;
+        for (int i = 0; i < n; i++)
+            x[i] = min + i * stats.binSize;
+        plot.add("bar", x, y);
+        plot.show();
+        // LuckyStackWorkerPlotWindow plotWindow = new LuckyStackWorkerPlotWindow(image,
+        // plot);
 
-        Util.saveImage(image, "C:\\Users\\wkast\\archive\\Jup\\testsession\\jup4.jpg", false, false, true);
 
-        Thread.currentThread().sleep(5000);
+        // Util.saveImage(image,
+        // "C:\\Users\\wkast\\archive\\Jup\\testsession\\jup4.jpg", false, false, true);
+
+        Thread.currentThread().sleep(15000);
         System.exit(0);
     }
 

@@ -62,6 +62,11 @@ public class OperationService {
                 || (OperationEnum.DENOISEITERATIONS == operation);
     }
 
+    public boolean isLocalContrastOperation(final OperationEnum operation) {
+        return (OperationEnum.LOCALCONTRASTFINE == operation) || (OperationEnum.LOCALCONTRASTMEDIUM == operation)
+                || (OperationEnum.LOCALCONTRASTLARGE == operation);
+    }
+
     public boolean isSavitzkyGolayDenoiseOperation(final OperationEnum operation) {
         return (OperationEnum.SAVITZKYGOLAYAMOUNT == operation) || (OperationEnum.SAVITZKYGOLAYITERATIONS == operation)
                 || (OperationEnum.SAVITZKYGOLAYSIZE == operation);
@@ -85,18 +90,14 @@ public class OperationService {
                 && (!excludedOperationList.contains(OperationEnum.SAVITZKYGOLAYSIZE))) {
             applySavitzkyGolayDenoise(image, profile);
         }
+        if ((!excludedOperationList.contains(OperationEnum.LOCALCONTRASTFINE)) && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTMEDIUM))
+                && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTLARGE))) {
+            applyLocalContrast(image, profile);
+        }
         if ((!excludedOperationList.contains(OperationEnum.CONTRAST)) && (!excludedOperationList.contains(OperationEnum.BRIGHTNESS))
                 && (!excludedOperationList.contains(OperationEnum.BACKGROUND))) {
             applyBrightnessAndContrast(image, profile, true);
         }
-        if ((!excludedOperationList.contains(OperationEnum.DISPERSIONCORRECTION))) {
-            this.applyDispersionCorrection(image, profile);
-        }
-    }
-
-    public void applyAllOperations(ImagePlus image, final Map<String, String> profileSettings, String profileName) {
-        final Profile profile = Util.toProfile(profileSettings, profileName);
-        applyAllOperations(image, profile);
     }
 
     public void applyAllOperations(ImagePlus image, Profile profile) {
@@ -123,8 +124,16 @@ public class OperationService {
                     .iterations(iterations).clippingStrength(clippingStrength).clippingRange(100 - profile.getClippingRange())
                     .deringRadius(profile.getDeringRadius().doubleValue()).deringStrength(deringStrength).build();
             LSWSharpenMode mode = (profile.getSharpenMode() == null) ? LSWSharpenMode.LUMINANCE : LSWSharpenMode.valueOf(profile.getSharpenMode());
-            LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
+            LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(profile.isLuminanceIncludeBlue())
+                    .includeGreen(profile.isLuminanceIncludeGreen()) //
+                    .includeRed(profile.isLuminanceIncludeRed()).includeColor(profile.isLuminanceIncludeColor())
                     .saturation(1f).unsharpMaskParameters(usParams).mode(mode).build();
+            if (!validateLuminanceInclusion(parameters)) {
+                log.warn("Attempt to exclude all channels from luminance sharpen!");
+                parameters.setIncludeRed(true);
+                parameters.setIncludeGreen(true);
+                parameters.setIncludeBlue(true);
+            }
             if (profile.getSharpenMode().equals(LSWSharpenMode.RGB.toString()) || !validateRGBStack(image)) {
                 if (profile.getClippingStrength() > 0) {
                     lswSharpenFilter.applyRGBModeClippingPrevention(image, parameters.getUnsharpMaskParameters());
@@ -193,13 +202,13 @@ public class OperationService {
     }
 
     public void applySaturation(final ImagePlus image, final Profile profile) {
-        if (profile.getSaturation() != null && (profile.getSaturation().compareTo(BigDecimal.ONE) > 0)) {
+        if (profile.getSaturation() != null) {
             if (validateRGBStack(image)) {
                 log.info("Applying saturation increase with factor {} to image {}", profile.getSaturation(),
                         image.getID());
                 saturationFilter.apply(image, profile);
             } else {
-                log.warn("Attemping to apply saturation increase to a non RGB image {}", image.getFileInfo());
+                log.debug("Attemping to apply saturation increase to a non RGB image {}", image.getFileInfo());
             }
         }
     }
@@ -245,6 +254,10 @@ public class OperationService {
             log.info("Applying dispersion correction");
             dispersionCorrectionFilter.apply(image, profile);
         }
+    }
+
+    private boolean validateLuminanceInclusion(LSWSharpenParameters parameters) {
+        return parameters.isIncludeRed() || parameters.isIncludeGreen() || parameters.isIncludeBlue();
     }
 
     private void applyLocalContrast(final ImagePlus image, int amount, BigDecimal radius, LSWSharpenMode localContrastMode) {

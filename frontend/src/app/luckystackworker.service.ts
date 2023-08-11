@@ -27,8 +27,11 @@ export class LuckyStackWorkerService {
     return this.http.get(`${this.baseUrl}/profiles/status`);
   }
 
-  updateProfile(profile: Profile): Observable<Object> {
-    return this.http.put(`${this.baseUrl}/profiles`, profile);
+  updateProfile(profile: Profile, operation: string): Observable<Object> {
+    return this.http.put(
+      `${this.baseUrl}/profiles?operation=${operation}`,
+      profile
+    );
   }
 
   applyProfile(profile: Profile): Observable<Object> {
@@ -61,6 +64,17 @@ export class LuckyStackWorkerService {
 
   cropSelectionChanged(): Observable<Object> {
     return this.http.put(`${this.baseUrl}/reference/crop`, null);
+  }
+
+  nightModeChanged(nightMode: boolean): Observable<Object> {
+    return this.http.put(
+      `${this.baseUrl}/reference/night?on=${nightMode}`,
+      null
+    );
+  }
+
+  histogramSelectionChanged(): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/reference/histogram`, null);
   }
 
   getLatestVersion(): Observable<any> {

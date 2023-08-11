@@ -8,6 +8,10 @@ export class Profile {
   denoiseSigma: number;
   denoiseRadius: number;
   denoiseIterations: number;
+  luminanceIncludeRed: boolean;
+  luminanceIncludeGreen: boolean;
+  luminanceIncludeBlue: boolean;
+  luminanceIncludeColor: boolean;
   gamma: number;
   contrast: number;
   brightness: number;
@@ -28,9 +32,6 @@ export class Profile {
   deringRadius: number;
   deringStrength: number;
   sharpenMode: string;
-  operation: string;
-  rootFolder: string;
-  largeImage: boolean;
   dispersionCorrectionEnabled: boolean;
   dispersionCorrectionRedX: number;
   dispersionCorrectionBlueX: number;

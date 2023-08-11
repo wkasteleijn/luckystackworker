@@ -112,42 +112,6 @@ public class Util {
         return path.substring(path.lastIndexOf("/") + 1);
     }
 
-    public static Profile toProfile(Map<String, String> props, final String profileName) {
-        return Profile.builder().amount(new BigDecimal(getSetting(props, "amount", profileName))) //
-                .radius(new BigDecimal(getSetting(props, "radius", profileName))) //
-                .iterations(Integer.valueOf(getSetting(props, "iterations", profileName))) //
-                .denoise(new BigDecimal(getSetting(props, "denoise", profileName))) //
-                .denoiseSigma(new BigDecimal(getSetting(props, "denoiseSigma", profileName))) //
-                .denoiseRadius(new BigDecimal(getSetting(props, "denoiseRadius", profileName))) //
-                .denoiseIterations(Integer.valueOf(getSetting(props, "denoiseIterations", profileName))) //
-                .savitzkyGolayAmount(Integer.valueOf(getSetting(props, "savitzkyGolayAmount", profileName))) //
-                .savitzkyGolayIterations(Integer.valueOf(getSetting(props, "savitzkyGolayIterations", profileName))) //
-                .savitzkyGolaySize(Integer.valueOf(getSetting(props, "savitzkyGolaySize", profileName))) //
-                .clippingStrength(Integer.valueOf(getSetting(props, "clippingStrength", profileName))) //
-                .clippingRange(Integer.valueOf(getSetting(props, "clippingRange", profileName))) //
-                .deringRadius(new BigDecimal(getSetting(props, "deringRadius", profileName))) //
-                .deringStrength(Integer.valueOf(getSetting(props, "deringStrength", profileName))) //
-                .sharpenMode(getSetting(props, "sharpenMode", profileName)) //
-                .gamma(new BigDecimal(getSetting(props, "gamma", profileName))) //
-                .contrast(Integer.valueOf(getSetting(props, "contrast", profileName))) //
-                .brightness(Integer.valueOf(getSetting(props, "brightness", profileName))) //
-                .background(Integer.valueOf(getSetting(props, "background", profileName))) //
-                .localContrastMode(getSetting(props, "localContrastMode", profileName)) //
-                .localContrastFine(Integer.valueOf(getSetting(props, "localContrastFine", profileName))) //
-                .localContrastMedium(Integer.valueOf(getSetting(props, "localContrastMedium", profileName))) //
-                .localContrastLarge(Integer.valueOf(getSetting(props, "localContrastLarge", profileName))) //
-                .red(new BigDecimal(getSetting(props, "red", profileName))) //
-                .green(new BigDecimal(getSetting(props, "green", profileName))) //
-                .blue(new BigDecimal(getSetting(props, "blue", profileName))) //
-                .saturation(new BigDecimal(getSetting(props, "saturation", profileName))) //
-                .dispersionCorrectionEnabled(Boolean.parseBoolean(getSetting(props, "dispersionCorrectionEnabled", profileName))) //
-                .dispersionCorrectionRedX(Integer.valueOf(getSetting(props, "dispersionCorrectionRedX", profileName))) //
-                .dispersionCorrectionRedY(Integer.valueOf(getSetting(props, "dispersionCorrectionRedY", profileName))) //
-                .dispersionCorrectionBlueX(Integer.valueOf(getSetting(props, "dispersionCorrectionBlueX", profileName))) //
-                .dispersionCorrectionBlueY(Integer.valueOf(getSetting(props, "dispersionCorrectionBlueY", profileName))) //
-                .name(profileName).build();
-    }
-
     public static String readFromInputStream(InputStream inputStream) {
         try {
             StringBuilder resultStringBuilder = new StringBuilder();
@@ -168,7 +132,7 @@ public class Util {
         Files.delete(Paths.get(path));
     }
 
-    public static void saveImage(ImagePlus image, String path, boolean isPngRgbStack, boolean crop, boolean asJpg) throws IOException {
+    public static void saveImage(ImagePlus image, String profileName, String path, boolean isPngRgbStack, boolean crop, boolean asJpg, boolean fromWorker) throws IOException {
         if (crop) {
             image = image.crop();
         }
@@ -181,6 +145,14 @@ public class Util {
         if (isPngRgbStack) {
             hackIncorrectPngFileInfo(saver);
         }
+        if (fromWorker) {
+            String folder = getFileDirectory(path);
+            if (!folder.endsWith(profileName + Constants.WORKER_FOLDER_POSTFIX)) {
+                String newFolder = folder + "/" + profileName + Constants.WORKER_FOLDER_POSTFIX;
+                Files.createDirectories(Paths.get(newFolder));
+                path = newFolder + "/" + getFilenameFromPath(getIJFileFormat(path));
+            }
+        }
         if (asJpg) {
             saver.setJpegQuality(100);
             saver.saveAsJpeg(path);
@@ -190,19 +162,24 @@ public class Util {
     }
 
     public static ImagePlus fixNonTiffOpeningSettings(ImagePlus image) {
-        log.info("Applying workaround for correctly opening PNG RGB stack");
-        ImagePlus result = new CompositeImage(image, IJ.COMPOSITE);
-        result.getStack().setSliceLabel("red", 1);
-        result.getStack().setSliceLabel("green", 2);
-        result.getStack().setSliceLabel("blue", 3);
-        result.getStack().setColorModel(ColorModel.getRGBdefault());
-        result.setActiveChannels("111");
-        result.setC(1);
-        result.setZ(1);
-        result.setDisplayMode(IJ.COMPOSITE);
-        result.setOpenAsHyperStack(true);
-        result.getFileInfo().fileType = FileInfo.RGB48;
-        return result;
+        if (isStack(image)) {
+            log.info("Applying workaround for correctly opening PNG RGB stack");
+            ImagePlus result = new CompositeImage(image, IJ.COMPOSITE);
+            result.getStack().setSliceLabel("red", 1);
+            result.getStack().setSliceLabel("green", 2);
+            result.getStack().setSliceLabel("blue", 3);
+            result.getStack().setColorModel(ColorModel.getRGBdefault());
+            result.setActiveChannels("111");
+            result.setC(1);
+            result.setZ(1);
+            result.setDisplayMode(IJ.COMPOSITE);
+            result.setOpenAsHyperStack(true);
+            result.getFileInfo().fileType = FileInfo.RGB48;
+            return result;
+        } else {
+            image.setDisplayMode(IJ.GRAYSCALE);
+            return image;
+        }
     }
 
     public static int getMaxHistogramPercentage(ImagePlus image) {
@@ -240,7 +217,14 @@ public class Util {
     }
 
     public static boolean isPngRgbStack(ImagePlus image, String filePath) {
-        return filePath.toLowerCase().endsWith(".png") && image.isStack() && image.getStack().getSize() > 1;
+        return isPng(image, filePath) && isStack(image);
+    }
+    public static boolean isPng(ImagePlus image, String filePath) {
+        return filePath.toLowerCase().endsWith(".png");
+    }
+
+    public static boolean isStack(ImagePlus image) {
+        return image.hasImageStack() && image.getStack().getSize() > 1;
     }
 
     public static void writeProfile(Profile profile, String path) throws IOException {
@@ -336,7 +320,7 @@ public class Util {
     }
 
     public static float[] rgbToHsl(float red, float green, float blue, boolean includeRed, boolean includeGreen,
-            boolean includeBlue,
+            boolean includeBlue, boolean includeColor,
             LSWSharpenMode mode) {
         float max = Math.max(Math.max(red, green), blue);
         float min = Math.min(Math.min(red, green), blue);
@@ -365,11 +349,13 @@ public class Util {
             luminance = (max + min) * 0.5f;
         }
 
-        float saturation;
-        if (c == 0) {
-            saturation = 0.f;
-        } else {
-            saturation = c / (1 - Math.abs(2.f * luminance - 1.f));
+        float saturation = 0.f;
+        if (includeColor) {
+            if (c == 0) {
+                saturation = 0.f;
+            } else {
+                saturation = c / (1 - Math.abs(2.f * luminance - 1.f));
+            }
         }
 
         float[] hsl = new float[3];
@@ -456,18 +442,6 @@ public class Util {
 
     public static String getLswVersion() {
         return System.getProperty("lsw.version");
-        // URLClassLoader classloader = (URLClassLoader) Util.class.getClassLoader();
-        // URL url = classloader.findResource("/META-INF/MANIFEST.MF");
-        // try {
-        // Manifest manifest = new Manifest(url.openStream());
-        // return (String) manifest
-        // .getMainAttributes()
-        // .get(Attributes.Name.IMPLEMENTATION_VERSION);
-        // } catch (IOException e) {
-        // log.warn("App version could not be determined due to missing
-        // implementation-version in manifest file!");
-        // return null;
-        // }
     }
 
     public static int convertToUnsignedInt(final short value) {
@@ -476,6 +450,14 @@ public class Util {
 
     public static short convertToShort(long value) {
         return (short) (value >= Constants.SHORT_HALF_SIZE ? value - Constants.UNSIGNED_INT_SIZE : value);
+    }
+
+    public static void setNonPersistentSettings(Profile profile) {
+        profile.setDispersionCorrectionEnabled(false); // dispersion correction is not meant to be persisted.
+        profile.setLuminanceIncludeRed(true);
+        profile.setLuminanceIncludeGreen(true);
+        profile.setLuminanceIncludeBlue(true);
+        profile.setLuminanceIncludeColor(true);
     }
 
     private static String getSetting(Map<String, String> props, String setting, String name) {

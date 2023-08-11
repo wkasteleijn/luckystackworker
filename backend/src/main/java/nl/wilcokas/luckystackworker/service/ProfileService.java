@@ -1,27 +1,29 @@
 package nl.wilcokas.luckystackworker.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
-import org.apache.velocity.exception.ResourceNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
+import nl.wilcokas.luckystackworker.dto.ProfileDTO;
+import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class ProfileService {
 
-    @Autowired
-    private ProfileRepository profileRepository;
+    private final ProfileRepository profileRepository;
 
-    public void updateProfile(Profile profile) {
+    public void updateProfile(ProfileDTO profile) {
         log.info("updateProfile called with profile {}", profile);
         Profile result = profileRepository.findByName(profile.getName()).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Unknown profile %s", profile.getName())));
+                () -> new ProfileNotFoundException(String.format("Unknown profile %s", profile.getName())));
         result.setRadius(profile.getRadius());
         result.setAmount(profile.getAmount());
         result.setIterations(profile.getIterations());
@@ -55,11 +57,18 @@ public class ProfileService {
         result.setDispersionCorrectionRedY(profile.getDispersionCorrectionRedY());
         result.setDispersionCorrectionBlueX(profile.getDispersionCorrectionBlueX());
         result.setDispersionCorrectionBlueY(profile.getDispersionCorrectionBlueY());
+        result.setLuminanceIncludeRed(profile.isLuminanceIncludeRed());
+        result.setLuminanceIncludeGreen(profile.isLuminanceIncludeGreen());
+        result.setLuminanceIncludeBlue(profile.isLuminanceIncludeBlue());
+        result.setLuminanceIncludeColor(profile.isLuminanceIncludeColor());
         profileRepository.save(result);
-        LuckyStackWorkerContext.updateWorkerForProfile(profile);
     }
 
     public Optional<Profile> findByName(String profileName) {
         return profileRepository.findByName(profileName);
+    }
+
+    public List<Profile> getAllProfiles() {
+        return StreamSupport.stream(profileRepository.findAll().spliterator(), false).toList();
     }
 }

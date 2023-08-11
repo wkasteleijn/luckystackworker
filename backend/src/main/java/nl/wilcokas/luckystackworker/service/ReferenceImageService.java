@@ -24,25 +24,32 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.apache.velocity.exception.ResourceNotFoundException;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
+import ij.gui.Plot;
+import ij.gui.PlotWindow;
 import ij.gui.RoiListener;
 import ij.gui.Toolbar;
 import ij.io.Opener;
+import ij.measure.Measurements;
+import ij.process.ImageStatistics;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.dto.Version;
+import nl.wilcokas.luckystackworker.dto.ProfileDTO;
+import nl.wilcokas.luckystackworker.dto.ResponseDTO;
+import nl.wilcokas.luckystackworker.dto.SettingsDTO;
+import nl.wilcokas.luckystackworker.dto.VersionDTO;
+import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
-import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
@@ -67,26 +74,29 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private JFrame roiIndicatorFrame = null;
     private JTextField roiIndicatorTextField = null;
 
+    private boolean showHistogram = true;
+    private PlotWindow plotWindow = null;
+    private Plot histogramPlot = null;
+
     private int zoomFactor = 0;
 
     private Image iconImage = new ImageIcon(getClass().getResource("/luckystackworker_icon.png")).getImage();
 
-    private SettingsRepository settingsRepository;
-    private HttpService httpService;
-    private ProfileService profileService;
-    private OperationService operationService;
+    private final SettingsService settingsService;
+    private final HttpService httpService;
+    private final ProfileService profileService;
+    private final OperationService operationService;
 
-    public ReferenceImageService(SettingsRepository settingsRepository, HttpService httpService,
-            ProfileService profileService,
-            OperationService operationService) {
-        this.settingsRepository = settingsRepository;
+    public ReferenceImageService(final SettingsService settingsService, final HttpService httpService, final ProfileService profileService,
+            final OperationService operationService) {
+        this.settingsService = settingsService;
         this.httpService = httpService;
         this.profileService = profileService;
         this.operationService = operationService;
         createRoiIndicator();
     }
 
-    public Profile selectReferenceImage(String filePath) throws IOException {
+    public ResponseDTO selectReferenceImage(String filePath) throws IOException {
         JFrame frame = getParentFrame();
         JFileChooser jfc = getJFileChooser(filePath);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
@@ -103,29 +113,29 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                     String profileName = Util.deriveProfileFromImageName(selectedFilePath);
                     if (profileName == null) {
                         log.info("Profile not found for reference image, taking the default, {}", profileName);
-                        profileName = getSettings().getDefaultProfile();
+                        profileName = settingsService.getDefaultProfile();
                     }
                     profile = profileService.findByName(profileName)
-                            .orElseThrow(() -> new ResourceNotFoundException("Unknown profile!"));
+                            .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
                 } else {
-                    profileService.updateProfile(profile);
                     log.info("Profile file found, profile was loaded from there.");
                 }
-                profile.setDispersionCorrectionEnabled(false); // dispersion correction is not meant to be persisted.
+                Util.setNonPersistentSettings(profile);
+                profileService.updateProfile(new ProfileDTO(profile));
+
                 this.isLargeImage = openReferenceImage(selectedFilePath, profile);
 
                 final String rootFolder = Util.getFileDirectory(selectedFilePath);
-                updateSettings(rootFolder, profile);
-                profile.setLargeImage(this.isLargeImage);
-                return profile;
+                SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
+                LuckyStackWorkerContext.setSelectedProfile(profile.getName());
+                return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
             }
         }
-        return new Profile();
+        return null;
     }
 
-    public void updateProcessing(Profile profile) {
-        final OperationEnum operation = profile.getOperation() == null ? null
-                : OperationEnum.valueOf(profile.getOperation().toUpperCase());
+    public void updateProcessing(Profile profile, String operationValue) {
+        final OperationEnum operation = operationValue == null ? null : OperationEnum.valueOf(operationValue.toUpperCase());
         if (previousOperation == null || previousOperation != operation) {
             Util.copyInto(referenceImage, processedImage, finalResultImage.getRoi(), profile, false);
             if (operationService.isSharpenOperation(operation)) {
@@ -133,7 +143,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                         OperationEnum.DENOISEAMOUNT,
                         OperationEnum.DENOISERADIUS, OperationEnum.DENOISESIGMA, OperationEnum.DENOISEITERATIONS,
                         OperationEnum.SAVITZKYGOLAYAMOUNT, OperationEnum.SAVITZKYGOLAYITERATIONS,
-                        OperationEnum.SAVITZKYGOLAYSIZE);
+                        OperationEnum.SAVITZKYGOLAYSIZE, OperationEnum.LOCALCONTRASTFINE, OperationEnum.LOCALCONTRASTMEDIUM,
+                        OperationEnum.LOCALCONTRASTLARGE);
             } else {
                 operationService.applyAllOperationsExcept(processedImage, profile, operation);
             }
@@ -146,12 +157,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             operationService.applySharpen(finalResultImage, profile);
             operationService.applyDenoise(finalResultImage, profile);
             operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
+            operationService.applyLocalContrast(finalResultImage, profile);
         } else if (operationService.isDenoiseOperation(operation)) {
             operationService.applyDenoise(finalResultImage, profile);
         } else if (operationService.isSavitzkyGolayDenoiseOperation(operation)) {
             operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
-        } else if ((OperationEnum.DISPERSIONCORRECTION == operation)) {
-            operationService.applyDispersionCorrection(finalResultImage, profile);
+        } else if (operationService.isLocalContrastOperation(operation)) {
+            operationService.applyLocalContrast(finalResultImage, profile);
         } else if ((OperationEnum.CONTRAST == operation) || (OperationEnum.BRIGHTNESS == operation)
                 || (OperationEnum.BACKGROUND == operation)) {
             operationService.applyBrightnessAndContrast(finalResultImage, profile, false);
@@ -159,22 +171,25 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
         // Always apply the following last and only on the final result as it messes up
         // the sharpening.
+        operationService.applyDispersionCorrection(finalResultImage, profile);
         operationService.applyRGBBalance(finalResultImage, profile);
         operationService.applyGamma(finalResultImage, profile);
         operationService.applySaturation(finalResultImage, profile);
-        operationService.applyLocalContrast(finalResultImage, profile);
 
         finalResultImage.updateAndDraw();
 
         finalResultImage.setTitle(filePath);
+        if (showHistogram && plotWindow != null) {
+            drawHistogram(false);
+        }
     }
 
     public void saveReferenceImage(String path, boolean asJpg) throws IOException {
         String pathNoExt = Util.getPathWithoutExtension(path);
         String savePath = pathNoExt + "." + (asJpg ? "jpg" : Constants.DEFAULT_OUTPUT_FORMAT);
         log.info("Saving image to  {}", savePath);
-        Util.saveImage(finalResultImage, savePath,
-                Util.isPngRgbStack(finalResultImage, filePath), roiActive, asJpg);
+        Util.saveImage(finalResultImage, null, savePath,
+                Util.isPngRgbStack(finalResultImage, filePath), roiActive, asJpg, false);
         writeProfile(pathNoExt);
     }
 
@@ -194,17 +209,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return frame;
     }
 
-    public void updateSettings(String rootFolder, Profile profile) {
+    public Settings updateSettingsForRootFolder(String rootFolder) {
         log.info("Setting the root folder to {}", rootFolder);
-        Settings settings = getSettings();
+        Settings settings = settingsService.getSettings();
         settings.setRootFolder(rootFolder);
-        settingsRepository.save(settings);
-        LuckyStackWorkerContext.updateWorkerForRootFolder(rootFolder);
-        profile.setRootFolder(rootFolder);
-        String selectedProfile = profile.getName();
-        if (selectedProfile != null) {
-            LuckyStackWorkerContext.setSelectedProfile(selectedProfile);
-        }
+        settingsService.saveSettings(settings);
+        LuckyStackWorkerContext.setRootFolderIsSelected();
+        return settings;
     }
 
     public void zoomIn() {
@@ -237,8 +248,30 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
     }
 
-    public Settings getSettings() {
-        return settingsRepository.findAll().iterator().next();
+    public void histogram() {
+        if (!showHistogram) {
+            if (plotWindow != null) {
+                plotWindow.setVisible(true);
+            }
+            createHistogram();
+            showHistogram = true;
+        } else {
+            showHistogram = false;
+            if (plotWindow != null) {
+                plotWindow.setVisible(false);
+            }
+        }
+    }
+
+    public void night(boolean on) {
+        if (showHistogram && plotWindow != null && plotWindow.isVisible()) {
+            if (on) {
+                histogramPlot.setColor(Color.RED, Color.RED);
+            } else {
+                histogramPlot.setColor(Color.GREEN, Color.GREEN);
+            }
+            this.drawHistogram(false);
+        }
     }
 
     public void writeProfile() throws IOException {
@@ -250,7 +283,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         String profileName = LuckyStackWorkerContext.getSelectedProfile();
         if (profileName != null) {
             Profile profile = profileService.findByName(profileName)
-                    .orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName)));
+                    .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName)));
             Util.writeProfile(profile, pathNoExt);
         } else {
             log.warn("Profile not saved, could not find the selected profile for file {}", pathNoExt);
@@ -261,8 +294,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return filePath;
     }
 
-    public Version getLatestVersion(LocalDateTime currentDate) {
-        Settings settings = getSettings();
+    public VersionDTO getLatestVersion(LocalDateTime currentDate) {
+        Settings settings = settingsService.getSettings();
         String latestKnowVersion = settings.getLatestKnownVersion();
         if (settings.getLatestKnownVersionChecked() == null || currentDate
                 .isAfter(settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
@@ -271,13 +304,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 settings.setLatestKnownVersion(latestVersionFromSite);
             }
             settings.setLatestKnownVersionChecked(currentDate);
-            settingsRepository.save(settings);
+            settingsService.saveSettings(settings);
 
             if (latestVersionFromSite != null && !latestVersionFromSite.equals(latestKnowVersion)) {
-                return Version.builder().latestVersion(latestVersionFromSite).isNewVersion(true).build();
+                return VersionDTO.builder().latestVersion(latestVersionFromSite).isNewVersion(true).build();
             }
         }
-        return Version.builder().latestVersion(latestKnowVersion).isNewVersion(false).build();
+        return VersionDTO.builder().latestVersion(latestKnowVersion).isNewVersion(false).build();
     }
 
     public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, boolean isSaveDialog) {
@@ -364,6 +397,97 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     @Override
     public void componentHidden(ComponentEvent e) {
         roiIndicatorFrame.setVisible(false);
+    }
+
+    private void createHistogram() {
+        createHistogramWindow();
+        drawHistogram(true);
+    }
+
+    private void createHistogramWindow() {
+        Point windowLocation = null;
+        if (plotWindow != null && plotWindow.isVisible()) {
+            plotWindow.setVisible(false);
+            plotWindow.dispose();
+            histogramPlot.dispose();
+            windowLocation = plotWindow.getLocation();
+        }
+        histogramPlot = new Plot("Histogram", "Value", "Frequency");
+        histogramPlot.setColor(Color.GREEN, Color.GREEN);
+        histogramPlot.setBackgroundColor(Color.DARK_GRAY);
+        histogramPlot.setImagePlus(finalResultImage);
+        histogramPlot.setWindowSize(Constants.DEFAULT_HISTOGRAM_WINDOW_WIDTH, Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT);
+        histogramPlot.setXYLabels(null, null);
+        histogramPlot.setXTicks(false);
+        histogramPlot.setYTicks(false);
+        histogramPlot.setAxisXLog(false);
+        histogramPlot.setAxisYLog(false);
+        histogramPlot.setXMinorTicks(false);
+        histogramPlot.setYMinorTicks(false);
+        plotWindow = histogramPlot.show();
+        plotWindow.setBackground(Color.DARK_GRAY);
+        plotWindow.setForeground(Color.BLACK);
+        plotWindow.setIconImage(iconImage);
+        plotWindow.getCanvas().setSize(Constants.DEFAULT_HISTOGRAM_WINDOW_WIDTH, Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT + 48);
+        plotWindow.setSize(Constants.DEFAULT_HISTOGRAM_WINDOW_WIDTH - 26, Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT + 90);
+        if (Constants.SYSTEM_PROFILE_MAC.equals(activeProfile)) {
+            Taskbar.getTaskbar().setIconImage(iconImage);
+        }
+        plotWindow.setLocation(determineHistogramWindowLocation(windowLocation));
+        plotWindow.remove(1);
+        plotWindow.setResizable(false);
+    }
+
+    private Point determineHistogramWindowLocation(Point windowLocation) {
+        Point imageWindowLocation = finalResultImage.getWindow().getLocation();
+        int imageWindowLocationX = (int) Math.round(imageWindowLocation.getX());
+        int imageWindowLocationY = (int) Math.round(imageWindowLocation.getY());
+        if (finalResultImage.getHeight() < (Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT * 3)) {
+            return new Point(imageWindowLocationX, imageWindowLocationY + finalResultImage.getHeight() + 74);
+        } else if (finalResultImage.getWidth() < Constants.MAX_IMAGE_WIDTH_HISTOGRAM) {
+            return new Point(imageWindowLocationX + finalResultImage.getWidth() + 10, imageWindowLocationY);
+        } else {
+            return new Point(imageWindowLocationX, imageWindowLocationY);
+        }
+    }
+
+    private void drawHistogram(boolean isNew) {
+        Pair<double[], double[]> histogram = getHistogram();
+        double[] x = histogram.getLeft();
+        double[] y = histogram.getRight();
+        histogramPlot.setLimits(0, 65535, 0, getYLimit(y));
+        if (isNew) {
+            histogramPlot.add("bar", x, y);
+        } else {
+            histogramPlot.replace(0, "bar", x, y);
+        }
+        histogramPlot.update();
+    }
+
+    private Pair<double[], double[]> getHistogram() {
+        ImageStatistics stats = finalResultImage.getStatistics(Measurements.AREA + Measurements.MEAN + Measurements.MODE + Measurements.MIN_MAX, 256);
+        double[] y = stats.histogram();
+        int n = y.length;
+        double[] x = new double[n];
+        double min = 0;
+        for (int i = 0; i < n; i++) {
+            x[i] = min + i * stats.binSize;
+        }
+        return Pair.of(x, y);
+    }
+
+    private double getYLimit(double[] y) {
+        int n = y.length;
+        int lowerBound = (int) Math.round(n * 0.1); // disregard the lowest and highest 10% of the histogram to determine maximum
+        // displayed.
+        int upperBound = (int) Math.round(n * 0.9);
+        double max = 0.0;
+        for (int i = lowerBound; i < upperBound; i++) {
+            if (y[i] > max) {
+                max = y[i];
+            }
+        }
+        return max;
     }
 
     private void createRoiIndicator() {
@@ -473,7 +597,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
         boolean isLargeImage = false;
         if (finalResultImage != null) {
-            if (Util.isPngRgbStack(finalResultImage, filePath)) {
+            if (Util.isPng(finalResultImage, filePath)) {
                 finalResultImage = Util.fixNonTiffOpeningSettings(finalResultImage);
             }
             operationService.correctExposure(finalResultImage);
@@ -496,10 +620,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             log.info("Opened reference image image with id {}", referenceImage.getID());
 
             if (profile != null) {
-                updateProcessing(profile);
+                updateProcessing(profile, null);
             }
 
             finalResultImage.setTitle(this.filePath);
+
+            if (showHistogram) {
+                createHistogram();
+            }
         }
         return isLargeImage;
     }
@@ -542,7 +670,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     private boolean validateSelectedFile(String path) {
         String extension = Util.getFilenameExtension(path);
-        if (!getSettings().getExtensions().contains(extension)) {
+        if (!settingsService.getSettings().getExtensions().contains(extension)) {
             JOptionPane.showMessageDialog(getParentFrame(),
                     String.format(
                             "The selected file with extension %s is not supported. %nYou can only open 16-bit RGB and Gray PNG and TIFF images.",

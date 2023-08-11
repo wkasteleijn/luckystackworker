@@ -78,24 +78,6 @@
       Load Profile
     </button>
 
-    <mat-slide-toggle
-      *ngIf="openRefImageEnabled()"
-      class="crop"
-      [(ngModel)]="crop"
-      [color]="colorTheme()"
-      (change)="cropSelectionChanged()"
-      ><span class="sliderLabel">Crop</span></mat-slide-toggle
-    >
-    <mat-slide-toggle
-      *ngIf="!openRefImageEnabled()"
-      class="crop"
-      [(ngModel)]="crop"
-      disabled
-      [color]="colorTheme()"
-      (change)="cropSelectionChanged()"
-      ><span class="sliderLabel">Crop</span></mat-slide-toggle
-    >
-
     <button
       *ngIf="openRefImageEnabled()"
       type="button"
@@ -143,6 +125,24 @@
     >
       &nbsp;&nbsp;-&nbsp;&nbsp;
     </button>
+
+    <mat-slide-toggle
+      *ngIf="openRefImageEnabled()"
+      class="crop"
+      [(ngModel)]="crop"
+      [color]="colorTheme()"
+      (change)="cropSelectionChanged()"
+      ><span class="sliderLabel">Crop</span></mat-slide-toggle
+    >
+    <mat-slide-toggle
+      *ngIf="!openRefImageEnabled()"
+      class="crop"
+      [(ngModel)]="crop"
+      disabled
+      [color]="colorTheme()"
+      (change)="cropSelectionChanged()"
+      ><span class="sliderLabel">Crop</span></mat-slide-toggle
+    >
   </div>
 
   <div class="button_container_top button_container">
@@ -165,8 +165,19 @@
     </mat-form-field>
 
     <span class="buttonDivider">&nbsp;</span>
-    <mat-slide-toggle [(ngModel)]="nightMode" [color]="colorTheme()"
+    <mat-slide-toggle
+      [(ngModel)]="nightMode"
+      (change)="nightModeChanged()"
+      [color]="colorTheme()"
       ><span class="sliderLabel">Night Mode</span></mat-slide-toggle
+    >
+  </div>
+  <div class="histogramToggle">
+    <mat-slide-toggle
+      [(ngModel)]="showHistogram"
+      [color]="colorTheme()"
+      (change)="histogramSelectionChanged()"
+      ><span class="sliderLabel">Histogram</span></mat-slide-toggle
     >
   </div>
   <mat-tab-group class="sliderTabs" selectedIndex="0">
@@ -190,13 +201,48 @@
             (change)="sharpenModeChanged($event, true)"
             class="sharpenMode"
           >
-            <mat-radio-button value="LUMINANCE" class="radioSizeButtonSharpen"
-              >Luminance
-            </mat-radio-button>
-            <mat-radio-button value="RGB" class="radioSizeButton sharpenModeRGB"
+            <mat-radio-button value="RGB" class="radioSizeButtonSharpen"
               >RGB</mat-radio-button
             >
+            <mat-radio-button
+              value="LUMINANCE"
+              class="radioSizeButton sharpenModeRGB"
+              >Luminance
+            </mat-radio-button>
           </mat-radio-group>
+        </div>
+        <div *ngIf="sharpenMode === 'LUMINANCE'">
+          <mat-checkbox
+            [(ngModel)]="luminanceIncludeRed"
+            (change)="sharpenModeChanged(undefined, true)"
+            [color]="colorTheme()"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            >Red</mat-checkbox
+          >
+          <mat-checkbox
+            [(ngModel)]="luminanceIncludeGreen"
+            (change)="sharpenModeChanged(undefined, true)"
+            [color]="colorTheme()"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            class="luminanceIncludeBox"
+            >Green</mat-checkbox
+          >
+          <mat-checkbox
+            [(ngModel)]="luminanceIncludeBlue"
+            (change)="sharpenModeChanged(undefined, true)"
+            [color]="colorTheme()"
+            class="luminanceIncludeBox"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            >Blue</mat-checkbox
+          >
+          <mat-checkbox
+            [(ngModel)]="luminanceIncludeColor"
+            (change)="sharpenModeChanged(undefined, true)"
+            [color]="colorTheme()"
+            class="luminanceIncludeBox"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            >Color</mat-checkbox
+          >
         </div>
       </div>
       <div class="sliderRow">
@@ -221,7 +267,7 @@
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="10"
-            min="5000"
+            min="0"
             max="9999"
             (input)="amountChanged($event, false)"
             (change)="amountChanged($event, true)"

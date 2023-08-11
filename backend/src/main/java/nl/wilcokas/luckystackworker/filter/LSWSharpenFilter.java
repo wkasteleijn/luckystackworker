@@ -148,7 +148,7 @@ public class LSWSharpenFilter {
             float[] pixelsLum = new float[pixelsRed.length];
             for (int i = 0; i < pixelsRed.length; i++) {
                 float[] hsl = Util.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], parameters.isIncludeRed(), parameters.isIncludeGreen(),
-                        parameters.isIncludeBlue(), parameters.getMode());
+                        parameters.isIncludeBlue(), parameters.isIncludeColor(), parameters.getMode());
                 pixelsHue[i] = hsl[0];
                 pixelsSat[i] = hsl[1];
                 pixelsLum[i] = hsl[2];
@@ -213,7 +213,7 @@ public class LSWSharpenFilter {
             float[] pixelsLum = new float[pixelsRed.length];
             for (int i = 0; i < pixelsRed.length; i++) {
                 float[] hsl = Util.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], parameters.isIncludeRed(), parameters.isIncludeGreen(),
-                        parameters.isIncludeBlue(), parameters.getMode());
+                        parameters.isIncludeBlue(), parameters.isIncludeColor(), parameters.getMode());
                 pixelsHue[i] = hsl[0];
                 pixelsSat[i] = hsl[1];
                 pixelsLum[i] = hsl[2];
@@ -255,7 +255,7 @@ public class LSWSharpenFilter {
             float[] pixelsLum = new float[pixelsRed.length];
             for (int i = 0; i < pixelsRed.length; i++) {
                 float[] hsl = Util.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], parameters.isIncludeRed(), parameters.isIncludeGreen(),
-                        parameters.isIncludeBlue(), parameters.getMode());
+                        parameters.isIncludeBlue(), parameters.isIncludeColor(), parameters.getMode());
                 pixelsHue[i] = hsl[0];
                 pixelsSat[i] = hsl[1];
                 pixelsLum[i] = hsl[2];

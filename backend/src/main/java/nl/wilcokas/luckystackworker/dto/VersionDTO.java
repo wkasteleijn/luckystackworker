@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class Version {
+public class VersionDTO {
 	private String latestVersion;
 	private boolean isNewVersion;
 }

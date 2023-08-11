@@ -8,6 +8,8 @@ public class Constants {
     }
 
     public static final String OUTPUT_POSTFIX = "_LSW";
+    public static final String OUTPUT_POSTFIX_SAVE = "_REF";
+    public static final String WORKER_FOLDER_POSTFIX = "_lsw";
     public static final String STATUS_IDLE = "Idle";
     public static final String STATUS_WORKING = "Working";
     public static final String DEFAULT_OUTPUT_FORMAT = "tif";
@@ -33,5 +35,7 @@ public class Constants {
     public static final BigDecimal LOCAL_CONTRAST_FINE_RADIUS = BigDecimal.valueOf(4);
     public static final BigDecimal LOCAL_CONTRAST_MEDIUM_RADIUS = BigDecimal.valueOf(16);
     public static final BigDecimal LOCAL_CONTRAST_LARGE_RADIUS = BigDecimal.valueOf(64);
-
+    public static final int DEFAULT_HISTOGRAM_WINDOW_WIDTH = 272;
+    public static final int DEFAULT_HISTOGRAM_WINDOW_HEIGHT = 128;
+    public static final int MAX_IMAGE_WIDTH_HISTOGRAM = 800;
 }

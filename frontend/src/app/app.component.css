@@ -58,6 +58,7 @@
   flex-wrap: nowrap;
   align-items: baseline;
   max-height: 32px;
+  color: rgb(168, 168, 168);
 }
 
 .sliderRowCategoryTitle {
@@ -193,7 +194,7 @@
 }
 
 .plusZoom {
-  margin-left: 56px;
+  margin-left: 16px;
 }
 
 .buttonDisabledZoom {
@@ -226,6 +227,9 @@
 }
 .radioSizeButtonSharpen {
   margin-left: 46px;
+}
+.luminanceIncludeBox {
+  margin-left: 24px;
 }
 .denoiseMode {
   margin-left: 24px;
@@ -320,4 +324,10 @@
 }
 .dispersionRestButton {
   margin-left: 83px;
+}
+.histogramToggle {
+  position: fixed;
+  top: 116px;
+  right: 34px;
+  z-index: 100;
 }

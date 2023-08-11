@@ -1,5 +1,15 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+XX/08/2023 minor release 4.3.0-beta:
+- Realtime function is now off by default
+- Apply profile now saves results in a subfolder called 'lsw_<profile>'
+- Added histogram window
+- Added checkboxes to luminance sharpen to include/exclude specific channels (red, green, blue, color)
+- Fixed issue with local contrast causing artefacts under certain conditions in combination with RGB sharpen
+- Fixed issue with RGB align causing line artefacts under certain conditions
+- Refactored backend java code
+- Upgraded java backend to the latest spring boot version, also upgraded other dependencies.
+
 07/05/2023 revision release 4.0.1:
 - Fixed ".tiff" not being accepted as valid extension.
 - Fixed dispersion correction issue.

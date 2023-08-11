@@ -5,6 +5,7 @@ import version from '../../package.json';
 import { AboutComponent } from './about/about.component';
 import { LuckyStackWorkerService } from './luckystackworker.service';
 import { Profile } from './model/profile';
+import { Settings } from './model/settings';
 import { NewVersionComponent } from './new_version/newversion.component';
 
 const SERVICE_POLL_DELAY_MS = 250;
@@ -44,6 +45,10 @@ export class AppComponent implements OnInit {
   clippingRange: number;
   deringRadius: number;
   deringStrength: number;
+  luminanceIncludeRed: boolean = true;
+  luminanceIncludeGreen: boolean = true;
+  luminanceIncludeBlue: boolean = true;
+  luminanceIncludeColor: boolean = true;
 
   // denoise
   denoiseAmount: number;
@@ -71,6 +76,7 @@ export class AppComponent implements OnInit {
   green: number;
   blue: number;
   profile: Profile;
+  settings: Settings;
   dispersionCorrectionEnabled: boolean = false;
 
   selectedProfile: string;
@@ -87,7 +93,8 @@ export class AppComponent implements OnInit {
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
 
-  realtimeEnabled: boolean = true;
+  realtimeEnabled: boolean = false;
+  showHistogram: boolean = true;
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
@@ -116,10 +123,11 @@ export class AppComponent implements OnInit {
           console.log(data);
           this.refImageSelected = true;
           this.crop = false;
-          if (data && data.amount > 0) {
-            this.profile = data;
-            this.selectedProfile = data.name;
-            this.rootFolder = data.rootFolder;
+          if (data && data.profile.amount > 0) {
+            this.profile = data.profile;
+            this.settings = data.settings;
+            this.selectedProfile = this.profile.name;
+            this.rootFolder = data.settings.rootFolder;
             this.updateProfileSettings();
           }
           this.hideSpinner();
@@ -167,7 +175,7 @@ export class AppComponent implements OnInit {
   radiusChanged(event: any, update: boolean) {
     this.profile.radius = event.value;
     this.radius = event.value;
-    this.profile.operation = 'radius';
+    this.settings.operation = 'radius';
     console.log('radiusChanged called: ' + this.profile.radius);
     if (update) {
       this.updateProfile();
@@ -177,7 +185,7 @@ export class AppComponent implements OnInit {
   amountChanged(event: any, update: boolean) {
     this.profile.amount = event.value;
     this.amount = event.value;
-    this.profile.operation = 'amount';
+    this.settings.operation = 'amount';
     console.log('amountChanged called: ' + this.profile.amount);
     if (update) {
       this.updateProfile();
@@ -187,7 +195,7 @@ export class AppComponent implements OnInit {
   iterationsChanged(event: any, update: boolean) {
     this.profile.iterations = event.value;
     this.iterations = event.value;
-    this.profile.operation = 'iterations';
+    this.settings.operation = 'iterations';
     console.log('iterationsChanged called: ' + this.profile.iterations);
     if (update) {
       this.updateProfile();
@@ -197,7 +205,7 @@ export class AppComponent implements OnInit {
   clippingStrengthChanged(event: any, update: boolean) {
     this.profile.clippingStrength = event.value;
     this.clippingStrength = event.value;
-    this.profile.operation = 'clippingStrength';
+    this.settings.operation = 'clippingStrength';
     console.log('clippingStrength called: ' + this.profile.clippingStrength);
     if (update) {
       this.updateProfile();
@@ -207,7 +215,7 @@ export class AppComponent implements OnInit {
   clippingRangeChanged(event: any, update: boolean) {
     this.profile.clippingRange = event.value;
     this.clippingRange = event.value;
-    this.profile.operation = 'clippingRange';
+    this.settings.operation = 'clippingRange';
     console.log('clippingRange called: ' + this.profile.clippingRange);
     if (update) {
       this.updateProfile();
@@ -217,7 +225,7 @@ export class AppComponent implements OnInit {
   deringRadiusChanged(event: any, update: boolean) {
     this.profile.deringRadius = event.value;
     this.deringRadius = event.value;
-    this.profile.operation = 'deringRadius';
+    this.settings.operation = 'deringRadius';
     console.log('deringRadius called: ' + this.profile.deringRadius);
     if (update) {
       this.updateProfile();
@@ -227,7 +235,7 @@ export class AppComponent implements OnInit {
   deringStrengthChanged(event: any, update: boolean) {
     this.profile.deringStrength = event.value;
     this.deringStrength = event.value;
-    this.profile.operation = 'deringStrength';
+    this.settings.operation = 'deringStrength';
     console.log('deringStrength called: ' + this.profile.deringStrength);
     if (update) {
       this.updateProfile();
@@ -235,9 +243,22 @@ export class AppComponent implements OnInit {
   }
 
   sharpenModeChanged(event: any, update: boolean) {
-    this.profile.sharpenMode = event.value;
-    this.sharpenMode = event.value;
-    this.profile.operation = 'sharpenMode';
+    this.profile.sharpenMode = event ? event.value : this.sharpenMode;
+    this.sharpenMode = event ? event.value : this.sharpenMode;
+    if (
+      !this.luminanceIncludeRed &&
+      !this.luminanceIncludeGreen &&
+      !this.luminanceIncludeBlue
+    ) {
+      this.luminanceIncludeRed = true;
+      this.luminanceIncludeGreen = true;
+      this.luminanceIncludeBlue = true;
+    }
+    this.profile.luminanceIncludeRed = this.luminanceIncludeRed;
+    this.profile.luminanceIncludeGreen = this.luminanceIncludeGreen;
+    this.profile.luminanceIncludeBlue = this.luminanceIncludeBlue;
+    this.profile.luminanceIncludeColor = this.luminanceIncludeColor;
+    this.settings.operation = 'sharpenMode';
     console.log('sharpenMode called: ' + this.profile.sharpenMode);
     if (update) {
       this.updateProfile();
@@ -247,7 +268,7 @@ export class AppComponent implements OnInit {
   localContrastModeChanged(event: any, update: boolean) {
     this.profile.localContrastMode = event.value;
     this.localContrastMode = event.value;
-    this.profile.operation = 'localContrastMode';
+    this.settings.operation = 'localContrastMode';
     console.log('localContrastMode called: ' + this.profile.localContrastMode);
     if (update) {
       this.updateProfile();
@@ -257,7 +278,7 @@ export class AppComponent implements OnInit {
   edgeArtefactSupressionModeChanged(event: any, update: boolean) {
     if (event.value === 'CLIPPING') {
       this.profile.deringStrength = 0;
-      this.profile.operation = 'clippingStrength';
+      this.settings.operation = 'clippingStrength';
       if (!this.profile.clippingStrength) {
         // If not set, start with the defaults
         this.profile.clippingRange = 50;
@@ -267,7 +288,7 @@ export class AppComponent implements OnInit {
       }
     } else if (event.value === 'DERING') {
       this.profile.clippingStrength = 0;
-      this.profile.operation = 'deringStrength';
+      this.settings.operation = 'deringStrength';
       if (!this.profile.deringStrength) {
         this.profile.deringRadius = 3;
         this.profile.deringStrength = 10;
@@ -276,7 +297,7 @@ export class AppComponent implements OnInit {
       }
     } else {
       // Off
-      this.profile.operation = 'deringStrength';
+      this.settings.operation = 'deringStrength';
       this.profile.clippingStrength = 0;
       this.profile.deringStrength = 0;
     }
@@ -287,7 +308,7 @@ export class AppComponent implements OnInit {
   denoiseAmountChanged(event: any, update: boolean) {
     this.profile.denoise = event.value;
     this.denoiseAmount = event.value;
-    this.profile.operation = 'denoiseAmount';
+    this.settings.operation = 'denoiseAmount';
     console.log('denoiseAmountChanged called: ' + this.profile.denoise);
     if (update) {
       this.updateProfile();
@@ -297,7 +318,7 @@ export class AppComponent implements OnInit {
   denoiseSigmaChanged(event: any, update: boolean) {
     this.profile.denoiseSigma = +event.value;
     this.denoiseSigma = event.value;
-    this.profile.operation = 'denoiseSigma';
+    this.settings.operation = 'denoiseSigma';
     console.log('denoiseSigmaChanged called: ' + this.profile.denoiseSigma);
     if (update) {
       this.updateProfile();
@@ -307,7 +328,7 @@ export class AppComponent implements OnInit {
   denoiseRadiusChanged(event: any, update: boolean) {
     this.profile.denoiseRadius = event.value;
     this.denoiseRadius = event.value;
-    this.profile.operation = 'denoiseRadius';
+    this.settings.operation = 'denoiseRadius';
     console.log('denoiseRadiusChanged called: ' + this.profile.denoiseRadius);
     if (update) {
       this.updateProfile();
@@ -317,7 +338,7 @@ export class AppComponent implements OnInit {
   denoiseIterationsChanged(event: any, update: boolean) {
     this.profile.denoiseIterations = event.value;
     this.denoiseIterations = event.value;
-    this.profile.operation = 'denoiseIterations';
+    this.settings.operation = 'denoiseIterations';
     console.log(
       'denoiseIterationsChanged called: ' + this.profile.denoiseRadius
     );
@@ -329,7 +350,7 @@ export class AppComponent implements OnInit {
   gammaChanged(event: any, update: boolean) {
     this.profile.gamma = event.value;
     this.gamma = event.value;
-    this.profile.operation = 'gamma';
+    this.settings.operation = 'gamma';
     console.log('gammaChanged called: ' + this.profile.gamma);
     if (update) {
       this.updateProfile();
@@ -339,7 +360,7 @@ export class AppComponent implements OnInit {
   contrastChanged(event: any, update: boolean) {
     this.profile.contrast = event.value;
     this.contrast = event.value;
-    this.profile.operation = 'contrast';
+    this.settings.operation = 'contrast';
     console.log('contrastChanged called: ' + this.profile.contrast);
     if (update) {
       this.updateProfile();
@@ -349,7 +370,7 @@ export class AppComponent implements OnInit {
   localContrastFineChanged(event: any, update: boolean) {
     this.profile.localContrastFine = event.value;
     this.localContrastFine = event.value;
-    this.profile.operation = 'localContrastFine';
+    this.settings.operation = 'localContrastFine';
     console.log('localContrastFine called: ' + this.profile.localContrastFine);
     if (update) {
       this.updateProfile();
@@ -359,7 +380,7 @@ export class AppComponent implements OnInit {
   localContrastMediumChanged(event: any, update: boolean) {
     this.profile.localContrastMedium = event.value;
     this.localContrastMedium = event.value;
-    this.profile.operation = 'localContrastMedium';
+    this.settings.operation = 'localContrastMedium';
     console.log(
       'localContrastMedium called: ' + this.profile.localContrastMedium
     );
@@ -371,7 +392,7 @@ export class AppComponent implements OnInit {
   localContrastLargeChanged(event: any, update: boolean) {
     this.profile.localContrastLarge = event.value;
     this.localContrastLarge = event.value;
-    this.profile.operation = 'localContrastLarge';
+    this.settings.operation = 'localContrastLarge';
     console.log(
       'localContrastLarge called: ' + this.profile.localContrastLarge
     );
@@ -383,7 +404,7 @@ export class AppComponent implements OnInit {
   brightnessChanged(event: any, update: boolean) {
     this.profile.brightness = event.value;
     this.brightness = event.value;
-    this.profile.operation = 'brightness';
+    this.settings.operation = 'brightness';
     console.log('brightnessChanged called: ' + this.profile.brightness);
     if (update) {
       this.updateProfile();
@@ -393,7 +414,7 @@ export class AppComponent implements OnInit {
   backgroundChanged(event: any, update: boolean) {
     this.profile.background = event.value;
     this.background = event.value;
-    this.profile.operation = 'background';
+    this.settings.operation = 'background';
     console.log('backgroundChanged called: ' + this.profile.background);
     if (update) {
       this.updateProfile();
@@ -403,7 +424,7 @@ export class AppComponent implements OnInit {
   saturationChanged(event: any, update: boolean) {
     this.profile.saturation = event.value;
     this.saturation = event.value;
-    this.profile.operation = 'saturation';
+    this.settings.operation = 'saturation';
     console.log('saturationChanged called: ' + this.profile.saturation);
     if (update) {
       this.updateProfile();
@@ -413,7 +434,7 @@ export class AppComponent implements OnInit {
   greenChanged(event: any, update: boolean) {
     this.profile.green = event.value;
     this.green = event.value;
-    this.profile.operation = 'green';
+    this.settings.operation = 'green';
     console.log('greenChanged called: ' + this.profile.green);
     if (update) {
       this.updateProfile();
@@ -423,7 +444,7 @@ export class AppComponent implements OnInit {
   redChanged(event: any, update: boolean) {
     this.profile.red = event.value;
     this.red = event.value;
-    this.profile.operation = 'red';
+    this.settings.operation = 'red';
     console.log('redChanged called: ' + this.profile.red);
     if (update) {
       this.updateProfile();
@@ -432,7 +453,7 @@ export class AppComponent implements OnInit {
 
   blueChanged(event: any, update: boolean) {
     this.profile.blue = event.value;
-    this.profile.operation = 'blue';
+    this.settings.operation = 'blue';
     this.blue = event.value;
     console.log('blueChanged called: ' + this.profile.blue);
     if (update) {
@@ -455,7 +476,7 @@ export class AppComponent implements OnInit {
   savitzkyGolayIterationsChanged(event: any, update: boolean) {
     this.profile.savitzkyGolayIterations = event.value;
     this.savitzkyGolayIterations = event.value;
-    this.profile.operation = 'savitzkyGolayIterations';
+    this.settings.operation = 'savitzkyGolayIterations';
     console.log(
       'savitzkyGolayIterationsChanged called: ' +
         this.profile.savitzkyGolayIterations
@@ -468,7 +489,7 @@ export class AppComponent implements OnInit {
   savitzkyGolayAmountChanged(event: any, update: boolean) {
     this.profile.savitzkyGolayAmount = event.value;
     this.savitzkyGolayAmount = event.value;
-    this.profile.operation = 'savitzkyGolayAmount';
+    this.settings.operation = 'savitzkyGolayAmount';
     console.log(
       'savitzkyGolayAmountChanged called: ' + this.profile.savitzkyGolayAmount
     );
@@ -480,7 +501,7 @@ export class AppComponent implements OnInit {
   savitzkyGolaySizeChanged(event: any, update: boolean) {
     this.profile.savitzkyGolaySize = +event.value;
     this.savitzkyGolaySize = event.value;
-    this.profile.operation = 'savitzkyGolaySize';
+    this.settings.operation = 'savitzkyGolaySize';
     console.log(
       'savitzkyGolaySizeChanged called: ' + this.profile.savitzkyGolaySize
     );
@@ -492,7 +513,7 @@ export class AppComponent implements OnInit {
   denoiseAlgorithmChanged(event: any) {
     if (event.value === 'SAVGOLAY') {
       this.profile.denoiseSigma = 0;
-      this.profile.operation = 'savitzkyGolaySize';
+      this.settings.operation = 'savitzkyGolaySize';
       if (!this.profile.savitzkyGolaySize) {
         // If not set, start with the defaults
         this.profile.savitzkyGolaySize = 3;
@@ -504,7 +525,7 @@ export class AppComponent implements OnInit {
       }
     } else if (event.value === 'SIGMA') {
       this.profile.savitzkyGolaySize = 0;
-      this.profile.operation = 'denoiseSigma';
+      this.settings.operation = 'denoiseSigma';
       if (!this.profile.denoiseSigma) {
         this.profile.denoiseSigma = 2;
         this.profile.denoise = 50;
@@ -517,7 +538,7 @@ export class AppComponent implements OnInit {
       }
     } else {
       // Off
-      this.profile.operation = 'savitzkyGolaySize';
+      this.settings.operation = 'savitzkyGolaySize';
       this.profile.denoiseSigma = 0;
       this.profile.savitzkyGolaySize = 0;
     }
@@ -544,14 +565,14 @@ export class AppComponent implements OnInit {
       'dispersionCorrectionEnabledChanged called: ' +
         this.dispersionCorrectionEnabled
     );
-    this.profile.operation = 'dispersionCorrection';
+    this.settings.operation = 'dispersionCorrection';
     this.profile.dispersionCorrectionEnabled = this.dispersionCorrectionEnabled;
     this.resetDispersionCorrection();
   }
 
   resetDispersionCorrection() {
     console.log('resetDispersionCorrection called');
-    this.profile.operation = 'dispersionCorrection';
+    this.settings.operation = 'dispersionCorrection';
     this.profile.dispersionCorrectionRedX = 0;
     this.profile.dispersionCorrectionRedY = 0;
     this.profile.dispersionCorrectionBlueX = 0;
@@ -561,7 +582,7 @@ export class AppComponent implements OnInit {
 
   dispersionCorrectionClicked(direction: string, color: string) {
     console.log('dispersionCorrectionClicked called: ' + direction);
-    this.profile.operation = 'dispersionCorrection';
+    this.settings.operation = 'dispersionCorrection';
     if (color === 'RED') {
       switch (direction) {
         case 'LEFT-UP':
@@ -704,8 +725,9 @@ export class AppComponent implements OnInit {
       (data) => {
         if (data) {
           console.log(data);
-          this.profile = data;
-          this.selectedProfile = data.name;
+          this.profile = data.profile;
+          this.settings = data.settings;
+          this.selectedProfile = this.profile.name;
           this.updateProfileSettings();
         }
         this.hideSpinner();
@@ -766,29 +788,38 @@ export class AppComponent implements OnInit {
     this.red = this.profile.red;
     this.green = this.profile.green;
     this.blue = this.profile.blue;
-    this.isLargeImage = this.profile.largeImage;
-    this.profile.dispersionCorrectionEnabled = false;
+    this.isLargeImage = this.settings.isLargeImage;
+    this.setNonPersistentSettings();
+  }
+
+  private setNonPersistentSettings() {
     this.dispersionCorrectionEnabled = false;
+    this.luminanceIncludeRed = true;
+    this.luminanceIncludeGreen = true;
+    this.luminanceIncludeBlue = true;
+    this.luminanceIncludeColor = true;
   }
 
   private updateProfile() {
     if (this.isLargeImage) {
       this.showSpinner();
     }
-    this.luckyStackWorkerService.updateProfile(this.profile).subscribe(
-      (data) => {
-        console.log(data);
-        if (this.isLargeImage) {
-          this.hideSpinner();
+    this.luckyStackWorkerService
+      .updateProfile(this.profile, this.settings.operation)
+      .subscribe(
+        (data) => {
+          console.log(data);
+          if (this.isLargeImage) {
+            this.hideSpinner();
+          }
+        },
+        (error) => {
+          console.log(error);
+          if (this.isLargeImage) {
+            this.hideSpinner();
+          }
         }
-      },
-      (error) => {
-        console.log(error);
-        if (this.profile.largeImage) {
-          this.hideSpinner();
-        }
-      }
-    );
+      );
   }
 
   private waitForWorker() {
@@ -824,9 +855,10 @@ export class AppComponent implements OnInit {
         console.log(data);
         this.refImageSelected = true;
         if (data) {
-          this.profile = data;
-          this.selectedProfile = data.name;
-          this.rootFolder = data.rootFolder;
+          this.profile = data.profile;
+          this.settings = data.settings;
+          this.selectedProfile = this.profile.name;
+          this.rootFolder = data.settings.rootFolder;
           this.updateProfileSettings();
           this.hideSpinner();
           this.checkLatestVersion();
@@ -883,9 +915,29 @@ export class AppComponent implements OnInit {
     return this.nightMode;
   }
 
+  nightModeChanged() {
+    console.log('nightModeChanged called');
+    this.luckyStackWorkerService.nightModeChanged(this.nightMode).subscribe(
+      (data) => {
+        console.log('Response');
+      },
+      (error) => console.log(error)
+    );
+  }
+
   cropSelectionChanged() {
     console.log('cropSelectionChanged called');
     this.luckyStackWorkerService.cropSelectionChanged().subscribe(
+      (data) => {
+        console.log('Response');
+      },
+      (error) => console.log(error)
+    );
+  }
+
+  histogramSelectionChanged() {
+    console.log('cropSelectionChanged called');
+    this.luckyStackWorkerService.histogramSelectionChanged().subscribe(
       (data) => {
         console.log('Response');
       },

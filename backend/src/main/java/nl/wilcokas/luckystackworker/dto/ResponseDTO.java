@@ -4,12 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-@Data
-@AllArgsConstructor
 @Builder
-public class Crop {
-	private int x;
-	private int y;
-	private int width;
-	private int height;
+@AllArgsConstructor
+@Data
+public class ResponseDTO {
+    private ProfileDTO profile;
+    private SettingsDTO settings;
 }
