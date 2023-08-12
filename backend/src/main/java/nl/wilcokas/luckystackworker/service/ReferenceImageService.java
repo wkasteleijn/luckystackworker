@@ -127,6 +127,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
                 final String rootFolder = Util.getFileDirectory(selectedFilePath);
                 SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
+                settingsDTO.setLargeImage(this.isLargeImage);
                 LuckyStackWorkerContext.setSelectedProfile(profile.getName());
                 return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
             }

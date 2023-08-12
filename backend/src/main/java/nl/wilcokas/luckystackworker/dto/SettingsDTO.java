@@ -28,5 +28,5 @@ public class SettingsDTO {
     private String latestKnownVersion;
     private LocalDateTime latestKnownVersionChecked;
     private String operation;
-    private boolean isLargeImage;
+    private boolean largeImage;
 }

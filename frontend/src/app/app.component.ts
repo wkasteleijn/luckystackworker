@@ -788,7 +788,7 @@ export class AppComponent implements OnInit {
     this.red = this.profile.red;
     this.green = this.profile.green;
     this.blue = this.profile.blue;
-    this.isLargeImage = this.settings.isLargeImage;
+    this.isLargeImage = this.settings.largeImage;
     this.setNonPersistentSettings();
   }
 
