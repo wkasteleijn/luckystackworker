@@ -190,7 +190,7 @@
 }
 
 .crop {
-  margin-left: 20px;
+  margin-left: 23px;
 }
 
 .plusZoom {
@@ -328,6 +328,6 @@
 .histogramToggle {
   position: fixed;
   top: 116px;
-  right: 34px;
+  left: 533px;
   z-index: 100;
 }

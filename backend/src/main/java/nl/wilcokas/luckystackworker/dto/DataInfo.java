@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DataInfoDTO {
+public class DataInfo {
     private String version;
     private String instalationDate;
 }
