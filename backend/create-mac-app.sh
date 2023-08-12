@@ -10,7 +10,7 @@ fi
 
 if [ "$2" = "arm64" ]; then
     echo "Building the LSW for $2 architecture"
-    export JRE_HOME="/Users/wkasteleijn/Applications/jdk-17.0.6+10-jre/Contents/Home"
+    export JRE_HOME="/Users/wkasteleijn/Applications/jre-arm64/Contents/Home"
 fi
 
 cd ~/git/luckystackworker/backend/target

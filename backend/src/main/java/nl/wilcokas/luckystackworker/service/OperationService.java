@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.text.StringSubstitutor;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import ij.ImagePlus;
@@ -35,8 +36,15 @@ import nl.wilcokas.luckystackworker.util.Util;
 @RequiredArgsConstructor
 @Service
 public class OperationService {
-    private static final String HISTOGRAM_STRETCH_MACRO = Util
-            .readFromInputStream(OperationService.class.getResourceAsStream("/histogramstretch.ijm"));
+    private static String HISTOGRAM_STRETCH_MACRO = null;
+    static {
+    	try {
+			HISTOGRAM_STRETCH_MACRO = Util
+			        .readFromInputStream(new ClassPathResource("/histogramstretch.ijm").getInputStream());
+		} catch (IOException e) {
+			log.error("Error loading histogram stretch script");
+		}
+    }
 
     private final LSWSharpenFilter lswSharpenFilter;
     private final RGBBalanceFilter rgbBalanceFilter;
