@@ -107,7 +107,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             String selectedFilePath = selectedFile.getAbsolutePath();
             if (validateSelectedFile(selectedFilePath)) {
                 log.info("Image selected {} ", selectedFilePath);
-                String fileNameNoExt = Util.getFilename(selectedFilePath);
+                String fileNameNoExt = Util.getPathWithoutExtension(selectedFilePath);
                 Profile profile = Util.readProfile(fileNameNoExt);
                 if (profile == null) {
                     String profileName = Util.deriveProfileFromImageName(selectedFilePath);

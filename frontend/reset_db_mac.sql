@@ -32,7 +32,7 @@ update profiles set luminance_include_blue=true;
 update profiles set luminance_include_color=true;
 
 select * from profiles;
-update settings set latest_known_version='4.0.1';
+update settings set latest_known_version='4.3.0-beta';
 update settings set latest_known_version_checked=null; --TIMESTAMP '2023-01-24 10.00.00';
 update settings set root_folder='~';
 update settings set extensions='tif,png,tiff';
