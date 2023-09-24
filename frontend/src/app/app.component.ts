@@ -198,7 +198,6 @@ export class AppComponent implements OnInit {
         this.hideSpinner();
       }
     );
-    this.updateProfile();
   }
 
   radiusChanged(event: any, update: boolean) {

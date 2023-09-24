@@ -150,6 +150,7 @@ public class ProfileController {
 
     @PutMapping("/scale")
     public ResponseDTO scale(@RequestBody ProfileDTO profile) throws IOException {
+        profileService.updateProfile(profile);
         return referenceImageService.scale(new Profile(profile));
     }
 

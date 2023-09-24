@@ -61,6 +61,7 @@ public class ProfileService {
         result.setLuminanceIncludeGreen(profile.isLuminanceIncludeGreen());
         result.setLuminanceIncludeBlue(profile.isLuminanceIncludeBlue());
         result.setLuminanceIncludeColor(profile.isLuminanceIncludeColor());
+        result.setScale(profile.getScale());
         profileRepository.save(result);
     }
 

@@ -453,7 +453,7 @@ public class Util {
     }
 
     public static void setNonPersistentSettings(Profile profile) {
-        setNonPersistentSettings(profile, 1);
+        setNonPersistentSettings(profile, profile.getScale());
     }
 
     public static void setNonPersistentSettings(Profile profile, double scale) {
