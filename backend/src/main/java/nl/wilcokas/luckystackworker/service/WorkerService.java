@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
+import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
@@ -141,14 +142,18 @@ public class WorkerService {
                         imp = Util.fixNonTiffOpeningSettings(imp);
                     }
                     operationService.correctExposure(imp);
-                    operationService.applyAllOperations(imp, profileService.findByName(profileName)
-                            .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName))));
+                    Profile profile = profileService.findByName(profileName)
+                            .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName)));
+                    if (profile.getScale() > 1.0) {
+                        imp = operationService.scaleImage(imp, profile.getScale());
+                    }
+                    operationService.applyAllOperations(imp, profile);
                     imp.updateAndDraw();
                     if (LuckyStackWorkerContext.getSelectedRoi() != null) {
                         imp.setRoi(LuckyStackWorkerContext.getSelectedRoi());
                         imp = imp.crop();
                     }
-                    Util.saveImage(imp, profileName, getOutputFile(file), Util.isPngRgbStack(imp, filePath),
+                    Util.saveImage(imp, profileName, getOutputFile(file), Util.isPngRgbStack(imp, filePath) || profile.getScale() > 1.0,
                             LuckyStackWorkerContext.getSelectedRoi() != null, false, true);
                     return true;
                 }

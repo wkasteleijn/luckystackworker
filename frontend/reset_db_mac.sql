@@ -30,6 +30,7 @@ update profiles set luminance_include_red=true;
 update profiles set luminance_include_green=true;
 update profiles set luminance_include_blue=true;
 update profiles set luminance_include_color=true;
+update profiles set scale=1;
 
 select * from profiles;
 update settings set latest_known_version='4.3.0-beta';

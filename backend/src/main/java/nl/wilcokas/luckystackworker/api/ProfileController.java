@@ -148,12 +148,21 @@ public class ProfileController {
         return referenceImageService.getLatestVersion(LocalDateTime.now());
     }
 
+    @PutMapping("/scale")
+    public ResponseDTO scale(@RequestBody ProfileDTO profile) throws IOException {
+        return referenceImageService.scale(new Profile(profile));
+    }
+
     @PutMapping("/exit")
     public void exit() {
         log.info("Exit called, ending application");
         if (referenceImageService.getFinalResultImage() != null) {
             referenceImageService.getFinalResultImage().hide();
         }
+        if (referenceImageService.getPlotWindow() != null) {
+            referenceImageService.getPlotWindow().setVisible(false);
+        }
+
         System.exit(0);
     }
 }

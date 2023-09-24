@@ -132,17 +132,17 @@ public class Util {
         Files.delete(Paths.get(path));
     }
 
-    public static void saveImage(ImagePlus image, String profileName, String path, boolean isPngRgbStack, boolean crop, boolean asJpg, boolean fromWorker) throws IOException {
+    public static void saveImage(ImagePlus image, String profileName, String path, boolean fixRgbStack, boolean crop, boolean asJpg, boolean fromWorker) throws IOException {
         if (crop) {
             image = image.crop();
         }
-        if (isPngRgbStack) {
+        if (fixRgbStack) {
             image.setActiveChannels("111");
             image.setC(1);
             image.setZ(1);
         }
         FileSaver saver = new FileSaver(image);
-        if (isPngRgbStack) {
+        if (fixRgbStack) {
             hackIncorrectPngFileInfo(saver);
         }
         if (fromWorker) {
@@ -453,11 +453,16 @@ public class Util {
     }
 
     public static void setNonPersistentSettings(Profile profile) {
+        setNonPersistentSettings(profile, 1);
+    }
+
+    public static void setNonPersistentSettings(Profile profile, double scale) {
         profile.setDispersionCorrectionEnabled(false); // dispersion correction is not meant to be persisted.
         profile.setLuminanceIncludeRed(true);
         profile.setLuminanceIncludeGreen(true);
         profile.setLuminanceIncludeBlue(true);
         profile.setLuminanceIncludeColor(true);
+        profile.setScale(scale);
     }
 
     private static String getSetting(Map<String, String> props, String setting, String name) {

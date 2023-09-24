@@ -318,7 +318,7 @@ public class LSWSharpenFilter {
                 minValue = value;
             }
         }
-        int average = (maxValue - minValue) / 4; // start cutting of from 0.25 times the average.
+        int average = (maxValue - minValue) / 8; // start cutting of from 0.25 times the average.
         for (int position = 0; position < maskPixels.length; position++) {
             int value = Util.convertToUnsignedInt(maskPixels[position]);
             if (value < average) {

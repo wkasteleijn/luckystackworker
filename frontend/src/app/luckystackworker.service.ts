@@ -42,16 +42,22 @@ export class LuckyStackWorkerService {
     return this.http.put(`${this.baseUrl}/profiles/exit`, null);
   }
 
-  openReferenceImage(rootFolder: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/reference/open?path=${rootFolder}`);
+  openReferenceImage(rootFolder: string, scale: number): Observable<any> {
+    return this.http.get(
+      `${this.baseUrl}/reference/open?path=${rootFolder}&scale=${scale}`
+    );
+  }
+
+  scale(profile: Profile): Observable<any> {
+    return this.http.put(`${this.baseUrl}/profiles/scale`, profile);
   }
 
   selectRootFolder(): Observable<any> {
     return this.http.get(`${this.baseUrl}/reference/rootfolder`);
   }
 
-  saveReferenceImage(rootFolder: string): Observable<Object> {
-    return this.http.put(`${this.baseUrl}/reference/save`, rootFolder);
+  saveReferenceImage(profile: Profile): Observable<any> {
+    return this.http.put(`${this.baseUrl}/reference/save`, profile);
   }
 
   zoomIn(): Observable<Object> {

@@ -62,6 +62,7 @@ public class Profile {
         this.luminanceIncludeGreen = profile.isLuminanceIncludeGreen();
         this.luminanceIncludeBlue = profile.isLuminanceIncludeBlue();
         this.luminanceIncludeColor = profile.isLuminanceIncludeColor();
+        this.scale = profile.getScale();
     }
 
     @Id
@@ -182,6 +183,9 @@ public class Profile {
 
     @Column(name = "luminanceIncludeColor")
     private boolean luminanceIncludeColor;
+
+    @Column(name = "scale")
+    private double scale;
 
     // Not used any longer, needed for historical reasons. Removing this would now
     // break the profile loading of old yaml files created prior to 4.1.0.

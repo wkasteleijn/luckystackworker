@@ -3,7 +3,6 @@ package nl.wilcokas.luckystackworker.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.Optional;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -21,8 +20,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.dto.ProfileDTO;
 import nl.wilcokas.luckystackworker.dto.ResponseDTO;
 import nl.wilcokas.luckystackworker.dto.SettingsDTO;
+import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.service.SettingsService;
 import nl.wilcokas.luckystackworker.util.Util;
@@ -38,9 +39,9 @@ public class ReferenceController {
     private final ReferenceImageService referenceImageService;
 
     @GetMapping("/open")
-    public ResponseDTO openReferenceImage(@RequestParam String path) throws IOException {
+    public ResponseDTO openReferenceImage(@RequestParam String path, @RequestParam double scale) throws IOException {
         final String base64DecodedPath = new String(Base64.getDecoder().decode(path));
-        return referenceImageService.selectReferenceImage(base64DecodedPath);
+        return referenceImageService.selectReferenceImage(base64DecodedPath, scale);
     }
 
     @GetMapping("/rootfolder")
@@ -61,9 +62,8 @@ public class ReferenceController {
     }
 
     @PutMapping("/save")
-    public void saveReferenceImage(@RequestBody Optional<String> path) throws IOException {
+    public void saveReferenceImage(@RequestBody ProfileDTO profile) throws IOException {
         JFrame frame = referenceImageService.getParentFrame();
-        // Ignoring path received from frontend as it isn't used.
         JFileChooser jfc = referenceImageService.getJFileChooser(settingsService.getRootFolder());
         jfc.setFileFilter(new FileNameExtensionFilter("TIFF, JPG", "tif", "tiff", "jpg", "jpeg"));
         String fileNameNoExt = Util.getFilename(referenceImageService.getFilePath());
@@ -73,7 +73,7 @@ public class ReferenceController {
         frame.dispose();
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
-            referenceImageService.saveReferenceImage(selectedFile.getAbsolutePath(), asJpeg(selectedFile));
+            referenceImageService.saveReferenceImage(selectedFile.getAbsolutePath(), asJpeg(selectedFile), new Profile(profile));
         }
     }
 

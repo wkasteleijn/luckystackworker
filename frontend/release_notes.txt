@@ -1,6 +1,6 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
-XX/08/2023 minor release 4.3.0-beta:
+13/08/2023 minor release 4.3.0-beta:
 - Realtime function is now off by default
 - Apply profile now saves results in a subfolder called 'lsw_<profile>'
 - Added histogram window

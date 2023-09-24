@@ -53,6 +53,7 @@ public class ProfileDTO {
         this.luminanceIncludeGreen=profile.isLuminanceIncludeGreen();
         this.luminanceIncludeBlue=profile.isLuminanceIncludeBlue();
         this.luminanceIncludeColor=profile.isLuminanceIncludeColor();
+        this.scale = profile.getScale();
     }
 
     private String name;
@@ -93,4 +94,5 @@ public class ProfileDTO {
     private boolean luminanceIncludeGreen;
     private boolean luminanceIncludeBlue;
     private boolean luminanceIncludeColor;
+    private double scale;
 }

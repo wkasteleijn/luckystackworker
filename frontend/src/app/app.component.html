@@ -24,7 +24,7 @@
         nightModeEnabled() ? 'activeColorNight button' : 'activeColor button'
       }}"
     >
-      Open Reference Stack
+      Open
     </button>
     <button
       *ngIf="!openRefImageEnabled()"
@@ -33,10 +33,23 @@
       disabled
       class="button_disabled"
     >
-      Open Reference Stack
+      Open
     </button>
-    <span class="buttonDivider">&nbsp;</span>
-    <mat-form-field appearance="fill">
+
+    <mat-radio-group
+      [color]="colorTheme()"
+      [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+      [(ngModel)]="scale"
+      (change)="scaleChanged($event)"
+    >
+      <span class="labelColor relatedButtonsSpace">Scale</span>
+      <mat-radio-button value="1">1</mat-radio-button>
+      <mat-radio-button value="1.5">1.5</mat-radio-button>
+      <mat-radio-button value="2">2</mat-radio-button>
+      <mat-radio-button value="3">3</mat-radio-button>
+    </mat-radio-group>
+
+    <mat-form-field appearance="fill" class="profileSelectorSpace">
       <select
         matNativeControl
         [disabled]="!refImageSelected || !openRefImageEnabled()"
@@ -56,27 +69,6 @@
         </option>
       </select>
     </mat-form-field>
-    <span class="buttonDivider">&nbsp;</span>
-    <button
-      *ngIf="openRefImageEnabled()"
-      type="button"
-      mat-button
-      class="button {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      (click)="loadProfile()"
-    >
-      Load Profile
-    </button>
-    <button
-      *ngIf="!openRefImageEnabled()"
-      type="button"
-      mat-button
-      disabled
-      class="button_disabled"
-    >
-      Load Profile
-    </button>
 
     <button
       *ngIf="openRefImageEnabled()"
@@ -109,8 +101,8 @@
       (click)="zoomOut()"
       class="{{
         nightModeEnabled()
-          ? 'buttonZoom buttonZoomSpace activeColorNight'
-          : 'buttonZoom buttonZoomSpace activeColor'
+          ? 'buttonZoom relatedButtonsSpace activeColorNight'
+          : 'buttonZoom relatedButtonsSpace activeColor'
       }}"
       title="Zoom out"
     >
@@ -121,7 +113,7 @@
       type="button"
       mat-button
       disabled
-      class="buttonDisabledZoom buttonZoomSpace"
+      class="buttonDisabledZoom relatedButtonsSpace"
     >
       &nbsp;&nbsp;-&nbsp;&nbsp;
     </button>
@@ -165,6 +157,29 @@
     </mat-form-field>
 
     <span class="buttonDivider">&nbsp;</span>
+
+    <button
+      *ngIf="openRefImageEnabled()"
+      type="button"
+      mat-button
+      class="button {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      (click)="loadProfile()"
+    >
+      Load Profile
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled()"
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled"
+    >
+      Load Profile
+    </button>
+
+    <span class="buttonDivider">&nbsp;</span>
     <mat-slide-toggle
       [(ngModel)]="nightMode"
       (change)="nightModeChanged()"
@@ -193,7 +208,7 @@
         >
           Sharpen
         </div>
-        <div class="sigmaRadio">
+        <div class="lswRadio">
           <mat-radio-group
             [color]="colorTheme()"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
@@ -1503,7 +1518,7 @@
       }}"
       title="This will save the currently open stack with all applied the post-processing. You can save it as a 16-bit TIFF or a 100% quality JPG. To do so add the applicable extension to the filename (filename.tif, filename.jpg)."
     >
-      Save Reference Image
+      Save
     </button>
     <button
       *ngIf="showVersionButton()"
@@ -1552,7 +1567,7 @@
     </button>
     <span class="buttonDivider">&nbsp;</span>
     <button type="button" mat-button disabled class="button_disabled">
-      Save Reference Image
+      Save
     </button>
     <span class="spanNoNewVersion"></span>
     <button

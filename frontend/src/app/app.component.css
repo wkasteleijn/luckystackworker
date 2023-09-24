@@ -105,7 +105,7 @@
 }
 
 .rootFolder {
-  width: 404px;
+  width: 284px;
   border-style: solid;
   margin-left: 16px;
 }
@@ -185,8 +185,12 @@
   background-color: black;
   border-radius: 8px;
 }
-.buttonZoomSpace {
+.relatedButtonsSpace {
   margin-left: 8px;
+}
+
+.profileSelectorSpace {
+  margin-left: 14px;
 }
 
 .crop {
@@ -247,7 +251,7 @@
 .savgolayRadio {
   margin-left: 24px;
 }
-.sigmaRadio {
+.lswRadio {
   margin-left: 24px;
 }
 .controlSeperator {

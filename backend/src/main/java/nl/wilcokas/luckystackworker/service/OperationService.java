@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import ij.ImagePlus;
 import ij.WindowManager;
 import ij.macro.Interpreter;
+import ij.plugin.Scaler;
 import ij.process.ImageProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,14 +37,15 @@ import nl.wilcokas.luckystackworker.util.Util;
 @RequiredArgsConstructor
 @Service
 public class OperationService {
-    private static String HISTOGRAM_STRETCH_MACRO = null;
+
+    private static String histogramStretchMacro;
     static {
-    	try {
-			HISTOGRAM_STRETCH_MACRO = Util
-			        .readFromInputStream(new ClassPathResource("/histogramstretch.ijm").getInputStream());
-		} catch (IOException e) {
-			log.error("Error loading histogram stretch script");
-		}
+        try {
+            histogramStretchMacro = Util
+                    .readFromInputStream(new ClassPathResource("/histogramstretch.ijm").getInputStream());
+        } catch (IOException e) {
+            log.error("Error loading histogram stretch script");
+        }
     }
 
     private final LSWSharpenFilter lswSharpenFilter;
@@ -241,7 +243,7 @@ public class OperationService {
 
             StringSubstitutor stringSubstitutor = new StringSubstitutor(
                     Map.of("isStack", validateRGBStack(image), "newMin", newMin, "newMax", newMax));
-            String result = stringSubstitutor.replace(HISTOGRAM_STRETCH_MACRO);
+            String result = stringSubstitutor.replace(histogramStretchMacro);
             WindowManager.setTempCurrentImage(image);
             new Interpreter().run(result);
         }
@@ -262,6 +264,12 @@ public class OperationService {
             log.info("Applying dispersion correction");
             dispersionCorrectionFilter.apply(image, profile);
         }
+    }
+
+    public ImagePlus scaleImage(final ImagePlus image, final double scale) {
+        int newWidth = (int) (image.getWidth() * scale);
+        int newHeight = (int) (image.getHeight() * scale);
+        return Scaler.resize(image, newWidth, newHeight, 3, "depth=3 interpolation=Bicubic create");
     }
 
     private boolean validateLuminanceInclusion(LSWSharpenParameters parameters) {

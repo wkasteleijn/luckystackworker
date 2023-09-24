@@ -37,4 +37,5 @@ export class Profile {
   dispersionCorrectionBlueX: number;
   dispersionCorrectionRedY: number;
   dispersionCorrectionBlueY: number;
+  scale: number;
 }

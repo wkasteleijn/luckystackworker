@@ -75,6 +75,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private JTextField roiIndicatorTextField = null;
 
     private boolean showHistogram = true;
+    @Getter
     private PlotWindow plotWindow = null;
     private Plot histogramPlot = null;
 
@@ -96,7 +97,15 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         createRoiIndicator();
     }
 
-    public ResponseDTO selectReferenceImage(String filePath) throws IOException {
+    public ResponseDTO scale(Profile profile) throws IOException {
+        this.isLargeImage = openReferenceImage(null, profile);
+        SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
+        settingsDTO.setLargeImage(this.isLargeImage);
+        LuckyStackWorkerContext.setSelectedProfile(profile.getName());
+        return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
+    }
+
+    public ResponseDTO selectReferenceImage(String filePath, double scale) throws IOException {
         JFrame frame = getParentFrame();
         JFileChooser jfc = getJFileChooser(filePath);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
@@ -120,7 +129,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 } else {
                     log.info("Profile file found, profile was loaded from there.");
                 }
-                Util.setNonPersistentSettings(profile);
+                Util.setNonPersistentSettings(profile, scale);
                 profileService.updateProfile(new ProfileDTO(profile));
 
                 this.isLargeImage = openReferenceImage(selectedFilePath, profile);
@@ -185,12 +194,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
     }
 
-    public void saveReferenceImage(String path, boolean asJpg) throws IOException {
+    public void saveReferenceImage(String path, boolean asJpg, Profile profile) throws IOException {
         String pathNoExt = Util.getPathWithoutExtension(path);
         String savePath = pathNoExt + "." + (asJpg ? "jpg" : Constants.DEFAULT_OUTPUT_FORMAT);
         log.info("Saving image to  {}", savePath);
         Util.saveImage(finalResultImage, null, savePath,
-                Util.isPngRgbStack(finalResultImage, filePath), roiActive, asJpg, false);
+                Util.isPngRgbStack(finalResultImage, filePath) || profile.getScale() > 1.0, roiActive, asJpg, false);
         writeProfile(pathNoExt);
     }
 
@@ -587,23 +596,29 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     private boolean openReferenceImage(String filePath, Profile profile) throws IOException {
-        this.filePath = filePath;
+        this.filePath = filePath == null ? this.filePath : filePath;
         if (finalResultImage != null) {
             // Can only have 1 image open at a time.
             finalResultImage.hide();
         }
         finalResultImage = new Opener().openImage(Util.getIJFileFormat(this.filePath));
+        if (profile.getScale() > 1.0) {
+            finalResultImage.hide();
+            finalResultImage = operationService.scaleImage(finalResultImage, profile.getScale());
+            finalResultImage.show();
+        }
+
         if (!Util.validateImageFormat(finalResultImage, getParentFrame(), activeProfile)) {
             return false;
         }
         boolean isLargeImage = false;
         if (finalResultImage != null) {
-            if (Util.isPng(finalResultImage, filePath)) {
+            if (Util.isPng(finalResultImage, this.filePath)) {
                 finalResultImage = Util.fixNonTiffOpeningSettings(finalResultImage);
             }
             operationService.correctExposure(finalResultImage);
             log.info("Opened final result image image with id {}", finalResultImage.getID());
-            finalResultImage.show(filePath);
+            finalResultImage.show(this.filePath);
             isLargeImage = setZoom(finalResultImage, false);
             setDefaultLayoutSettings(finalResultImage,
                     new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y));

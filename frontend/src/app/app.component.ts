@@ -95,6 +95,7 @@ export class AppComponent implements OnInit {
 
   realtimeEnabled: boolean = false;
   showHistogram: boolean = true;
+  scale: string = '1';
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
@@ -117,7 +118,7 @@ export class AppComponent implements OnInit {
     const base64EncodedPath = btoa(this.rootFolder);
     this.showSpinner();
     this.luckyStackWorkerService
-      .openReferenceImage(base64EncodedPath)
+      .openReferenceImage(base64EncodedPath, Number(this.scale))
       .subscribe(
         (data) => {
           console.log(data);
@@ -143,7 +144,7 @@ export class AppComponent implements OnInit {
   saveReferenceImage() {
     console.log('saveReferenceImage called');
     this.showSpinner();
-    this.luckyStackWorkerService.saveReferenceImage(this.rootFolder).subscribe(
+    this.luckyStackWorkerService.saveReferenceImage(this.profile).subscribe(
       (data) => {
         this.hideSpinner();
         console.log(data);
@@ -170,6 +171,34 @@ export class AppComponent implements OnInit {
         this.hideSpinner();
       }
     );
+  }
+
+  scaleChanged(event: any) {
+    console.log('scaleChanged called');
+    this.profile.scale = event.value;
+    this.scale = event.value;
+    this.showSpinner();
+    this.luckyStackWorkerService.scale(this.profile).subscribe(
+      (data) => {
+        console.log(data);
+        this.refImageSelected = true;
+        this.crop = false;
+        if (data && data.profile.amount > 0) {
+          this.profile = data.profile;
+          this.settings = data.settings;
+          this.selectedProfile = this.profile.name;
+          this.rootFolder = data.settings.rootFolder;
+          this.updateProfileSettings();
+        }
+        this.hideSpinner();
+        this.workerProgress = 0;
+      },
+      (error) => {
+        console.log(error);
+        this.hideSpinner();
+      }
+    );
+    this.updateProfile();
   }
 
   radiusChanged(event: any, update: boolean) {
