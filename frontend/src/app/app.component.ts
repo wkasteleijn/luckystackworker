@@ -45,6 +45,7 @@ export class AppComponent implements OnInit {
   clippingRange: number;
   deringRadius: number;
   deringStrength: number;
+  deringThreshold: number;
   luminanceIncludeRed: boolean = true;
   luminanceIncludeGreen: boolean = true;
   luminanceIncludeBlue: boolean = true;
@@ -255,6 +256,16 @@ export class AppComponent implements OnInit {
     this.deringRadius = event.value;
     this.settings.operation = 'deringRadius';
     console.log('deringRadius called: ' + this.profile.deringRadius);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  deringTresholdChanged(event: any, update: boolean) {
+    this.profile.deringThreshold = event.value;
+    this.deringThreshold = event.value;
+    this.settings.operation = 'deringThreshold';
+    console.log('deringThreshold called: ' + this.profile.deringThreshold);
     if (update) {
       this.updateProfile();
     }

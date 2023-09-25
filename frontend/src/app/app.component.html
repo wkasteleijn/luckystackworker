@@ -382,7 +382,7 @@
 
       <div *ngIf="edgeArtefactSupressionMode === 'DERING'">
         <div class="sliderRow">
-          <div class="sliderLabel">Dering Strength</div>
+          <div class="sliderLabel">Strength</div>
           <div class="slider">
             <mat-slider
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
@@ -404,7 +404,7 @@
           </div>
         </div>
         <div class="sliderRow">
-          <div class="sliderLabel">Dering Radius</div>
+          <div class="sliderLabel">Radius</div>
           <div class="slider">
             <mat-slider
               [disabled]="
@@ -427,6 +427,33 @@
                 deringRadius === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
               }}"
               >{{ deringRadius }}</span
+            >
+          </div>
+        </div>
+        <div class="sliderRow">
+          <div class="sliderLabel">Threshold</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="
+                shouldShowSpinner() ||
+                !refImageSelected ||
+                deringStrength === 0 ||
+                crop
+              "
+              tickInterval="1"
+              step="1"
+              min="1"
+              max="10"
+              (input)="deringThresholdChanged($event, false)"
+              (change)="deringThresholdChanged($event, true)"
+              [(ngModel)]="deringThreshold"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span
+              class="{{
+                deringThreshold === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
+              }}"
+              >{{ deringThreshold }}</span
             >
           </div>
         </div>

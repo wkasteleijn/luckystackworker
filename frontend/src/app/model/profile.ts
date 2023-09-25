@@ -31,6 +31,7 @@ export class Profile {
   clippingRange: number;
   deringRadius: number;
   deringStrength: number;
+  deringThreshold: number;
   sharpenMode: string;
   dispersionCorrectionEnabled: boolean;
   dispersionCorrectionRedX: number;
