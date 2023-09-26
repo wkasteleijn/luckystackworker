@@ -54,6 +54,7 @@ public class ProfileDTO {
         this.luminanceIncludeBlue=profile.isLuminanceIncludeBlue();
         this.luminanceIncludeColor=profile.isLuminanceIncludeColor();
         this.scale = profile.getScale();
+        this.deringThreshold = profile.getThreshold();
     }
 
     private String name;
@@ -95,4 +96,5 @@ public class ProfileDTO {
     private boolean luminanceIncludeBlue;
     private boolean luminanceIncludeColor;
     private double scale;
+    private int deringThreshold;
 }

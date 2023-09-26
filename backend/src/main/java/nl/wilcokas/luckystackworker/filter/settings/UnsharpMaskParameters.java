@@ -15,4 +15,5 @@ public class UnsharpMaskParameters {
     private float clippingRange;
     private double deringRadius;
     private float deringStrength;
+    private int deringThreshold;
 }

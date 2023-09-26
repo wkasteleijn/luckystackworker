@@ -261,7 +261,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  deringTresholdChanged(event: any, update: boolean) {
+  deringThresholdChanged(event: any, update: boolean) {
     this.profile.deringThreshold = event.value;
     this.deringThreshold = event.value;
     this.settings.operation = 'deringThreshold';

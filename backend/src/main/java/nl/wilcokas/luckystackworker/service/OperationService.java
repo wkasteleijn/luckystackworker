@@ -64,7 +64,7 @@ public class OperationService {
         return ((OperationEnum.AMOUNT == operation) || (OperationEnum.RADIUS == operation) || (OperationEnum.ITERATIONS == operation)
                 || (OperationEnum.SHARPENMODE == operation) || (OperationEnum.CLIPPINGSTRENGTH == operation)
                 || (OperationEnum.CLIPPINGRANGE == operation) || (OperationEnum.DERINGRADIUS == operation)
-                || (OperationEnum.DERINGSTRENGTH == operation));
+                || (OperationEnum.DERINGSTRENGTH == operation) || (OperationEnum.DERINGTHRESHOLD == operation));
     }
 
     public boolean isDenoiseOperation(final OperationEnum operation) {
@@ -87,7 +87,8 @@ public class OperationService {
         if ((!excludedOperationList.contains(OperationEnum.AMOUNT)) && (!excludedOperationList.contains(OperationEnum.RADIUS))
                 && (!excludedOperationList.contains(OperationEnum.ITERATIONS)) && (!excludedOperationList.contains(OperationEnum.CLIPPINGSTRENGTH))
                 && (!excludedOperationList.contains(OperationEnum.CLIPPINGRANGE)) && (!excludedOperationList.contains(OperationEnum.DERINGRADIUS))
-                && (!excludedOperationList.contains(OperationEnum.DERINGSTRENGTH)) && (!excludedOperationList.contains(OperationEnum.SHARPENMODE))) {
+                && (!excludedOperationList.contains(OperationEnum.DERINGSTRENGTH)) && (!excludedOperationList.contains(OperationEnum.DERINGTHRESHOLD))
+                && (!excludedOperationList.contains(OperationEnum.SHARPENMODE))) {
             applySharpen(image, profile);
         }
         if ((!excludedOperationList.contains(OperationEnum.DENOISEAMOUNT)) && (!excludedOperationList.contains(OperationEnum.DENOISESIGMA))
@@ -132,7 +133,8 @@ public class OperationService {
             float deringStrength = profile.getDeringStrength() / 100f;
             UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radius(profile.getRadius().doubleValue()).amount(amount)
                     .iterations(iterations).clippingStrength(clippingStrength).clippingRange(100 - profile.getClippingRange())
-                    .deringRadius(profile.getDeringRadius().doubleValue()).deringStrength(deringStrength).build();
+                    .deringRadius(profile.getDeringRadius().doubleValue()).deringStrength(deringStrength).deringThreshold(profile.getThreshold())
+                    .build();
             LSWSharpenMode mode = (profile.getSharpenMode() == null) ? LSWSharpenMode.LUMINANCE : LSWSharpenMode.valueOf(profile.getSharpenMode());
             LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(profile.isLuminanceIncludeBlue())
                     .includeGreen(profile.isLuminanceIncludeGreen()) //

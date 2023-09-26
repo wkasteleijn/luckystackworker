@@ -38,6 +38,7 @@ public class ProfileService {
         result.setClippingStrength(profile.getClippingStrength());
         result.setDeringStrength(profile.getDeringStrength());
         result.setDeringRadius(profile.getDeringRadius());
+        result.setThreshold(profile.getDeringThreshold());
         result.setClippingRange(profile.getClippingRange());
         result.setSharpenMode(profile.getSharpenMode());
         result.setGamma(profile.getGamma());

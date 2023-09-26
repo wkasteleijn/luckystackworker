@@ -124,14 +124,14 @@
 }
 
 .button_container_top {
-  margin-bottom: 12px;
+  margin-bottom: 4px;
 }
 
 .button_container {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  margin-top: 20px;
+  margin-top: 12px;
 }
 
 .button_disabled {
@@ -156,7 +156,7 @@
 }
 
 .button_about {
-  margin-left: 34px;
+  margin-left: 132px;
 }
 
 .spanNoNewVersion {
@@ -332,7 +332,7 @@
 }
 .histogramToggle {
   position: fixed;
-  top: 116px;
-  left: 533px;
+  top: 96px;
+  left: 531px;
   z-index: 100;
 }

@@ -63,6 +63,7 @@ public class Profile {
         this.luminanceIncludeBlue = profile.isLuminanceIncludeBlue();
         this.luminanceIncludeColor = profile.isLuminanceIncludeColor();
         this.scale = profile.getScale();
+        this.threshold = profile.getDeringThreshold();
     }
 
     @Id
@@ -186,6 +187,9 @@ public class Profile {
 
     @Column(name = "scale")
     private double scale;
+
+    @Column(name = "threshold")
+    private int threshold;
 
     // Not used any longer, needed for historical reasons. Removing this would now
     // break the profile loading of old yaml files created prior to 4.1.0.

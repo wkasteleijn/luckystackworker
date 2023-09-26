@@ -238,6 +238,14 @@ public class Util {
             if (profileStr != null) {
                 Profile profile = new Yaml().load(profileStr);
 
+                // Added since v4.4.0, so older version written yaml needs to stay compatible.
+                if (profile.getThreshold() == 0) {
+                    profile.setThreshold(Constants.DEFAULT_THRESHOLD);
+                }
+                if (profile.getScale() == 0D) {
+                    profile.setScale(1D);
+                }
+
                 // Added since v3.2.0, so older version written yaml needs to stay compatible.
                 if (profile.getLocalContrastMode() == null) {
                     profile.setLocalContrastMode(LSWSharpenMode.LUMINANCE.toString());

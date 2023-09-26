@@ -311,7 +311,15 @@
       </div>
 
       <div class="sliderRow">
-        <div class="edgeArtifactLabel">Edge Artefact Suppression Mode</div>
+        <div
+          class="edgeArtifactLabel sliderRowCategoryTitle {{
+            nightModeEnabled()
+              ? 'sliderRowCategoryTitleColorNight'
+              : 'sliderRowCategoryTitleColor'
+          }}"
+        >
+          Edge Artefact Suppression
+        </div>
         <div class="slider">
           <mat-radio-group
             [color]="colorTheme()"

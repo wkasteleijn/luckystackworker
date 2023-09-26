@@ -159,7 +159,8 @@ public class LSWSharpenFilter {
             if (unsharpMaskParameters.getDeringStrength() > 0.0f) {
                 ImageProcessor ipLum = new ShortProcessor(image.getWidth(), image.getHeight());
                 ipLum.setPixels(1, fpLum);
-                final FloatProcessor fpMask = createDeringMaskStack(unsharpMaskParameters.getDeringRadius(), ipLum);
+                final FloatProcessor fpMask = createDeringMaskStack(unsharpMaskParameters.getDeringRadius(),
+                        unsharpMaskParameters.getDeringThreshold(), ipLum);
                 ImageProcessor ipLumMask = new ShortProcessor(image.getWidth(), image.getHeight());
                 ipLumMask.setPixels(1, fpMask);
                 doUnsharpMaskDeringing(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(),
@@ -289,7 +290,7 @@ public class LSWSharpenFilter {
                 int finalLayer = layer;
                 executor.execute(() -> {
                     ImageProcessor ip = maskStack.getProcessor(finalLayer);
-                    FloatProcessor fp = createDeringMaskStack(radius, ip);
+                    FloatProcessor fp = createDeringMaskStack(radius, unsharpMaskParameters.getDeringThreshold(), ip);
                     ip.setPixels(1, fp);
                 });
             }
@@ -305,7 +306,7 @@ public class LSWSharpenFilter {
         return null;
     }
 
-    private FloatProcessor createDeringMaskStack(double radius, ImageProcessor ip) {
+    private FloatProcessor createDeringMaskStack(double radius, int threshold, ImageProcessor ip) {
         int minValue = 65535;
         int maxValue = 0;
         short[] maskPixels = (short[]) ip.getPixels();
@@ -318,7 +319,7 @@ public class LSWSharpenFilter {
                 minValue = value;
             }
         }
-        int average = (maxValue - minValue) / 8; // start cutting of from 0.25 times the average.
+        int average = (maxValue - minValue) / threshold; // start cutting of from threshold times the average.
         for (int position = 0; position < maskPixels.length; position++) {
             int value = Util.convertToUnsignedInt(maskPixels[position]);
             if (value < average) {
