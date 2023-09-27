@@ -80,8 +80,13 @@
 }
 
 .workerLabel {
-  width: 520px;
+  margin-right: 52px;
+}
+
+.workerLabelStatus {
+  width: 298px;
   text-overflow: clip;
+  white-space: nowrap;
 }
 
 .dropdown {
@@ -156,7 +161,7 @@
 }
 
 .button_about {
-  margin-left: 132px;
+  margin-left: 256px;
 }
 
 .spanNoNewVersion {

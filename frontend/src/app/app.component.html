@@ -1499,12 +1499,75 @@
               ? 'sliderRowCategoryTitleColorNight'
               : 'sliderRowCategoryTitleColor'
           }}"
-          >Worker: {{ workerProgress === 100 ? "Done" : workerStatus }}</span
+          >Batch Worker</span
         >
+        <button
+          *ngIf="openRefImageEnabled()"
+          type="button"
+          mat-button
+          (click)="applyProfile()"
+          class="button {{
+            nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+          }}"
+          title="Start batch worker to process all {{
+            selectedProfile
+          }} stacks found in the root folder."
+        >
+          <mat-icon
+            aria-hidden="false"
+            fontIcon="keyboard_double_arrow_right"
+          ></mat-icon>
+        </button>
+        <button
+          *ngIf="!openRefImageEnabled()"
+          type="button"
+          mat-button
+          disabled
+          class="button_disabled"
+        >
+          <mat-icon
+            aria-hidden="false"
+            fontIcon="keyboard_double_arrow_right"
+          ></mat-icon>
+        </button>
+        <button
+          *ngIf="isWorkerBusy()"
+          type="button"
+          mat-button
+          class="relatedButtonsSpace button {{
+            nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+          }}"
+          title="Stop batch process when running."
+        >
+          <mat-icon aria-hidden="false" fontIcon="rectangle"></mat-icon>
+        </button>
+        <button
+          *ngIf="!isWorkerBusy()"
+          type="button"
+          mat-button
+          disabled
+          class="relatedButtonsSpace button_disabled"
+          title="Stop batch process when running."
+        >
+          <mat-icon aria-hidden="false" fontIcon="rectangle"></mat-icon>
+        </button>
+        <div
+          class="relatedButtonsSpace workerLabelStatus {{
+            !isWorkerBusy()
+              ? ''
+              : nightModeEnabled()
+              ? 'sliderRowCategoryTitleColorNight'
+              : 'sliderRowCategoryTitleColor'
+          }}"
+        >
+          Status:
+          {{ workerProgress === 100 ? "Done" : getWorkerStatusDisplayText() }}
+        </div>
         <mat-checkbox
           [(ngModel)]="realtimeEnabled"
           (change)="realtimeEnabledChanged()"
           [color]="colorTheme()"
+          title="Activate real time processing of stacks as they are being produced in the root foder by external stacking software."
         ></mat-checkbox
         ><span
           class="realtimeLabel {{
@@ -1514,6 +1577,7 @@
                 : 'sliderRowCategoryTitleColor'
               : ''
           }}"
+          title="Activate real time processing of stacks as they are being produced in the root foder by external stacking software."
           >Realtime</span
         >
       </div>
@@ -1533,17 +1597,6 @@
   </mat-card>
 
   <div class="button_container" *ngIf="buttonBarEnabled()">
-    <button
-      type="button"
-      mat-button
-      (click)="applyProfile()"
-      class="button {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-    >
-      Apply Profile
-    </button>
-    <span class="buttonDivider">&nbsp;</span>
     <button
       type="button"
       mat-button
@@ -1597,10 +1650,6 @@
     </button>
   </div>
   <div class="button_container" *ngIf="!buttonBarEnabled()">
-    <button type="button" mat-button disabled class="button_disabled">
-      Apply Profile
-    </button>
-    <span class="buttonDivider">&nbsp;</span>
     <button type="button" mat-button disabled class="button_disabled">
       Save
     </button>

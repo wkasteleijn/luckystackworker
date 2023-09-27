@@ -925,6 +925,10 @@ export class AppComponent implements OnInit {
     return 'Idle' === this.workerStatus && !this._showSpinner;
   }
 
+  isWorkerBusy() {
+    return 'Idle' !== this.workerStatus;
+  }
+
   zoomIn() {
     console.log('zoomIn called');
     this.luckyStackWorkerService.zoomIn().subscribe(
@@ -986,6 +990,12 @@ export class AppComponent implements OnInit {
 
   colorTheme() {
     return this.nightMode ? this.componentColorNight : this.componentColor;
+  }
+
+  getWorkerStatusDisplayText() {
+    return this.workerStatus.length > 40
+      ? this.workerStatus.substring(0, 40) + '...'
+      : this.workerStatus;
   }
 
   private showSpinner() {

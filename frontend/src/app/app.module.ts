@@ -5,6 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
@@ -38,6 +39,7 @@ import { AppComponent } from './app.component';
     MatSlideToggleModule,
     MatRadioModule,
     MatCheckboxModule,
+    MatIconModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
