@@ -38,7 +38,7 @@
 
     <mat-radio-group
       [color]="colorTheme()"
-      [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+      [disabled]="shouldShowSpinner() || crop"
       [(ngModel)]="scale"
       (change)="scaleChanged($event)"
     >
@@ -71,7 +71,7 @@
     </mat-form-field>
 
     <button
-      *ngIf="openRefImageEnabled()"
+      *ngIf="openRefImageEnabled() && refImageSelected"
       type="button"
       mat-button
       (click)="zoomIn()"
@@ -85,7 +85,7 @@
       &nbsp;&nbsp;+&nbsp;&nbsp;
     </button>
     <button
-      *ngIf="!openRefImageEnabled()"
+      *ngIf="!openRefImageEnabled() || !refImageSelected"
       type="button"
       mat-button
       disabled
@@ -95,7 +95,7 @@
     </button>
 
     <button
-      *ngIf="openRefImageEnabled()"
+      *ngIf="openRefImageEnabled() && refImageSelected"
       type="button"
       mat-button
       (click)="zoomOut()"
@@ -109,7 +109,7 @@
       &nbsp;&nbsp;-&nbsp;&nbsp;
     </button>
     <button
-      *ngIf="!openRefImageEnabled()"
+      *ngIf="!openRefImageEnabled() || !refImageSelected"
       type="button"
       mat-button
       disabled
@@ -159,7 +159,7 @@
     <span class="buttonDivider">&nbsp;</span>
 
     <button
-      *ngIf="openRefImageEnabled()"
+      *ngIf="openRefImageEnabled() && refImageSelected"
       type="button"
       mat-button
       class="button {{
@@ -170,7 +170,7 @@
       Load Profile
     </button>
     <button
-      *ngIf="!openRefImageEnabled()"
+      *ngIf="!openRefImageEnabled() || !refImageSelected"
       type="button"
       mat-button
       disabled
@@ -1502,7 +1502,7 @@
           >Batch Worker</span
         >
         <button
-          *ngIf="openRefImageEnabled()"
+          *ngIf="openRefImageEnabled() && refImageSelected"
           type="button"
           mat-button
           (click)="applyProfile()"
@@ -1513,27 +1513,22 @@
             selectedProfile
           }} stacks found in the root folder."
         >
-          <mat-icon
-            aria-hidden="false"
-            fontIcon="keyboard_double_arrow_right"
-          ></mat-icon>
+          <mat-icon aria-hidden="false" fontIcon="play_arrow"></mat-icon>
         </button>
         <button
-          *ngIf="!openRefImageEnabled()"
+          *ngIf="!openRefImageEnabled() || !refImageSelected"
           type="button"
           mat-button
           disabled
           class="button_disabled"
         >
-          <mat-icon
-            aria-hidden="false"
-            fontIcon="keyboard_double_arrow_right"
-          ></mat-icon>
+          <mat-icon aria-hidden="false" fontIcon="play_arrow"></mat-icon>
         </button>
         <button
           *ngIf="isWorkerBusy()"
           type="button"
           mat-button
+          (click)="stopWorker()"
           class="relatedButtonsSpace button {{
             nightModeEnabled() ? 'activeColorNight' : 'activeColor'
           }}"

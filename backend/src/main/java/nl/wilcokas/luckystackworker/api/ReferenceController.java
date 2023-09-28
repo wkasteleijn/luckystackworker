@@ -2,7 +2,6 @@ package nl.wilcokas.luckystackworker.api;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Base64;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -39,9 +38,8 @@ public class ReferenceController {
     private final ReferenceImageService referenceImageService;
 
     @GetMapping("/open")
-    public ResponseDTO openReferenceImage(@RequestParam String path, @RequestParam double scale) throws IOException {
-        final String base64DecodedPath = new String(Base64.getDecoder().decode(path));
-        return referenceImageService.selectReferenceImage(base64DecodedPath, scale);
+    public ResponseDTO openReferenceImage(@RequestParam double scale) throws IOException {
+        return referenceImageService.selectReferenceImage(settingsService.getSettings().getRootFolder(), scale);
     }
 
     @GetMapping("/rootfolder")

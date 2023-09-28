@@ -15,6 +15,7 @@ public class LuckyStackWorkerContext {
     private static boolean realTimeEnabled = false;
     private static boolean rootFolderSelected = false;
     private static boolean profileBeingApplied = false;
+    private static boolean workerStopped = false;
     private static String selectedProfile;
 
     @Getter
@@ -71,6 +72,14 @@ public class LuckyStackWorkerContext {
 
     public static void setProfileBeingApplied(boolean profileBeingApplied) {
         LuckyStackWorkerContext.profileBeingApplied = profileBeingApplied;
+    }
+
+    public static void setWorkerStopped(boolean workerStopped) {
+        LuckyStackWorkerContext.workerStopped = workerStopped;
+    }
+
+    public static boolean isWorkerStopped() {
+        return workerStopped;
     }
 
     public static String getSelectedProfile() {

@@ -110,16 +110,17 @@ export class AppComponent implements OnInit {
         event.preventDefault();
       }
     });
-    this.showSpinner();
-    this.pollSelectedProfile();
   }
 
   openReferenceImage() {
     console.log('openReferenceImage called');
-    const base64EncodedPath = btoa(this.rootFolder);
     this.showSpinner();
+    this.callopenReferenceImage();
+  }
+
+  private callopenReferenceImage() {
     this.luckyStackWorkerService
-      .openReferenceImage(base64EncodedPath, Number(this.scale))
+      .openReferenceImage(Number(this.scale))
       .subscribe(
         (data) => {
           console.log(data);
@@ -136,8 +137,11 @@ export class AppComponent implements OnInit {
           this.workerProgress = 0;
         },
         (error) => {
-          console.log(error);
-          this.hideSpinner();
+          console.log('Backend is still starting or is unavailable');
+          setTimeout(
+            () => this.callopenReferenceImage(),
+            SERVICE_POLL_DELAY_MS
+          );
         }
       );
   }
@@ -775,6 +779,16 @@ export class AppComponent implements OnInit {
     );
   }
 
+  stopWorker() {
+    console.log('Stop worker called');
+    this.luckyStackWorkerService.stop().subscribe(
+      (data) => {
+        console.log('Response');
+      },
+      (error) => console.log(error)
+    );
+  }
+
   private updateProfileSettings() {
     this.radius = this.profile.radius;
     this.amount = this.profile.amount;
@@ -885,31 +899,6 @@ export class AppComponent implements OnInit {
         }
       },
       (error) => console.log(error)
-    );
-  }
-
-  private pollSelectedProfile() {
-    this.luckyStackWorkerService.getSelectedProfile().subscribe(
-      (data) => {
-        console.log(data);
-        this.refImageSelected = true;
-        if (data) {
-          this.profile = data.profile;
-          this.settings = data.settings;
-          this.selectedProfile = this.profile.name;
-          this.rootFolder = data.settings.rootFolder;
-          this.updateProfileSettings();
-          this.hideSpinner();
-          this.checkLatestVersion();
-        } else {
-          console.log('Profile was not yet selected');
-          setTimeout(() => this.pollSelectedProfile(), SERVICE_POLL_DELAY_MS);
-        }
-      },
-      (error) => {
-        console.log('Profile was not yet selected');
-        setTimeout(() => this.pollSelectedProfile(), SERVICE_POLL_DELAY_MS);
-      }
     );
   }
 

@@ -154,6 +154,11 @@ public class ProfileController {
         return referenceImageService.scale(new Profile(profile));
     }
 
+    @PutMapping("/stop")
+    public void stopWorker() {
+        LuckyStackWorkerContext.setWorkerStopped(true);
+    }
+
     @PutMapping("/exit")
     public void exit() {
         log.info("Exit called, ending application");

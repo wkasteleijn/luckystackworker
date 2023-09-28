@@ -24,7 +24,6 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.io.FileInfo;
-import ij.io.FileSaver;
 import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
@@ -141,7 +140,7 @@ public class Util {
             image.setC(1);
             image.setZ(1);
         }
-        FileSaver saver = new FileSaver(image);
+        LSWFileSaver saver = new LSWFileSaver(image);
         if (fixRgbStack) {
             hackIncorrectPngFileInfo(saver);
         }
@@ -477,8 +476,8 @@ public class Util {
         return props.get(name + "." + setting);
     }
 
-    private static void hackIncorrectPngFileInfo(FileSaver saver) {
-        Field field = ReflectionUtils.findField(FileSaver.class, "fi");
+    private static void hackIncorrectPngFileInfo(LSWFileSaver saver) {
+        Field field = ReflectionUtils.findField(LSWFileSaver.class, "fi");
         ReflectionUtils.makeAccessible(field);
         FileInfo fileInfo = (FileInfo) ReflectionUtils.getField(field, saver);
         Field fileType = ReflectionUtils.findField(FileInfo.class, "fileType");

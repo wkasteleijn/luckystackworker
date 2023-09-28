@@ -116,6 +116,10 @@ public class WorkerService {
                 filesProcessed = filesProcessed | processFile(file, false);
             }
             LuckyStackWorkerContext.setFilesProcessedCount(++count);
+            if (LuckyStackWorkerContext.isWorkerStopped()) {
+                LuckyStackWorkerContext.setWorkerStopped(false);
+                break;
+            }
         }
         return filesProcessed;
     }
