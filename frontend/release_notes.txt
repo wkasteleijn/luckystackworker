@@ -1,5 +1,15 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+
+01/10/2023 minor release 4.7.0:
+- Added new slider for controlling the dering threshold
+- Added radio controls to open stack at different scales
+- Added stop button to the batch worker
+- Improved the startup experience
+- Several UI layout improvements
+- Shortcut automatically added to the desktop during installation
+- Several bugfixes
+
 13/08/2023 minor release 4.3.0-beta:
 - Realtime function is now off by default
 - Apply profile now saves results in a subfolder called 'lsw_<profile>'

@@ -131,6 +131,7 @@ export class AppComponent implements OnInit {
             this.settings = data.settings;
             this.selectedProfile = this.profile.name;
             this.rootFolder = data.settings.rootFolder;
+            this.checkLatestVersion();
             this.updateProfileSettings();
           }
           this.hideSpinner();
@@ -818,6 +819,7 @@ export class AppComponent implements OnInit {
     this.clippingRange = this.profile.clippingRange;
     this.deringRadius = this.profile.deringRadius;
     this.deringStrength = this.profile.deringStrength;
+    this.deringThreshold = this.profile.deringThreshold;
     if (!this.profile.clippingStrength && !this.profile.deringStrength) {
       this.edgeArtefactSupressionMode = 'OFF';
     } else if (this.profile.deringStrength) {
@@ -903,11 +905,7 @@ export class AppComponent implements OnInit {
   }
 
   buttonBarEnabled() {
-    return (
-      'Idle' === this.workerStatus &&
-      this.refImageSelected &&
-      !this._showSpinner
-    );
+    return 'Idle' === this.workerStatus && !this._showSpinner;
   }
 
   openRefImageEnabled() {

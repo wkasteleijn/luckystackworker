@@ -23,6 +23,7 @@
       class="{{
         nightModeEnabled() ? 'activeColorNight button' : 'activeColor button'
       }}"
+      title="Open a 16-bit image stack for processing."
     >
       Open
     </button>
@@ -41,6 +42,7 @@
       [disabled]="shouldShowSpinner() || crop"
       [(ngModel)]="scale"
       (change)="scaleChanged($event)"
+      title="Select the scale used for opening the image stack"
     >
       <span class="labelColor relatedButtonsSpace">Scale</span>
       <mat-radio-button value="1">1</mat-radio-button>
@@ -450,8 +452,8 @@
               "
               tickInterval="1"
               step="1"
-              min="1"
-              max="10"
+              min="2"
+              max="20"
               (input)="deringThresholdChanged($event, false)"
               (change)="deringThresholdChanged($event, true)"
               [(ngModel)]="deringThreshold"
@@ -1594,12 +1596,22 @@
   <div class="button_container" *ngIf="buttonBarEnabled()">
     <button
       type="button"
+      *ngIf="refImageSelected"
       mat-button
       (click)="saveReferenceImage()"
       class="button {{
         nightModeEnabled() ? 'activeColorNight' : 'activeColor'
       }}"
       title="This will save the currently open stack with all applied the post-processing. You can save it as a 16-bit TIFF or a 100% quality JPG. To do so add the applicable extension to the filename (filename.tif, filename.jpg)."
+    >
+      Save
+    </button>
+    <button
+      *ngIf="!refImageSelected"
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled"
     >
       Save
     </button>
@@ -1623,7 +1635,6 @@
     </button>
     <span *ngIf="!showVersionButton()" class="spanNoNewVersion"></span>
     <button
-      *ngIf="openRefImageEnabled()"
       type="button"
       mat-button
       class="button_about button  {{
