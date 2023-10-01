@@ -202,13 +202,14 @@ public class OperationService {
     }
 
     public void applyRGBBalance(final ImagePlus image, final Profile profile) {
-        if ((profile.getRed() != null && (profile.getRed().compareTo(BigDecimal.ONE) > 0))
-                || (profile.getGreen() != null && (profile.getGreen().compareTo(BigDecimal.ONE) > 0))
-                || (profile.getBlue() != null && (profile.getBlue().compareTo(BigDecimal.ONE) > 0))) {
+        if ((profile.getRed() != null && (!profile.getRed().equals(BigDecimal.ZERO)))
+                || (profile.getGreen() != null && (!profile.getGreen().equals(BigDecimal.ZERO)))
+                || (profile.getBlue() != null && (!profile.getBlue().equals(BigDecimal.ZERO)))) {
             if (validateRGBStack(image)) {
                 log.info("Applying RGB balance correction to image {} with values R {}, G {}, B {}", image.getID(), profile.getRed(), profile.getGreen(),
                         profile.getBlue());
-                rgbBalanceFilter.apply(image, profile.getRed().intValue(), profile.getGreen().intValue(), profile.getBlue().intValue());
+                rgbBalanceFilter.apply(image, profile.getRed().intValue(), profile.getGreen().intValue(), profile.getBlue().intValue(),
+                        profile.getPurple().intValue() / 255D);
             }
         }
     }

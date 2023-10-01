@@ -1,6 +1,7 @@
 update profiles set green=0;
 update profiles set blue=0;
 update profiles set red=0;
+update profiles set purple=0;
 update profiles set gamma=1;
 update profiles set denoise=0;
 update profiles set denoise_radius=1;

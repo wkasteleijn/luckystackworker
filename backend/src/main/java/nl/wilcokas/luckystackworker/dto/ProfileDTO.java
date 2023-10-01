@@ -25,9 +25,13 @@ public class ProfileDTO {
         this.denoiseRadius=profile.getDenoiseRadius();
         this.denoiseIterations=profile.getDenoiseIterations();
         this.gamma=profile.getGamma();
-        this.red=profile.getRed();
-        this.green=profile.getGreen();
-        this.blue = profile.getBlue();
+
+        // Reversed on the frontend since 4.8.0
+        this.red = profile.getRed().negate();
+        this.green = profile.getGreen().negate();
+        this.blue = profile.getBlue().negate();
+
+        this.purple = profile.getPurple();
         this.saturation = profile.getSaturation();
         this.contrast=profile.getContrast();
         this.brightness=profile.getBrightness();
@@ -70,6 +74,7 @@ public class ProfileDTO {
     private BigDecimal red;
     private BigDecimal green;
     private BigDecimal blue;
+    private BigDecimal purple;
     private BigDecimal saturation;
     private int contrast;
     private int brightness;

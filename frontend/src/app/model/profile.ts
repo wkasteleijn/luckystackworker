@@ -23,6 +23,7 @@ export class Profile {
   red: number;
   green: number;
   blue: number;
+  purple: number;
   saturation: number;
   savitzkyGolaySize: number;
   savitzkyGolayAmount: number;

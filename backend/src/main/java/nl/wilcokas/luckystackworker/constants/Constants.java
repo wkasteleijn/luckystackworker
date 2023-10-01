@@ -39,4 +39,8 @@ public class Constants {
     public static final int DEFAULT_HISTOGRAM_WINDOW_HEIGHT = 128;
     public static final int MAX_IMAGE_WIDTH_HISTOGRAM = 800;
     public static final int DEFAULT_THRESHOLD = 4;
+    public static final int RED_LAYER_INDEX = 1;
+    public static final int GREEN_LAYER_INDEX = 2;
+    public static final int BLUE_LAYER_INDEX = 3;
+
 }

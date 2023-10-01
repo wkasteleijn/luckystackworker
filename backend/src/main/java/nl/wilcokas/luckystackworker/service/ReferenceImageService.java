@@ -605,7 +605,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         if (profile.getScale() > 1.0) {
             finalResultImage.hide();
             finalResultImage = operationService.scaleImage(finalResultImage, profile.getScale());
-            finalResultImage.show();
         }
 
         if (!Util.validateImageFormat(finalResultImage, getParentFrame(), activeProfile)) {

@@ -76,6 +76,7 @@ export class AppComponent implements OnInit {
   red: number;
   green: number;
   blue: number;
+  purple: number;
   profile: Profile;
   settings: Settings;
   dispersionCorrectionEnabled: boolean = false;
@@ -505,6 +506,16 @@ export class AppComponent implements OnInit {
     }
   }
 
+  purpleChanged(event: any, update: boolean) {
+    this.profile.purple = event.value;
+    this.settings.operation = 'purple';
+    this.purple = event.value;
+    console.log('purpleChanged called: ' + this.profile.purple);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
   profileSelectionChanged(event: any) {
     console.log('profileChanged called: ' + this.selectedProfile);
     this.luckyStackWorkerService.getProfile(this.selectedProfile).subscribe(
@@ -843,6 +854,7 @@ export class AppComponent implements OnInit {
     this.red = this.profile.red;
     this.green = this.profile.green;
     this.blue = this.profile.blue;
+    this.purple = this.profile.purple;
     this.isLargeImage = this.settings.largeImage;
     this.setNonPersistentSettings();
   }

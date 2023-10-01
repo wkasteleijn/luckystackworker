@@ -45,6 +45,7 @@ public class ProfileService {
         result.setRed(profile.getRed());
         result.setGreen(profile.getGreen());
         result.setBlue(profile.getBlue());
+        result.setPurple(profile.getPurple());
         result.setSaturation(profile.getSaturation());
         result.setContrast(profile.getContrast());
         result.setBrightness(profile.getBrightness());

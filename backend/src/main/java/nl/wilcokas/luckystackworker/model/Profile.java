@@ -34,9 +34,13 @@ public class Profile {
         this.denoiseRadius = profile.getDenoiseRadius();
         this.denoiseIterations = profile.getDenoiseIterations();
         this.gamma = profile.getGamma();
-        this.red = profile.getRed();
-        this.green = profile.getGreen();
-        this.blue = profile.getBlue();
+
+        // Reversed on the frontend since 4.8.0
+        this.red = profile.getRed().negate();
+        this.green = profile.getGreen().negate();
+        this.blue = profile.getBlue().negate();
+
+        this.purple = profile.getPurple();
         this.saturation = profile.getSaturation();
         this.contrast = profile.getContrast();
         this.brightness = profile.getBrightness();
@@ -109,6 +113,9 @@ public class Profile {
 
     @Column(name = "blue")
     private BigDecimal blue;
+
+    @Column(name = "purple")
+    private BigDecimal purple;
 
     @Column(name = "saturation")
     private BigDecimal saturation;

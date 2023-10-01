@@ -42,7 +42,7 @@
       [disabled]="shouldShowSpinner() || crop"
       [(ngModel)]="scale"
       (change)="scaleChanged($event)"
-      title="Select the scale used for opening the image stack"
+      title="Select the scale used for opening the image stack. The selected scale is not persisted with the object profile."
     >
       <span class="labelColor relatedButtonsSpace">Scale</span>
       <mat-radio-button value="1">1</mat-radio-button>
@@ -927,13 +927,13 @@
       </div>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Reduce Red</div>
+        <div class="sliderLabel">Red</div>
         <div class="slider">
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="1"
-            min="0"
-            max="255"
+            min="-100"
+            max="100"
             (input)="redChanged($event, false)"
             (change)="redChanged($event, true)"
             [(ngModel)]="red"
@@ -948,13 +948,13 @@
         </div>
       </div>
       <div class="sliderRow">
-        <div class="sliderLabel">Reduce Green</div>
+        <div class="sliderLabel">Green</div>
         <div class="slider">
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="1"
-            min="0"
-            max="255"
+            min="-100"
+            max="100"
             (input)="greenChanged($event, false)"
             (change)="greenChanged($event, true)"
             [(ngModel)]="green"
@@ -969,13 +969,13 @@
         </div>
       </div>
       <div class="sliderRow">
-        <div class="sliderLabel">Reduce Blue</div>
+        <div class="sliderLabel">Blue</div>
         <div class="slider">
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="1"
-            min="0"
-            max="255"
+            min="-100"
+            max="100"
             (input)="blueChanged($event, false)"
             (change)="blueChanged($event, true)"
             [(ngModel)]="blue"
@@ -986,6 +986,27 @@
             *ngIf="refImageSelected"
             class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
             >{{ blue == 0 ? "Off" : "" }}</span
+          >
+        </div>
+      </div>
+      <div class="sliderRow">
+        <div class="sliderLabel">Reduce Purple</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            step="1"
+            min="0"
+            max="255"
+            (input)="purpleChanged($event, false)"
+            (change)="purpleChanged($event, true)"
+            [(ngModel)]="purple"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ purple }}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ purple == 0 ? "Off" : "" }}</span
           >
         </div>
       </div>
