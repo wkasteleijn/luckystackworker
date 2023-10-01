@@ -1,9 +1,10 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
 
-01/10/2023 minor release 4.7.0:
+01/10/2023 minor release 4.8.0:
 - Added new slider for controlling the dering threshold
 - Added radio controls to open stack at different scales
+- Added new slider to reduce purple fringing
 - Added stop button to the batch worker
 - Improved the startup experience
 - Several UI layout improvements

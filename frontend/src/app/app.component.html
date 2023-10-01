@@ -904,6 +904,15 @@
 
     <!-- Color & Dispersion panel -->
     <mat-tab label="Color & Dispersion">
+      <div
+        class="sliderRowCategoryTitle {{
+          nightModeEnabled()
+            ? 'sliderRowCategoryTitleColorNight'
+            : 'sliderRowCategoryTitleColor'
+        }}"
+      >
+        Enhancements
+      </div>
       <div class="sliderRow">
         <div class="sliderLabel">Saturation</div>
         <div class="slider">
@@ -925,7 +934,37 @@
           >
         </div>
       </div>
+      <div class="sliderRow">
+        <div class="sliderLabel">Remove Purple</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            step="1"
+            min="0"
+            max="255"
+            (input)="purpleChanged($event, false)"
+            (change)="purpleChanged($event, true)"
+            [(ngModel)]="purple"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ purple }}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ purple == 0 ? "Off" : "" }}</span
+          >
+        </div>
+      </div>
 
+      <div
+        class="sliderRowCategoryTitle {{
+          nightModeEnabled()
+            ? 'sliderRowCategoryTitleColorNight'
+            : 'sliderRowCategoryTitleColor'
+        }}"
+      >
+        Balance
+      </div>
       <div class="sliderRow">
         <div class="sliderLabel">Red</div>
         <div class="slider">
@@ -989,32 +1028,18 @@
           >
         </div>
       </div>
-      <div class="sliderRow">
-        <div class="sliderLabel">Reduce Purple</div>
-        <div class="slider">
-          <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            step="1"
-            min="0"
-            max="255"
-            (input)="purpleChanged($event, false)"
-            (change)="purpleChanged($event, true)"
-            [(ngModel)]="purple"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span class="sliderLabel">{{ purple }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ purple == 0 ? "Off" : "" }}</span
-          >
-        </div>
-      </div>
 
       <!-- Dispersion corrector-->
-      <p></p>
       <div class="sliderRow" title="{{ dispersionCorrectorTitle }}">
-        <div class="sliderLabel"></div>
+        <div
+          class="sliderRowCategoryTitle {{
+            nightModeEnabled()
+              ? 'sliderRowCategoryTitleColorNight'
+              : 'sliderRowCategoryTitleColor'
+          }}"
+        >
+          Dispersion Correction
+        </div>
         <div class="dispersionPanel">
           <mat-checkbox
             [(ngModel)]="dispersionCorrectionEnabled"
@@ -1029,7 +1054,7 @@
                   : 'sliderRowCategoryTitleColor'
                 : 'labelColor'
             }}"
-            >Correct Disperion</span
+            >On</span
           >
           <button
             *ngIf="dispersionCorrectionEnabled"

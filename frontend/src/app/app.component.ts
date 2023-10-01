@@ -477,7 +477,7 @@ export class AppComponent implements OnInit {
   }
 
   greenChanged(event: any, update: boolean) {
-    this.profile.green = event.value;
+    this.profile.green = -event.value;
     this.green = event.value;
     this.settings.operation = 'green';
     console.log('greenChanged called: ' + this.profile.green);
@@ -487,7 +487,7 @@ export class AppComponent implements OnInit {
   }
 
   redChanged(event: any, update: boolean) {
-    this.profile.red = event.value;
+    this.profile.red = -event.value;
     this.red = event.value;
     this.settings.operation = 'red';
     console.log('redChanged called: ' + this.profile.red);
@@ -497,7 +497,7 @@ export class AppComponent implements OnInit {
   }
 
   blueChanged(event: any, update: boolean) {
-    this.profile.blue = event.value;
+    this.profile.blue = -event.value;
     this.settings.operation = 'blue';
     this.blue = event.value;
     console.log('blueChanged called: ' + this.profile.blue);
@@ -851,9 +851,9 @@ export class AppComponent implements OnInit {
     this.localContrastFine = this.profile.localContrastFine;
     this.localContrastMedium = this.profile.localContrastMedium;
     this.localContrastLarge = this.profile.localContrastLarge;
-    this.red = this.profile.red;
-    this.green = this.profile.green;
-    this.blue = this.profile.blue;
+    this.red = -this.profile.red;
+    this.green = -this.profile.green;
+    this.blue = -this.profile.blue;
     this.purple = this.profile.purple;
     this.isLargeImage = this.settings.largeImage;
     this.setNonPersistentSettings();

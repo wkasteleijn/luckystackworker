@@ -34,12 +34,9 @@ public class Profile {
         this.denoiseRadius = profile.getDenoiseRadius();
         this.denoiseIterations = profile.getDenoiseIterations();
         this.gamma = profile.getGamma();
-
-        // Reversed on the frontend since 4.8.0
-        this.red = profile.getRed().negate();
-        this.green = profile.getGreen().negate();
-        this.blue = profile.getBlue().negate();
-
+        this.red = profile.getRed();
+        this.green = profile.getGreen();
+        this.blue = profile.getBlue();
         this.purple = profile.getPurple();
         this.saturation = profile.getSaturation();
         this.contrast = profile.getContrast();
