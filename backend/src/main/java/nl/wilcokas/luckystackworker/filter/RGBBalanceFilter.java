@@ -1,12 +1,19 @@
 package nl.wilcokas.luckystackworker.filter;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.stereotype.Component;
 
 import ij.ImagePlus;
 import ij.ImageStack;
+import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.util.Util;
 
+@Slf4j
 @Component
 public class RGBBalanceFilter {
 
@@ -31,15 +38,30 @@ public class RGBBalanceFilter {
             greenPixelsResult[i] = getPixelResult(newGreenValue, desaturatedValue, amountGreen, purpleCorrectionFactor, purpleReductionAmount);
             bluePixelsResult[i] = getPixelResult(newBlueValue, desaturatedValue, amountBlue, purpleCorrectionFactor, purpleReductionAmount);
         }
-        for (int i = 0; i < redPixels.length; i++) {
-            redPixels[i] = redPixelsResult[i];
+        int numThreads = Runtime.getRuntime().availableProcessors();
+        Executor executor = Executors.newFixedThreadPool(numThreads);
+        executor.execute(() -> {
+            for (int i = 0; i < redPixels.length; i++) {
+                redPixels[i] = redPixelsResult[i];
+            }
+        });
+        executor.execute(() -> {
+            for (int i = 0; i < greenPixels.length; i++) {
+                greenPixels[i] = greenPixelsResult[i];
+            }
+        });
+        executor.execute(() -> {
+            for (int i = 0; i < bluePixels.length; i++) {
+                bluePixels[i] = bluePixelsResult[i];
+            }
+        });
+        ((ExecutorService) executor).shutdown();
+        try {
+            ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            log.warn("Parallel thread execution was stopped: ", e);
         }
-        for (int i = 0; i < greenPixels.length; i++) {
-            greenPixels[i] = greenPixelsResult[i];
-        }
-        for (int i = 0; i < bluePixels.length; i++) {
-            bluePixels[i] = bluePixelsResult[i];
-        }
+
     }
 
     private short getPixelResult(int newValueUnsignedInt, int desaturatedValue, int correctionAmount, double purpleCorrectionFactor,
