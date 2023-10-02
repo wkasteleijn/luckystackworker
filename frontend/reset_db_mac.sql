@@ -35,7 +35,7 @@ update profiles set scale=1;
 update profiles set threshold=4;
 
 select * from profiles;
-update settings set latest_known_version='4.3.0-beta';
+update settings set latest_known_version='4.8.0';
 update settings set latest_known_version_checked=null; --TIMESTAMP '2023-01-24 10.00.00';
 update settings set root_folder='~';
 update settings set extensions='tif,png,tiff';
