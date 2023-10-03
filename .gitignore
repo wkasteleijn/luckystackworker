@@ -2,6 +2,7 @@ backend/target/
 backend/.settings/
 backend/.classpath
 backend/.project
+backend/.metadata
 frontend/node_modules
 frontend/.angular
 frontend/dist
@@ -11,3 +12,4 @@ frontend/jre/
 frontend/lsw-gui-darwin-x64
 frontend/lsw-gui-darwin-arm64
 .DS_Store
+
