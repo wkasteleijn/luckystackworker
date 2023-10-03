@@ -15,7 +15,7 @@ public class Constants {
     public static final String DEFAULT_OUTPUT_FORMAT = "tif";
     public static final int MAX_ROI_X = 1024;
     public static final int MAX_ROI_Y = 768;
-    public static final int MAX_WINDOW_SIZE = 1280;
+    public static final int MAX_WINDOW_SIZE = 1024;
     public static final BigDecimal DEFAULT_DENOISE_RADIUS = BigDecimal.valueOf(1);
     public static final BigDecimal DEFAULT_DENOISE_SIGMA = BigDecimal.valueOf(2);
     public static final int DEFAULT_DENOISE_ITERATIONS = 1;
