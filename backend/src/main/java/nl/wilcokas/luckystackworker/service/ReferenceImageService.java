@@ -26,6 +26,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import ij.IJ;
@@ -81,8 +82,15 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     private int zoomFactor = 0;
 
-    private Image iconImage = new ImageIcon(getClass().getResource("/luckystackworker_icon.png")).getImage();
-
+    private static Image iconImage;
+    static {
+        try {
+        	iconImage = new ImageIcon(new ClassPathResource("/luckystackworker_icon.png").getURL()).getImage();
+        } catch (IOException e) {
+            log.error("Error loading histogram stretch script");
+        }
+    }    
+    
     private final SettingsService settingsService;
     private final HttpService httpService;
     private final ProfileService profileService;
