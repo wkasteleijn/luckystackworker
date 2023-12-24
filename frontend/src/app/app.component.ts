@@ -51,7 +51,7 @@ export class AppComponent implements OnInit {
   luminanceIncludeBlue: boolean = true;
   luminanceIncludeColor: boolean = true;
 
-  // denoise
+  // denoise 1
   denoiseAmount: number;
   denoiseSigma: string;
   denoiseRadius: number;
@@ -60,6 +60,9 @@ export class AppComponent implements OnInit {
   savitzkyGolayAmount: number;
   savitzkyGolayIterations: number;
   denoiseAlgorithm: string;
+
+  // denoise 2
+  denoiseAlgorithm2: string;
 
   //  light
   gamma: number;

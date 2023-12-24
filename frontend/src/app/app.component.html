@@ -189,16 +189,8 @@
       ><span class="sliderLabel">Night Mode</span></mat-slide-toggle
     >
   </div>
-  <div class="histogramToggle">
-    <mat-slide-toggle
-      [(ngModel)]="showHistogram"
-      [color]="colorTheme()"
-      (change)="histogramSelectionChanged()"
-      ><span class="sliderLabel">Histogram</span></mat-slide-toggle
-    >
-  </div>
   <mat-tab-group class="sliderTabs" selectedIndex="0">
-    <mat-tab label="Sharpen & Denoise">
+    <mat-tab label="Sharpen">
       <!-- Sharpen panel -->
       <div class="sliderRow">
         <div
@@ -468,7 +460,9 @@
           </div>
         </div>
       </div>
+    </mat-tab>
 
+    <mat-tab label="Denoise">
       <div class="sliderRow">
         <div
           class="sliderRowCategoryTitle {{
@@ -479,7 +473,7 @@
               : 'sliderRowCategoryTitleColor'
           }}"
         >
-          Denoise
+          Denoise pass 1
         </div>
         <mat-radio-group
           [color]="colorTheme()"
@@ -724,6 +718,18 @@
             >
           </div>
         </div>
+      </div>
+
+      <div
+        class="sliderRowCategoryTitle {{
+          denoiseAlgorithm2 === 'OFF'
+            ? 'denoiseOffLabel'
+            : nightModeEnabled()
+            ? 'sliderRowCategoryTitleColorNight'
+            : 'sliderRowCategoryTitleColor'
+        }}"
+      >
+        Denoise pass 2
       </div>
     </mat-tab>
 
@@ -1680,6 +1686,12 @@
       >
     </button>
     <span *ngIf="!showVersionButton()" class="spanNoNewVersion"></span>
+    <mat-slide-toggle
+      [(ngModel)]="showHistogram"
+      [color]="colorTheme()"
+      (change)="histogramSelectionChanged()"
+      ><span class="sliderLabel">Histogram</span></mat-slide-toggle
+    >
     <button
       type="button"
       mat-button
@@ -1705,7 +1717,10 @@
     <button type="button" mat-button disabled class="button_disabled">
       Save
     </button>
-    <span class="spanNoNewVersion"></span>
+    <span *ngIf="!openRefImageEnabled()" class="spanNoNewVersion"></span>
+    <mat-slide-toggle disabled
+      ><span class="sliderLabel">Histogram</span></mat-slide-toggle
+    >
     <button
       *ngIf="!openRefImageEnabled()"
       type="button"
