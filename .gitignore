@@ -3,6 +3,7 @@ backend/.settings/
 backend/.classpath
 backend/.project
 backend/.metadata
+backend/gmic
 frontend/node_modules
 frontend/.angular
 frontend/dist
