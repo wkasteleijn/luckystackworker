@@ -466,7 +466,7 @@
       <div class="sliderRow">
         <div
           class="sliderRowCategoryTitle {{
-            denoiseAlgorithm === 'OFF'
+            denoiseAlgorithm1 === 'OFF'
               ? 'denoiseOffLabel'
               : nightModeEnabled()
               ? 'sliderRowCategoryTitleColorNight'
@@ -478,8 +478,138 @@
         <mat-radio-group
           [color]="colorTheme()"
           [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-          [(ngModel)]="denoiseAlgorithm"
-          (change)="denoiseAlgorithmChanged($event)"
+          [(ngModel)]="denoiseAlgorithm1"
+          (change)="denoiseAlgorithm1Changed($event)"
+        >
+          <mat-radio-button value="OFF" class="radioSizeButtonDenoise"
+            >Off</mat-radio-button
+          >
+          <mat-radio-button value="IAN" class="denoiseMode"
+            >G'mic Ian's</mat-radio-button
+          >
+          <mat-radio-button value="SIGMA1" class="denoiseMode"
+            >Sigma 1</mat-radio-button
+          >
+        </mat-radio-group>
+      </div>
+      <div *ngIf="denoiseAlgorithm1 === 'IAN'">
+        <div class="sliderRow">
+          <div class="sliderLabel">Amount</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              tickInterval="1"
+              step="1"
+              min="1"
+              max="30"
+              (input)="iansAmountChanged($event, false)"
+              (change)="iansAmountChanged($event, true)"
+              [(ngModel)]="iansAmount"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span
+              class="{{
+                savitzkyGolaySize === '0'
+                  ? 'sliderLabelDisabled'
+                  : 'sliderLabel'
+              }}"
+              >{{ iansAmount }}</span
+            >
+          </div>
+        </div>
+
+        <div class="sliderRow">
+          <div class="sliderLabel">Recovery</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              tickInterval="1"
+              step="1"
+              min="0"
+              max="200"
+              (input)="iansRecoveryChanged($event, false)"
+              (change)="iansRecoveryChanged($event, true)"
+              [(ngModel)]="iansRecovery"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span class="sliderLabel'">{{ iansRecovery }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="denoiseAlgorithm1 === 'SIGMA1'">
+        <div class="sliderRow">
+          <div class="sliderLabel">Amount</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              tickInterval="1000"
+              step="1"
+              min="0"
+              max="100"
+              (input)="denoise1AmountChanged($event, false)"
+              (change)="denoise1AmountChanged($event, true)"
+              [(ngModel)]="denoise1Amount"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span class="sliderLabel">{{ denoise1Amount }}</span>
+          </div>
+        </div>
+
+        <div class="sliderRow">
+          <div class="sliderLabel">Radius</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              tickInterval="1000"
+              step="0.1"
+              min="0.5"
+              max="4"
+              (input)="denoise1RadiusChanged($event, false)"
+              (change)="denoise1RadiusChanged($event, true)"
+              [(ngModel)]="denoise1Radius"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span class="sliderLabel">{{ denoise1Radius }}</span>
+          </div>
+        </div>
+
+        <div class="sliderRow">
+          <div class="sliderLabel">Iterations</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              tickInterval="1"
+              step="1"
+              min="1"
+              max="10"
+              (input)="denoise1IterationsChanged($event, false)"
+              (change)="denoise1IterationsChanged($event, true)"
+              [(ngModel)]="denoise1Iterations"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span class="sliderLabel">{{ denoise1Iterations }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sliderRow">
+        <div
+          class="sliderRowCategoryTitle {{
+            denoiseAlgorithm2 === 'OFF'
+              ? 'denoiseOffLabel'
+              : nightModeEnabled()
+              ? 'sliderRowCategoryTitleColorNight'
+              : 'sliderRowCategoryTitleColor'
+          }}"
+        >
+          Denoise pass 2
+        </div>
+        <mat-radio-group
+          [color]="colorTheme()"
+          [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+          [(ngModel)]="denoiseAlgorithm2"
+          (change)="denoiseAlgorithm2Changed($event)"
         >
           <mat-radio-button value="OFF" class="radioSizeButtonDenoise"
             >Off</mat-radio-button
@@ -487,31 +617,12 @@
           <mat-radio-button value="SAVGOLAY" class="denoiseMode"
             >Savitzky-Golay</mat-radio-button
           >
-          <mat-radio-button value="SIGMA" class="denoiseMode"
-            >Sigma</mat-radio-button
+          <mat-radio-button value="SIGMA2" class="denoiseMode"
+            >Sigma 2</mat-radio-button
           >
         </mat-radio-group>
-        <div *ngIf="denoiseAlgorithm === 'SIGMA'">
-          <div class="denoiseMode">
-            <mat-radio-group
-              [color]="colorTheme()"
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-              [(ngModel)]="denoiseSigma"
-              (change)="denoiseSigmaChanged($event, true)"
-            >
-              <mat-radio-button
-                value="2"
-                class="denoiseFirstRadio radioSizeButton"
-                >Mode 1</mat-radio-button
-              >
-              <mat-radio-button value="5" class="radioSizeButton"
-                >Mode 2</mat-radio-button
-              >
-            </mat-radio-group>
-          </div>
-        </div>
       </div>
-      <div *ngIf="denoiseAlgorithm === 'SAVGOLAY'">
+      <div *ngIf="denoiseAlgorithm2 === 'SAVGOLAY'">
         <div class="sliderRow">
           <div class="sliderLabel">Kernel Size</div>
           <div class="slider">
@@ -616,120 +727,42 @@
         </div>
       </div>
 
-      <div *ngIf="denoiseAlgorithm === 'SIGMA'">
+      <div *ngIf="denoiseAlgorithm2 === 'SIGMA2'">
         <div class="sliderRow">
-          <div
-            class="{{
-              denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-            }}"
-          >
-            Amount
-          </div>
+          <div class="sliderLabel">Radius</div>
           <div class="slider">
             <mat-slider
-              [disabled]="
-                shouldShowSpinner() ||
-                !refImageSelected ||
-                denoiseSigma === '0' ||
-                crop
-              "
-              tickInterval="1000"
-              step="1"
-              min="0"
-              max="100"
-              (input)="denoiseAmountChanged($event, false)"
-              (change)="denoiseAmountChanged($event, true)"
-              [(ngModel)]="denoiseAmount"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <span
-              class="{{
-                denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-              }}"
-              >{{ denoiseAmount }}</span
-            >
-          </div>
-        </div>
-
-        <div class="sliderRow">
-          <div
-            class="{{
-              denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-            }}"
-          >
-            Radius
-          </div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="
-                shouldShowSpinner() ||
-                !refImageSelected ||
-                denoiseSigma === '0' ||
-                crop
-              "
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               tickInterval="1000"
               step="0.1"
               min="0.5"
               max="4"
-              (input)="denoiseRadiusChanged($event, false)"
-              (change)="denoiseRadiusChanged($event, true)"
-              [(ngModel)]="denoiseRadius"
+              (input)="denoise2RadiusChanged($event, false)"
+              (change)="denoise2RadiusChanged($event, true)"
+              [(ngModel)]="denoise2Radius"
               [color]="colorTheme()"
             ></mat-slider>
-            <span
-              class="{{
-                denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-              }}"
-              >{{ denoiseRadius }}</span
-            >
+            <span class="sliderLabel">{{ denoise2Radius }}</span>
           </div>
         </div>
 
         <div class="sliderRow">
-          <div
-            class="{{
-              denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-            }}"
-          >
-            Iterations
-          </div>
+          <div class="sliderLabel">Iterations</div>
           <div class="slider">
             <mat-slider
-              [disabled]="
-                shouldShowSpinner() ||
-                !refImageSelected ||
-                denoiseSigma === '0' ||
-                crop
-              "
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               tickInterval="1"
               step="1"
               min="1"
               max="10"
-              (input)="denoiseIterationsChanged($event, false)"
-              (change)="denoiseIterationsChanged($event, true)"
-              [(ngModel)]="denoiseIterations"
+              (input)="denoise2IterationsChanged($event, false)"
+              (change)="denoise2IterationsChanged($event, true)"
+              [(ngModel)]="denoise2Iterations"
               [color]="colorTheme()"
             ></mat-slider>
-            <span
-              class="{{
-                denoiseSigma === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-              }}"
-              >{{ denoiseIterations }}</span
-            >
+            <span class="sliderLabel">{{ denoise2Iterations }}</span>
           </div>
         </div>
-      </div>
-
-      <div
-        class="sliderRowCategoryTitle {{
-          denoiseAlgorithm2 === 'OFF'
-            ? 'denoiseOffLabel'
-            : nightModeEnabled()
-            ? 'sliderRowCategoryTitleColorNight'
-            : 'sliderRowCategoryTitleColor'
-        }}"
-      >
-        Denoise pass 2
       </div>
     </mat-tab>
 

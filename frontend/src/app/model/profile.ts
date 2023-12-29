@@ -4,14 +4,30 @@ export class Profile {
   amount: number;
   level: number;
   iterations: number;
-  denoise: number;
-  denoiseSigma: number;
-  denoiseRadius: number;
-  denoiseIterations: number;
+
+  // denoise 1
+  denoiseAlgorithm1: string;
+  denoise1Amount: number;
+  denoise1Radius: number;
+  denoise1Iterations: number;
+
+  iansAmount: number;
+  iansRecovery: number;
+
+  // denoise 2
+  denoiseAlgorithm2: string;
+  savitzkyGolaySize: number;
+  savitzkyGolayAmount: number;
+  savitzkyGolayIterations: number;
+
+  denoise2Radius: number;
+  denoise2Iterations: number;
+
   luminanceIncludeRed: boolean;
   luminanceIncludeGreen: boolean;
   luminanceIncludeBlue: boolean;
   luminanceIncludeColor: boolean;
+
   gamma: number;
   contrast: number;
   brightness: number;
@@ -25,9 +41,6 @@ export class Profile {
   blue: number;
   purple: number;
   saturation: number;
-  savitzkyGolaySize: number;
-  savitzkyGolayAmount: number;
-  savitzkyGolayIterations: number;
   clippingStrength: number;
   clippingRange: number;
   deringRadius: number;

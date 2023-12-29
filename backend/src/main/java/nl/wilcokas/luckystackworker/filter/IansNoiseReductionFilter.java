@@ -24,15 +24,15 @@ public class IansNoiseReductionFilter {
         double mediumValue = parameters.getMedium() / 200D;
         double largeValue = parameters.getLarge() / 200D;
 
-        String workFolder = System.getProperty("user.home") + "\\AppData\\Local\\LuckyStackWorker";
-        String inputFile = workFolder + "\\temp_in.tif";
+        String workFolder = Util.getIJFileFormat(System.getProperty("user.home")) + "/AppData/Local/LuckyStackWorker";
+        String inputFile = workFolder + "/temp_in.tif";
         Util.saveImage(image, profileName, inputFile, Util.isPngRgbStack(image, inputFile), false, false, fromWorker);
 
-        String outputFile = workFolder + "\\temp_out.tif";
+        String outputFile = workFolder + "/temp_out.tif";
         ProcessBuilder processBuilder = new ProcessBuilder(
                 "./gmic/gmic.exe", "-input", inputFile, "-div", "65536",
                 "iain_nr_2019", "1,0,0,0,0.5,1,1,%s,%s,%s,3,%s,0.5,4,0".formatted(
-                        fineValue, mediumValue, largeValue, parameters.isRecover() ? 1 : 0, Integer.toString(parameters.isRecover() ? 1 : 0)),
+                        fineValue, mediumValue, largeValue, parameters.isRecover() ? 1 : 0),
                 "-mul", "65536", "-output", outputFile + ",int16");
         Process process = processBuilder.start();
         int exitCode = process.waitFor();

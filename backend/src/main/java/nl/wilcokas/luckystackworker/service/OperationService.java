@@ -20,11 +20,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.filter.DispersionCorrectionFilter;
+import nl.wilcokas.luckystackworker.filter.IansNoiseReductionFilter;
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
 import nl.wilcokas.luckystackworker.filter.RGBBalanceFilter;
 import nl.wilcokas.luckystackworker.filter.SaturationFilter;
 import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter;
 import nl.wilcokas.luckystackworker.filter.SigmaFilterPlus;
+import nl.wilcokas.luckystackworker.filter.settings.IansNoiseReductionParameters;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenParameters;
 import nl.wilcokas.luckystackworker.filter.settings.SavitzkyGolayRadius;
@@ -54,6 +56,7 @@ public class OperationService {
     private final SavitzkyGolayFilter savitzkyGolayFilter;
     private final SigmaFilterPlus sigmaFilterPlusFilter;
     private final DispersionCorrectionFilter dispersionCorrectionFilter;
+    private final IansNoiseReductionFilter iansNoiseReductionFilter;
 
     public void correctExposure(ImagePlus image) throws IOException {
         image.setDefault16bitRange(16);
@@ -91,10 +94,16 @@ public class OperationService {
                 && (!excludedOperationList.contains(OperationEnum.SHARPENMODE))) {
             applySharpen(image, profile);
         }
-        if ((!excludedOperationList.contains(OperationEnum.DENOISEAMOUNT)) && (!excludedOperationList.contains(OperationEnum.DENOISESIGMA))
-                && (!excludedOperationList.contains(OperationEnum.DENOISERADIUS))
-                && (!excludedOperationList.contains(OperationEnum.DENOISEITERATIONS))) {
-            applyDenoise(image, profile);
+        if ((!excludedOperationList.contains(OperationEnum.DENOISE1AMOUNT))
+                && (!excludedOperationList.contains(OperationEnum.DENOISE1RADIUS))
+                && (!excludedOperationList.contains(OperationEnum.DENOISE1ITERATIONS))) {
+            applySigmaDenoise1(image, profile);
+        }
+        if ((!excludedOperationList.contains(OperationEnum.DENOISE2RADIUS)) && (!excludedOperationList.contains(OperationEnum.DENOISE2ITERATIONS))) {
+            applySigmaDenoise2(image, profile);
+        }
+        if ((!excludedOperationList.contains(OperationEnum.IANSAMOUNT)) && (!excludedOperationList.contains(OperationEnum.IANSRECOVERY))) {
+            applyIansNoiseReduction(image, profile);
         }
         if ((!excludedOperationList.contains(OperationEnum.SAVITZKYGOLAYAMOUNT))
                 && (!excludedOperationList.contains(OperationEnum.SAVITZKYGOLAYITERATIONS))
@@ -113,7 +122,8 @@ public class OperationService {
 
     public void applyAllOperations(ImagePlus image, Profile profile) {
         applySharpen(image, profile);
-        applyDenoise(image, profile);
+        applySigmaDenoise1(image, profile);
+        applySigmaDenoise2(image, profile);
         applySavitzkyGolayDenoise(image, profile);
         applyLocalContrast(image, profile);
         applyDispersionCorrection(image, profile);
@@ -176,17 +186,36 @@ public class OperationService {
         }
     }
 
-    public void applyDenoise(final ImagePlus image, final Profile profile) {
-        if (profile.getDenoiseSigma() != null && (profile.getDenoiseSigma().compareTo(BigDecimal.ZERO) > 0)) {
-            int iterations = profile.getDenoiseIterations() == 0 ? 1 : profile.getDenoiseIterations();
-            log.info("Applying Sigma denoise with value {} to image {}", profile.getDenoise(), image.getID());
-            BigDecimal factor = profile.getDenoise().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100)
-                    : profile.getDenoise();
+    public void applySigmaDenoise1(final ImagePlus image, final Profile profile) {
+        if ("SIGMA1".equals(profile.getDenoiseAlgorithm1())) {
+            int iterations = profile.getDenoise1Iterations() == 0 ? 1 : profile.getDenoise1Iterations();
+            log.info("Applying Sigma denoise mode 1 with value {} to image {}", profile.getDenoise1Amount(), image.getID());
+            BigDecimal factor = profile.getDenoise1Amount().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100) : profile.getDenoise1Amount();
             BigDecimal minimum = factor.divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
             for (int i = 0; i < iterations; i++) {
-                sigmaFilterPlusFilter.apply(image, profile.getDenoiseRadius().doubleValue(), profile.getDenoiseSigma().doubleValue(),
+                sigmaFilterPlusFilter.apply(image, profile.getDenoise1Radius().doubleValue(), 2D,
                         minimum.doubleValue());
             }
+        }
+    }
+
+    public void applySigmaDenoise2(final ImagePlus image, final Profile profile) {
+        if ("SIGMA2".equals(profile.getDenoiseAlgorithm1())) {
+            int iterations = profile.getDenoise1Iterations() == 0 ? 1 : profile.getDenoise1Iterations();
+            log.info("Applying Sigma denoise mode 2 with value {} to image {}", profile.getDenoise1Amount(), image.getID());
+            BigDecimal factor = profile.getDenoise1Amount().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100) : profile.getDenoise1Amount();
+            BigDecimal minimum = factor.divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
+            for (int i = 0; i < iterations; i++) {
+                sigmaFilterPlusFilter.apply(image, profile.getDenoise1Radius().doubleValue(), 5D, minimum.doubleValue());
+            }
+        }
+    }
+
+    public void applyIansNoiseReduction(final ImagePlus image, final Profile profile, boolean fromWorker) throws IOException, InterruptedException {
+        if ("IAN".equals(profile.getDenoiseAlgorithm1())) {
+            log.info("Applying Ian's noise reduction to image {}", image.getID());
+            IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(0).medium(0).large(0).build();
+            iansNoiseReductionFilter.apply(image, profile.getName(), parameters, fromWorker);
         }
     }
 

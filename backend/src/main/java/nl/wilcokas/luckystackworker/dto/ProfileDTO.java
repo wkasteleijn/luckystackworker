@@ -20,10 +20,16 @@ public class ProfileDTO {
         this.amount=profile.getAmount();
         this.iterations=profile.getIterations();
         this.level=profile.getLevel();
-        this.denoise=profile.getDenoise();
-        this.denoiseSigma=profile.getDenoiseSigma();
-        this.denoiseRadius=profile.getDenoiseRadius();
-        this.denoiseIterations=profile.getDenoiseIterations();
+
+        this.denoise1Amount = profile.getDenoise1Amount();
+        this.denoise1Radius = profile.getDenoise1Radius();
+        this.denoise1Iterations = profile.getDenoise1Iterations();
+        this.denoise2Radius = profile.getDenoise2Radius();
+        this.denoise2Iterations = profile.getDenoise2Iterations();
+        this.savitzkyGolaySize=profile.getSavitzkyGolaySize();
+        this.savitzkyGolayAmount=profile.getSavitzkyGolayAmount();
+        this.savitzkyGolayIterations=profile.getSavitzkyGolayIterations();
+
         this.gamma=profile.getGamma();
         this.red = profile.getRed();
         this.green = profile.getGreen();
@@ -33,9 +39,6 @@ public class ProfileDTO {
         this.contrast=profile.getContrast();
         this.brightness=profile.getBrightness();
         this.background=profile.getBackground();
-        this.savitzkyGolaySize=profile.getSavitzkyGolaySize();
-        this.savitzkyGolayAmount=profile.getSavitzkyGolayAmount();
-        this.savitzkyGolayIterations=profile.getSavitzkyGolayIterations();
         this.clippingStrength=profile.getClippingStrength();
         this.clippingRange=profile.getClippingRange();
         this.deringRadius=profile.getDeringRadius();
@@ -63,10 +66,21 @@ public class ProfileDTO {
     private BigDecimal amount;
     private int iterations;
     private int level;
-    private BigDecimal denoise;
-    private BigDecimal denoiseSigma;
-    private BigDecimal denoiseRadius;
-    private int denoiseIterations;
+
+    private String denoiseAlgorithm1;
+    private BigDecimal denoise1Amount;
+    private BigDecimal denoise1Radius;
+    private int denoise1Iterations;
+    private BigDecimal iansAmount;
+    private BigDecimal iansRecovery;
+
+    private String denoiseAlgorithm2;
+    private int savitzkyGolaySize;
+    private int savitzkyGolayAmount;
+    private int savitzkyGolayIterations;
+    private BigDecimal denoise2Radius;
+    private int denoise2Iterations;
+
     private BigDecimal gamma;
     private BigDecimal red;
     private BigDecimal green;
@@ -76,9 +90,6 @@ public class ProfileDTO {
     private int contrast;
     private int brightness;
     private int background;
-    private int savitzkyGolaySize;
-    private int savitzkyGolayAmount;
-    private int savitzkyGolayIterations;
     private int clippingStrength;
     private int clippingRange;
     private BigDecimal deringRadius;

@@ -29,10 +29,13 @@ public class Profile {
         this.amount = profile.getAmount();
         this.iterations = profile.getIterations();
         this.level = profile.getLevel();
-        this.denoise = profile.getDenoise();
-        this.denoiseSigma = profile.getDenoiseSigma();
-        this.denoiseRadius = profile.getDenoiseRadius();
-        this.denoiseIterations = profile.getDenoiseIterations();
+        this.denoise1Amount = profile.getDenoise1Amount();
+        this.denoise1Radius = profile.getDenoise1Radius();
+        this.denoise1Iterations = profile.getDenoise1Iterations();
+        this.denoise2Radius = profile.getDenoise2Radius();
+        this.denoise2Iterations = profile.getDenoise2Iterations();
+        this.iansAmount = profile.getIansAmount();
+        this.iansRecovery = profile.getIansRecovery();
         this.gamma = profile.getGamma();
         this.red = profile.getRed();
         this.green = profile.getGreen();
@@ -87,17 +90,34 @@ public class Profile {
     @Column(name = "level")
     private int level;
 
+    @Column(name = "denoise_algorithm_1")
+    private String denoiseAlgorithm1;
+
+    @Column(name = "denoise_algorithm_2")
+    private String denoiseAlgorithm2;
+
     @Column(name = "denoise")
-    private BigDecimal denoise;
+    private BigDecimal denoise1Amount;
 
     @Column(name = "denoise_sigma")
-    private BigDecimal denoiseSigma;
+    private BigDecimal denoiseSigma; // Unused as of 5.0.0
 
     @Column(name = "denoise_radius")
-    private BigDecimal denoiseRadius;
+    private BigDecimal denoise1Radius;
 
     @Column(name = "denoise_iterations")
-    private int denoiseIterations;
+    private int denoise1Iterations;
+
+    @Column(name = "ians_amount")
+    private BigDecimal iansAmount;
+    @Column(name = "ians_recovery")
+    private BigDecimal iansRecovery;
+
+    @Column(name = "denoise2_radius")
+    private BigDecimal denoise2Radius;
+
+    @Column(name = "denoise2_iterations")
+    private int denoise2Iterations;
 
     @Column(name = "gamma")
     private BigDecimal gamma;

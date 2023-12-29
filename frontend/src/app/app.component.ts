@@ -52,17 +52,24 @@ export class AppComponent implements OnInit {
   luminanceIncludeColor: boolean = true;
 
   // denoise 1
-  denoiseAmount: number;
-  denoiseSigma: string;
-  denoiseRadius: number;
-  denoiseIterations: number;
-  savitzkyGolaySize: string;
-  savitzkyGolayAmount: number;
-  savitzkyGolayIterations: number;
-  denoiseAlgorithm: string;
+  denoiseAlgorithm1: string;
+
+  denoise1Amount: number;
+  denoise1Radius: number;
+  denoise1Iterations: number;
+
+  iansAmount: number;
+  iansRecovery: number;
 
   // denoise 2
   denoiseAlgorithm2: string;
+
+  denoise2Radius: number;
+  denoise2Iterations: number;
+
+  savitzkyGolaySize: string;
+  savitzkyGolayAmount: number;
+  savitzkyGolayIterations: number;
 
   //  light
   gamma: number;
@@ -88,7 +95,7 @@ export class AppComponent implements OnInit {
   rootFolder: string = 'C:\\';
   workerStatus: string = 'Idle';
   workerProgress: number;
-  refImageSelected: boolean = false;
+  refImageSelected: boolean = true; // TODO: set to false by default!
   nightMode: boolean = false;
   crop: boolean = false;
   _showSpinner = false;
@@ -353,42 +360,73 @@ export class AppComponent implements OnInit {
     this.updateProfile();
   }
 
-  denoiseAmountChanged(event: any, update: boolean) {
-    this.profile.denoise = event.value;
-    this.denoiseAmount = event.value;
-    this.settings.operation = 'denoiseAmount';
-    console.log('denoiseAmountChanged called: ' + this.profile.denoise);
+  denoise1AmountChanged(event: any, update: boolean) {
+    this.denoise1Amount = event.value;
+    this.settings.operation = 'denoise1Amount';
+    console.log('denoise1AmountChanged called: ' + this.profile.denoise1Amount);
     if (update) {
       this.updateProfile();
     }
   }
 
-  denoiseSigmaChanged(event: any, update: boolean) {
-    this.profile.denoiseSigma = +event.value;
-    this.denoiseSigma = event.value;
-    this.settings.operation = 'denoiseSigma';
-    console.log('denoiseSigmaChanged called: ' + this.profile.denoiseSigma);
+  denoise1RadiusChanged(event: any, update: boolean) {
+    this.profile.denoise1Radius = event.value;
+    this.denoise1Radius = event.value;
+    this.settings.operation = 'denoise1Radius';
+    console.log('denoise1RadiusChanged called: ' + this.profile.denoise1Radius);
     if (update) {
       this.updateProfile();
     }
   }
 
-  denoiseRadiusChanged(event: any, update: boolean) {
-    this.profile.denoiseRadius = event.value;
-    this.denoiseRadius = event.value;
-    this.settings.operation = 'denoiseRadius';
-    console.log('denoiseRadiusChanged called: ' + this.profile.denoiseRadius);
-    if (update) {
-      this.updateProfile();
-    }
-  }
-
-  denoiseIterationsChanged(event: any, update: boolean) {
-    this.profile.denoiseIterations = event.value;
-    this.denoiseIterations = event.value;
-    this.settings.operation = 'denoiseIterations';
+  denoise1IterationsChanged(event: any, update: boolean) {
+    this.profile.denoise1Iterations = event.value;
+    this.denoise1Iterations = event.value;
+    this.settings.operation = 'denoise1Iterations';
     console.log(
-      'denoiseIterationsChanged called: ' + this.profile.denoiseRadius
+      'denoise1IterationsChanged called: ' + this.profile.denoise1Iterations
+    );
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  iansAmountChanged(event: any, update: boolean) {
+    this.profile.iansAmount = event.value;
+    this.iansAmount = event.value;
+    this.settings.operation = 'iansAmount';
+    console.log('iansAmount called: ' + this.profile.iansAmount);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  iansRecoveryChanged(event: any, update: boolean) {
+    this.profile.iansRecovery = event.value;
+    this.iansRecovery = event.value;
+    this.settings.operation = 'iansRecovery';
+    console.log('iansRecovery called: ' + this.profile.iansRecovery);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  denoise2RadiusChanged(event: any, update: boolean) {
+    this.profile.denoise2Radius = event.value;
+    this.denoise1Radius = event.value;
+    this.settings.operation = 'denoise2Radius';
+    console.log('denoise2RadiusChanged called: ' + this.profile.denoise2Radius);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  denoise2IterationsChanged(event: any, update: boolean) {
+    this.profile.denoise2Iterations = event.value;
+    this.denoise2Iterations = event.value;
+    this.settings.operation = 'denoise2Iterations';
+    console.log(
+      'denoise2IterationsChanged called: ' + this.profile.denoise2Iterations
     );
     if (update) {
       this.updateProfile();
@@ -568,9 +606,34 @@ export class AppComponent implements OnInit {
     }
   }
 
-  denoiseAlgorithmChanged(event: any) {
+  denoiseAlgorithm1Changed(event: any) {
+    if (event.value === 'SIGMA1') {
+      this.settings.operation = 'denoise1Sigma';
+      if (!this.profile.denoise1Amount) {
+        this.profile.denoise1Amount = 50;
+        this.profile.denoise1Radius = 1;
+        this.profile.denoise1Iterations = 1;
+        this.denoise1Amount = 50;
+        this.denoise1Radius = 1;
+        this.denoise1Iterations = 1;
+      }
+      this.profile.denoiseAlgorithm1 = 'SIGMA1';
+    } else if (event.value === 'IAN') {
+      this.settings.operation = 'ian';
+      if (!this.profile.iansAmount) {
+        this.profile.iansAmount = 1;
+        this.profile.iansRecovery = 0;
+        this.iansAmount = 1;
+        this.iansRecovery = 0;
+      }
+      this.profile.denoiseAlgorithm1 = 'IAN';
+    }
+    console.log('denoiseAlgorithm1Changed called: ' + event.value);
+    this.updateProfile();
+  }
+
+  denoiseAlgorithm2Changed(event: any) {
     if (event.value === 'SAVGOLAY') {
-      this.profile.denoiseSigma = 0;
       this.settings.operation = 'savitzkyGolaySize';
       if (!this.profile.savitzkyGolaySize) {
         // If not set, start with the defaults
@@ -581,26 +644,18 @@ export class AppComponent implements OnInit {
         this.savitzkyGolayAmount = 100;
         this.savitzkyGolayIterations = 1;
       }
-    } else if (event.value === 'SIGMA') {
-      this.profile.savitzkyGolaySize = 0;
-      this.settings.operation = 'denoiseSigma';
-      if (!this.profile.denoiseSigma) {
-        this.profile.denoiseSigma = 2;
-        this.profile.denoise = 50;
-        this.profile.denoiseRadius = 1;
-        this.profile.denoiseIterations = 1;
-        this.denoiseSigma = '2';
-        this.denoiseAmount = 50;
-        this.denoiseRadius = 1;
-        this.denoiseIterations = 1;
+      this.profile.denoiseAlgorithm2 = 'SAVGOLAY';
+    } else if (event.value === 'SIGMA2') {
+      this.settings.operation = 'denoise2Sigma';
+      if (!this.profile.denoise2Radius) {
+        this.profile.denoise2Radius = 1;
+        this.profile.denoise2Iterations = 1;
+        this.denoise2Radius = 1;
+        this.denoise2Iterations = 1;
       }
-    } else {
-      // Off
-      this.settings.operation = 'savitzkyGolaySize';
-      this.profile.denoiseSigma = 0;
-      this.profile.savitzkyGolaySize = 0;
+      this.profile.denoiseAlgorithm2 = 'SIGMA2';
     }
-    console.log('denoiseAlgorithmChanged called: ' + event.value);
+    console.log('denoiseAlgorithm1Changed called: ' + event.value);
     this.updateProfile();
   }
 
@@ -808,29 +863,26 @@ export class AppComponent implements OnInit {
     this.radius = this.profile.radius;
     this.amount = this.profile.amount;
     this.iterations = this.profile.iterations;
-    this.denoiseAmount = this.profile.denoise;
-    this.denoiseSigma = this.profile.denoiseSigma
-      ? this.profile.denoiseSigma.toString()
-      : '0';
-    this.denoiseRadius = this.profile.denoiseRadius;
-    this.denoiseIterations = this.profile.denoiseIterations;
+
+    this.denoiseAlgorithm1 = this.profile.denoiseAlgorithm1;
+    this.denoise1Amount = this.profile.denoise1Amount;
+    this.denoise1Radius = this.profile.denoise1Radius;
+    this.denoise1Iterations = this.profile.denoise1Iterations;
+    this.iansAmount = this.profile.iansAmount;
+    this.iansRecovery = this.profile.iansRecovery;
+
+    this.denoiseAlgorithm2 = this.profile.denoiseAlgorithm2;
+    this.denoise2Radius = this.profile.denoise2Radius;
+    this.denoise2Iterations = this.profile.denoise2Iterations;
     this.savitzkyGolayIterations = this.profile.savitzkyGolayIterations;
     this.savitzkyGolayAmount = this.profile.savitzkyGolayAmount;
     this.savitzkyGolaySize = this.profile.savitzkyGolaySize
       ? this.profile.savitzkyGolaySize.toString()
       : '0';
-    if (!this.profile.denoiseSigma && !this.profile.savitzkyGolaySize) {
-      this.denoiseAlgorithm = 'OFF';
-    } else if (this.profile.savitzkyGolaySize) {
-      this.denoiseAlgorithm = 'SAVGOLAY';
-      // prevent that both are selected under the hood, and prefer savitzky-golay in that case.
-      this.denoiseSigma = '0';
-      this.profile.denoiseSigma = 0;
-    } else {
-      this.denoiseAlgorithm = 'SIGMA';
-    }
+
     this.clippingStrength = this.profile.clippingStrength;
     this.clippingRange = this.profile.clippingRange;
+
     this.deringRadius = this.profile.deringRadius;
     this.deringStrength = this.profile.deringStrength;
     this.deringThreshold = this.profile.deringThreshold;
@@ -844,6 +896,7 @@ export class AppComponent implements OnInit {
     } else {
       this.edgeArtefactSupressionMode = 'CLIPPING';
     }
+
     this.sharpenMode = this.profile.sharpenMode;
     this.saturation = this.profile.saturation;
     this.gamma = this.profile.gamma;

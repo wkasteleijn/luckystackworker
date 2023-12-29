@@ -30,7 +30,7 @@ public class Probeersels {
         //
         //        Util.saveImage(newImage, "jup", "C:/Users/wkast/archive/Jup/testsession/jup_scaled.tif", true, false, false, false);
 
-        IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(5).build();
+        IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(5).recover(true).build();
         IansNoiseReductionFilter iansNoiseReductionFilter = new IansNoiseReductionFilter();
         log.info("Start Ians noise reduction");
         iansNoiseReductionFilter.apply(image, "jup", parameters, false);
