@@ -70,13 +70,20 @@ public class OperationService {
                 || (OperationEnum.DERINGSTRENGTH == operation) || (OperationEnum.DERINGTHRESHOLD == operation));
     }
 
-    public boolean isSigmaDenoise1Operation(final OperationEnum operation) {
-        return (OperationEnum.DENOISE1AMOUNT == operation) || (OperationEnum.DENOISE1RADIUS == operation)
+    public boolean isSigmaDenoise1Operation(final OperationEnum operation, final Profile profile) {
+        return (OperationEnum.DENOISEALGORITHM1 == operation && Constants.DENOISE_ALGORITHM_SIGMA1.equals(profile.getDenoiseAlgorithm1()))
+                || (OperationEnum.DENOISE1AMOUNT == operation) || (OperationEnum.DENOISE1RADIUS == operation)
                 || (OperationEnum.DENOISE1ITERATIONS == operation);
     }
 
-    public boolean isSigmaDenoise2Operation(final OperationEnum operation) {
-        return (OperationEnum.DENOISE2RADIUS == operation) || (OperationEnum.DENOISE2ITERATIONS == operation);
+    public boolean isIansNoiseReductionOperation(final OperationEnum operation, final Profile profile) {
+        return (OperationEnum.DENOISEALGORITHM1 == operation && Constants.DENOISE_ALGORITHM_IANS.equals(profile.getDenoiseAlgorithm1()))
+                || (OperationEnum.IANSAMOUNT == operation) || (OperationEnum.IANSRECOVERY == operation);
+    }
+
+    public boolean isSigmaDenoise2Operation(final OperationEnum operation, final Profile profile) {
+        return (OperationEnum.DENOISEALGORITHM2 == operation && Constants.DENOISE_ALGORITHM_SIGMA2.equals(profile.getDenoiseAlgorithm2()))
+                || (OperationEnum.DENOISE2RADIUS == operation) || (OperationEnum.DENOISE2ITERATIONS == operation);
     }
 
     public boolean isLocalContrastOperation(final OperationEnum operation) {
@@ -84,8 +91,9 @@ public class OperationService {
                 || (OperationEnum.LOCALCONTRASTLARGE == operation);
     }
 
-    public boolean isSavitzkyGolayDenoiseOperation(final OperationEnum operation) {
-        return (OperationEnum.SAVITZKYGOLAYAMOUNT == operation) || (OperationEnum.SAVITZKYGOLAYITERATIONS == operation)
+    public boolean isSavitzkyGolayDenoiseOperation(final OperationEnum operation, final Profile profile) {
+        return (OperationEnum.DENOISEALGORITHM2 == operation && Constants.DENOISE_ALGORITHM_SAVGOLAY.equals(profile.getDenoiseAlgorithm2()))
+                || (OperationEnum.SAVITZKYGOLAYAMOUNT == operation) || (OperationEnum.SAVITZKYGOLAYITERATIONS == operation)
                 || (OperationEnum.SAVITZKYGOLAYSIZE == operation);
     }
 
@@ -288,7 +296,7 @@ public class OperationService {
     }
 
     public void applySavitzkyGolayDenoise(ImagePlus image, final Profile profile) {
-        if (profile.getSavitzkyGolaySize() > 0) {
+        if ("SAVGOLAY".equals(profile.getDenoiseAlgorithm1())) {
             log.info("Starting SavitzkyGolayDenoise filter");
             int iterations = profile.getSavitzkyGolayIterations() == 0 ? 1 : profile.getSavitzkyGolayIterations();
             for (int i = 0; i < iterations; i++) {

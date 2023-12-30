@@ -237,6 +237,31 @@ public class Util {
             if (profileStr != null) {
                 Profile profile = new Yaml().load(profileStr);
 
+                // Added since v5.0.0, so older version written yaml needs to stay compatible.
+                if (profile.getIansAmount() == null) {
+                    profile.setIansAmount(BigDecimal.ZERO);
+                }
+                if (profile.getIansRecovery() == null) {
+                    profile.setIansRecovery(BigDecimal.ZERO);
+                }
+                if (profile.getDenoiseAlgorithm1() == null) {
+                    profile.setDenoiseAlgorithm1(Constants.DEFAULT_DENOISEALGORITHM);
+                }
+                if (profile.getDenoiseAlgorithm2() == null) {
+                    profile.setDenoiseAlgorithm2(Constants.DEFAULT_DENOISEALGORITHM);
+                }
+                if (profile.getDenoise2Radius() == null) {
+                    profile.setDenoise2Radius(BigDecimal.ONE);
+                }
+
+                // Renamed since v5.0.0, so older version written yaml values will be lost (if ever used).
+                if (profile.getDenoise1Amount() == null) {
+                    profile.setDenoise1Amount(BigDecimal.ZERO);
+                }
+                if (profile.getDenoise1Radius() == null) {
+                    profile.setDenoise1Radius(BigDecimal.ONE);
+                }
+
                 // Added since v4.8.0, so older version written yaml needs to stay compatible.
                 if (profile.getThreshold() == 0) {
                     profile.setThreshold(Constants.DEFAULT_THRESHOLD);

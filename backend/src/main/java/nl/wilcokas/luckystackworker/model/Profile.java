@@ -108,7 +108,7 @@ public class Profile {
     private BigDecimal denoise1Radius;
 
     @Column(name = "denoise_iterations")
-    private Integer denoise1Iterations;
+    private int denoise1Iterations;
 
     @Column(name = "ians_amount")
     private BigDecimal iansAmount;

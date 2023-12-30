@@ -19,9 +19,9 @@ public class IansNoiseReductionFilter {
     public void apply(ImagePlus image, final String profileName, final IansNoiseReductionParameters parameters)
             throws IOException, InterruptedException {
 
-        BigDecimal fineValue = parameters.getFine().divide(BigDecimal.valueOf(200));
-        BigDecimal mediumValue = parameters.getMedium().divide(BigDecimal.valueOf(200));
-        BigDecimal largeValue = parameters.getLarge().divide(BigDecimal.valueOf(200));
+        BigDecimal fineValue = parameters.getFine() == null ? BigDecimal.ZERO : parameters.getFine().divide(BigDecimal.valueOf(200));
+        BigDecimal mediumValue = parameters.getMedium() == null ? BigDecimal.ZERO : parameters.getMedium().divide(BigDecimal.valueOf(200));
+        BigDecimal largeValue = parameters.getLarge() == null ? BigDecimal.ZERO : parameters.getLarge().divide(BigDecimal.valueOf(200));
 
         String workFolder = Util.getIJFileFormat(System.getProperty("user.home")) + "/AppData/Local/LuckyStackWorker";
         String inputFile = workFolder + "/temp_in.tif";

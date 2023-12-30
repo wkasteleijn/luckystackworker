@@ -42,5 +42,9 @@ public class Constants {
     public static final int RED_LAYER_INDEX = 1;
     public static final int GREEN_LAYER_INDEX = 2;
     public static final int BLUE_LAYER_INDEX = 3;
-
+    public static final String DEFAULT_DENOISEALGORITHM = "OFF";
+    public static final String DENOISE_ALGORITHM_SIGMA1 = "SIGMA1";
+    public static final String DENOISE_ALGORITHM_SIGMA2 = "SIGMA2";
+    public static final String DENOISE_ALGORITHM_SAVGOLAY = "SAVGOLAY";
+    public static final String DENOISE_ALGORITHM_IANS = "IAN";
 }
