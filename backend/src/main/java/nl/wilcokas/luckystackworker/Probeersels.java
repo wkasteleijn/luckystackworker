@@ -1,6 +1,7 @@
 package nl.wilcokas.luckystackworker;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 import ij.ImagePlus;
 import ij.io.Opener;
@@ -30,10 +31,11 @@ public class Probeersels {
         //
         //        Util.saveImage(newImage, "jup", "C:/Users/wkast/archive/Jup/testsession/jup_scaled.tif", true, false, false, false);
 
-        IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(5).recover(true).build();
+        IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(BigDecimal.valueOf(5)).recovery(BigDecimal.valueOf(0.5))
+                .build();
         IansNoiseReductionFilter iansNoiseReductionFilter = new IansNoiseReductionFilter();
         log.info("Start Ians noise reduction");
-        iansNoiseReductionFilter.apply(image, "jup", parameters, false);
+        iansNoiseReductionFilter.apply(image, "jup", parameters);
         image.updateAndDraw();
         log.info("Ians noise reduction done");
 

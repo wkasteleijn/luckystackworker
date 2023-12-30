@@ -70,9 +70,13 @@ public class OperationService {
                 || (OperationEnum.DERINGSTRENGTH == operation) || (OperationEnum.DERINGTHRESHOLD == operation));
     }
 
-    public boolean isDenoiseOperation(final OperationEnum operation) {
-        return (OperationEnum.DENOISEAMOUNT == operation) || (OperationEnum.DENOISERADIUS == operation) || (OperationEnum.DENOISESIGMA == operation)
-                || (OperationEnum.DENOISEITERATIONS == operation);
+    public boolean isSigmaDenoise1Operation(final OperationEnum operation) {
+        return (OperationEnum.DENOISE1AMOUNT == operation) || (OperationEnum.DENOISE1RADIUS == operation)
+                || (OperationEnum.DENOISE1ITERATIONS == operation);
+    }
+
+    public boolean isSigmaDenoise2Operation(final OperationEnum operation) {
+        return (OperationEnum.DENOISE2RADIUS == operation) || (OperationEnum.DENOISE2ITERATIONS == operation);
     }
 
     public boolean isLocalContrastOperation(final OperationEnum operation) {
@@ -85,7 +89,8 @@ public class OperationService {
                 || (OperationEnum.SAVITZKYGOLAYSIZE == operation);
     }
 
-    public void applyAllOperationsExcept(final ImagePlus image, final Profile profile, final OperationEnum... operations) {
+    public void applyAllOperationsExcept(final ImagePlus image, final Profile profile, final OperationEnum... operations)
+            throws IOException, InterruptedException {
         List<OperationEnum> excludedOperationList = Arrays.asList(operations);
         if ((!excludedOperationList.contains(OperationEnum.AMOUNT)) && (!excludedOperationList.contains(OperationEnum.RADIUS))
                 && (!excludedOperationList.contains(OperationEnum.ITERATIONS)) && (!excludedOperationList.contains(OperationEnum.CLIPPINGSTRENGTH))
@@ -211,11 +216,12 @@ public class OperationService {
         }
     }
 
-    public void applyIansNoiseReduction(final ImagePlus image, final Profile profile, boolean fromWorker) throws IOException, InterruptedException {
+    public void applyIansNoiseReduction(final ImagePlus image, final Profile profile) throws IOException, InterruptedException {
         if ("IAN".equals(profile.getDenoiseAlgorithm1())) {
             log.info("Applying Ian's noise reduction to image {}", image.getID());
-            IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(0).medium(0).large(0).build();
-            iansNoiseReductionFilter.apply(image, profile.getName(), parameters, fromWorker);
+            IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(profile.getIansAmount()).medium(BigDecimal.ZERO)
+                    .large(BigDecimal.ZERO).recovery(profile.getIansRecovery()).build();
+            iansNoiseReductionFilter.apply(image, profile.getName(), parameters);
         }
     }
 

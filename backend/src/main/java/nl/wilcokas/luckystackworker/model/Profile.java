@@ -29,6 +29,8 @@ public class Profile {
         this.amount = profile.getAmount();
         this.iterations = profile.getIterations();
         this.level = profile.getLevel();
+        this.denoiseAlgorithm1 = profile.getDenoiseAlgorithm1();
+        this.denoiseAlgorithm2 = profile.getDenoiseAlgorithm2();
         this.denoise1Amount = profile.getDenoise1Amount();
         this.denoise1Radius = profile.getDenoise1Radius();
         this.denoise1Iterations = profile.getDenoise1Iterations();
@@ -106,7 +108,7 @@ public class Profile {
     private BigDecimal denoise1Radius;
 
     @Column(name = "denoise_iterations")
-    private int denoise1Iterations;
+    private Integer denoise1Iterations;
 
     @Column(name = "ians_amount")
     private BigDecimal iansAmount;

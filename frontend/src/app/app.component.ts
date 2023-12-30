@@ -607,8 +607,8 @@ export class AppComponent implements OnInit {
   }
 
   denoiseAlgorithm1Changed(event: any) {
+    this.settings.operation = 'DENOISEALGORITHM1';
     if (event.value === 'SIGMA1') {
-      this.settings.operation = 'denoise1Sigma';
       if (!this.profile.denoise1Amount) {
         this.profile.denoise1Amount = 50;
         this.profile.denoise1Radius = 1;
@@ -619,7 +619,6 @@ export class AppComponent implements OnInit {
       }
       this.profile.denoiseAlgorithm1 = 'SIGMA1';
     } else if (event.value === 'IAN') {
-      this.settings.operation = 'ian';
       if (!this.profile.iansAmount) {
         this.profile.iansAmount = 1;
         this.profile.iansRecovery = 0;
@@ -633,8 +632,8 @@ export class AppComponent implements OnInit {
   }
 
   denoiseAlgorithm2Changed(event: any) {
+    this.settings.operation = 'DENOISEALGORITHM2';
     if (event.value === 'SAVGOLAY') {
-      this.settings.operation = 'savitzkyGolaySize';
       if (!this.profile.savitzkyGolaySize) {
         // If not set, start with the defaults
         this.profile.savitzkyGolaySize = 3;
@@ -646,7 +645,6 @@ export class AppComponent implements OnInit {
       }
       this.profile.denoiseAlgorithm2 = 'SAVGOLAY';
     } else if (event.value === 'SIGMA2') {
-      this.settings.operation = 'denoise2Sigma';
       if (!this.profile.denoise2Radius) {
         this.profile.denoise2Radius = 1;
         this.profile.denoise2Iterations = 1;

@@ -38,7 +38,7 @@ public class ReferenceController {
     private final ReferenceImageService referenceImageService;
 
     @GetMapping("/open")
-    public ResponseDTO openReferenceImage(@RequestParam double scale) throws IOException {
+    public ResponseDTO openReferenceImage(@RequestParam double scale) throws IOException, InterruptedException {
         return referenceImageService.selectReferenceImage(settingsService.getSettings().getRootFolder(), scale);
     }
 

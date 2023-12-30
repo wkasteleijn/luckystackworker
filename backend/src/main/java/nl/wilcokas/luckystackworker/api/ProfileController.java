@@ -77,7 +77,7 @@ public class ProfileController {
     }
 
     @GetMapping("/load")
-    public ResponseDTO loadProfile() {
+    public ResponseDTO loadProfile() throws IOException, InterruptedException {
         log.info("loadProfile called");
         JFrame frame = referenceImageService.getParentFrame();
         JFileChooser jfc = referenceImageService
@@ -104,7 +104,8 @@ public class ProfileController {
     }
 
     @PutMapping
-    public ResponseEntity<String> updateProfile(@RequestBody ProfileDTO profile, @RequestParam String operation) {
+    public ResponseEntity<String> updateProfile(@RequestBody ProfileDTO profile, @RequestParam String operation)
+            throws IOException, InterruptedException {
         // Rate limiting added to prevent overloading whenever scroll keys are held down
         // or pressed very quickly.
         LocalDateTime activeOperationTime = LuckyStackWorkerContext.getActiveOperationTime();
@@ -149,7 +150,7 @@ public class ProfileController {
     }
 
     @PutMapping("/scale")
-    public ResponseDTO scale(@RequestBody ProfileDTO profile) throws IOException {
+    public ResponseDTO scale(@RequestBody ProfileDTO profile) throws IOException, InterruptedException {
         profileService.updateProfile(profile);
         return referenceImageService.scale(new Profile(profile));
     }

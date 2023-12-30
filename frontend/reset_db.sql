@@ -33,6 +33,12 @@ update profiles set luminance_include_blue=true;
 update profiles set luminance_include_color=true;
 update profiles set scale=1;
 update profiles set threshold=4;
+update profiles set denoise_algorithm_1='OFF';
+update profiles set denoise_algorithm_2='OFF';
+update profiles set denoise2_radius=1;
+update profiles set denoise2_iterations=1;
+update profiles set ians_amount=1.5;
+update profiles set ians_recovery=0;
 
 select * from profiles;
 update settings set latest_known_version='4.8.0';

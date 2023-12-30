@@ -285,12 +285,12 @@ public class Util {
                 }
 
                 // Added since v1.5.0, so older version written yaml needs to stay compatible.
-                if (profile.getDenoiseRadius() == null) {
-                    profile.setDenoiseRadius(Constants.DEFAULT_DENOISE_RADIUS);
+                if (profile.getDenoise1Radius() == null) {
+                    profile.setDenoise1Radius(Constants.DEFAULT_DENOISE_RADIUS);
                     profile.setDenoiseSigma(Constants.DEFAULT_DENOISE_SIGMA);
                 }
-                if (profile.getDenoiseIterations() == 0) {
-                    profile.setDenoiseIterations(Constants.DEFAULT_DENOISE_ITERATIONS);
+                if (profile.getDenoise1Iterations() == 0) {
+                    profile.setDenoise1Iterations(Constants.DEFAULT_DENOISE_ITERATIONS);
                 }
                 if (profile.getSaturation() == null) {
                     profile.setSaturation(BigDecimal.valueOf(1));

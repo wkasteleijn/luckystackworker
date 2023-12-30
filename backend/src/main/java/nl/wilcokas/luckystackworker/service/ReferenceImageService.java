@@ -85,12 +85,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private static Image iconImage;
     static {
         try {
-        	iconImage = new ImageIcon(new ClassPathResource("/luckystackworker_icon.png").getURL()).getImage();
+            iconImage = new ImageIcon(new ClassPathResource("/luckystackworker_icon.png").getURL()).getImage();
         } catch (IOException e) {
             log.error("Error loading histogram stretch script");
         }
-    }    
-    
+    }
+
     private final SettingsService settingsService;
     private final HttpService httpService;
     private final ProfileService profileService;
@@ -105,7 +105,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         createRoiIndicator();
     }
 
-    public ResponseDTO scale(Profile profile) throws IOException {
+    public ResponseDTO scale(Profile profile) throws IOException, InterruptedException {
         this.isLargeImage = openReferenceImage(null, profile);
         SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
         settingsDTO.setLargeImage(this.isLargeImage);
@@ -113,7 +113,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
     }
 
-    public ResponseDTO selectReferenceImage(String filePath, double scale) throws IOException {
+    public ResponseDTO selectReferenceImage(String filePath, double scale) throws IOException, InterruptedException {
         JFrame frame = getParentFrame();
         JFileChooser jfc = getJFileChooser(filePath);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
@@ -152,14 +152,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return null;
     }
 
-    public void updateProcessing(Profile profile, String operationValue) {
+    public void updateProcessing(Profile profile, String operationValue) throws IOException, InterruptedException {
         final OperationEnum operation = operationValue == null ? null : OperationEnum.valueOf(operationValue.toUpperCase());
         if (previousOperation == null || previousOperation != operation) {
             Util.copyInto(referenceImage, processedImage, finalResultImage.getRoi(), profile, false);
             if (operationService.isSharpenOperation(operation)) {
                 operationService.applyAllOperationsExcept(processedImage, profile, operation,
-                        OperationEnum.DENOISEAMOUNT,
-                        OperationEnum.DENOISERADIUS, OperationEnum.DENOISESIGMA, OperationEnum.DENOISEITERATIONS,
+                        OperationEnum.DENOISE1AMOUNT, OperationEnum.DENOISE1RADIUS, OperationEnum.DENOISE1ITERATIONS,
                         OperationEnum.SAVITZKYGOLAYAMOUNT, OperationEnum.SAVITZKYGOLAYITERATIONS,
                         OperationEnum.SAVITZKYGOLAYSIZE, OperationEnum.LOCALCONTRASTFINE, OperationEnum.LOCALCONTRASTMEDIUM,
                         OperationEnum.LOCALCONTRASTLARGE);
@@ -173,11 +172,15 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
         if (operationService.isSharpenOperation(operation)) {
             operationService.applySharpen(finalResultImage, profile);
-            operationService.applyDenoise(finalResultImage, profile);
+            operationService.applyIansNoiseReduction(finalResultImage, profile);
+            operationService.applySigmaDenoise1(finalResultImage, profile);
+            operationService.applySigmaDenoise2(finalResultImage, profile);
             operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
             operationService.applyLocalContrast(finalResultImage, profile);
-        } else if (operationService.isDenoiseOperation(operation)) {
-            operationService.applyDenoise(finalResultImage, profile);
+        } else if (operationService.isSigmaDenoise1Operation(operation)) {
+            operationService.applySigmaDenoise1(finalResultImage, profile);
+        } else if (operationService.isSigmaDenoise2Operation(operation)) {
+            operationService.applySigmaDenoise2(finalResultImage, profile);
         } else if (operationService.isSavitzkyGolayDenoiseOperation(operation)) {
             operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
         } else if (operationService.isLocalContrastOperation(operation)) {
@@ -603,7 +606,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return true;
     }
 
-    private boolean openReferenceImage(String filePath, Profile profile) throws IOException {
+    private boolean openReferenceImage(String filePath, Profile profile) throws IOException, InterruptedException {
         this.filePath = filePath == null ? this.filePath : filePath;
         if (finalResultImage != null) {
             // Can only have 1 image open at a time.
