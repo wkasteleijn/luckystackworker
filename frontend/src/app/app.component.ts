@@ -609,23 +609,11 @@ export class AppComponent implements OnInit {
   denoiseAlgorithm1Changed(event: any) {
     this.settings.operation = 'DENOISEALGORITHM1';
     if (event.value === 'SIGMA1') {
-      if (!this.profile.denoise1Amount) {
-        this.profile.denoise1Amount = 50;
-        this.profile.denoise1Radius = 1;
-        this.profile.denoise1Iterations = 1;
-        this.denoise1Amount = 50;
-        this.denoise1Radius = 1;
-        this.denoise1Iterations = 1;
-      }
       this.profile.denoiseAlgorithm1 = 'SIGMA1';
     } else if (event.value === 'IAN') {
-      if (!this.profile.iansAmount) {
-        this.profile.iansAmount = 1;
-        this.profile.iansRecovery = 0;
-        this.iansAmount = 1;
-        this.iansRecovery = 0;
-      }
       this.profile.denoiseAlgorithm1 = 'IAN';
+    } else {
+      this.profile.denoiseAlgorithm1 = 'OFF';
     }
     console.log('denoiseAlgorithm1Changed called: ' + event.value);
     this.updateProfile();
@@ -634,24 +622,11 @@ export class AppComponent implements OnInit {
   denoiseAlgorithm2Changed(event: any) {
     this.settings.operation = 'DENOISEALGORITHM2';
     if (event.value === 'SAVGOLAY') {
-      if (!this.profile.savitzkyGolaySize) {
-        // If not set, start with the defaults
-        this.profile.savitzkyGolaySize = 3;
-        this.profile.savitzkyGolayAmount = 100;
-        this.profile.savitzkyGolayIterations = 1;
-        this.savitzkyGolaySize = '3';
-        this.savitzkyGolayAmount = 100;
-        this.savitzkyGolayIterations = 1;
-      }
       this.profile.denoiseAlgorithm2 = 'SAVGOLAY';
     } else if (event.value === 'SIGMA2') {
-      if (!this.profile.denoise2Radius) {
-        this.profile.denoise2Radius = 1;
-        this.profile.denoise2Iterations = 1;
-        this.denoise2Radius = 1;
-        this.denoise2Iterations = 1;
-      }
       this.profile.denoiseAlgorithm2 = 'SIGMA2';
+    } else {
+      this.profile.denoiseAlgorithm2 = 'OFF';
     }
     console.log('denoiseAlgorithm1Changed called: ' + event.value);
     this.updateProfile();

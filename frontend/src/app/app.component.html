@@ -500,7 +500,7 @@
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               step="0.01"
               min="0"
-              max="30"
+              max="15"
               (input)="iansAmountChanged($event, false)"
               (change)="iansAmountChanged($event, true)"
               [(ngModel)]="iansAmount"
@@ -522,10 +522,9 @@
           <div class="slider">
             <mat-slider
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-              tickInterval="1"
-              step="1"
+              step="0.01"
               min="0"
-              max="200"
+              max="2"
               (input)="iansRecoveryChanged($event, false)"
               (change)="iansRecoveryChanged($event, true)"
               [(ngModel)]="iansRecovery"
