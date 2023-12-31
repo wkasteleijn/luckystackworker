@@ -59,6 +59,7 @@ public class ProfileDTO {
         this.luminanceIncludeColor=profile.isLuminanceIncludeColor();
         this.scale = profile.getScale();
         this.deringThreshold = profile.getThreshold();
+        this.equalizeLocalHistogramsStrength = profile.getEqualizeLocalHistogramsStrength();
     }
 
     private String name;
@@ -110,4 +111,5 @@ public class ProfileDTO {
     private boolean luminanceIncludeColor;
     private double scale;
     private int deringThreshold;
+    private int equalizeLocalHistogramsStrength;
 }

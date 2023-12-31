@@ -97,7 +97,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private final OperationService operationService;
 
     public ReferenceImageService(final SettingsService settingsService, final HttpService httpService, final ProfileService profileService,
-            final OperationService operationService) {
+            final OperationService operationService, final GmicService gmicService) {
         this.settingsService = settingsService;
         this.httpService = httpService;
         this.profileService = profileService;
@@ -162,7 +162,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                         OperationEnum.IANSAMOUNT, OperationEnum.IANSRECOVERY, OperationEnum.DENOISE2RADIUS, OperationEnum.DENOISE2ITERATIONS,
                         OperationEnum.SAVITZKYGOLAYAMOUNT, OperationEnum.SAVITZKYGOLAYITERATIONS,
                         OperationEnum.SAVITZKYGOLAYSIZE, OperationEnum.LOCALCONTRASTFINE, OperationEnum.LOCALCONTRASTMEDIUM,
-                        OperationEnum.LOCALCONTRASTLARGE);
+                        OperationEnum.LOCALCONTRASTLARGE, OperationEnum.EQUALIZELOCALHISTOGRAMSSTRENGTH);
             } else {
                 operationService.applyAllOperationsExcept(processedImage, profile, operation);
             }
@@ -188,6 +188,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
         } else if (operationService.isLocalContrastOperation(operation)) {
             operationService.applyLocalContrast(finalResultImage, profile);
+        } else if (operationService.isEqualizeLocalHistogramsOperation(operation)) {
+            operationService.applyEqualizeLocalHistorgrams(finalResultImage, profile);
         } else if ((OperationEnum.CONTRAST == operation) || (OperationEnum.BRIGHTNESS == operation)
                 || (OperationEnum.BACKGROUND == operation)) {
             operationService.applyBrightnessAndContrast(finalResultImage, profile, false);

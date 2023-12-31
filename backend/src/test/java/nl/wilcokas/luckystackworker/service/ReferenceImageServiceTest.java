@@ -36,13 +36,15 @@ class ReferenceImageServiceTest {
     private ProfileService profileService;
     @Mock
     private OperationService operationService;
+    @Mock
+    private GmicService gmicService;
 
     @InjectMocks
     private ReferenceImageService referenceImageService;
 
     @BeforeEach
     void setup() {
-        referenceImageService = new ReferenceImageService(settingsService, httpService, profileService, operationService);
+        referenceImageService = new ReferenceImageService(settingsService, httpService, profileService, operationService, gmicService);
     }
 
     @Test

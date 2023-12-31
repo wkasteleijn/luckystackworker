@@ -70,6 +70,7 @@ public class Profile {
         this.luminanceIncludeColor = profile.isLuminanceIncludeColor();
         this.scale = profile.getScale();
         this.threshold = profile.getDeringThreshold();
+        this.equalizeLocalHistogramsStrength = profile.getEqualizeLocalHistogramsStrength();
     }
 
     @Id
@@ -216,6 +217,9 @@ public class Profile {
 
     @Column(name = "threshold")
     private int threshold;
+
+    @Column(name = "eq_local_hist_strength")
+    private int equalizeLocalHistogramsStrength;
 
     // Not used any longer, needed for historical reasons. Removing this would now
     // break the profile loading of old yaml files created prior to 4.1.0.

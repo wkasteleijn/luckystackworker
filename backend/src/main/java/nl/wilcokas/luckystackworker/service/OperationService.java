@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.filter.DispersionCorrectionFilter;
+import nl.wilcokas.luckystackworker.filter.EqualizeLocalHistogramsFilter;
 import nl.wilcokas.luckystackworker.filter.IansNoiseReductionFilter;
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
 import nl.wilcokas.luckystackworker.filter.RGBBalanceFilter;
@@ -57,6 +58,7 @@ public class OperationService {
     private final SigmaFilterPlus sigmaFilterPlusFilter;
     private final DispersionCorrectionFilter dispersionCorrectionFilter;
     private final IansNoiseReductionFilter iansNoiseReductionFilter;
+    private final EqualizeLocalHistogramsFilter equalizeLocalHistogramsFilter;
 
     public void correctExposure(ImagePlus image) throws IOException {
         image.setDefault16bitRange(16);
@@ -89,6 +91,10 @@ public class OperationService {
     public boolean isLocalContrastOperation(final OperationEnum operation) {
         return (OperationEnum.LOCALCONTRASTFINE == operation) || (OperationEnum.LOCALCONTRASTMEDIUM == operation)
                 || (OperationEnum.LOCALCONTRASTLARGE == operation);
+    }
+
+    public boolean isEqualizeLocalHistogramsOperation(final OperationEnum operation) {
+        return (OperationEnum.EQUALIZELOCALHISTOGRAMSSTRENGTH == operation);
     }
 
     public boolean isSavitzkyGolayDenoiseOperation(final OperationEnum operation, final Profile profile) {
@@ -127,15 +133,19 @@ public class OperationService {
                 && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTLARGE))) {
             applyLocalContrast(image, profile);
         }
+        if (!excludedOperationList.contains(OperationEnum.EQUALIZELOCALHISTOGRAMSSTRENGTH)) {
+            applyEqualizeLocalHistorgrams(image, profile);
+        }
         if ((!excludedOperationList.contains(OperationEnum.CONTRAST)) && (!excludedOperationList.contains(OperationEnum.BRIGHTNESS))
                 && (!excludedOperationList.contains(OperationEnum.BACKGROUND))) {
             applyBrightnessAndContrast(image, profile, true);
         }
     }
 
-    public void applyAllOperations(ImagePlus image, Profile profile) {
+    public void applyAllOperations(ImagePlus image, Profile profile) throws IOException, InterruptedException {
         applySharpen(image, profile);
         applySigmaDenoise1(image, profile);
+        applyIansNoiseReduction(image, profile);
         applySigmaDenoise2(image, profile);
         applySavitzkyGolayDenoise(image, profile);
         applyLocalContrast(image, profile);
@@ -267,6 +277,11 @@ public class OperationService {
                 log.debug("Attemping to apply saturation increase to a non RGB image {}", image.getFileInfo());
             }
         }
+    }
+
+    public void applyEqualizeLocalHistorgrams(final ImagePlus image, final Profile profile) throws IOException, InterruptedException {
+        log.info("Applying equalize local historgrams with strength {} to image {}", profile.getEqualizeLocalHistogramsStrength(), image.getID());
+        equalizeLocalHistogramsFilter.apply(image, profile.getName(), profile.getEqualizeLocalHistogramsStrength());
     }
 
     public void applyBrightnessAndContrast(ImagePlus image, final Profile profile, boolean copyMinMax) {
