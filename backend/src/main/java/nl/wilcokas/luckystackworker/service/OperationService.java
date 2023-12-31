@@ -200,7 +200,7 @@ public class OperationService {
     }
 
     public void applySigmaDenoise1(final ImagePlus image, final Profile profile) {
-        if ("SIGMA1".equals(profile.getDenoiseAlgorithm1())) {
+        if (Constants.DENOISE_ALGORITHM_SIGMA1.equals(profile.getDenoiseAlgorithm1())) {
             int iterations = profile.getDenoise1Iterations() == 0 ? 1 : profile.getDenoise1Iterations();
             log.info("Applying Sigma denoise mode 1 with value {} to image {}", profile.getDenoise1Amount(), image.getID());
             BigDecimal factor = profile.getDenoise1Amount().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100) : profile.getDenoise1Amount();
@@ -213,7 +213,7 @@ public class OperationService {
     }
 
     public void applySigmaDenoise2(final ImagePlus image, final Profile profile) {
-        if ("SIGMA2".equals(profile.getDenoiseAlgorithm1())) {
+        if (Constants.DENOISE_ALGORITHM_SIGMA2.equals(profile.getDenoiseAlgorithm2())) {
             int iterations = profile.getDenoise1Iterations() == 0 ? 1 : profile.getDenoise1Iterations();
             log.info("Applying Sigma denoise mode 2 with value {} to image {}", profile.getDenoise1Amount(), image.getID());
             BigDecimal factor = profile.getDenoise1Amount().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100) : profile.getDenoise1Amount();
@@ -225,7 +225,7 @@ public class OperationService {
     }
 
     public void applyIansNoiseReduction(final ImagePlus image, final Profile profile) throws IOException, InterruptedException {
-        if ("IAN".equals(profile.getDenoiseAlgorithm1())) {
+        if (Constants.DENOISE_ALGORITHM_IANS.equals(profile.getDenoiseAlgorithm1())) {
             log.info("Applying Ian's noise reduction to image {}", image.getID());
             IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(profile.getIansAmount()).medium(BigDecimal.ZERO)
                     .large(BigDecimal.ZERO).recovery(profile.getIansRecovery()).build();
@@ -296,7 +296,7 @@ public class OperationService {
     }
 
     public void applySavitzkyGolayDenoise(ImagePlus image, final Profile profile) {
-        if ("SAVGOLAY".equals(profile.getDenoiseAlgorithm1())) {
+        if (Constants.DENOISE_ALGORITHM_SAVGOLAY.equals(profile.getDenoiseAlgorithm2())) {
             log.info("Starting SavitzkyGolayDenoise filter");
             int iterations = profile.getSavitzkyGolayIterations() == 0 ? 1 : profile.getSavitzkyGolayIterations();
             for (int i = 0; i < iterations; i++) {

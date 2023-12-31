@@ -159,6 +159,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             if (operationService.isSharpenOperation(operation)) {
                 operationService.applyAllOperationsExcept(processedImage, profile, operation,
                         OperationEnum.DENOISE1AMOUNT, OperationEnum.DENOISE1RADIUS, OperationEnum.DENOISE1ITERATIONS,
+                        OperationEnum.IANSAMOUNT, OperationEnum.IANSRECOVERY, OperationEnum.DENOISE2RADIUS, OperationEnum.DENOISE2ITERATIONS,
                         OperationEnum.SAVITZKYGOLAYAMOUNT, OperationEnum.SAVITZKYGOLAYITERATIONS,
                         OperationEnum.SAVITZKYGOLAYSIZE, OperationEnum.LOCALCONTRASTFINE, OperationEnum.LOCALCONTRASTMEDIUM,
                         OperationEnum.LOCALCONTRASTLARGE);

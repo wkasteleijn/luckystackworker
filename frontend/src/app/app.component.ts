@@ -362,6 +362,7 @@ export class AppComponent implements OnInit {
 
   denoise1AmountChanged(event: any, update: boolean) {
     this.denoise1Amount = event.value;
+    this.profile.denoise1Amount = event.value;
     this.settings.operation = 'denoise1Amount';
     console.log('denoise1AmountChanged called: ' + this.profile.denoise1Amount);
     if (update) {
