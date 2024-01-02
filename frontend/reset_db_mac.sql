@@ -39,6 +39,7 @@ update profiles set denoise2_radius=1;
 update profiles set denoise2_iterations=1;
 update profiles set ians_amount=1.5;
 update profiles set ians_recovery=0;
+update profiles set eq_local_hist_strength=0;
 
 select * from profiles;
 update settings set latest_known_version='4.8.0';

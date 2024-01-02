@@ -28,11 +28,13 @@ public class ProfileService {
         result.setAmount(profile.getAmount());
         result.setIterations(profile.getIterations());
         result.setLevel(profile.getLevel());
+        result.setDenoiseAlgorithm1(profile.getDenoiseAlgorithm1());
         result.setIansAmount(profile.getIansAmount());
         result.setIansRecovery(profile.getIansRecovery());
         result.setDenoise1Amount(profile.getDenoise1Amount());
         result.setDenoise1Radius(profile.getDenoise1Radius());
         result.setDenoise1Iterations(profile.getDenoise1Iterations());
+        result.setDenoiseAlgorithm2(profile.getDenoiseAlgorithm2());
         result.setDenoise2Radius(profile.getDenoise2Radius());
         result.setDenoise2Iterations(profile.getDenoise2Iterations());
         result.setSavitzkyGolayAmount(profile.getSavitzkyGolayAmount());

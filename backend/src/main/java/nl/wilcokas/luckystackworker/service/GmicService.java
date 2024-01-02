@@ -25,7 +25,7 @@ public class GmicService {
         String inputFile = workFolder + "/temp_in.tif";
         Util.saveImage(image, profileName, inputFile, true, false, false, false);
         String outputFile = workFolder + "/temp_out.tif";
-        List<String> arguments = new ArrayList<>(Arrays.asList("./gmic/gmic.exe", "-input", inputFile, "-div", "65536"));
+        List<String> arguments = new ArrayList<>(Arrays.asList("./gmic/gmic.exe", "v", "2", "-input", inputFile, "-div", "65536"));
         arguments.addAll(commands);
         arguments.addAll(Arrays.asList("-mul", "65536", "-output", outputFile + ",int16"));
         ProcessBuilder processBuilder = new ProcessBuilder(arguments);

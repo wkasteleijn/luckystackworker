@@ -508,11 +508,14 @@
             ></mat-slider>
             <span
               class="{{
-                savitzkyGolaySize === '0'
-                  ? 'sliderLabelDisabled'
-                  : 'sliderLabel'
+                iansAmount === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
               }}"
               >{{ iansAmount }}</span
+            >
+            <span
+              *ngIf="refImageSelected"
+              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+              >{{ iansAmount == 0 ? "Off" : "" }}</span
             >
           </div>
         </div>
@@ -530,7 +533,17 @@
               [(ngModel)]="iansRecovery"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel'">{{ iansRecovery }}</span>
+            <span
+              class="{{
+                iansRecovery === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+              }}"
+              >{{ iansRecovery }}</span
+            >
+            <span
+              *ngIf="refImageSelected"
+              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+              >{{ iansRecovery == 0 ? "Off" : "" }}</span
+            >
           </div>
         </div>
       </div>
@@ -551,6 +564,11 @@
               [color]="colorTheme()"
             ></mat-slider>
             <span class="sliderLabel">{{ denoise1Amount }}</span>
+            <span
+              *ngIf="refImageSelected"
+              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+              >{{ denoise1Amount == 0 ? "Off" : "" }}</span
+            >
           </div>
         </div>
 
@@ -684,6 +702,11 @@
                   : 'sliderLabel'
               }}"
               >{{ savitzkyGolayAmount }}</span
+            >
+            <span
+              *ngIf="refImageSelected"
+              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+              >{{ savitzkyGolayAmount == 0 ? "Off" : "" }}</span
             >
           </div>
         </div>
@@ -840,7 +863,27 @@
           >
         </div>
       </div>
-
+      <div class="sliderRow">
+        <div class="sliderLabel">Equalize locally</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            step="1"
+            min="0"
+            max="100"
+            (input)="equalizeLocalHistogramsChanged($event, false)"
+            (change)="equalizeLocalHistogramsChanged($event, true)"
+            [(ngModel)]="equalizeLocalHistograms"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ equalizeLocalHistograms }}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ equalizeLocalHistograms == 0 ? "Off" : "" }}</span
+          >
+        </div>
+      </div>
       <div
         class="sliderRowCategoryTitle {{
           nightModeEnabled()

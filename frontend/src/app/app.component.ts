@@ -81,6 +81,7 @@ export class AppComponent implements OnInit {
   localContrastFine: number;
   localContrastMedium: number;
   localContrastLarge: number;
+  equalizeLocalHistograms: number;
 
   // color
   red: number;
@@ -488,6 +489,19 @@ export class AppComponent implements OnInit {
     }
   }
 
+  equalizeLocalHistogramsChanged(event: any, update: boolean) {
+    this.profile.equalizeLocalHistogramsStrength = event.value;
+    this.equalizeLocalHistograms = event.value;
+    this.settings.operation = 'equalizeLocalHistogramsStrength';
+    console.log(
+      'equalizeLocalHistograms called: ' +
+        this.profile.equalizeLocalHistogramsStrength
+    );
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
   brightnessChanged(event: any, update: boolean) {
     this.profile.brightness = event.value;
     this.brightness = event.value;
@@ -886,6 +900,7 @@ export class AppComponent implements OnInit {
     this.blue = -this.profile.blue;
     this.purple = this.profile.purple;
     this.isLargeImage = this.settings.largeImage;
+    this.equalizeLocalHistograms = this.profile.equalizeLocalHistogramsStrength;
     this.setNonPersistentSettings();
   }
 

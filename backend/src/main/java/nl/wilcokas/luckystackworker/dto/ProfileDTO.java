@@ -21,9 +21,14 @@ public class ProfileDTO {
         this.iterations=profile.getIterations();
         this.level=profile.getLevel();
 
+        this.denoiseAlgorithm1 = profile.getDenoiseAlgorithm1();
         this.denoise1Amount = profile.getDenoise1Amount();
         this.denoise1Radius = profile.getDenoise1Radius();
         this.denoise1Iterations = profile.getDenoise1Iterations();
+        this.iansAmount = profile.getIansAmount();
+        this.iansRecovery = profile.getIansRecovery();
+
+        this.denoiseAlgorithm2 = profile.getDenoiseAlgorithm2();
         this.denoise2Radius = profile.getDenoise2Radius();
         this.denoise2Iterations = profile.getDenoise2Iterations();
         this.savitzkyGolaySize=profile.getSavitzkyGolaySize();

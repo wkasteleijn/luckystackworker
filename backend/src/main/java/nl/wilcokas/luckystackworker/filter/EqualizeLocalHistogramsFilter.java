@@ -17,7 +17,9 @@ public class EqualizeLocalHistogramsFilter {
 
     public void apply(final ImagePlus image, final String profileName, final int strength)
             throws IOException, InterruptedException {
-        gmicService.callGmicCli(image, profileName, Arrays.asList("fx_equalize_local_histograms", "%s,2,4,100,8,1,16,0,50,50".formatted(strength)));
+        if (strength>0) {
+            gmicService.callGmicCli(image, profileName,
+                    Arrays.asList("fx_equalize_local_histograms", "%s,2,4,100,4,1,16,0,50,50".formatted(strength)));
+        }
     }
-
 }

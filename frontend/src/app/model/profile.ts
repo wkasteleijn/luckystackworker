@@ -36,6 +36,7 @@ export class Profile {
   localContrastFine: number;
   localContrastMedium: number;
   localContrastLarge: number;
+  equalizeLocalHistogramsStrength: number;
   red: number;
   green: number;
   blue: number;
