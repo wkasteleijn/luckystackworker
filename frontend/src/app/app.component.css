@@ -306,11 +306,11 @@
 }
 .dispersionPanelRow {
   display: flex;
-  gap: 4px;
   margin-top: 4px;
 }
 .dispersionPanelColumn {
   flex: 1;
+  width: 48px;
 }
 .buttonAuto {
   color: rgb(168, 168, 168);

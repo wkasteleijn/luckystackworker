@@ -24,6 +24,10 @@ import nl.wilcokas.luckystackworker.dto.ProfileDTO;
 public class Profile {
 
     public Profile(ProfileDTO profile) {
+        mapFromDTO(profile);
+    }
+
+    public void mapFromDTO(final ProfileDTO profile) {
         this.name = profile.getName();
         this.radius = profile.getRadius();
         this.amount = profile.getAmount();

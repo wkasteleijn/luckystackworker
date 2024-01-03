@@ -801,6 +801,27 @@
         </div>
       </div>
       <div class="sliderRow">
+        <div class="sliderLabel">Equalize locally</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            step="1"
+            min="0"
+            max="100"
+            (input)="equalizeLocalHistogramsChanged($event, false)"
+            (change)="equalizeLocalHistogramsChanged($event, true)"
+            [(ngModel)]="equalizeLocalHistograms"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ equalizeLocalHistograms }}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ equalizeLocalHistograms == 0 ? "Off" : "" }}</span
+          >
+        </div>
+      </div>
+      <div class="sliderRow">
         <div class="sliderLabel">Fine Details</div>
         <div class="slider">
           <mat-slider
@@ -860,27 +881,6 @@
             *ngIf="refImageSelected"
             class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
             >{{ localContrastLarge == 0 ? "Off" : "" }}</span
-          >
-        </div>
-      </div>
-      <div class="sliderRow">
-        <div class="sliderLabel">Equalize locally</div>
-        <div class="slider">
-          <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            step="1"
-            min="0"
-            max="100"
-            (input)="equalizeLocalHistogramsChanged($event, false)"
-            (change)="equalizeLocalHistogramsChanged($event, true)"
-            [(ngModel)]="equalizeLocalHistograms"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span class="sliderLabel">{{ equalizeLocalHistograms }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ equalizeLocalHistograms == 0 ? "Off" : "" }}</span
           >
         </div>
       </div>
@@ -1120,7 +1120,7 @@
         >
           Dispersion Correction
         </div>
-        <div class="dispersionPanel">
+        <div class="dispersionPanel" title="{{ dispersionCorrectorTitle }}">
           <mat-checkbox
             [(ngModel)]="dispersionCorrectionEnabled"
             (change)="dispersionCorrectionEnabledChanged()"
@@ -1136,30 +1136,7 @@
             }}"
             >On</span
           >
-          <button
-            *ngIf="dispersionCorrectionEnabled"
-            type="button"
-            mat-button
-            class="dispersionRestButton button {{
-              nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-            }}"
-            (click)="resetDispersionCorrection()"
-          >
-            Reset
-          </button>
-          <button
-            *ngIf="!dispersionCorrectionEnabled"
-            type="button"
-            disabled
-            mat-button
-            class="dispersionRestButton button_disabled"
-          >
-            Reset
-          </button>
         </div>
-      </div>
-      <div class="sliderRow" title="{{ dispersionCorrectorTitle }}">
-        <div class="sliderLabel"></div>
         <div class="dispersionPanel">
           <section *ngIf="dispersionCorrectionEnabled">
             <div class="dispersionPanelRow">
@@ -1434,6 +1411,19 @@
                   />
                 </button>
               </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  *ngIf="dispersionCorrectionEnabled"
+                  type="button"
+                  mat-button
+                  class="dispersionRestButton button {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="resetDispersionCorrection()"
+                >
+                  Reset
+                </button>
+              </div>
             </div>
             <div class="dispersionPanelRow">
               <div class="dispersionPanelColumn">
@@ -1463,6 +1453,7 @@
                   <img src="assets/images/right.png" class="dispersionArrow" />
                 </button>
               </div>
+              <div class="dispersionPanelColumn">&nbsp;</div>
             </div>
             <div class="dispersionPanelRow">
               <div class="dispersionPanelColumn">
@@ -1507,6 +1498,7 @@
                   />
                 </button>
               </div>
+              <div class="dispersionPanelColumn">&nbsp;</div>
             </div>
           </section>
           <section *ngIf="!dispersionCorrectionEnabled">
@@ -1547,6 +1539,17 @@
                   />
                 </button>
               </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  *ngIf="!dispersionCorrectionEnabled"
+                  type="button"
+                  disabled
+                  mat-button
+                  class="dispersionRestButton button_disabled"
+                >
+                  Reset
+                </button>
+              </div>
             </div>
             <div class="dispersionPanelRow">
               <div class="dispersionPanelColumn">
@@ -1572,6 +1575,7 @@
                   <img src="assets/images/right.png" class="dispersionArrow" />
                 </button>
               </div>
+              <div class="dispersionPanelColumn">&nbsp;</div>
             </div>
             <div class="dispersionPanelRow">
               <div class="dispersionPanelColumn">
@@ -1610,6 +1614,7 @@
                   />
                 </button>
               </div>
+              <div class="dispersionPanelColumn">&nbsp;</div>
             </div>
           </section>
         </div>
