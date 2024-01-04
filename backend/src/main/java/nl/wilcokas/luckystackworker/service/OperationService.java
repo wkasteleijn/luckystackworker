@@ -129,12 +129,12 @@ public class OperationService {
                 && (!excludedOperationList.contains(OperationEnum.SAVITZKYGOLAYSIZE))) {
             applySavitzkyGolayDenoise(image, profile);
         }
+        if (!excludedOperationList.contains(OperationEnum.EQUALIZELOCALHISTOGRAMSSTRENGTH)) {
+            applyEqualizeLocalHistorgrams(image, profile);
+        }
         if ((!excludedOperationList.contains(OperationEnum.LOCALCONTRASTFINE)) && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTMEDIUM))
                 && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTLARGE))) {
             applyLocalContrast(image, profile);
-        }
-        if (!excludedOperationList.contains(OperationEnum.EQUALIZELOCALHISTOGRAMSSTRENGTH)) {
-            applyEqualizeLocalHistorgrams(image, profile);
         }
         if ((!excludedOperationList.contains(OperationEnum.CONTRAST)) && (!excludedOperationList.contains(OperationEnum.BRIGHTNESS))
                 && (!excludedOperationList.contains(OperationEnum.BACKGROUND))) {
@@ -148,6 +148,7 @@ public class OperationService {
         applyIansNoiseReduction(image, profile);
         applySigmaDenoise2(image, profile);
         applySavitzkyGolayDenoise(image, profile);
+        applyEqualizeLocalHistorgrams(image, profile);
         applyLocalContrast(image, profile);
         applyDispersionCorrection(image, profile);
         applyBrightnessAndContrast(image, profile, true);

@@ -177,6 +177,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             operationService.applySigmaDenoise1(finalResultImage, profile);
             operationService.applySigmaDenoise2(finalResultImage, profile);
             operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
+            operationService.applyEqualizeLocalHistorgrams(finalResultImage, profile);
             operationService.applyLocalContrast(finalResultImage, profile);
         } else if (operationService.isSigmaDenoise1Operation(operation, profile)) {
             operationService.applySigmaDenoise1(finalResultImage, profile);
