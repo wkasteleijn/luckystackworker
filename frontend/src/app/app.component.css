@@ -161,11 +161,15 @@
 }
 
 .button_about {
-  margin-left: 142px;
+  margin-left: 122px;
 }
 
 .spanNoNewVersion {
-  margin-left: 194px;
+  margin-left: 215px;
+}
+
+.distanceBetweenNewVersionAndHistogram {
+  margin-left: 20px;
 }
 
 .line {

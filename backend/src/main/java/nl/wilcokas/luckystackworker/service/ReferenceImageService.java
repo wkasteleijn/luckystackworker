@@ -626,7 +626,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         if (!Util.validateImageFormat(finalResultImage, getParentFrame(), activeProfile)) {
             return false;
         }
-        boolean isLargeImage = false;
+        boolean largeImage = false;
         if (finalResultImage != null) {
             if (Util.isPng(finalResultImage, this.filePath)) {
                 finalResultImage = Util.fixNonTiffOpeningSettings(finalResultImage);
@@ -634,7 +634,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             operationService.correctExposure(finalResultImage);
             log.info("Opened final result image image with id {}", finalResultImage.getID());
             finalResultImage.show(this.filePath);
-            isLargeImage = setZoom(finalResultImage, false);
+            largeImage = setZoom(finalResultImage, false);
             setDefaultLayoutSettings(finalResultImage,
                     new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y));
             zoomFactor = 0;
@@ -660,7 +660,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 createHistogram();
             }
         }
-        return isLargeImage;
+        return largeImage;
     }
 
     private void setDefaultLayoutSettings(ImagePlus image, Point location) {

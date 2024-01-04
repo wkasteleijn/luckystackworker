@@ -1765,6 +1765,10 @@
       >
     </button>
     <span *ngIf="!showVersionButton()" class="spanNoNewVersion"></span>
+    <span
+      *ngIf="showVersionButton()"
+      class="distanceBetweenNewVersionAndHistogram"
+    ></span>
     <mat-slide-toggle
       [(ngModel)]="showHistogram"
       [color]="colorTheme()"

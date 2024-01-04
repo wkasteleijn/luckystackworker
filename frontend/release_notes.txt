@@ -1,5 +1,11 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+07/01/2024: major release 5.0.0:
+- Created seperate tab for denoise controls
+- Added possibility to apply denoising in 2 passes with different algorithms of choice
+- Added new denoise algorithm: Ian's NR (from G'MIC)
+- Added 'Equalize locally' slider to apply very powerful HDR alike contrast enhancement (from G'MIC Equalize lccal histograms)
+- More compact layout
 
 03/10/2023 minor release 4.8.0:
 - Added new slider for controlling the dering threshold

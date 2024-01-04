@@ -101,7 +101,7 @@ export class AppComponent implements OnInit {
   crop: boolean = false;
   _showSpinner = false;
   latestKnownVersion = version.version;
-  private isLargeImage: boolean = false;
+  private slowProcessing: boolean = false;
 
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
@@ -899,9 +899,23 @@ export class AppComponent implements OnInit {
     this.green = -this.profile.green;
     this.blue = -this.profile.blue;
     this.purple = this.profile.purple;
-    this.isLargeImage = this.settings.largeImage;
+    this.slowProcessing = this.determineIfSlowProcessing(
+      this.profile,
+      this.settings.largeImage
+    );
     this.equalizeLocalHistograms = this.profile.equalizeLocalHistogramsStrength;
     this.setNonPersistentSettings();
+  }
+
+  private determineIfSlowProcessing(
+    profile: Profile,
+    largeImage: boolean
+  ): boolean {
+    return (
+      largeImage ||
+      profile.denoiseAlgorithm1 === 'IAN' ||
+      profile.equalizeLocalHistogramsStrength > 0
+    );
   }
 
   private setNonPersistentSettings() {
@@ -913,7 +927,11 @@ export class AppComponent implements OnInit {
   }
 
   private updateProfile() {
-    if (this.isLargeImage) {
+    this.slowProcessing = this.determineIfSlowProcessing(
+      this.profile,
+      this.settings.largeImage
+    );
+    if (this.slowProcessing) {
       this.showSpinner();
     }
     this.luckyStackWorkerService
@@ -921,13 +939,13 @@ export class AppComponent implements OnInit {
       .subscribe(
         (data) => {
           console.log(data);
-          if (this.isLargeImage) {
+          if (this.slowProcessing) {
             this.hideSpinner();
           }
         },
         (error) => {
           console.log(error);
-          if (this.isLargeImage) {
+          if (this.slowProcessing) {
             this.hideSpinner();
           }
         }
