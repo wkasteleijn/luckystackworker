@@ -42,7 +42,7 @@ update profiles set ians_recovery=0;
 update profiles set eq_local_hist_strength=0;
 
 select * from profiles;
-update settings set latest_known_version='4.8.0';
+update settings set latest_known_version='5.0.0';
 update settings set latest_known_version_checked=null; --TIMESTAMP '2023-01-24 10.00.00';
 update settings set root_folder='C:/';
 update settings set extensions='tif,png,tiff';
