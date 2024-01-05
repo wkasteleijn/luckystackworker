@@ -499,7 +499,21 @@ public class Util {
         profile.setLuminanceIncludeColor(true);
         profile.setScale(scale);
     }
-
+    
+    public static String getDataFolder(String profile) {
+        String dataFolder = System.getProperty("user.home");
+        if (Constants.SYSTEM_PROFILE_MAC.equals(profile)) {
+            dataFolder += "/.lsw";
+        } else if (Constants.SYSTEM_PROFILE_WINDOWS.equals(profile)) {
+            dataFolder += "/AppData/Local/LuckyStackWorker";
+        }
+        return dataFolder;
+    }
+    
+    public static String getActiveOSProfile() {
+    	return System.getProperty("spring.profiles.active");
+    }
+    
     private static String getSetting(Map<String, String> props, String setting, String name) {
         return props.get(name + "." + setting);
     }

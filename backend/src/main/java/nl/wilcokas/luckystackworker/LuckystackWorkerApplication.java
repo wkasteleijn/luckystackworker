@@ -25,7 +25,7 @@ public class LuckystackWorkerApplication {
     public static void main(String[] args) throws IOException {
         System.setProperty("java.awt.headless", "false");
 
-        String profile = System.getProperty("spring.profiles.active");
+        String profile = Util.getActiveOSProfile();
         if (Constants.SYSTEM_PROFILE_WINDOWS.equals(profile)) {
             log.info("Starting electron GUI");
             try {
@@ -39,7 +39,7 @@ public class LuckystackWorkerApplication {
         String lswVersion = Util.getLswVersion();
         if (lswVersion != null) {
             log.info("Current app version is {}", lswVersion);
-            String dataFolder = getDataFolder(profile);
+            String dataFolder = Util.getDataFolder(profile);
             createDataFolderWhenMissing(dataFolder);
             DataInfo dataInfo = getDataInfo(dataFolder);
             if (dataInfo != null) {
@@ -80,16 +80,6 @@ public class LuckystackWorkerApplication {
             log.info("Creating data folder {}", dataFolder);
             Files.createDirectories(path);
         }
-    }
-
-    private static String getDataFolder(String profile) {
-        String dataFolder = System.getProperty("user.home");
-        if (Constants.SYSTEM_PROFILE_MAC.equals(profile)) {
-            dataFolder += "/.lsw";
-        } else if (Constants.SYSTEM_PROFILE_WINDOWS.equals(profile)) {
-            dataFolder += "/AppData/Local/LuckyStackWorker";
-        }
-        return dataFolder;
     }
 
     private static void writeDataInfoFile(String lswVersion, String dataFolder) throws IOException {
