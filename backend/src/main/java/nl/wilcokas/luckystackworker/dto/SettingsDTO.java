@@ -19,6 +19,7 @@ public class SettingsDTO {
         this.defaultProfile = settings.getDefaultProfile();
         this.latestKnownVersion = settings.getLatestKnownVersion();
         this.latestKnownVersionChecked = settings.getLatestKnownVersionChecked();
+        this.gmicAvailable = settings.isGmicAvailable();
     }
 
     private String rootFolder;
@@ -29,4 +30,5 @@ public class SettingsDTO {
     private LocalDateTime latestKnownVersionChecked;
     private String operation;
     private boolean largeImage;
+    private boolean gmicAvailable;
 }

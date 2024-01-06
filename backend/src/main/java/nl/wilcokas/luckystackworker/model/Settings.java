@@ -42,4 +42,7 @@ public class Settings {
 
     @Column(name = "latestKnownVersionChecked")
     private LocalDateTime latestKnownVersionChecked;
+
+    @Column(name = "gmicAvailable")
+    private boolean gmicAvailable;
 }

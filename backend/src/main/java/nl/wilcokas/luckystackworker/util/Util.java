@@ -8,13 +8,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.util.ReflectionUtils;
 import org.yaml.snakeyaml.Yaml;
@@ -30,6 +34,7 @@ import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.exceptions.FilterException;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.model.Profile;
 
@@ -499,7 +504,7 @@ public class Util {
         profile.setLuminanceIncludeColor(true);
         profile.setScale(scale);
     }
-    
+
     public static String getDataFolder(String profile) {
         String dataFolder = System.getProperty("user.home");
         if (Constants.SYSTEM_PROFILE_MAC.equals(profile)) {
@@ -509,11 +514,35 @@ public class Util {
         }
         return dataFolder;
     }
-    
+
     public static String getActiveOSProfile() {
-    	return System.getProperty("spring.profiles.active");
+        return System.getProperty("spring.profiles.active");
     }
-    
+
+    public static void runCliCommand(String activeOSProfile, List<String> arguments) throws IOException, InterruptedException {
+        ProcessBuilder processBuilder = getProcessBuilder(activeOSProfile, arguments);
+        processBuilder.redirectErrorStream(true);
+        if (logOutput(processBuilder.start()) != 0) {
+            throw new FilterException("CLI execution failed");
+        }
+    }
+
+    private static int logOutput(final Process process) throws IOException, InterruptedException {
+        log.info("=== CLI output start ===");
+        log.info(IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8.name()));
+        log.info("==== CLI output end ====");
+        return process.waitFor();
+    }
+
+    private static ProcessBuilder getProcessBuilder(String activeOSProfile, List<String> arguments) {
+        if (Constants.SYSTEM_PROFILE_WINDOWS.equals(activeOSProfile)) {
+            return new ProcessBuilder(arguments);
+        } else {
+            String joinedArguments = arguments.stream().collect(Collectors.joining(" "));
+            return new ProcessBuilder("zsh", "-c", joinedArguments);
+        }
+    }
+
     private static String getSetting(Map<String, String> props, String setting, String name) {
         return props.get(name + "." + setting);
     }
