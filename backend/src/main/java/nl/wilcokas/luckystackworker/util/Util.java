@@ -259,12 +259,18 @@ public class Util {
                     profile.setDenoise2Radius(BigDecimal.ONE);
                 }
 
-                // Renamed since v5.0.0, so older version written yaml values will be lost (if ever used).
-                if (profile.getDenoise1Amount() == null) {
-                    profile.setDenoise1Amount(BigDecimal.ZERO);
-                }
-                if (profile.getDenoise1Radius() == null) {
-                    profile.setDenoise1Radius(BigDecimal.ONE);
+                // Renamed since v5.0.0
+                if (BigDecimal.valueOf(2).compareTo(profile.getDenoiseSigma()) < 0) {
+                    profile.setDenoiseAlgorithm2(Constants.DENOISE_ALGORITHM_SIGMA2);
+                    profile.setDenoise2Radius(profile.getDenoiseRadius());
+                    profile.setDenoise2Iterations(profile.getDenoiseIterations());
+                } else if (profile.getSavitzkyGolaySize() > 0) {
+                    profile.setDenoiseAlgorithm2(Constants.DENOISE_ALGORITHM_SAVGOLAY);
+                } else {
+                    profile.setDenoiseAlgorithm1(Constants.DENOISE_ALGORITHM_SIGMA1);
+                    profile.setDenoise1Amount(profile.getDenoise());
+                    profile.setDenoise1Radius(profile.getDenoiseRadius());
+                    profile.setDenoise1Iterations(profile.getDenoiseIterations());
                 }
 
                 // Added since v4.8.0, so older version written yaml needs to stay compatible.

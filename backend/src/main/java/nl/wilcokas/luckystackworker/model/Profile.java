@@ -233,4 +233,10 @@ public class Profile {
     private String rootFolder;
     @Transient
     private boolean isLargeImage;
+    @Transient
+    private BigDecimal denoise;
+    @Transient
+    private BigDecimal denoiseRadius;
+    @Transient
+    private int denoiseIterations;
 }

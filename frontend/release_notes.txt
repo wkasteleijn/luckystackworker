@@ -4,7 +4,8 @@ LuckyStackWorker - RELEASE NOTES
 - Created seperate tab for denoise controls
 - Added possibility to apply denoising in 2 passes with different algorithms of choice
 - Added new denoise algorithm: Ian's NR (from G'MIC)
-- Added 'Equalize locally' slider to apply very powerful HDR alike contrast enhancement (from G'MIC Equalize lccal histograms)
+- Added 'Equalize locally' slider to apply very powerful HDR alike contrast enhancement (from G'MIC Equalize local histograms)
+- Added dispersion deviation indicators to the dispersion corrector
 - More compact layout
 
 03/10/2023 minor release 4.8.0:
