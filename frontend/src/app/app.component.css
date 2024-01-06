@@ -345,3 +345,14 @@
   left: 531px;
   z-index: 100;
 }
+.dispersionIndicators {
+  position: fixed;
+  width: 40px;
+  z-index: 100;
+  top: 416px;
+  left: 568px;
+}
+.dispersionIndicatorBlue {
+  left: 608px;
+  top: 416px;
+}

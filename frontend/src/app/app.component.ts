@@ -88,10 +88,10 @@ export class AppComponent implements OnInit {
   green: number;
   blue: number;
   purple: number;
-  profile: Profile;
-  settings: Settings;
   dispersionCorrectionEnabled: boolean = false;
 
+  profile: Profile;
+  settings: Settings;
   selectedProfile: string;
   rootFolder: string = 'C:\\';
   workerStatus: string = 'Idle';
@@ -1058,6 +1058,50 @@ export class AppComponent implements OnInit {
     return this.workerStatus.length > 40
       ? this.workerStatus.substring(0, 40) + '...'
       : this.workerStatus;
+  }
+
+  dispersionIndicatorRedColor(): string {
+    if (this.nightModeEnabled()) {
+      if (
+        this.profile.dispersionCorrectionRedX !== 0 ||
+        this.profile.dispersionCorrectionRedY !== 0
+      ) {
+        return 'sliderRowCategoryTitleColorNight';
+      } else {
+        return '';
+      }
+    } else {
+      if (
+        this.profile.dispersionCorrectionRedX !== 0 ||
+        this.profile.dispersionCorrectionRedY !== 0
+      ) {
+        return 'sliderRowCategoryTitleColor';
+      } else {
+        return '';
+      }
+    }
+  }
+
+  dispersionIndicatorBlueColor(): string {
+    if (this.nightModeEnabled()) {
+      if (
+        this.profile.dispersionCorrectionBlueX !== 0 ||
+        this.profile.dispersionCorrectionBlueY !== 0
+      ) {
+        return 'sliderRowCategoryTitleColorNight';
+      } else {
+        return '';
+      }
+    } else {
+      if (
+        this.profile.dispersionCorrectionBlueX !== 0 ||
+        this.profile.dispersionCorrectionBlueY !== 0
+      ) {
+        return 'sliderRowCategoryTitleColor';
+      } else {
+        return '';
+      }
+    }
   }
 
   private showSpinner() {

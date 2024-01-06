@@ -484,7 +484,10 @@
           <mat-radio-button value="OFF" class="radioSizeButtonDenoise"
             >Off</mat-radio-button
           >
-          <mat-radio-button value="IAN" class="denoiseMode" title="Warning: slows down processing, but is very effective!"
+          <mat-radio-button
+            value="IAN"
+            class="denoiseMode"
+            title="Warning: slows down processing, but is very effective!"
             >Ian's NR</mat-radio-button
           >
           <mat-radio-button value="SIGMA1" class="denoiseMode"
@@ -800,7 +803,10 @@
           Local Contrast
         </div>
       </div>
-      <div class="sliderRow" title="Warning: slows down processing, but is very effective!">
+      <div
+        class="sliderRow"
+        title="Warning: slows down processing, but is very effective!"
+      >
         <div class="sliderLabel">Equalize locally</div>
         <div class="slider">
           <mat-slider
@@ -1499,6 +1505,16 @@
                 </button>
               </div>
               <div class="dispersionPanelColumn">&nbsp;</div>
+            </div>
+            <div class="dispersionIndicators">
+              <div class="{{ dispersionIndicatorRedColor() }}">Red</div>
+              dx: {{ profile.dispersionCorrectionRedX }}<br />
+              dy: {{ profile.dispersionCorrectionRedY }}
+            </div>
+            <div class="dispersionIndicators dispersionIndicatorBlue">
+              <div class="{{ dispersionIndicatorBlueColor() }}">Blue</div>
+              dx: {{ profile.dispersionCorrectionBlueX }}<br />
+              dy: {{ profile.dispersionCorrectionBlueY }}
             </div>
           </section>
           <section *ngIf="!dispersionCorrectionEnabled">
