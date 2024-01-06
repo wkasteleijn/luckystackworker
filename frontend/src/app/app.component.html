@@ -487,7 +487,12 @@
           <mat-radio-button
             value="IAN"
             class="denoiseMode"
-            title="Warning: slows down processing, but is very effective!"
+            disabled="{{ !this.settings?.gmicAvailable }}"
+            title="{{
+              this.settings?.gmicAvailable
+                ? 'Warning: slows down processing, but is very effective!'
+                : gmicUnavailableMessage()
+            }}"
             >Ian's NR</mat-radio-button
           >
           <mat-radio-button value="SIGMA1" class="denoiseMode"
@@ -500,7 +505,12 @@
           <div class="sliderLabel">Amount</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="
+                shouldShowSpinner() ||
+                !refImageSelected ||
+                crop ||
+                !this.settings?.gmicAvailable
+              "
               step="0.01"
               min="0"
               max="15"
@@ -527,7 +537,12 @@
           <div class="sliderLabel">Recovery</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="
+                shouldShowSpinner() ||
+                !refImageSelected ||
+                crop ||
+                !this.settings?.gmicAvailable
+              "
               step="0.01"
               min="0"
               max="2"
@@ -805,12 +820,21 @@
       </div>
       <div
         class="sliderRow"
-        title="Warning: slows down processing, but is very effective!"
+        title="{{
+          this.settings?.gmicAvailable
+            ? 'Warning: slows down processing, but is very effective!'
+            : gmicUnavailableMessage()
+        }}"
       >
         <div class="sliderLabel">Equalize locally</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="
+              shouldShowSpinner() ||
+              !refImageSelected ||
+              crop ||
+              !this.settings?.gmicAvailable
+            "
             step="1"
             min="0"
             max="100"

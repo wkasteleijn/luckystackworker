@@ -46,5 +46,6 @@ update settings set latest_known_version='5.0.0';
 update settings set latest_known_version_checked=null; --TIMESTAMP '2023-01-24 10.00.00';
 update settings set root_folder='~';
 update settings set extensions='tif,png,tiff';
+update settings set gmic_available = true;
 
 select * from settings;

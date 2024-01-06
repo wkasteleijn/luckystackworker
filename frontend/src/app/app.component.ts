@@ -1128,6 +1128,10 @@ export class AppComponent implements OnInit {
     return version.version !== this.latestKnownVersion;
   }
 
+  gmicUnavailableMessage() {
+    return "This control is unavailable because G'MIC isn't installed on your machine. Open a terminal window and type: brew install gmic. If brew isn't installed either then go to https://docs.brew.sh/Installation and follow the instructions.";
+  }
+
   private checkLatestVersion() {
     this.luckyStackWorkerService.getLatestVersion().subscribe(
       (data) => {
