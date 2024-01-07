@@ -72,20 +72,17 @@ public class OperationService {
                 || (OperationEnum.DERINGSTRENGTH == operation) || (OperationEnum.DERINGTHRESHOLD == operation));
     }
 
-    public boolean isSigmaDenoise1Operation(final OperationEnum operation, final Profile profile) {
-        return (OperationEnum.DENOISEALGORITHM1 == operation && Constants.DENOISE_ALGORITHM_SIGMA1.equals(profile.getDenoiseAlgorithm1()))
-                || (OperationEnum.DENOISE1AMOUNT == operation) || (OperationEnum.DENOISE1RADIUS == operation)
+    public boolean isSigmaDenoise1Operation(final OperationEnum operation) {
+        return (OperationEnum.DENOISE1AMOUNT == operation) || (OperationEnum.DENOISE1RADIUS == operation)
                 || (OperationEnum.DENOISE1ITERATIONS == operation);
     }
 
-    public boolean isIansNoiseReductionOperation(final OperationEnum operation, final Profile profile) {
-        return (OperationEnum.DENOISEALGORITHM1 == operation && Constants.DENOISE_ALGORITHM_IANS.equals(profile.getDenoiseAlgorithm1()))
-                || (OperationEnum.IANSAMOUNT == operation) || (OperationEnum.IANSRECOVERY == operation);
+    public boolean isIansNoiseReductionOperation(final OperationEnum operation) {
+        return (OperationEnum.IANSAMOUNT == operation) || (OperationEnum.IANSRECOVERY == operation);
     }
 
-    public boolean isSigmaDenoise2Operation(final OperationEnum operation, final Profile profile) {
-        return (OperationEnum.DENOISEALGORITHM2 == operation && Constants.DENOISE_ALGORITHM_SIGMA2.equals(profile.getDenoiseAlgorithm2()))
-                || (OperationEnum.DENOISE2RADIUS == operation) || (OperationEnum.DENOISE2ITERATIONS == operation);
+    public boolean isSigmaDenoise2Operation(final OperationEnum operation) {
+        return (OperationEnum.DENOISE2RADIUS == operation) || (OperationEnum.DENOISE2ITERATIONS == operation);
     }
 
     public boolean isLocalContrastOperation(final OperationEnum operation) {
@@ -97,9 +94,8 @@ public class OperationService {
         return (OperationEnum.EQUALIZELOCALHISTOGRAMSSTRENGTH == operation);
     }
 
-    public boolean isSavitzkyGolayDenoiseOperation(final OperationEnum operation, final Profile profile) {
-        return (OperationEnum.DENOISEALGORITHM2 == operation && Constants.DENOISE_ALGORITHM_SAVGOLAY.equals(profile.getDenoiseAlgorithm2()))
-                || (OperationEnum.SAVITZKYGOLAYAMOUNT == operation) || (OperationEnum.SAVITZKYGOLAYITERATIONS == operation)
+    public boolean isSavitzkyGolayDenoiseOperation(final OperationEnum operation) {
+        return (OperationEnum.SAVITZKYGOLAYAMOUNT == operation) || (OperationEnum.SAVITZKYGOLAYITERATIONS == operation)
                 || (OperationEnum.SAVITZKYGOLAYSIZE == operation);
     }
 
@@ -118,9 +114,6 @@ public class OperationService {
                 && (!excludedOperationList.contains(OperationEnum.DENOISE1ITERATIONS))) {
             applySigmaDenoise1(image, profile);
         }
-        if ((!excludedOperationList.contains(OperationEnum.DENOISE2RADIUS)) && (!excludedOperationList.contains(OperationEnum.DENOISE2ITERATIONS))) {
-            applySigmaDenoise2(image, profile);
-        }
         if ((!excludedOperationList.contains(OperationEnum.IANSAMOUNT)) && (!excludedOperationList.contains(OperationEnum.IANSRECOVERY))) {
             applyIansNoiseReduction(image, profile);
         }
@@ -128,6 +121,9 @@ public class OperationService {
                 && (!excludedOperationList.contains(OperationEnum.SAVITZKYGOLAYITERATIONS))
                 && (!excludedOperationList.contains(OperationEnum.SAVITZKYGOLAYSIZE))) {
             applySavitzkyGolayDenoise(image, profile);
+        }
+        if ((!excludedOperationList.contains(OperationEnum.DENOISE2RADIUS)) && (!excludedOperationList.contains(OperationEnum.DENOISE2ITERATIONS))) {
+            applySigmaDenoise2(image, profile);
         }
         if (!excludedOperationList.contains(OperationEnum.EQUALIZELOCALHISTOGRAMSSTRENGTH)) {
             applyEqualizeLocalHistorgrams(image, profile);

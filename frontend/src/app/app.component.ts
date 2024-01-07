@@ -622,12 +622,14 @@ export class AppComponent implements OnInit {
   }
 
   denoiseAlgorithm1Changed(event: any) {
-    this.settings.operation = 'DENOISEALGORITHM1';
     if (event.value === 'SIGMA1') {
+      this.settings.operation = 'denoise1Amount';
       this.profile.denoiseAlgorithm1 = 'SIGMA1';
     } else if (event.value === 'IAN') {
+      this.settings.operation = 'iansAmount';
       this.profile.denoiseAlgorithm1 = 'IAN';
     } else {
+      this.settings.operation = 'DENOISEALGORITHM1';
       this.profile.denoiseAlgorithm1 = 'OFF';
     }
     console.log('denoiseAlgorithm1Changed called: ' + event.value);
@@ -635,12 +637,14 @@ export class AppComponent implements OnInit {
   }
 
   denoiseAlgorithm2Changed(event: any) {
-    this.settings.operation = 'DENOISEALGORITHM2';
     if (event.value === 'SAVGOLAY') {
+      this.settings.operation = 'savitzkyGolayAmount';
       this.profile.denoiseAlgorithm2 = 'SAVGOLAY';
     } else if (event.value === 'SIGMA2') {
+      this.settings.operation = 'denoise2Iterations';
       this.profile.denoiseAlgorithm2 = 'SIGMA2';
     } else {
+      this.settings.operation = 'DENOISEALGORITHM2';
       this.profile.denoiseAlgorithm2 = 'OFF';
     }
     console.log('denoiseAlgorithm1Changed called: ' + event.value);

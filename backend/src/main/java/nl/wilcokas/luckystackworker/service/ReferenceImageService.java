@@ -61,7 +61,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private String activeProfile;
 
     private ImagePlus referenceImage;
-    private ImagePlus processedImage;
     @Getter
     private boolean isLargeImage = false;
 
@@ -153,55 +152,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void updateProcessing(Profile profile, String operationValue) throws IOException, InterruptedException {
-        final OperationEnum operation = operationValue == null ? null : OperationEnum.valueOf(operationValue.toUpperCase());
-        if (previousOperation == null || previousOperation != operation) {
-            Util.copyInto(referenceImage, processedImage, finalResultImage.getRoi(), profile, false);
-            if (operationService.isSharpenOperation(operation)) {
-                operationService.applyAllOperationsExcept(processedImage, profile, operation,
-                        OperationEnum.DENOISE1AMOUNT, OperationEnum.DENOISE1RADIUS, OperationEnum.DENOISE1ITERATIONS,
-                        OperationEnum.IANSAMOUNT, OperationEnum.IANSRECOVERY, OperationEnum.DENOISE2RADIUS, OperationEnum.DENOISE2ITERATIONS,
-                        OperationEnum.SAVITZKYGOLAYAMOUNT, OperationEnum.SAVITZKYGOLAYITERATIONS,
-                        OperationEnum.SAVITZKYGOLAYSIZE, OperationEnum.LOCALCONTRASTFINE, OperationEnum.LOCALCONTRASTMEDIUM,
-                        OperationEnum.LOCALCONTRASTLARGE, OperationEnum.EQUALIZELOCALHISTOGRAMSSTRENGTH);
-            } else {
-                operationService.applyAllOperationsExcept(processedImage, profile, operation);
-            }
-            previousOperation = operation;
-        }
-        Util.copyInto(processedImage, finalResultImage, finalResultImage.getRoi(), profile, true);
+        Util.copyInto(referenceImage, finalResultImage, finalResultImage.getRoi(), profile, true);
         setDefaultLayoutSettings(finalResultImage, finalResultImage.getWindow().getLocation());
 
-        if (operationService.isSharpenOperation(operation)) {
-            operationService.applySharpen(finalResultImage, profile);
-            operationService.applyIansNoiseReduction(finalResultImage, profile);
-            operationService.applySigmaDenoise1(finalResultImage, profile);
-            operationService.applySigmaDenoise2(finalResultImage, profile);
-            operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
-            operationService.applyEqualizeLocalHistorgrams(finalResultImage, profile);
-            operationService.applyLocalContrast(finalResultImage, profile);
-        } else if (operationService.isSigmaDenoise1Operation(operation, profile)) {
-            operationService.applySigmaDenoise1(finalResultImage, profile);
-        } else if (operationService.isIansNoiseReductionOperation(operation, profile)) {
-            operationService.applyIansNoiseReduction(finalResultImage, profile);
-        } else if (operationService.isSigmaDenoise2Operation(operation, profile)) {
-            operationService.applySigmaDenoise2(finalResultImage, profile);
-        } else if (operationService.isSavitzkyGolayDenoiseOperation(operation, profile)) {
-            operationService.applySavitzkyGolayDenoise(finalResultImage, profile);
-        } else if (operationService.isLocalContrastOperation(operation)) {
-            operationService.applyLocalContrast(finalResultImage, profile);
-        } else if (operationService.isEqualizeLocalHistogramsOperation(operation)) {
-            operationService.applyEqualizeLocalHistorgrams(finalResultImage, profile);
-        } else if ((OperationEnum.CONTRAST == operation) || (OperationEnum.BRIGHTNESS == operation)
-                || (OperationEnum.BACKGROUND == operation)) {
-            operationService.applyBrightnessAndContrast(finalResultImage, profile, false);
-        }
-
-        // Always apply the following last and only on the final result as it messes up
-        // the sharpening.
-        operationService.applyDispersionCorrection(finalResultImage, profile);
-        operationService.applyRGBBalance(finalResultImage, profile);
-        operationService.applyGamma(finalResultImage, profile);
-        operationService.applySaturation(finalResultImage, profile);
+        operationService.applyAllOperations(finalResultImage, profile);
 
         finalResultImage.updateAndDraw();
 
@@ -641,12 +595,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             zoomFactor = 0;
             roiActive = false;
 
-            processedImage = finalResultImage.duplicate();
-            log.info("Opened duplicate image with id {}", processedImage.getID());
-            processedImage.show();
-            processedImage.getWindow().setVisible(false);
-
-            referenceImage = processedImage.duplicate();
+            referenceImage = finalResultImage.duplicate();
             referenceImage.show();
             referenceImage.getWindow().setVisible(false);
             log.info("Opened reference image image with id {}", referenceImage.getID());

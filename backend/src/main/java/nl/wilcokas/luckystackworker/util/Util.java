@@ -268,8 +268,8 @@ public class Util {
                     profile.setDenoiseAlgorithm2(Constants.DENOISE_ALGORITHM_SAVGOLAY);
                 } else {
                     profile.setDenoiseAlgorithm1(Constants.DENOISE_ALGORITHM_SIGMA1);
-                    profile.setDenoise1Amount(profile.getDenoise());
-                    profile.setDenoise1Radius(profile.getDenoiseRadius());
+                    profile.setDenoise1Amount(profile.getDenoise() == null ? BigDecimal.ZERO : profile.getDenoise());
+                    profile.setDenoise1Radius(profile.getDenoiseRadius() == null ? BigDecimal.ONE : profile.getDenoiseRadius());
                     profile.setDenoise1Iterations(profile.getDenoiseIterations());
                 }
 
