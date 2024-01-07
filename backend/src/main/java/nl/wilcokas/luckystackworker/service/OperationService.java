@@ -3,8 +3,6 @@ package nl.wilcokas.luckystackworker.service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.text.StringSubstitutor;
@@ -32,7 +30,6 @@ import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenParameters;
 import nl.wilcokas.luckystackworker.filter.settings.SavitzkyGolayRadius;
 import nl.wilcokas.luckystackworker.filter.settings.UnsharpMaskParameters;
-import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.Util;
 
@@ -63,79 +60,6 @@ public class OperationService {
     public void correctExposure(ImagePlus image) throws IOException {
         image.setDefault16bitRange(16);
         image.resetDisplayRange();
-    }
-
-    public boolean isSharpenOperation(final OperationEnum operation) {
-        return ((OperationEnum.AMOUNT == operation) || (OperationEnum.RADIUS == operation) || (OperationEnum.ITERATIONS == operation)
-                || (OperationEnum.SHARPENMODE == operation) || (OperationEnum.CLIPPINGSTRENGTH == operation)
-                || (OperationEnum.CLIPPINGRANGE == operation) || (OperationEnum.DERINGRADIUS == operation)
-                || (OperationEnum.DERINGSTRENGTH == operation) || (OperationEnum.DERINGTHRESHOLD == operation));
-    }
-
-    public boolean isSigmaDenoise1Operation(final OperationEnum operation) {
-        return (OperationEnum.DENOISE1AMOUNT == operation) || (OperationEnum.DENOISE1RADIUS == operation)
-                || (OperationEnum.DENOISE1ITERATIONS == operation);
-    }
-
-    public boolean isIansNoiseReductionOperation(final OperationEnum operation) {
-        return (OperationEnum.IANSAMOUNT == operation) || (OperationEnum.IANSRECOVERY == operation);
-    }
-
-    public boolean isSigmaDenoise2Operation(final OperationEnum operation) {
-        return (OperationEnum.DENOISE2RADIUS == operation) || (OperationEnum.DENOISE2ITERATIONS == operation);
-    }
-
-    public boolean isLocalContrastOperation(final OperationEnum operation) {
-        return (OperationEnum.LOCALCONTRASTFINE == operation) || (OperationEnum.LOCALCONTRASTMEDIUM == operation)
-                || (OperationEnum.LOCALCONTRASTLARGE == operation);
-    }
-
-    public boolean isEqualizeLocalHistogramsOperation(final OperationEnum operation) {
-        return (OperationEnum.EQUALIZELOCALHISTOGRAMSSTRENGTH == operation);
-    }
-
-    public boolean isSavitzkyGolayDenoiseOperation(final OperationEnum operation) {
-        return (OperationEnum.SAVITZKYGOLAYAMOUNT == operation) || (OperationEnum.SAVITZKYGOLAYITERATIONS == operation)
-                || (OperationEnum.SAVITZKYGOLAYSIZE == operation);
-    }
-
-    public void applyAllOperationsExcept(final ImagePlus image, final Profile profile, final OperationEnum... operations)
-            throws IOException, InterruptedException {
-        List<OperationEnum> excludedOperationList = Arrays.asList(operations);
-        if ((!excludedOperationList.contains(OperationEnum.AMOUNT)) && (!excludedOperationList.contains(OperationEnum.RADIUS))
-                && (!excludedOperationList.contains(OperationEnum.ITERATIONS)) && (!excludedOperationList.contains(OperationEnum.CLIPPINGSTRENGTH))
-                && (!excludedOperationList.contains(OperationEnum.CLIPPINGRANGE)) && (!excludedOperationList.contains(OperationEnum.DERINGRADIUS))
-                && (!excludedOperationList.contains(OperationEnum.DERINGSTRENGTH)) && (!excludedOperationList.contains(OperationEnum.DERINGTHRESHOLD))
-                && (!excludedOperationList.contains(OperationEnum.SHARPENMODE))) {
-            applySharpen(image, profile);
-        }
-        if ((!excludedOperationList.contains(OperationEnum.DENOISE1AMOUNT))
-                && (!excludedOperationList.contains(OperationEnum.DENOISE1RADIUS))
-                && (!excludedOperationList.contains(OperationEnum.DENOISE1ITERATIONS))) {
-            applySigmaDenoise1(image, profile);
-        }
-        if ((!excludedOperationList.contains(OperationEnum.IANSAMOUNT)) && (!excludedOperationList.contains(OperationEnum.IANSRECOVERY))) {
-            applyIansNoiseReduction(image, profile);
-        }
-        if ((!excludedOperationList.contains(OperationEnum.SAVITZKYGOLAYAMOUNT))
-                && (!excludedOperationList.contains(OperationEnum.SAVITZKYGOLAYITERATIONS))
-                && (!excludedOperationList.contains(OperationEnum.SAVITZKYGOLAYSIZE))) {
-            applySavitzkyGolayDenoise(image, profile);
-        }
-        if ((!excludedOperationList.contains(OperationEnum.DENOISE2RADIUS)) && (!excludedOperationList.contains(OperationEnum.DENOISE2ITERATIONS))) {
-            applySigmaDenoise2(image, profile);
-        }
-        if (!excludedOperationList.contains(OperationEnum.EQUALIZELOCALHISTOGRAMSSTRENGTH)) {
-            applyEqualizeLocalHistorgrams(image, profile);
-        }
-        if ((!excludedOperationList.contains(OperationEnum.LOCALCONTRASTFINE)) && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTMEDIUM))
-                && (!excludedOperationList.contains(OperationEnum.LOCALCONTRASTLARGE))) {
-            applyLocalContrast(image, profile);
-        }
-        if ((!excludedOperationList.contains(OperationEnum.CONTRAST)) && (!excludedOperationList.contains(OperationEnum.BRIGHTNESS))
-                && (!excludedOperationList.contains(OperationEnum.BACKGROUND))) {
-            applyBrightnessAndContrast(image, profile, true);
-        }
     }
 
     public void applyAllOperations(ImagePlus image, Profile profile) throws IOException, InterruptedException {

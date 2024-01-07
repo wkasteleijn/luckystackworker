@@ -154,11 +154,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     public void updateProcessing(Profile profile, String operationValue) throws IOException, InterruptedException {
         Util.copyInto(referenceImage, finalResultImage, finalResultImage.getRoi(), profile, true);
         setDefaultLayoutSettings(finalResultImage, finalResultImage.getWindow().getLocation());
-
         operationService.applyAllOperations(finalResultImage, profile);
-
         finalResultImage.updateAndDraw();
-
         finalResultImage.setTitle(filePath);
         if (showHistogram && plotWindow != null) {
             drawHistogram(false);
