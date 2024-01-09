@@ -127,7 +127,7 @@ public class ProfileController {
         String profileName = profile.getName();
         if (profileName != null) {
             LuckyStackWorkerContext.statusUpdate(Constants.STATUS_WORKING);
-            LuckyStackWorkerContext.setSelectedRoi(referenceImageService.getFinalResultImage().getRoi());
+            LuckyStackWorkerContext.setSelectedRoi(referenceImageService.getDisplayedImage().getRoi());
             LuckyStackWorkerContext.setSelectedProfile(profileName);
             referenceImageService.writeProfile();
             LuckyStackWorkerContext.setProfileBeingApplied(true);
@@ -163,8 +163,8 @@ public class ProfileController {
     @PutMapping("/exit")
     public void exit() {
         log.info("Exit called, ending application");
-        if (referenceImageService.getFinalResultImage() != null) {
-            referenceImageService.getFinalResultImage().hide();
+        if (referenceImageService.getDisplayedImage() != null) {
+            referenceImageService.getDisplayedImage().hide();
         }
         if (referenceImageService.getPlotWindow() != null) {
             referenceImageService.getPlotWindow().setVisible(false);

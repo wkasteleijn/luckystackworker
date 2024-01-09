@@ -15,6 +15,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.time.LocalDateTime;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -31,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.ImageStack;
 import ij.gui.ImageWindow;
 import ij.gui.Plot;
 import ij.gui.PlotWindow;
@@ -38,6 +43,7 @@ import ij.gui.RoiListener;
 import ij.gui.Toolbar;
 import ij.io.Opener;
 import ij.measure.Measurements;
+import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -48,9 +54,9 @@ import nl.wilcokas.luckystackworker.dto.ResponseDTO;
 import nl.wilcokas.luckystackworker.dto.SettingsDTO;
 import nl.wilcokas.luckystackworker.dto.VersionDTO;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
-import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
+import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import nl.wilcokas.luckystackworker.util.Util;
 
 @Slf4j
@@ -60,14 +66,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     @Value("${spring.profiles.active}")
     private String activeProfile;
 
-    private ImagePlus referenceImage;
+    @Getter
+    private ImagePlus displayedImage;
+
     @Getter
     private boolean isLargeImage = false;
 
-    @Getter
     private ImagePlus finalResultImage;
 
-    private OperationEnum previousOperation;
     private String filePath;
 
     private boolean roiActive = false;
@@ -80,6 +86,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private Plot histogramPlot = null;
 
     private int zoomFactor = 0;
+
+    private LswImageLayersDto unprocessedImageLayers;
 
     private static Image iconImage;
     static {
@@ -152,11 +160,15 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void updateProcessing(Profile profile, String operationValue) throws IOException, InterruptedException {
-        Util.copyInto(referenceImage, finalResultImage, finalResultImage.getRoi(), profile, true);
-        setDefaultLayoutSettings(finalResultImage, finalResultImage.getWindow().getLocation());
+        // Util.copyInto(displayedImage, finalResultImage, finalResultImage.getRoi(),
+        // profile, true);
+        // setDefaultLayoutSettings(finalResultImage,
+        // finalResultImage.getWindow().getLocation());
+        copyLayers(unprocessedImageLayers, this.finalResultImage);
         operationService.applyAllOperations(finalResultImage, profile);
         finalResultImage.updateAndDraw();
-        finalResultImage.setTitle(filePath);
+        copyLayers(getImageLayers(finalResultImage), displayedImage);
+        displayedImage.updateAndDraw();
         if (showHistogram && plotWindow != null) {
             drawHistogram(false);
         }
@@ -166,8 +178,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         String pathNoExt = Util.getPathWithoutExtension(path);
         String savePath = pathNoExt + "." + (asJpg ? "jpg" : Constants.DEFAULT_OUTPUT_FORMAT);
         log.info("Saving image to  {}", savePath);
-        Util.saveImage(finalResultImage, null, savePath,
-                Util.isPngRgbStack(finalResultImage, filePath) || profile.getScale() > 1.0, roiActive, asJpg, false);
+        Util.saveImage(displayedImage, null, savePath, Util.isPngRgbStack(displayedImage, filePath) || profile.getScale() > 1.0, roiActive, asJpg,
+                false);
         writeProfile(pathNoExt);
     }
 
@@ -197,29 +209,29 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void zoomIn() {
-        IJ.run(finalResultImage, "In [+]", null);
+        IJ.run(displayedImage, "In [+]", null);
         zoomFactor++;
     }
 
     public void zoomOut() {
-        IJ.run(finalResultImage, "Out [-]", null);
+        IJ.run(displayedImage, "Out [-]", null);
         zoomFactor--;
     }
 
     public void crop() {
         if (!roiActive) {
-            int width = finalResultImage.getWidth() / 2;
-            int height = finalResultImage.getHeight() / 2;
-            int x = (finalResultImage.getWidth() - width) / 2;
-            int y = (finalResultImage.getHeight() - height) / 2;
-            finalResultImage.setRoi(x, y, width, height);
+            int width = displayedImage.getWidth() / 2;
+            int height = displayedImage.getHeight() / 2;
+            int x = (displayedImage.getWidth() - width) / 2;
+            int y = (displayedImage.getHeight() - height) / 2;
+            displayedImage.setRoi(x, y, width, height);
             new Toolbar().setTool(Toolbar.RECTANGLE);
-            LuckyStackWorkerContext.setSelectedRoi(finalResultImage.getRoi());
+            LuckyStackWorkerContext.setSelectedRoi(displayedImage.getRoi());
             roiActive = true;
             showRoiIndicator();
         } else {
             roiActive = false;
-            finalResultImage.deleteRoi();
+            displayedImage.deleteRoi();
             new Toolbar().setTool(Toolbar.HAND);
             LuckyStackWorkerContext.setSelectedRoi(null);
             hideRoiIndicator();
@@ -393,7 +405,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         histogramPlot = new Plot("Histogram", "Value", "Frequency");
         histogramPlot.setColor(Color.GREEN, Color.GREEN);
         histogramPlot.setBackgroundColor(Color.DARK_GRAY);
-        histogramPlot.setImagePlus(finalResultImage);
+        histogramPlot.setImagePlus(displayedImage);
         histogramPlot.setWindowSize(Constants.DEFAULT_HISTOGRAM_WINDOW_WIDTH, Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT);
         histogramPlot.setXYLabels(null, null);
         histogramPlot.setXTicks(false);
@@ -417,13 +429,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     private Point determineHistogramWindowLocation(Point windowLocation) {
-        Point imageWindowLocation = finalResultImage.getWindow().getLocation();
+        Point imageWindowLocation = displayedImage.getWindow().getLocation();
         int imageWindowLocationX = (int) Math.round(imageWindowLocation.getX());
         int imageWindowLocationY = (int) Math.round(imageWindowLocation.getY());
-        if (finalResultImage.getHeight() < (Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT * 3)) {
-            return new Point(imageWindowLocationX, imageWindowLocationY + finalResultImage.getHeight() + 74);
-        } else if (finalResultImage.getWidth() < Constants.MAX_IMAGE_WIDTH_HISTOGRAM) {
-            return new Point(imageWindowLocationX + finalResultImage.getWidth() + 10, imageWindowLocationY);
+        if (displayedImage.getHeight() < (Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT * 3)) {
+            return new Point(imageWindowLocationX, imageWindowLocationY + displayedImage.getHeight() + 74);
+        } else if (displayedImage.getWidth() < Constants.MAX_IMAGE_WIDTH_HISTOGRAM) {
+            return new Point(imageWindowLocationX + displayedImage.getWidth() + 10, imageWindowLocationY);
         } else {
             return new Point(imageWindowLocationX, imageWindowLocationY);
         }
@@ -443,7 +455,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     private Pair<double[], double[]> getHistogram() {
-        ImageStatistics stats = finalResultImage.getStatistics(Measurements.AREA + Measurements.MEAN + Measurements.MODE + Measurements.MIN_MAX, 256);
+        ImageStatistics stats = displayedImage.getStatistics(Measurements.AREA + Measurements.MEAN + Measurements.MODE + Measurements.MIN_MAX, 256);
         double[] y = stats.histogram();
         int n = y.length;
         double[] x = new double[n];
@@ -492,15 +504,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     private void updateRoiText() {
-        if (finalResultImage.getRoi() != null) {
-            roiIndicatorTextField.setText(((int) finalResultImage.getRoi().getFloatWidth()) + " x "
-                    + ((int) finalResultImage.getRoi().getFloatHeight()));
+        if (displayedImage.getRoi() != null) {
+            roiIndicatorTextField.setText(((int) displayedImage.getRoi().getFloatWidth()) + " x " + ((int) displayedImage.getRoi().getFloatHeight()));
         }
 
     }
 
     private void setRoiIndicatorLocation() {
-        Window parentWindow = finalResultImage.getWindow();
+        Window parentWindow = displayedImage.getWindow();
         Point location = parentWindow.getLocation();
         roiIndicatorFrame.setLocation((int) location.getX() + 16, (int) (location.getY() + 32));
     }
@@ -565,43 +576,47 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     private boolean openReferenceImage(String filePath, Profile profile) throws IOException, InterruptedException {
         this.filePath = filePath == null ? this.filePath : filePath;
-        if (finalResultImage != null) {
+
+        if (displayedImage != null) {
             // Can only have 1 image open at a time.
-            finalResultImage.hide();
-        }
-        finalResultImage = new Opener().openImage(Util.getIJFileFormat(this.filePath));
-        if (profile.getScale() > 1.0) {
-            finalResultImage.hide();
-            finalResultImage = operationService.scaleImage(finalResultImage, profile.getScale());
+            displayedImage.hide();
         }
 
-        if (!Util.validateImageFormat(finalResultImage, getParentFrame(), activeProfile)) {
-            return false;
-        }
+        finalResultImage = new Opener().openImage(Util.getIJFileFormat(this.filePath));
         boolean largeImage = false;
         if (finalResultImage != null) {
-            if (Util.isPng(finalResultImage, this.filePath)) {
-                finalResultImage = Util.fixNonTiffOpeningSettings(finalResultImage);
+            finalResultImage.show();
+            finalResultImage.getWindow().setVisible(false);
+            if (!Util.validateImageFormat(finalResultImage, getParentFrame(), activeProfile)) {
+                return false;
             }
-            operationService.correctExposure(finalResultImage);
+            if (profile.getScale() > 1.0) {
+                finalResultImage = operationService.scaleImage(finalResultImage, profile.getScale());
+            }
+            unprocessedImageLayers = getImageLayers(finalResultImage);
+
             log.info("Opened final result image image with id {}", finalResultImage.getID());
-            finalResultImage.show(this.filePath);
-            largeImage = setZoom(finalResultImage, false);
-            setDefaultLayoutSettings(finalResultImage,
+
+            displayedImage = finalResultImage.duplicate();
+            displayedImage.show();
+            if (Util.isPng(displayedImage, this.filePath)) {
+                displayedImage = Util.fixNonTiffOpeningSettings(displayedImage);
+            }
+            operationService.correctExposure(displayedImage);
+            displayedImage.show(this.filePath);
+            largeImage = setZoom(displayedImage, false);
+            setDefaultLayoutSettings(displayedImage,
                     new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y));
             zoomFactor = 0;
             roiActive = false;
 
-            referenceImage = finalResultImage.duplicate();
-            referenceImage.show();
-            referenceImage.getWindow().setVisible(false);
-            log.info("Opened reference image image with id {}", referenceImage.getID());
+            log.info("Opened reference image image with id {}", displayedImage.getID());
 
             if (profile != null) {
                 updateProcessing(profile, null);
             }
 
-            finalResultImage.setTitle(this.filePath);
+            displayedImage.setTitle(this.filePath);
 
             if (showHistogram) {
                 createHistogram();
@@ -635,11 +650,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         } else if (isUpdate) {
             if (zoomFactor < 0) {
                 for (int i = 0; i < Math.abs(zoomFactor); i++) {
-                    IJ.run(finalResultImage, "Out [-]", null);
+                    IJ.run(displayedImage, "Out [-]", null);
                 }
             } else if (zoomFactor > 0) {
                 for (int i = 0; i < zoomFactor; i++) {
-                    IJ.run(finalResultImage, "In [+]", null);
+                    IJ.run(displayedImage, "In [+]", null);
                 }
             }
         }
@@ -656,6 +671,53 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             return false;
         }
         return true;
+    }
+
+    private LswImageLayersDto getImageLayers(ImagePlus image) {
+        ImageStack stack = image.getStack();
+        short[][] newPixels = new short[3][stack.getProcessor(1).getPixelCount()];
+        int numThreads = Runtime.getRuntime().availableProcessors();
+        Executor executor = Executors.newFixedThreadPool(numThreads);
+        for (int layer = 1; layer <= stack.size(); layer++) {
+            int finalLayer = layer;
+            executor.execute(() -> {
+                ImageProcessor p = stack.getProcessor(finalLayer);
+                short[] pixels = (short[]) p.getPixels();
+                for (int i = 0; i < pixels.length; i++) {
+                    newPixels[finalLayer - 1][i] = pixels[i];
+                }
+            });
+        }
+        ((ExecutorService) executor).shutdown();
+        try {
+            ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            log.warn("Thread execution was stopped: ", e);
+        }
+        return LswImageLayersDto.builder().layers(newPixels).count(stack.size()).build();
+    }
+
+    private void copyLayers(LswImageLayersDto layersDto, ImagePlus image) {
+        ImageStack stack = image.getStack();
+        int numThreads = Runtime.getRuntime().availableProcessors();
+        Executor executor = Executors.newFixedThreadPool(numThreads);
+        short[][] layers = layersDto.getLayers();
+        for (int layer = 1; layer <= stack.size(); layer++) {
+            final int finalLayer = layer;
+            executor.execute(() -> {
+                ImageProcessor p = stack.getProcessor(finalLayer);
+                short[] pixels = (short[]) p.getPixels();
+                for (int i = 0; i < pixels.length; i++) {
+                    pixels[i] = layers[finalLayer - 1][i];
+                }
+            });
+        }
+        ((ExecutorService) executor).shutdown();
+        try {
+            ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            log.warn("Thread execution was stopped: ", e);
+        }
     }
 
     final class MyFileChooser extends JFileChooser {
