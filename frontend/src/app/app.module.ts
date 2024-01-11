@@ -3,16 +3,16 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSliderModule } from '@angular/material/slider';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatLegacyCardModule } from '@angular/material/legacy-card';
+import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox';
+import { MatLegacyProgressBarModule } from '@angular/material/legacy-progress-bar';
+import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatLegacyRadioModule } from '@angular/material/legacy-radio';
+import { MatLegacySlideToggleModule } from '@angular/material/legacy-slide-toggle';
+import { MatLegacySliderModule } from '@angular/material/legacy-slider';
+import { MatLegacySnackBarModule } from '@angular/material/legacy-snack-bar';
+import { MatLegacyTabsModule } from '@angular/material/legacy-tabs';
 import {
   BrowserAnimationsModule,
   NoopAnimationsModule,
@@ -27,18 +27,18 @@ import { AppComponent } from './app.component';
     BrowserModule,
     AppRoutingModule,
     NoopAnimationsModule,
-    MatSliderModule,
+    MatLegacySliderModule,
     FormsModule,
     HttpClientModule,
-    MatSnackBarModule,
-    MatCardModule,
-    MatTabsModule,
-    MatProgressBarModule,
-    MatProgressSpinnerModule,
+    MatLegacySnackBarModule,
+    MatLegacyCardModule,
+    MatLegacyTabsModule,
+    MatLegacyProgressBarModule,
+    MatLegacyProgressSpinnerModule,
     BrowserAnimationsModule,
-    MatSlideToggleModule,
-    MatRadioModule,
-    MatCheckboxModule,
+    MatLegacySlideToggleModule,
+    MatLegacyRadioModule,
+    MatLegacyCheckboxModule,
     MatIconModule,
   ],
   providers: [],

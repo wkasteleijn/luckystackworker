@@ -75,14 +75,14 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "luckystackworker:build"
+            "buildTarget": "luckystackworker:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "luckystackworker:build:production"
+              "buildTarget": "luckystackworker:build:production"
             },
             "development": {
-              "browserTarget": "luckystackworker:build:dev"
+              "buildTarget": "luckystackworker:build:dev"
             }
           },
           "defaultConfiguration": "production"
@@ -90,7 +90,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "luckystackworker:build"
+            "buildTarget": "luckystackworker:build"
           }
         },
         "test": {
@@ -134,7 +134,6 @@
       }
     }
   },
-  "defaultProject": "luckystackworker",
   "cli": {
     "analytics": "7761699d-592f-4419-b084-ce8aed4170bd"
   }

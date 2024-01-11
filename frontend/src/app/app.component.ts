@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar';
 import version from '../../package.json';
 import { AboutComponent } from './about/about.component';
 import { LuckyStackWorkerService } from './luckystackworker.service';
@@ -112,8 +112,8 @@ export class AppComponent implements OnInit {
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
-    private aboutSnackbar: MatSnackBar,
-    private newVersionSnackbar: MatSnackBar
+    private aboutSnackbar: MatLegacySnackBar,
+    private newVersionSnackbar: MatLegacySnackBar
   ) {}
 
   ngOnInit(): void {
