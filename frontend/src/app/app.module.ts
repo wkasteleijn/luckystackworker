@@ -3,9 +3,9 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatLegacyCardModule } from '@angular/material/legacy-card';
+import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox';
 import { MatLegacyProgressBarModule } from '@angular/material/legacy-progress-bar';
 import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
 import { MatLegacyRadioModule } from '@angular/material/legacy-radio';
@@ -38,7 +38,7 @@ import { AppComponent } from './app.component';
     BrowserAnimationsModule,
     MatLegacySlideToggleModule,
     MatLegacyRadioModule,
-    MatCheckboxModule,
+    MatLegacyCheckboxModule,
     MatIconModule,
   ],
   providers: [],
