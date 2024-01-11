@@ -1,23 +1,18 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { MatSnackBarRef } from '@angular/material/snack-bar';
+import { Component, OnInit } from '@angular/core';
+import { MatLegacySnackBarRef } from '@angular/material/legacy-snack-bar';
 
 @Component({
   selector: 'app-newversion',
   templateUrl: './newversion.component.html',
-  styleUrls: ['./newversion.component.css']
+  styleUrls: ['./newversion.component.css'],
 })
 export class NewVersionComponent implements OnInit {
+  constructor(public snackBarRef: MatLegacySnackBarRef<NewVersionComponent>) {}
 
-
-  constructor(
-    public snackBarRef: MatSnackBarRef<NewVersionComponent>) { }
-
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   // @Input
   get latestVersion() {
-    return "1.6.1";
+    return '1.6.1';
   }
-
 }
