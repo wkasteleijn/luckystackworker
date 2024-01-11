@@ -262,11 +262,9 @@
             step="0.1"
             min="0.5"
             max="4"
-            (input)="radiusChanged($event, false)"
-            (change)="radiusChanged($event, true)"
             [(ngModel)]="radius"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="radiusChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="radiusChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ radius }}</span>
         </div>
       </div>
@@ -278,28 +276,24 @@
             step="10"
             min="0"
             max="9999"
-            (input)="amountChanged($event, false)"
-            (change)="amountChanged($event, true)"
             [(ngModel)]="amount"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="amountChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="amountChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ amount }}</span>
         </div>
       </div>
       <div class="sliderRow">
         <div class="sliderLabel">Iterations</div>
         <div class="slider">
+          <!-- TODO: The 'tickInterval' property no longer exists -->
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            tickInterval="1"
             step="1"
             min="1"
             max="10"
-            (input)="iterationsChanged($event, false)"
-            (change)="iterationsChanged($event, true)"
             [(ngModel)]="iterations"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="iterationsChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="iterationsChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ iterations }}</span>
         </div>
       </div>
@@ -339,23 +333,22 @@
         <div class="sliderRow">
           <div class="sliderLabel">Suppress Clipping</div>
           <div class="slider">
+            <!-- TODO: The 'tickInterval' property no longer exists -->
             <mat-slider
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-              tickInterval="1"
               step="1"
               min="1"
               max="100"
-              (input)="clippingStrengthChanged($event, false)"
-              (change)="clippingStrengthChanged($event, true)"
               [(ngModel)]="clippingStrength"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="clippingStrengthChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="clippingStrengthChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span class="sliderLabel">{{ clippingStrength }}</span>
           </div>
         </div>
         <div class="sliderRow">
           <div class="sliderLabel">Suppression Range</div>
           <div class="slider">
+            <!-- TODO: The 'tickInterval' property no longer exists -->
             <mat-slider
               [disabled]="
                 shouldShowSpinner() ||
@@ -363,15 +356,12 @@
                 clippingStrength === 0 ||
                 crop
               "
-              tickInterval="1"
               step="1"
               min="1"
               max="100"
-              (input)="clippingRangeChanged($event, false)"
-              (change)="clippingRangeChanged($event, true)"
               [(ngModel)]="clippingRange"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="clippingRangeChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="clippingRangeChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span
               class="{{
                 clippingStrength === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
@@ -386,17 +376,15 @@
         <div class="sliderRow">
           <div class="sliderLabel">Strength</div>
           <div class="slider">
+            <!-- TODO: The 'tickInterval' property no longer exists -->
             <mat-slider
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-              tickInterval="1"
               step="1"
               min="1"
               max="100"
-              (input)="deringStrengthChanged($event, false)"
-              (change)="deringStrengthChanged($event, true)"
               [(ngModel)]="deringStrength"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="deringStrengthChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="deringStrengthChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span
               class="{{
                 deringStrength === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
@@ -408,6 +396,7 @@
         <div class="sliderRow">
           <div class="sliderLabel">Radius</div>
           <div class="slider">
+            <!-- TODO: The 'tickInterval' property no longer exists -->
             <mat-slider
               [disabled]="
                 shouldShowSpinner() ||
@@ -415,15 +404,12 @@
                 deringStrength === 0 ||
                 crop
               "
-              tickInterval="1"
               step="1"
               min="1"
               max="100"
-              (input)="deringRadiusChanged($event, false)"
-              (change)="deringRadiusChanged($event, true)"
               [(ngModel)]="deringRadius"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="deringRadiusChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="deringRadiusChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span
               class="{{
                 deringRadius === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
@@ -435,6 +421,7 @@
         <div class="sliderRow">
           <div class="sliderLabel">Threshold</div>
           <div class="slider">
+            <!-- TODO: The 'tickInterval' property no longer exists -->
             <mat-slider
               [disabled]="
                 shouldShowSpinner() ||
@@ -442,15 +429,12 @@
                 deringStrength === 0 ||
                 crop
               "
-              tickInterval="1"
               step="1"
               min="2"
               max="20"
-              (input)="deringThresholdChanged($event, false)"
-              (change)="deringThresholdChanged($event, true)"
               [(ngModel)]="deringThreshold"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="deringThresholdChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="deringThresholdChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span
               class="{{
                 deringThreshold === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
@@ -514,11 +498,9 @@
               step="0.1"
               min="0"
               max="15"
-              (input)="iansAmountChanged($event, false)"
-              (change)="iansAmountChanged($event, true)"
               [(ngModel)]="iansAmount"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="iansAmountChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="iansAmountChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span
               class="{{
                 iansAmount === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
@@ -546,11 +528,9 @@
               step="0.01"
               min="0"
               max="2"
-              (input)="iansRecoveryChanged($event, false)"
-              (change)="iansRecoveryChanged($event, true)"
               [(ngModel)]="iansRecovery"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="iansRecoveryChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="iansRecoveryChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span
               class="{{
                 iansRecovery === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
@@ -570,17 +550,15 @@
         <div class="sliderRow">
           <div class="sliderLabel">Amount</div>
           <div class="slider">
+            <!-- TODO: The 'tickInterval' property no longer exists -->
             <mat-slider
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-              tickInterval="1000"
               step="1"
               min="0"
               max="100"
-              (input)="denoise1AmountChanged($event, false)"
-              (change)="denoise1AmountChanged($event, true)"
               [(ngModel)]="denoise1Amount"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="denoise1AmountChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="denoise1AmountChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span class="sliderLabel">{{ denoise1Amount }}</span>
             <span
               *ngIf="refImageSelected"
@@ -593,17 +571,15 @@
         <div class="sliderRow">
           <div class="sliderLabel">Radius</div>
           <div class="slider">
+            <!-- TODO: The 'tickInterval' property no longer exists -->
             <mat-slider
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-              tickInterval="1000"
               step="0.1"
               min="0.5"
               max="4"
-              (input)="denoise1RadiusChanged($event, false)"
-              (change)="denoise1RadiusChanged($event, true)"
               [(ngModel)]="denoise1Radius"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="denoise1RadiusChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="denoise1RadiusChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span class="sliderLabel">{{ denoise1Radius }}</span>
           </div>
         </div>
@@ -611,17 +587,15 @@
         <div class="sliderRow">
           <div class="sliderLabel">Iterations</div>
           <div class="slider">
+            <!-- TODO: The 'tickInterval' property no longer exists -->
             <mat-slider
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-              tickInterval="1"
               step="1"
               min="1"
               max="10"
-              (input)="denoise1IterationsChanged($event, false)"
-              (change)="denoise1IterationsChanged($event, true)"
               [(ngModel)]="denoise1Iterations"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="denoise1IterationsChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="denoise1IterationsChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span class="sliderLabel">{{ denoise1Iterations }}</span>
           </div>
         </div>
@@ -660,6 +634,7 @@
         <div class="sliderRow">
           <div class="sliderLabel">Kernel Size</div>
           <div class="slider">
+            <!-- TODO: The 'tickInterval' property no longer exists -->
             <mat-slider
               [disabled]="
                 shouldShowSpinner() ||
@@ -667,15 +642,12 @@
                 savitzkyGolaySize === '0' ||
                 crop
               "
-              tickInterval="1"
               step="1"
               min="2"
               max="6"
-              (input)="savitzkyGolaySizeChanged($event, false)"
-              (change)="savitzkyGolaySizeChanged($event, true)"
               [(ngModel)]="savitzkyGolaySize"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="savitzkyGolaySizeChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="savitzkyGolaySizeChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span
               class="{{
                 savitzkyGolaySize === '0'
@@ -697,6 +669,7 @@
             Amount
           </div>
           <div class="slider">
+            <!-- TODO: The 'tickInterval' property no longer exists -->
             <mat-slider
               [disabled]="
                 shouldShowSpinner() ||
@@ -704,15 +677,12 @@
                 savitzkyGolaySize === '0' ||
                 crop
               "
-              tickInterval="1"
               step="1"
               min="1"
               max="100"
-              (input)="savitzkyGolayAmountChanged($event, false)"
-              (change)="savitzkyGolayAmountChanged($event, true)"
               [(ngModel)]="savitzkyGolayAmount"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="savitzkyGolayAmountChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="savitzkyGolayAmountChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span
               class="{{
                 savitzkyGolaySize === '0'
@@ -738,6 +708,7 @@
             Iterations
           </div>
           <div class="slider">
+            <!-- TODO: The 'tickInterval' property no longer exists -->
             <mat-slider
               [disabled]="
                 shouldShowSpinner() ||
@@ -745,15 +716,12 @@
                 savitzkyGolaySize === '0' ||
                 crop
               "
-              tickInterval="1"
               step="1"
               min="1"
               max="10"
-              (input)="savitzkyGolayIterationsChanged($event, false)"
-              (change)="savitzkyGolayIterationsChanged($event, true)"
               [(ngModel)]="savitzkyGolayIterations"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="savitzkyGolayIterationsChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="savitzkyGolayIterationsChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span
               class="{{
                 savitzkyGolaySize === '0'
@@ -770,17 +738,15 @@
         <div class="sliderRow">
           <div class="sliderLabel">Radius</div>
           <div class="slider">
+            <!-- TODO: The 'tickInterval' property no longer exists -->
             <mat-slider
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-              tickInterval="1000"
               step="0.1"
               min="0.5"
               max="4"
-              (input)="denoise2RadiusChanged($event, false)"
-              (change)="denoise2RadiusChanged($event, true)"
               [(ngModel)]="denoise2Radius"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="denoise2RadiusChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="denoise2RadiusChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span class="sliderLabel">{{ denoise2Radius }}</span>
           </div>
         </div>
@@ -788,17 +754,15 @@
         <div class="sliderRow">
           <div class="sliderLabel">Iterations</div>
           <div class="slider">
+            <!-- TODO: The 'tickInterval' property no longer exists -->
             <mat-slider
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-              tickInterval="1"
               step="1"
               min="1"
               max="10"
-              (input)="denoise2IterationsChanged($event, false)"
-              (change)="denoise2IterationsChanged($event, true)"
               [(ngModel)]="denoise2Iterations"
               [color]="colorTheme()"
-            ></mat-slider>
+             #ngSlider><input matSliderThumb (input)="denoise2IterationsChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="denoise2IterationsChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
             <span class="sliderLabel">{{ denoise2Iterations }}</span>
           </div>
         </div>
@@ -838,11 +802,9 @@
             step="1"
             min="0"
             max="100"
-            (input)="equalizeLocalHistogramsChanged($event, false)"
-            (change)="equalizeLocalHistogramsChanged($event, true)"
             [(ngModel)]="equalizeLocalHistograms"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="equalizeLocalHistogramsChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="equalizeLocalHistogramsChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ equalizeLocalHistograms }}</span>
           <span
             *ngIf="refImageSelected"
@@ -859,11 +821,9 @@
             step="1"
             min="0"
             max="99"
-            (input)="localContrastFineChanged($event, false)"
-            (change)="localContrastFineChanged($event, true)"
             [(ngModel)]="localContrastFine"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="localContrastFineChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="localContrastFineChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ localContrastFine }}</span>
           <span
             *ngIf="refImageSelected"
@@ -880,11 +840,9 @@
             step="1"
             min="0"
             max="99"
-            (input)="localContrastMediumChanged($event, false)"
-            (change)="localContrastMediumChanged($event, true)"
             [(ngModel)]="localContrastMedium"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="localContrastMediumChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="localContrastMediumChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ localContrastMedium }}</span>
           <span
             *ngIf="refImageSelected"
@@ -901,11 +859,9 @@
             step="1"
             min="0"
             max="99"
-            (input)="localContrastLargeChanged($event, false)"
-            (change)="localContrastLargeChanged($event, true)"
             [(ngModel)]="localContrastLarge"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="localContrastLargeChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="localContrastLargeChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ localContrastLarge }}</span>
           <span
             *ngIf="refImageSelected"
@@ -931,11 +887,9 @@
             step="0.01"
             min="0.0"
             max="2.0"
-            (input)="gammaChanged($event, false)"
-            (change)="gammaChanged($event, true)"
             [(ngModel)]="gamma"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="gammaChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="gammaChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ gamma }}</span>
           <span
             *ngIf="refImageSelected"
@@ -953,11 +907,9 @@
             step="1"
             min="0"
             max="100"
-            (input)="contrastChanged($event, false)"
-            (change)="contrastChanged($event, true)"
             [(ngModel)]="contrast"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="contrastChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="contrastChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ contrast }}</span>
           <span
             *ngIf="refImageSelected"
@@ -975,11 +927,9 @@
             step="1"
             min="0"
             max="100"
-            (input)="brightnessChanged($event, false)"
-            (change)="brightnessChanged($event, true)"
             [(ngModel)]="brightness"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="brightnessChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="brightnessChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ brightness }}</span>
           <span
             *ngIf="refImageSelected"
@@ -997,11 +947,9 @@
             step="1"
             min="0"
             max="100"
-            (input)="backgroundChanged($event, false)"
-            (change)="backgroundChanged($event, true)"
             [(ngModel)]="background"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="backgroundChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="backgroundChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ background }}</span>
           <span
             *ngIf="refImageSelected"
@@ -1031,11 +979,9 @@
             step="0.01"
             min="1.00"
             max="5.00"
-            (input)="saturationChanged($event, false)"
-            (change)="saturationChanged($event, true)"
             [(ngModel)]="saturation"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="saturationChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="saturationChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ saturation }}</span>
           <span
             *ngIf="refImageSelected"
@@ -1052,11 +998,9 @@
             step="1"
             min="0"
             max="255"
-            (input)="purpleChanged($event, false)"
-            (change)="purpleChanged($event, true)"
             [(ngModel)]="purple"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="purpleChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="purpleChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ purple }}</span>
           <span
             *ngIf="refImageSelected"
@@ -1083,11 +1027,9 @@
             step="1"
             min="-100"
             max="100"
-            (input)="redChanged($event, false)"
-            (change)="redChanged($event, true)"
             [(ngModel)]="red"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="redChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="redChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ red }}</span>
           <span
             *ngIf="refImageSelected"
@@ -1104,11 +1046,9 @@
             step="1"
             min="-100"
             max="100"
-            (input)="greenChanged($event, false)"
-            (change)="greenChanged($event, true)"
             [(ngModel)]="green"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="greenChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="greenChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ green }}</span>
           <span
             *ngIf="refImageSelected"
@@ -1125,11 +1065,9 @@
             step="1"
             min="-100"
             max="100"
-            (input)="blueChanged($event, false)"
-            (change)="blueChanged($event, true)"
             [(ngModel)]="blue"
             [color]="colorTheme()"
-          ></mat-slider>
+           #ngSlider><input matSliderThumb (input)="blueChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, false)" #ngSliderThumb="matSliderThumb" (change)="blueChanged({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}, true)" /></mat-slider>
           <span class="sliderLabel">{{ blue }}</span>
           <span
             *ngIf="refImageSelected"
@@ -1663,7 +1601,7 @@
   </mat-tab-group>
 
   <!-- Worker panel -->
-  <mat-card class="card cardColor">
+  <mat-card appearance="outlined" class="card cardColor">
     <mat-card-content>
       <div class="sliderRow">
         <span
