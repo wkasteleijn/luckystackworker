@@ -251,7 +251,8 @@ public class OperationService {
     public ImagePlus scaleImage(final ImagePlus image, final double scale) {
         int newWidth = (int) (image.getWidth() * scale);
         int newHeight = (int) (image.getHeight() * scale);
-        return Scaler.resize(image, newWidth, newHeight, 3, "depth=3 interpolation=Bicubic create");
+        int depth = image.getStack().size();
+        return Scaler.resize(image, newWidth, newHeight, depth, "depth=%s interpolation=Bicubic create".formatted(depth));
     }
 
     private boolean validateLuminanceInclusion(LSWSharpenParameters parameters) {

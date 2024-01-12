@@ -23,7 +23,7 @@ public class GmicService {
             String activeOSProfile = Util.getActiveOSProfile();
             String workFolder = Util.getDataFolder(activeOSProfile);
             String inputFile = workFolder + "/temp_in.tif";
-            Util.saveImage(image, profileName, inputFile, true, false, false, false);
+            Util.saveImage(image, profileName, inputFile, image.getStack().size() > 1, false, false, false);
             String outputFile = workFolder + "/temp_out.tif";
             List<String> arguments = new ArrayList<>(Arrays.asList("v", "2", "-input", inputFile, "-div", "65536"));
             arguments.addAll(0, getGmicCommand(activeOSProfile));
@@ -42,7 +42,7 @@ public class GmicService {
                 }
             }
         } catch (Exception e) {
-            log.error("Error calling G'MIC CLI :" + e.getMessage());
+            log.error("Error calling G'MIC CLI :", e);
         }
     }
 

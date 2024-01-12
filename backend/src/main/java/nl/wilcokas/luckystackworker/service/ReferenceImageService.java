@@ -13,6 +13,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.http.HttpClient;
 import java.time.LocalDateTime;
 import java.util.concurrent.Executor;
@@ -32,6 +33,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
 
 import ij.IJ;
 import ij.ImagePlus;
@@ -405,6 +407,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         histogramPlot = new Plot("Histogram", "Value", "Frequency");
         histogramPlot.setColor(Color.GREEN, Color.GREEN);
         histogramPlot.setBackgroundColor(Color.DARK_GRAY);
+        // Hack Plot to force setting the processor since it was left null by the
+        // constructor for mono images.
+        if (this.finalResultImage.getStack().size() == 1) {
+            Field ip = ReflectionUtils.findField(Plot.class, "ip");
+            ReflectionUtils.makeAccessible(ip);
+            ReflectionUtils.setField(ip, histogramPlot, displayedImage.getProcessor());
+        }
         histogramPlot.setImagePlus(displayedImage);
         histogramPlot.setWindowSize(Constants.DEFAULT_HISTOGRAM_WINDOW_WIDTH, Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT);
         histogramPlot.setXYLabels(null, null);
@@ -598,7 +607,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             log.info("Opened final result image image with id {}", finalResultImage.getID());
 
             displayedImage = finalResultImage.duplicate();
-            displayedImage.show();
             if (Util.isPng(displayedImage, this.filePath)) {
                 displayedImage = Util.fixNonTiffOpeningSettings(displayedImage);
             }
