@@ -1,9 +1,6 @@
 package nl.wilcokas.luckystackworker.filter;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Component;
 
@@ -11,7 +8,8 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.util.Util;
+import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
+import nl.wilcokas.luckystackworker.util.LswUtil;
 
 @Slf4j
 @Component
@@ -29,17 +27,16 @@ public class RGBBalanceFilter {
         short[] bluePixelsResult = new short[bluePixels.length];
 
         for (int i = 0; i < redPixels.length; i++) {
-            int newRedValue = Util.convertToUnsignedInt(redPixels[i]) - (amountRed * STEP_SIZE);
-            int newGreenValue = Util.convertToUnsignedInt(greenPixels[i]) - (amountGreen * STEP_SIZE);
-            int newBlueValue = Util.convertToUnsignedInt(bluePixels[i]) - (amountBlue * STEP_SIZE);
+            int newRedValue = LswImageProcessingUtil.convertToUnsignedInt(redPixels[i]) - (amountRed * STEP_SIZE);
+            int newGreenValue = LswImageProcessingUtil.convertToUnsignedInt(greenPixels[i]) - (amountGreen * STEP_SIZE);
+            int newBlueValue = LswImageProcessingUtil.convertToUnsignedInt(bluePixels[i]) - (amountBlue * STEP_SIZE);
             int desaturatedValue = (newRedValue + newGreenValue + newBlueValue) / 3;
             double purpleCorrectionFactor = purpleReductionAmount > 0D ? getPurpleCorrectionFactor(newRedValue, newGreenValue, newBlueValue) : 0D;
             redPixelsResult[i] = getPixelResult(newRedValue, desaturatedValue, amountRed, purpleCorrectionFactor, purpleReductionAmount);
             greenPixelsResult[i] = getPixelResult(newGreenValue, desaturatedValue, amountGreen, purpleCorrectionFactor, purpleReductionAmount);
             bluePixelsResult[i] = getPixelResult(newBlueValue, desaturatedValue, amountBlue, purpleCorrectionFactor, purpleReductionAmount);
         }
-        int numThreads = Runtime.getRuntime().availableProcessors();
-        Executor executor = Executors.newFixedThreadPool(numThreads);
+        Executor executor = LswUtil.getParallelExecutor();
         executor.execute(() -> {
             for (int i = 0; i < redPixels.length; i++) {
                 redPixels[i] = redPixelsResult[i];
@@ -55,20 +52,15 @@ public class RGBBalanceFilter {
                 bluePixels[i] = bluePixelsResult[i];
             }
         });
-        ((ExecutorService) executor).shutdown();
-        try {
-            ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            log.warn("Parallel thread execution was stopped: ", e);
-        }
-
+        LswUtil.stopAndAwaitParallelExecutor(executor);
     }
 
     private short getPixelResult(int newValueUnsignedInt, int desaturatedValue, int correctionAmount, double purpleCorrectionFactor,
             double purpleReductionAmount) {
         int purpleCorrectedValue = (int) ((desaturatedValue * purpleCorrectionFactor) + (newValueUnsignedInt * (1 - purpleCorrectionFactor)));
         int finalNewValue = (int) ((purpleCorrectedValue * purpleReductionAmount) + (newValueUnsignedInt * (1 - purpleReductionAmount)));
-        return Util.convertToShort(finalNewValue > Constants.MAX_INT_VALUE ? Constants.MAX_INT_VALUE : (finalNewValue < 0 ? 0 : finalNewValue));
+        return LswImageProcessingUtil
+                .convertToShort(finalNewValue > Constants.MAX_INT_VALUE ? Constants.MAX_INT_VALUE : (finalNewValue < 0 ? 0 : finalNewValue));
     }
 
     private double getPurpleCorrectionFactor(int redValue, int greenValue, int blueValue) {

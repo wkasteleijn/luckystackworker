@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.util.Collections;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,31 +16,32 @@ import org.yaml.snakeyaml.Yaml;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.dto.DataInfo;
-import nl.wilcokas.luckystackworker.util.Util;
+import nl.wilcokas.luckystackworker.util.LswFileUtil;
+import nl.wilcokas.luckystackworker.util.LswUtil;
 
 @Slf4j
 @EnableScheduling
 @SpringBootApplication
 public class LuckystackWorkerApplication {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         System.setProperty("java.awt.headless", "false");
 
-        String profile = Util.getActiveOSProfile();
+        String profile = LswUtil.getActiveOSProfile();
         if (Constants.SYSTEM_PROFILE_WINDOWS.equals(profile)) {
             log.info("Starting electron GUI");
             try {
-                Runtime.getRuntime().exec(".\\lsw_gui.exe");
-            } catch (IOException e) {
-                log.error("Failed to start GUI! ", e);
+                LswUtil.runCliCommand(profile, Collections.singletonList(".\\lsw_gui.exe"));
+            } catch (Exception e) {
+                log.warn("GUI wasn't started, are you running on windows in development mode?");
             }
         }
 
         log.info("Determining database version and replace it if needed..");
-        String lswVersion = Util.getLswVersion();
+        String lswVersion = LswUtil.getLswVersion();
         if (lswVersion != null) {
             log.info("Current app version is {}", lswVersion);
-            String dataFolder = Util.getDataFolder(profile);
+            String dataFolder = LswFileUtil.getDataFolder(profile);
             createDataFolderWhenMissing(dataFolder);
             DataInfo dataInfo = getDataInfo(dataFolder);
             if (dataInfo != null) {

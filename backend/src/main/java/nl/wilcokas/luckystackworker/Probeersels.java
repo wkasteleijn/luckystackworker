@@ -6,7 +6,8 @@ import ij.ImagePlus;
 import ij.io.Opener;
 import ij.plugin.Scaler;
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.luckystackworker.util.Util;
+import nl.wilcokas.luckystackworker.util.LswFileUtil;
+import nl.wilcokas.luckystackworker.util.LswUtil;
 
 @Slf4j
 public class Probeersels {
@@ -28,12 +29,12 @@ public class Probeersels {
         newImage.show();
         image.hide();
 
-        Util.saveImage(newImage, "jup", "C:/Users/wkast/archive/Jup/testsession/jup_scaled.tif", true, false, false, false);
+        LswFileUtil.saveImage(newImage, "jup", "C:/Users/wkast/archive/Jup/testsession/jup_scaled.tif", true, false, false, false);
 
         image.updateAndDraw();
         log.info("Ians noise reduction done");
 
-        Thread.currentThread().sleep(10000);
+        LswUtil.waitMilliseconds(10000);
 
         System.exit(0);
     }

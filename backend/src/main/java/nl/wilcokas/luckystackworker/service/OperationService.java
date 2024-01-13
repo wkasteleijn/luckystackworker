@@ -31,7 +31,8 @@ import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenParameters;
 import nl.wilcokas.luckystackworker.filter.settings.SavitzkyGolayRadius;
 import nl.wilcokas.luckystackworker.filter.settings.UnsharpMaskParameters;
 import nl.wilcokas.luckystackworker.model.Profile;
-import nl.wilcokas.luckystackworker.util.Util;
+import nl.wilcokas.luckystackworker.util.LswFileUtil;
+import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,7 +42,7 @@ public class OperationService {
     private static String histogramStretchMacro;
     static {
         try {
-            histogramStretchMacro = Util
+            histogramStretchMacro = LswFileUtil
                     .readFromInputStream(new ClassPathResource("/histogramstretch.ijm").getInputStream());
         } catch (IOException e) {
             log.error("Error loading histogram stretch script");
@@ -208,7 +209,7 @@ public class OperationService {
     public void applyBrightnessAndContrast(ImagePlus image, final Profile profile, boolean copyMinMax) {
         if (profile.getContrast() != 0 || profile.getBrightness() != 0 || profile.getBackground() != 0) {
             if (copyMinMax) {
-                Util.copyMinMax(image, image);
+                LswImageProcessingUtil.copyMinMax(image, image);
             }
             log.info("Applying contrast increase with factor {} to image {}", profile.getContrast(),
                     image.getID());

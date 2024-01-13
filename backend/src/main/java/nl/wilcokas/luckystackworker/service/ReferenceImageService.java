@@ -13,13 +13,9 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.http.HttpClient;
 import java.time.LocalDateTime;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -33,7 +29,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 
 import ij.IJ;
 import ij.ImagePlus;
@@ -59,7 +54,9 @@ import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
-import nl.wilcokas.luckystackworker.util.Util;
+import nl.wilcokas.luckystackworker.util.LswFileUtil;
+import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
+import nl.wilcokas.luckystackworker.util.LswUtil;
 
 @Slf4j
 @Service
@@ -133,10 +130,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             String selectedFilePath = selectedFile.getAbsolutePath();
             if (validateSelectedFile(selectedFilePath)) {
                 log.info("Image selected {} ", selectedFilePath);
-                String fileNameNoExt = Util.getPathWithoutExtension(selectedFilePath);
-                Profile profile = Util.readProfile(fileNameNoExt);
+                String fileNameNoExt = LswFileUtil.getPathWithoutExtension(selectedFilePath);
+                Profile profile = LswFileUtil.readProfile(fileNameNoExt);
                 if (profile == null) {
-                    String profileName = Util.deriveProfileFromImageName(selectedFilePath);
+                    String profileName = LswFileUtil.deriveProfileFromImageName(selectedFilePath);
                     if (profileName == null) {
                         log.info("Profile not found for reference image, taking the default, {}", profileName);
                         profileName = settingsService.getDefaultProfile();
@@ -146,12 +143,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 } else {
                     log.info("Profile file found, profile was loaded from there.");
                 }
-                Util.setNonPersistentSettings(profile, scale);
+                LswImageProcessingUtil.setNonPersistentSettings(profile, scale);
                 profileService.updateProfile(new ProfileDTO(profile));
 
                 this.isLargeImage = openReferenceImage(selectedFilePath, profile);
 
-                final String rootFolder = Util.getFileDirectory(selectedFilePath);
+                final String rootFolder = LswFileUtil.getFileDirectory(selectedFilePath);
                 SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
                 settingsDTO.setLargeImage(this.isLargeImage);
                 LuckyStackWorkerContext.setSelectedProfile(profile.getName());
@@ -177,10 +174,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void saveReferenceImage(String path, boolean asJpg, Profile profile) throws IOException {
-        String pathNoExt = Util.getPathWithoutExtension(path);
+        String pathNoExt = LswFileUtil.getPathWithoutExtension(path);
         String savePath = pathNoExt + "." + (asJpg ? "jpg" : Constants.DEFAULT_OUTPUT_FORMAT);
         log.info("Saving image to  {}", savePath);
-        Util.saveImage(displayedImage, null, savePath, Util.isPngRgbStack(displayedImage, filePath) || profile.getScale() > 1.0, roiActive, asJpg,
+        LswFileUtil.saveImage(displayedImage, null, savePath, LswFileUtil.isPngRgbStack(displayedImage, filePath) || profile.getScale() > 1.0, roiActive, asJpg,
                 false);
         writeProfile(pathNoExt);
     }
@@ -267,7 +264,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void writeProfile() throws IOException {
-        String fileNameNoExt = Util.getPathWithoutExtension(filePath);
+        String fileNameNoExt = LswFileUtil.getPathWithoutExtension(filePath);
         writeProfile(fileNameNoExt);
     }
 
@@ -276,7 +273,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         if (profileName != null) {
             Profile profile = profileService.findByName(profileName)
                     .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName)));
-            Util.writeProfile(profile, pathNoExt);
+            LswFileUtil.writeProfile(profile, pathNoExt);
         } else {
             log.warn("Profile not saved, could not find the selected profile for file {}", pathNoExt);
         }
@@ -313,11 +310,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         if (Constants.SYSTEM_PROFILE_MAC.equals(activeProfile)) {
             // Workaround for issue on macs, somehow needs to wait some milliseconds for the
             // frame to be initialized.
-            try {
-                Thread.currentThread().sleep(500);
-            } catch (InterruptedException e) {
-                log.warn("Thread waiting for folder chooser got interrupted: {}", e.getMessage());
-            }
+            LswUtil.waitMilliseconds(500);
         }
         int returnValue = 0;
         if (isSaveDialog) {
@@ -410,9 +403,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         // Hack Plot to force setting the processor since it was left null by the
         // constructor for mono images.
         if (this.finalResultImage.getStack().size() == 1) {
-            Field ip = ReflectionUtils.findField(Plot.class, "ip");
-            ReflectionUtils.makeAccessible(ip);
-            ReflectionUtils.setField(ip, histogramPlot, displayedImage.getProcessor());
+            LswUtil.setPrivateField(histogramPlot, Plot.class, "ip", displayedImage.getProcessor());
         }
         histogramPlot.setImagePlus(displayedImage);
         histogramPlot.setWindowSize(Constants.DEFAULT_HISTOGRAM_WINDOW_WIDTH, Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT);
@@ -591,12 +582,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             displayedImage.hide();
         }
 
-        finalResultImage = new Opener().openImage(Util.getIJFileFormat(this.filePath));
+        finalResultImage = new Opener().openImage(LswFileUtil.getIJFileFormat(this.filePath));
         boolean largeImage = false;
         if (finalResultImage != null) {
             finalResultImage.show();
             finalResultImage.getWindow().setVisible(false);
-            if (!Util.validateImageFormat(finalResultImage, getParentFrame(), activeProfile)) {
+            if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame(), activeProfile)) {
                 return false;
             }
             if (profile.getScale() > 1.0) {
@@ -607,8 +598,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             log.info("Opened final result image image with id {}", finalResultImage.getID());
 
             displayedImage = finalResultImage.duplicate();
-            if (Util.isPng(displayedImage, this.filePath)) {
-                displayedImage = Util.fixNonTiffOpeningSettings(displayedImage);
+            if (LswFileUtil.isPng(displayedImage, this.filePath)) {
+                displayedImage = LswFileUtil.fixNonTiffOpeningSettings(displayedImage);
             }
             operationService.correctExposure(displayedImage);
             displayedImage.show(this.filePath);
@@ -670,7 +661,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     private boolean validateSelectedFile(String path) {
-        String extension = Util.getFilenameExtension(path);
+        String extension = LswFileUtil.getFilenameExtension(path);
         if (!settingsService.getSettings().getExtensions().contains(extension)) {
             JOptionPane.showMessageDialog(getParentFrame(),
                     String.format(
@@ -684,8 +675,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private LswImageLayersDto getImageLayers(ImagePlus image) {
         ImageStack stack = image.getStack();
         short[][] newPixels = new short[3][stack.getProcessor(1).getPixelCount()];
-        int numThreads = Runtime.getRuntime().availableProcessors();
-        Executor executor = Executors.newFixedThreadPool(numThreads);
+        Executor executor = LswUtil.getParallelExecutor();
         for (int layer = 1; layer <= stack.size(); layer++) {
             int finalLayer = layer;
             executor.execute(() -> {
@@ -696,19 +686,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 }
             });
         }
-        ((ExecutorService) executor).shutdown();
-        try {
-            ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            log.warn("Thread execution was stopped: ", e);
-        }
+        LswUtil.stopAndAwaitParallelExecutor(executor);
         return LswImageLayersDto.builder().layers(newPixels).count(stack.size()).build();
     }
 
     private void copyLayers(LswImageLayersDto layersDto, ImagePlus image) {
         ImageStack stack = image.getStack();
-        int numThreads = Runtime.getRuntime().availableProcessors();
-        Executor executor = Executors.newFixedThreadPool(numThreads);
+        Executor executor = LswUtil.getParallelExecutor();
         short[][] layers = layersDto.getLayers();
         for (int layer = 1; layer <= stack.size(); layer++) {
             final int finalLayer = layer;
@@ -720,12 +704,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 }
             });
         }
-        ((ExecutorService) executor).shutdown();
-        try {
-            ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            log.warn("Thread execution was stopped: ", e);
-        }
+        LswUtil.stopAndAwaitParallelExecutor(executor);
     }
 
     final class MyFileChooser extends JFileChooser {

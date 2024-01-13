@@ -25,7 +25,7 @@ import nl.wilcokas.luckystackworker.dto.SettingsDTO;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.service.SettingsService;
-import nl.wilcokas.luckystackworker.util.Util;
+import nl.wilcokas.luckystackworker.util.LswFileUtil;
 
 @CrossOrigin(origins = { "http://localhost:4200", "https://www.wilcokas.com" })
 @RestController
@@ -52,7 +52,7 @@ public class ReferenceController {
         int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, false);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFolder = jfc.getSelectedFile();
-            String rootFolder = Util.getIJFileFormat(selectedFolder.getAbsolutePath());
+            String rootFolder = LswFileUtil.getIJFileFormat(selectedFolder.getAbsolutePath());
             log.info("RootFolder selected {} ", rootFolder);
             settingsDTO = new SettingsDTO(referenceImageService.updateSettingsForRootFolder(rootFolder));
         }
@@ -64,7 +64,7 @@ public class ReferenceController {
         JFrame frame = referenceImageService.getParentFrame();
         JFileChooser jfc = referenceImageService.getJFileChooser(settingsService.getRootFolder());
         jfc.setFileFilter(new FileNameExtensionFilter("TIFF, JPG", "tif", "tiff", "jpg", "jpeg"));
-        String fileNameNoExt = Util.getFilename(referenceImageService.getFilePath());
+        String fileNameNoExt = LswFileUtil.getFilename(referenceImageService.getFilePath());
         jfc.setSelectedFile(
                 new File(fileNameNoExt + Constants.OUTPUT_POSTFIX_SAVE + "." + Constants.DEFAULT_OUTPUT_FORMAT));
         int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, "Save reference image", true);
@@ -112,7 +112,7 @@ public class ReferenceController {
     }
 
     private boolean asJpeg(File selectedFile) {
-        String fileExtension = Util.getFilenameExtension(selectedFile).toLowerCase();
+        String fileExtension = LswFileUtil.getFilenameExtension(selectedFile).toLowerCase();
         return "jpg".equals(fileExtension) || "jpeg".equals(fileExtension);
     }
 }

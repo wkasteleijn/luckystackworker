@@ -35,7 +35,8 @@ import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.service.ProfileService;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.service.SettingsService;
-import nl.wilcokas.luckystackworker.util.Util;
+import nl.wilcokas.luckystackworker.util.LswFileUtil;
+import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 
 @CrossOrigin(origins = { "http://localhost:4200" })
 @RequiredArgsConstructor
@@ -88,12 +89,12 @@ public class ProfileController {
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
             String selectedFilePath = selectedFile.getAbsolutePath();
-            String filePathNoExt = Util.getPathWithoutExtension(selectedFilePath);
-            Profile profile = Util.readProfile(filePathNoExt);
+            String filePathNoExt = LswFileUtil.getPathWithoutExtension(selectedFilePath);
+            Profile profile = LswFileUtil.readProfile(filePathNoExt);
             if (profile != null) {
                 SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
                 settingsDTO.setLargeImage(referenceImageService.isLargeImage());
-                Util.setNonPersistentSettings(profile);
+                LswImageProcessingUtil.setNonPersistentSettings(profile);
                 ProfileDTO profileDTO = new ProfileDTO(profile);
                 updateProfile(profileDTO, null);
                 LuckyStackWorkerContext.setSelectedProfile(profile.getName());

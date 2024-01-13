@@ -8,7 +8,7 @@ import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.model.Profile;
-import nl.wilcokas.luckystackworker.util.Util;
+import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 
 @Component
 public class SaturationFilter {
@@ -33,7 +33,7 @@ public class SaturationFilter {
         float[] pixelsLum = new float[pixelsRed.length];
         for (int i = 0; i < pixelsRed.length; i++) {
             LSWSharpenMode mode = LSWSharpenMode.valueOf(profile.getSharpenMode());
-            float[] hsl = Util.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], true, true, true,
+            float[] hsl = LswImageProcessingUtil.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], true, true, true,
                     mode == LSWSharpenMode.RGB || profile.isLuminanceIncludeColor(), mode);
             pixelsHue[i] = hsl[0];
             pixelsSat[i] = hsl[1] * profile.getSaturation().floatValue();
@@ -41,7 +41,7 @@ public class SaturationFilter {
         }
 
         for (int i = 0; i < pixelsRed.length; i++) {
-            float[] rgb = Util.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
+            float[] rgb = LswImageProcessingUtil.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
             pixelsRed[i] = rgb[0];
             pixelsGreen[i] = rgb[1];
             pixelsBlue[i] = rgb[2];

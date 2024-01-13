@@ -2,9 +2,6 @@ package nl.wilcokas.luckystackworker.filter;
 
 import java.awt.Rectangle;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Component;
 
@@ -18,7 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenParameters;
 import nl.wilcokas.luckystackworker.filter.settings.UnsharpMaskParameters;
-import nl.wilcokas.luckystackworker.util.Util;
+import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
+import nl.wilcokas.luckystackworker.util.LswUtil;
 
 @Slf4j
 @Component
@@ -34,9 +32,7 @@ public class LSWSharpenFilter {
         for (int i = 0; i < unsharpMaskParameters.getIterations(); i++) {
 
             // Run every stack in a seperate thread to increase performance.
-            int numThreads = Runtime.getRuntime().availableProcessors();
-            Executor executor = Executors.newFixedThreadPool(numThreads);
-
+            Executor executor = LswUtil.getParallelExecutor();
             for (int slice = 1; slice <= stack.getSize(); slice++) {
                 int finalLayer = slice;
                 executor.execute(() -> {
@@ -53,12 +49,7 @@ public class LSWSharpenFilter {
                     ip.setPixels(finalLayer, fp);
                 });
             }
-            ((ExecutorService) executor).shutdown();
-            try {
-                ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-            } catch (InterruptedException e) {
-                log.warn("LSWSharpenFilter thread execution was stopped: ", e);
-            }
+            LswUtil.stopAndAwaitParallelExecutor(executor);
         }
     }
 
@@ -70,8 +61,7 @@ public class LSWSharpenFilter {
         for (int i = 0; i < unsharpMaskParameters.getIterations(); i++) {
 
             // Run every stack in a seperate thread to increase performance.
-            int numThreads = Runtime.getRuntime().availableProcessors();
-            Executor executor = Executors.newFixedThreadPool(numThreads);
+            Executor executor = LswUtil.getParallelExecutor();
             for (int slice = 1; slice <= intialStack.getSize(); slice++) {
                 int finalLayer = slice;
                 executor.execute(() -> {
@@ -82,20 +72,14 @@ public class LSWSharpenFilter {
                     ip.setPixels(finalLayer, fp);
                 });
             }
-            ((ExecutorService) executor).shutdown();
-            try {
-                ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-            } catch (InterruptedException e) {
-                log.warn("LSWSharpenFilter thread execution was stopped: ", e);
-            }
+            LswUtil.stopAndAwaitParallelExecutor(executor);
         }
 
         // Pass 2, apply the adaptive filter based on the result of pass 1.
         for (int i = 0; i < unsharpMaskParameters.getIterations(); i++) {
 
             // Run every stack in a seperate thread to increase performance.
-            int numThreads = Runtime.getRuntime().availableProcessors();
-            Executor executor = Executors.newFixedThreadPool(numThreads);
+            Executor executor = LswUtil.getParallelExecutor();
             for (int slice = 1; slice <= intialStack.getSize(); slice++) {
                 int finalLayer = slice;
                 executor.execute(() -> {
@@ -110,12 +94,7 @@ public class LSWSharpenFilter {
                     ipFinal.setPixels(finalLayer, fpFinal);
                 });
             }
-            ((ExecutorService) executor).shutdown();
-            try {
-                ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-            } catch (InterruptedException e) {
-                log.warn("LSWSharpenFilter thread execution was stopped: ", e);
-            }
+            LswUtil.stopAndAwaitParallelExecutor(executor);
         }
     }
 
@@ -147,7 +126,8 @@ public class LSWSharpenFilter {
             float[] pixelsSat = new float[pixelsRed.length];
             float[] pixelsLum = new float[pixelsRed.length];
             for (int i = 0; i < pixelsRed.length; i++) {
-                float[] hsl = Util.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], parameters.isIncludeRed(), parameters.isIncludeGreen(),
+                float[] hsl = LswImageProcessingUtil.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], parameters.isIncludeRed(),
+                        parameters.isIncludeGreen(),
                         parameters.isIncludeBlue(), parameters.isIncludeColor(), parameters.getMode());
                 pixelsHue[i] = hsl[0];
                 pixelsSat[i] = hsl[1];
@@ -170,7 +150,7 @@ public class LSWSharpenFilter {
             }
 
             for (int i = 0; i < pixelsRed.length; i++) {
-                float[] rgb = Util.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
+                float[] rgb = LswImageProcessingUtil.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
                 pixelsRed[i] = rgb[0];
                 pixelsGreen[i] = rgb[1];
                 pixelsBlue[i] = rgb[2];
@@ -213,7 +193,8 @@ public class LSWSharpenFilter {
             float[] pixelsSat = new float[pixelsRed.length];
             float[] pixelsLum = new float[pixelsRed.length];
             for (int i = 0; i < pixelsRed.length; i++) {
-                float[] hsl = Util.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], parameters.isIncludeRed(), parameters.isIncludeGreen(),
+                float[] hsl = LswImageProcessingUtil.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], parameters.isIncludeRed(),
+                        parameters.isIncludeGreen(),
                         parameters.isIncludeBlue(), parameters.isIncludeColor(), parameters.getMode());
                 pixelsHue[i] = hsl[0];
                 pixelsSat[i] = hsl[1];
@@ -224,7 +205,7 @@ public class LSWSharpenFilter {
             doUnsharpMask(unsharpMaskParameters.getRadius(), unsharpMaskParameters.getAmount(), fpLumInitial);
 
             for (int i = 0; i < pixelsRed.length; i++) {
-                float[] rgb = Util.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
+                float[] rgb = LswImageProcessingUtil.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
                 pixelsRed[i] = rgb[0];
                 pixelsGreen[i] = rgb[1];
                 pixelsBlue[i] = rgb[2];
@@ -255,7 +236,8 @@ public class LSWSharpenFilter {
             float[] pixelsSat = new float[pixelsRed.length];
             float[] pixelsLum = new float[pixelsRed.length];
             for (int i = 0; i < pixelsRed.length; i++) {
-                float[] hsl = Util.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], parameters.isIncludeRed(), parameters.isIncludeGreen(),
+                float[] hsl = LswImageProcessingUtil.rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i], parameters.isIncludeRed(),
+                        parameters.isIncludeGreen(),
                         parameters.isIncludeBlue(), parameters.isIncludeColor(), parameters.getMode());
                 pixelsHue[i] = hsl[0];
                 pixelsSat[i] = hsl[1];
@@ -267,7 +249,7 @@ public class LSWSharpenFilter {
                     unsharpMaskParameters.getClippingRange(), fpLumInitial, fpLum);
 
             for (int i = 0; i < pixelsRed.length; i++) {
-                float[] rgb = Util.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
+                float[] rgb = LswImageProcessingUtil.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
                 pixelsRed[i] = rgb[0];
                 pixelsGreen[i] = rgb[1];
                 pixelsBlue[i] = rgb[2];
@@ -284,8 +266,7 @@ public class LSWSharpenFilter {
             ImageStack maskStack = originalStack.duplicate();
             double radius = unsharpMaskParameters.getDeringRadius();
 
-            int numThreads = Runtime.getRuntime().availableProcessors();
-            Executor executor = Executors.newFixedThreadPool(numThreads);
+            Executor executor = LswUtil.getParallelExecutor();
             for (int layer = 1; layer <= maskStack.size(); layer++) {
                 int finalLayer = layer;
                 executor.execute(() -> {
@@ -294,13 +275,7 @@ public class LSWSharpenFilter {
                     ip.setPixels(1, fp);
                 });
             }
-            ((ExecutorService) executor).shutdown();
-            try {
-                ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-            } catch (InterruptedException e) {
-                log.warn("LSWSharpenFilter thread execution was stopped: ", e);
-            }
-
+            LswUtil.stopAndAwaitParallelExecutor(executor);
             return maskStack;
         }
         return null;
@@ -311,7 +286,7 @@ public class LSWSharpenFilter {
         int maxValue = 0;
         short[] maskPixels = (short[]) ip.getPixels();
         for (int position = 0; position < maskPixels.length; position++) {
-            int value = Util.convertToUnsignedInt(maskPixels[position]);
+            int value = LswImageProcessingUtil.convertToUnsignedInt(maskPixels[position]);
             if (value > maxValue) {
                 maxValue = value;
             }
@@ -321,7 +296,7 @@ public class LSWSharpenFilter {
         }
         int average = (maxValue - minValue) / threshold; // start cutting of from threshold times the average.
         for (int position = 0; position < maskPixels.length; position++) {
-            int value = Util.convertToUnsignedInt(maskPixels[position]);
+            int value = LswImageProcessingUtil.convertToUnsignedInt(maskPixels[position]);
             if (value < average) {
                 maskPixels[position] = 0;
             } else if (value > average) {
@@ -403,7 +378,7 @@ public class LSWSharpenFilter {
         Rectangle roi = fp.getRoi();
         for (int y = roi.y; y < roi.y + roi.height; y++) {
             for (int x = roi.x, p = width * y + x; x < roi.x + roi.width; x++, p++) {
-                int maskValue = Util.convertToUnsignedInt(maskPixels[p]);
+                int maskValue = LswImageProcessingUtil.convertToUnsignedInt(maskPixels[p]);
                 float cutoffFactor = (Constants.MAX_INT_VALUE - maskValue) / (Constants.MAX_INT_VALUE / 100);
                 float amountNew = amount - (amount * ((cutoffFactor / 100) * deringStrength));
                 float pixelValueNew = getUnsharpMaskValue(snapshotPixels[p], pixels[p], amountNew);
@@ -427,69 +402,4 @@ public class LSWSharpenFilter {
     private float getUnsharpMaskValue(float pixelValue, float pixelValueAfterBlur, float amount) {
         return (pixelValue - amount * pixelValueAfterBlur) / (1f - amount);
     }
-
-    // public void applyIndividualLuminanceMode(ImagePlus image, final
-    // LSWSharpenParameters parameters) {
-    // if (!parameters.isIncludeRed() && !parameters.isIncludeGreen() &&
-    // !parameters.isIncludeBlue()) {
-    // log.error("Cannot have red, green and blue excluded");
-    // return;
-    // }
-    // UnsharpMaskParameters unsharpMaskParametersRed =
-    // parameters.getUnsharpMaskParametersRed();
-    // UnsharpMaskParameters unsharpMaskParametersGreen =
-    // parameters.getUnsharpMaskParametersGreen();
-    // UnsharpMaskParameters unsharpMaskParametersBlue =
-    // parameters.getUnsharpMaskParametersBlue();
-    // boolean saturationApplied = false;
-    // ImageStack stack = image.getStack();
-    // ImageProcessor ipRed = stack.getProcessor(1);
-    // ImageProcessor ipGreen = stack.getProcessor(2);
-    // ImageProcessor ipBlue = stack.getProcessor(3);
-    //
-    // for (int it = 0; it < unsharpMaskParameters.getIterations(); it++) {
-    //
-    // FloatProcessor fpRed = ipRed.toFloat(1, null);
-    // FloatProcessor fpGreen = ipGreen.toFloat(2, null);
-    // FloatProcessor fpBlue = ipBlue.toFloat(3, null);
-    // fpRed.snapshot();
-    // fpGreen.snapshot();
-    // fpBlue.snapshot();
-    // float[] pixelsRed = (float[]) fpRed.getPixels();
-    // float[] pixelsGreen = (float[]) fpGreen.getPixels();
-    // float[] pixelsBlue = (float[]) fpBlue.getPixels();
-    //
-    // float[] pixelsHue = new float[pixelsRed.length];
-    // float[] pixelsSat = new float[pixelsRed.length];
-    // float[] pixelsLum = new float[pixelsRed.length];
-    // for (int i = 0; i < pixelsRed.length; i++) {
-    // float[] hsl = rgbToHsl(pixelsRed[i], pixelsGreen[i], pixelsBlue[i],
-    // parameters.isIncludeRed(), parameters.isIncludeGreen(),
-    // parameters.isIncludeBlue());
-    // pixelsHue[i] = hsl[0];
-    // pixelsSat[i] = hsl[1] * (saturationApplied ? 1f :
-    // parameters.getSaturation());
-    // pixelsLum[i] = hsl[2];
-    // }
-    // saturationApplied = true;
-    // FloatProcessor fpLum = new FloatProcessor(image.getWidth(),
-    // image.getHeight(), pixelsLum);
-    // fpLum.snapshot();
-    // doUnsharpMask(unsharpMaskParameters.getRadius(),
-    // unsharpMaskParameters.getAmount(), fpLum);
-    //
-    // for (int i = 0; i < pixelsRed.length; i++) {
-    // float[] rgb = hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
-    // pixelsRed[i] = rgb[0];
-    // pixelsGreen[i] = rgb[1];
-    // pixelsBlue[i] = rgb[2];
-    // }
-    //
-    // ipRed.setPixels(1, fpRed);
-    // ipGreen.setPixels(2, fpGreen);
-    // ipBlue.setPixels(3, fpBlue);
-    // image.updateAndDraw();
-    // }
-    // }
-
 }

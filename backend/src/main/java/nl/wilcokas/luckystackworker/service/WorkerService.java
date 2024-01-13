@@ -18,7 +18,7 @@ import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.Profile;
-import nl.wilcokas.luckystackworker.util.Util;
+import nl.wilcokas.luckystackworker.util.LswFileUtil;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -83,8 +83,8 @@ public class WorkerService {
         try {
             Collection<File> files = getImages(true);
             for (File file : files) {
-                String name = Util.getFilename(Util.getIJFileFormat(file.getAbsolutePath()));
-                String extension = Util.getFilenameExtension(file);
+                String name = LswFileUtil.getFilename(LswFileUtil.getIJFileFormat(file.getAbsolutePath()));
+                String extension = LswFileUtil.getFilenameExtension(file);
                 if (!name.contains(Constants.OUTPUT_POSTFIX) && (!name.contains(Constants.OUTPUT_POSTFIX_SAVE))
                         && Arrays.asList(settingsService.getExtensions()).contains(extension)
                         && !isInFileList(files, name + Constants.OUTPUT_POSTFIX)) {
@@ -102,15 +102,15 @@ public class WorkerService {
     }
 
     private boolean isInFileList(Collection<File> files, String filename) {
-        return files.stream().map(f -> Util.getFilename(Util.getIJFileFormat(f.getAbsolutePath()))).anyMatch(filename::equals);
+        return files.stream().map(f -> LswFileUtil.getFilename(LswFileUtil.getIJFileFormat(f.getAbsolutePath()))).anyMatch(filename::equals);
     }
 
     private boolean processFiles(Collection<File> files) {
         boolean filesProcessed = false;
         int count = 0;
         for (File file : files) {
-            String name = Util.getFilename(file);
-            String extension = Util.getFilenameExtension(file);
+            String name = LswFileUtil.getFilename(file);
+            String extension = LswFileUtil.getFilenameExtension(file);
             if (!name.contains(Constants.OUTPUT_POSTFIX) && (!name.contains(Constants.OUTPUT_POSTFIX_SAVE))
                     && Arrays.asList(settingsService.getExtensions()).contains(extension)) {
                 filesProcessed = filesProcessed | processFile(file, false);
@@ -126,7 +126,7 @@ public class WorkerService {
 
     private boolean processFile(final File file, boolean realtime) {
         String filePath = file.getAbsolutePath();
-        Optional<String> profileOpt = Optional.ofNullable(Util.deriveProfileFromImageName(file.getAbsolutePath()));
+        Optional<String> profileOpt = Optional.ofNullable(LswFileUtil.deriveProfileFromImageName(file.getAbsolutePath()));
         if (!profileOpt.isPresent()) {
             log.info("Could not determine a profile for file {}", filePath);
             return false;
@@ -134,16 +134,16 @@ public class WorkerService {
         String profileName = profileOpt.get();
         if (realtime || profileName.equals(LuckyStackWorkerContext.getSelectedProfile())) {
             try {
-                final String filename = Util.getImageName(Util.getIJFileFormat(filePath));
+                final String filename = LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(filePath));
                 log.info("Applying profile '{}' to: {}", profileName, filename);
                 if (!realtime) {
                     LuckyStackWorkerContext.statusUpdate("Processing : " + filename);
                 }
 
                 ImagePlus imp = new Opener().openImage(filePath);
-                if (Util.validateImageFormat(imp, null, null)) {
-                    if (Util.isPngRgbStack(imp, filePath)) {
-                        imp = Util.fixNonTiffOpeningSettings(imp);
+                if (LswFileUtil.validateImageFormat(imp, null, null)) {
+                    if (LswFileUtil.isPngRgbStack(imp, filePath)) {
+                        imp = LswFileUtil.fixNonTiffOpeningSettings(imp);
                     }
                     operationService.correctExposure(imp);
                     Profile profile = profileService.findByName(profileName)
@@ -157,7 +157,7 @@ public class WorkerService {
                         imp.setRoi(LuckyStackWorkerContext.getSelectedRoi());
                         imp = imp.crop();
                     }
-                    Util.saveImage(imp, profileName, getOutputFile(file), Util.isPngRgbStack(imp, filePath) || profile.getScale() > 1.0,
+                    LswFileUtil.saveImage(imp, profileName, getOutputFile(file), LswFileUtil.isPngRgbStack(imp, filePath) || profile.getScale() > 1.0,
                             LuckyStackWorkerContext.getSelectedRoi() != null, false, true);
                     return true;
                 }
@@ -169,7 +169,7 @@ public class WorkerService {
     }
 
     private String getOutputFile(final File file) {
-        return Util.getPathWithoutExtension(file.getAbsolutePath()) + Constants.OUTPUT_POSTFIX + "."
+        return LswFileUtil.getPathWithoutExtension(file.getAbsolutePath()) + Constants.OUTPUT_POSTFIX + "."
                 + Constants.DEFAULT_OUTPUT_FORMAT;
     }
 }

@@ -13,27 +13,33 @@ import ij.io.Opener;
 import ij.process.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.util.Util;
+import nl.wilcokas.luckystackworker.util.LswFileUtil;
+import nl.wilcokas.luckystackworker.util.LswUtil;
 
 @Slf4j
 @Service
 public class GmicService {
     public void callGmicCli(ImagePlus image, final String profileName, final List<String> commands) {
         try {
-            String activeOSProfile = Util.getActiveOSProfile();
-            String workFolder = Util.getDataFolder(activeOSProfile);
+            String activeOSProfile = LswUtil.getActiveOSProfile();
+            String workFolder = LswFileUtil.getDataFolder(activeOSProfile);
             String inputFile = workFolder + "/temp_in.tif";
-            Util.saveImage(image, profileName, inputFile, image.getStack().size() > 1, false, false, false);
+            LswFileUtil.saveImage(image, profileName, inputFile, image.getStack().size() > 1, false, false, false);
             String outputFile = workFolder + "/temp_out.tif";
             List<String> arguments = new ArrayList<>(Arrays.asList("v", "2", "-input", inputFile, "-div", "65536"));
             arguments.addAll(0, getGmicCommand(activeOSProfile));
             arguments.addAll(commands);
-            arguments.addAll(Arrays.asList("-mul", "65536", "-output", outputFile + ",int16"));
-            Util.runCliCommand(activeOSProfile, arguments);
-            ImagePlus outputImage = new Opener().openImage(Util.getIJFileFormat(outputFile));
+            arguments.addAll(Arrays.asList("-mul", "65536"));
+            if (image.getStack().size() == 1) {
+                // Convert mono to RGB in G'MIC, else the resulting output is messed up.
+                arguments.add("-to_rgb");
+            }
+            arguments.addAll(Arrays.asList("-output", outputFile + ",int16"));
+            LswUtil.runCliCommand(activeOSProfile, arguments);
+            ImagePlus outputImage = new Opener().openImage(LswFileUtil.getIJFileFormat(outputFile));
             ImageStack outputStack = outputImage.getStack();
             ImageStack imageStack = image.getStack();
-            for (int layer = 1; layer <= outputStack.getSize(); layer++) {
+            for (int layer = 1; layer <= imageStack.getSize(); layer++) {
                 ImageProcessor newProcessor = outputStack.getProcessor(layer);
                 short[] pixelsNew = (short[]) newProcessor.getPixels();
                 short[] pixels = (short[]) imageStack.getProcessor(layer).getPixels();
@@ -48,7 +54,7 @@ public class GmicService {
 
     public boolean isGmicAvailable(String activeOSProfile) {
         try {
-            Util.runCliCommand(activeOSProfile, getGmicCommand(activeOSProfile));
+            LswUtil.runCliCommand(activeOSProfile, getGmicCommand(activeOSProfile));
             log.info("G'MIC is available");
             return true;
         } catch (Exception e) {
