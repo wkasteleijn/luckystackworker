@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.Arrays;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,11 +27,12 @@ public class LuckystackWorkerApplication {
     public static void main(String[] args) throws IOException, InterruptedException {
         System.setProperty("java.awt.headless", "false");
 
-        String profile = LswUtil.getActiveOSProfile();
-        if (Constants.SYSTEM_PROFILE_WINDOWS.equals(profile)) {
+        String osProfile = LswUtil.getActiveOSProfile();
+        String dataFolder = LswFileUtil.getDataFolder(osProfile);
+        if (Constants.SYSTEM_PROFILE_WINDOWS.equals(osProfile)) {
             log.info("Starting electron GUI");
             try {
-                LswUtil.runCliCommand(profile, Collections.singletonList(".\\lsw_gui.exe"));
+                LswUtil.runCliCommand(osProfile, Arrays.asList("./lsw_gui.exe", ">>", dataFolder + "/lsw-gui.log"), false);
             } catch (Exception e) {
                 log.warn("GUI wasn't started, are you running on windows in development mode?");
             }
@@ -41,7 +42,6 @@ public class LuckystackWorkerApplication {
         String lswVersion = LswUtil.getLswVersion();
         if (lswVersion != null) {
             log.info("Current app version is {}", lswVersion);
-            String dataFolder = LswFileUtil.getDataFolder(profile);
             createDataFolderWhenMissing(dataFolder);
             DataInfo dataInfo = getDataInfo(dataFolder);
             if (dataInfo != null) {
@@ -49,13 +49,13 @@ public class LuckystackWorkerApplication {
                     log.info(
                             "Overwriting current data file as the version does not correspond, data file : {}",
                             dataInfo.getVersion());
-                    copyDbFile(profile, dataFolder);
+                    copyDbFile(osProfile, dataFolder);
                     writeDataInfoFile(lswVersion, dataFolder);
                 }
             } else {
                 log.info("First time the app was started, copying db file and data info file to data folder {}",
                         dataFolder);
-                copyDbFile(profile, dataFolder);
+                copyDbFile(osProfile, dataFolder);
                 writeDataInfoFile(lswVersion, dataFolder);
             }
         } else {

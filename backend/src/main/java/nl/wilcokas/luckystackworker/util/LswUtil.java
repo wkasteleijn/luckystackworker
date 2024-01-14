@@ -22,11 +22,15 @@ public class LswUtil {
     private LswUtil() {
     }
 
-    public static void runCliCommand(String activeOSProfile, List<String> arguments) throws IOException, InterruptedException {
+    public static void runCliCommand(String activeOSProfile, List<String> arguments, boolean await) throws IOException, InterruptedException {
         ProcessBuilder processBuilder = getProcessBuilder(activeOSProfile, arguments);
-        processBuilder.redirectErrorStream(true);
-        if (logOutput(processBuilder.start()) != 0) {
-            throw new IOException("CLI execution failed");
+        if (await) {
+            processBuilder.redirectErrorStream(true);
+            if (logOutput(processBuilder.start()) != 0) {
+                throw new IOException("CLI execution failed");
+            }
+        } else {
+            processBuilder.start();
         }
     }
 

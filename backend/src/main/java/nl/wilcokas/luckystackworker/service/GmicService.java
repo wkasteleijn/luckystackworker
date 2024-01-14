@@ -35,7 +35,7 @@ public class GmicService {
                 arguments.add("-to_rgb");
             }
             arguments.addAll(Arrays.asList("-output", outputFile + ",int16"));
-            LswUtil.runCliCommand(activeOSProfile, arguments);
+            LswUtil.runCliCommand(activeOSProfile, arguments, true);
             ImagePlus outputImage = new Opener().openImage(LswFileUtil.getIJFileFormat(outputFile));
             ImageStack outputStack = outputImage.getStack();
             ImageStack imageStack = image.getStack();
@@ -54,7 +54,7 @@ public class GmicService {
 
     public boolean isGmicAvailable(String activeOSProfile) {
         try {
-            LswUtil.runCliCommand(activeOSProfile, getGmicCommand(activeOSProfile));
+            LswUtil.runCliCommand(activeOSProfile, getGmicCommand(activeOSProfile), true);
             log.info("G'MIC is available");
             return true;
         } catch (Exception e) {
