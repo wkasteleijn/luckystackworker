@@ -100,9 +100,9 @@ public class LuckystackWorkerApplication {
         log.info("Writing new data info file");
     }
 
-    private static String getResourceFolder(String profile) {
+    private static String getResourceFolder(String osProfile) {
         String resourceFolder = System.getProperty("user.dir");
-        if (Constants.SYSTEM_PROFILE_MAC.equals(profile) && !"true".equals(System.getProperty("dev.mode"))) {
+        if (Constants.SYSTEM_PROFILE_MAC.equals(osProfile) && !"true".equals(System.getProperty("dev.mode"))) {
             resourceFolder += "/Resources";
         }
         return resourceFolder;

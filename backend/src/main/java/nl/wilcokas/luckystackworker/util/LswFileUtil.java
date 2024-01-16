@@ -292,7 +292,7 @@ public class LswFileUtil {
     }
 
 
-    public static boolean validateImageFormat(ImagePlus image, JFrame parentFrame, String activeProfile) {
+    public static boolean validateImageFormat(ImagePlus image, JFrame parentFrame, String activeOSProfile) {
         String message = "This file format is not supported. %nYou can only open 16-bit RGB and grayscale PNG and TIFF images.";
         boolean is16Bit = false;
         if (image != null) {
@@ -307,7 +307,7 @@ public class LswFileUtil {
         if (!is16Bit) {
             log.warn("Attempt to open a non 16-bit image");
             if (parentFrame != null) {
-                if (Constants.SYSTEM_PROFILE_MAC.equals(activeProfile)) {
+                if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile) || Constants.SYSTEM_PROFILE_LINUX.equals(activeOSProfile)) {
                     // Workaround for issue on macs, somehow needs to wait some milliseconds for the
                     // frame to be initialized.
                     LswUtil.waitMilliseconds(500);
@@ -319,11 +319,11 @@ public class LswFileUtil {
         return true;
     }
 
-    public static String getDataFolder(String profile) {
+    public static String getDataFolder(String osProfile) {
         String dataFolder = System.getProperty("user.home");
-        if (Constants.SYSTEM_PROFILE_MAC.equals(profile)) {
+        if (Constants.SYSTEM_PROFILE_MAC.equals(osProfile) || Constants.SYSTEM_PROFILE_LINUX.equals(osProfile)) {
             dataFolder += "/.lsw";
-        } else if (Constants.SYSTEM_PROFILE_WINDOWS.equals(profile)) {
+        } else if (Constants.SYSTEM_PROFILE_WINDOWS.equals(osProfile)) {
             dataFolder += "/AppData/Local/LuckyStackWorker";
         }
         return dataFolder;

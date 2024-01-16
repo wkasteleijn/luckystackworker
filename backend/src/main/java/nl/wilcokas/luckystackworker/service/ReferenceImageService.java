@@ -63,7 +63,7 @@ import nl.wilcokas.luckystackworker.util.LswUtil;
 public class ReferenceImageService implements RoiListener, WindowListener, ComponentListener {
 
     @Value("${spring.profiles.active}")
-    private String activeProfile;
+    private String activeOSProfile;
 
     @Getter
     private ImagePlus displayedImage;
@@ -307,7 +307,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, String title, boolean isSaveDialog) {
-        if (Constants.SYSTEM_PROFILE_MAC.equals(activeProfile)) {
+        if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile) || Constants.SYSTEM_PROFILE_LINUX.equals(activeOSProfile)) {
             // Workaround for issue on macs, somehow needs to wait some milliseconds for the
             // frame to be initialized.
             LswUtil.waitMilliseconds(500);
@@ -420,7 +420,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         plotWindow.setIconImage(iconImage);
         plotWindow.getCanvas().setSize(Constants.DEFAULT_HISTOGRAM_WINDOW_WIDTH, Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT + 48);
         plotWindow.setSize(Constants.DEFAULT_HISTOGRAM_WINDOW_WIDTH - 26, Constants.DEFAULT_HISTOGRAM_WINDOW_HEIGHT + 90);
-        if (Constants.SYSTEM_PROFILE_MAC.equals(activeProfile)) {
+        if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile)) {
             Taskbar.getTaskbar().setIconImage(iconImage);
         }
         plotWindow.setLocation(determineHistogramWindowLocation(windowLocation));
@@ -587,7 +587,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         if (finalResultImage != null) {
             finalResultImage.show();
             finalResultImage.getWindow().setVisible(false);
-            if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame(), activeProfile)) {
+            if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame(), activeOSProfile)) {
                 return false;
             }
             if (profile.getScale() > 1.0) {
@@ -629,7 +629,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         image.setBorderColor(Color.BLACK);
         ImageWindow window = image.getWindow();
         window.setIconImage(iconImage);
-        if (Constants.SYSTEM_PROFILE_MAC.equals(activeProfile)) {
+        if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile)) {
             Taskbar.getTaskbar().setIconImage(iconImage);
         }
         if (location != null) {
