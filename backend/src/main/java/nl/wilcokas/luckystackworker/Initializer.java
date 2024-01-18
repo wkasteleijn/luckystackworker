@@ -10,10 +10,8 @@ import org.springframework.stereotype.Component;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.service.GmicService;
 import nl.wilcokas.luckystackworker.service.SettingsService;
-import nl.wilcokas.luckystackworker.util.LswUtil;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,8 +32,8 @@ public class Initializer {
 
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-        Settings settings = settingsService.getSettings();
-        settings.setGmicAvailable(gmicService.isGmicAvailable(LswUtil.getActiveOSProfile()));
-        settingsService.saveSettings(settings);
+        //        Settings settings = settingsService.getSettings();
+        //        settings.setGmicAvailable(gmicService.isGmicAvailable(LswUtil.getActiveOSProfile()));
+        //        settingsService.saveSettings(settings);
     }
 }
