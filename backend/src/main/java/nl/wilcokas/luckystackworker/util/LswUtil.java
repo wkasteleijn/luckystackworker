@@ -46,7 +46,12 @@ public class LswUtil {
             return new ProcessBuilder(arguments);
         } else {
             String joinedArguments = arguments.stream().collect(Collectors.joining(" "));
-            return new ProcessBuilder("zsh", "-c", joinedArguments);
+            String shellType = switch (activeOSProfile) {
+            case Constants.SYSTEM_PROFILE_MAC -> "zsh";
+            case Constants.SYSTEM_PROFILE_LINUX -> "bash";
+            default -> "bash";
+            };
+            return new ProcessBuilder(shellType, "-c", joinedArguments);
         }
     }
 
