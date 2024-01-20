@@ -22,7 +22,7 @@
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
-    <opt>-Dspring.profiles.active=win</opt>
+    <opt>-Dspring.profiles.active=win -Dlsw.version=5.0.0</opt>
   </jre>
   <versionInfo>
     <fileVersion>1.0.0.0</fileVersion>

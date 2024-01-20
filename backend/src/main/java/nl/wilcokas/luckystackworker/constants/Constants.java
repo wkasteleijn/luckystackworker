@@ -48,4 +48,5 @@ public class Constants {
     public static final String DENOISE_ALGORITHM_SIGMA2 = "SIGMA2";
     public static final String DENOISE_ALGORITHM_SAVGOLAY = "SAVGOLAY";
     public static final String DENOISE_ALGORITHM_IANS = "IAN";
+    public static final int SECONDS_AFTER_NEXT_EXECUTION = 3;
 }

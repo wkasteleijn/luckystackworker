@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 import org.springframework.boot.SpringApplication;
@@ -29,6 +31,7 @@ public class LuckystackWorkerApplication {
 
         String osProfile = LswUtil.getActiveOSProfile();
         String dataFolder = LswFileUtil.getDataFolder(osProfile);
+        createDataFolderWhenMissing(dataFolder);
         if (Constants.SYSTEM_PROFILE_WINDOWS.equals(osProfile)) {
             log.info("Starting electron GUI");
             try {
@@ -42,16 +45,26 @@ public class LuckystackWorkerApplication {
         String lswVersion = LswUtil.getLswVersion();
         if (lswVersion != null) {
             log.info("Current app version is {}", lswVersion);
-            createDataFolderWhenMissing(dataFolder);
             DataInfo dataInfo = getDataInfo(dataFolder);
             if (dataInfo != null) {
+
+                // This is to prevent double servers running when the user accidentally doubly clicked the icon
+                // instead of single click.
+                if (dataInfo.getLastExecutionTime() != null) {
+                    LocalDateTime lastExecutionTime = LocalDateTime.parse(dataInfo.getLastExecutionTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    if (lastExecutionTime.plusSeconds(Constants.SECONDS_AFTER_NEXT_EXECUTION).isAfter(LocalDateTime.now())) {
+                        log.error("Another instance was already started, shutting down!");
+                        System.exit(1);
+                    }
+                }
+
                 if (!dataInfo.getVersion().equals(lswVersion)) {
-                    log.info(
+                    log.warn(
                             "Overwriting current data file as the version does not correspond, data file : {}",
                             dataInfo.getVersion());
                     copyDbFile(osProfile, dataFolder);
-                    writeDataInfoFile(lswVersion, dataFolder);
                 }
+                writeDataInfoFile(lswVersion, dataFolder);
             } else {
                 log.info("First time the app was started, copying db file and data info file to data folder {}",
                         dataFolder);
@@ -59,7 +72,7 @@ public class LuckystackWorkerApplication {
                 writeDataInfoFile(lswVersion, dataFolder);
             }
         } else {
-            log.info("Could not determine app version");
+            log.warn("Could not determine app version");
         }
 
         SpringApplication.run(LuckystackWorkerApplication.class, args);
@@ -87,6 +100,7 @@ public class LuckystackWorkerApplication {
     private static void writeDataInfoFile(String lswVersion, String dataFolder) throws IOException {
         DataInfo dataInfo;
         dataInfo = DataInfo.builder().version(lswVersion).instalationDate(LocalDate.now().toString())
+                .lastExecutionTime(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now()))
                 .build();
         String dataInfoStr = new Yaml().dump(dataInfo);
         Files.writeString(Paths.get(dataFolder + "/data-info.yml"), dataInfoStr);
