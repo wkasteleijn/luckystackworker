@@ -9,6 +9,8 @@ frontend/.angular
 frontend/dist
 frontend/LuckyStackWorker-win32-x64
 frontend/LuckyStackWorker-win32-x64.zip
+frontend/LuckyStackWorker-linux-x64
+frontend/LuckyStackWorker-linux-x64.zip
 frontend/jre/
 frontend/lsw-gui-darwin-x64
 frontend/lsw-gui-darwin-arm64
