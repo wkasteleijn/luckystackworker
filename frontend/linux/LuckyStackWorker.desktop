@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=LuckyStackWorker
+Version=5.0.0
+Type=Application
+Exec=/opt/LuckyStackWorker/lsw-5.0.0-linux-x64/LuckyStackWorker
+Comment=Lucky Stack Worker
+Terminal=false
+PrefersNonDefaultGPU=false
+Icon=/usr/share/icons/hicolor/256x256/apps/LuckyStackWorker.png
+MimeType=image/tiff
+Categories=Graphics;Astro
+Keywords=Graphics;Image;Astronomy
+GenericName[en_US]=image post-processing
+Name[en_US]=LuckyStackWorker.desktop
