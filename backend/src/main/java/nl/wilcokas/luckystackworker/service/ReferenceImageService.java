@@ -442,16 +442,20 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     private void drawHistogram(boolean isNew) {
-        Pair<double[], double[]> histogram = getHistogram();
-        double[] x = histogram.getLeft();
-        double[] y = histogram.getRight();
-        histogramPlot.setLimits(0, 65535, 0, getYLimit(y));
-        if (isNew) {
-            histogramPlot.add("bar", x, y);
-        } else {
-            histogramPlot.replace(0, "bar", x, y);
+        try {
+            Pair<double[], double[]> histogram = getHistogram();
+            double[] x = histogram.getLeft();
+            double[] y = histogram.getRight();
+            histogramPlot.setLimits(0, 65535, 0, getYLimit(y));
+            if (isNew) {
+                histogramPlot.add("bar", x, y);
+            } else {
+                histogramPlot.replace(0, "bar", x, y);
+            }
+            histogramPlot.update();
+        } catch (Exception e) {
+            log.error("Error drawing the histogram: ", e);
         }
-        histogramPlot.update();
     }
 
     private Pair<double[], double[]> getHistogram() {

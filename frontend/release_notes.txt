@@ -1,6 +1,6 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
-20/01/2024: major release 5.0.0:
+21/01/2024: major release 5.0.0:
 - Created seperate tab for denoise controls
 - Added possibility to apply denoising in 2 passes with different algorithms of choice
 - Added new denoise algorithm: Ian's NR (from G'MIC)
