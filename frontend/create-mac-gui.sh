@@ -14,3 +14,6 @@ rm -rf .angular
 rm -rf createExe*.bat
 rm -rf reset_db.sql
 rm -rf launch4j_lsw.xml
+rm -rf linux
+rm -f LuckyStackWorker.exe
+

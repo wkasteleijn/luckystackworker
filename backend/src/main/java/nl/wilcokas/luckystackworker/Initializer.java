@@ -26,11 +26,12 @@ public class Initializer {
     @PostConstruct
     public void init() throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
     UnsupportedLookAndFeelException {
-        log.info("Java home is {}", System.getProperty("java.home"));
-        log.info("Java vendor is {}", System.getProperty("java.vendor"));
-        log.info("Java version is {}", System.getProperty("java.version"));
-        log.info("Active profile is {}", System.getProperty("spring.profiles.active"));
-        log.info("Current folder is {}", System.getProperty("user.dir"));
+        log.warn("Java home is {}", System.getProperty("java.home"));
+        log.warn("Java vendor is {}", System.getProperty("java.vendor"));
+        log.warn("Java version is {}", System.getProperty("java.version"));
+        log.warn("Active profile is {}", System.getProperty("spring.profiles.active"));
+        log.warn("Current folder is {}", System.getProperty("user.dir"));
+        log.warn("User home folder is {}", System.getProperty("user.home"));
 
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 

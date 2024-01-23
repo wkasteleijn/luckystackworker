@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# # # # # # # # # # # # # # # # # # # # # # # # #
+#                                               #
+#   LuckyStackWorker set-up script for Linux    #
+#                                               #
+# # # # # # # # # # # # # # # # # # # # # # # # #
+##
+##  COMMANDLINE: $ sudo ./lsw-setup
+##
+
+_APP="LuckyStackWorker"
+_VER="lsw-5.0.0-linux-x64"
+_ROOT=opt
+_LSW_FOLDER=/$_ROOT/$_APP/$_VER
+
+# make sure we're running with elevated privileges, so we can
+# make folders and copy files into /opt and /usr
+SUDO=''
+if (( $EUID != 0 )); then
+    SUDO='sudo'
+fi
+#$SUDO a_command 
+
+echo "Checking Directories"
+[[ -d /$_ROOT/$_APP ]] || $SUDO mkdir /$_ROOT/$_APP ; echo "  -- Created " /$_ROOT/$_APP 
+[[ -d $_LSW_FOLDER ]] || $SUDO mkdir $_LSW_FOLDER ; echo "  -- Created " $_LSW_FOLDER 
+
+# copy all the files to the LSW_folder
+[[ -d $_LSW_FOLDER/jre ]] || echo "Copying Files" ; $SUDO cp -rp ./* $_LSW_FOLDER 
+
+cd $_LSW_FOLDER
+
+[[ -f /usr/share/icons/hicolor/256x256/apps/LuckyStackWorker.png ]] || \
+  echo "Copying Icon and Shortcut" ; \
+	$SUDO cp ./resources/app/dist/luckystackworker/assets/images/luckystackworker_icon.png \
+	   /usr/share/icons/hicolor/256x256/apps/LuckyStackWorker.png ; \
+	$SUDO cp LuckyStackWorker.desktop /usr/share/applications ; \
+	cp LuckyStackWorker.desktop ~/Desktop
+
+# make our programs executable if they aren't already
+[[ -x lsw-gui ]] || $SUDO chmod +x lsw-gui
+[[ -x LuckyStackWorker ]] || $SUDO chmod +x LuckyStackWorker
+[[ -x LuckyStackWorker.desktop ]] || $SUDO chmod +x LuckyStackWorker.desktop
+
+echo "LuckyStackWorker Setup Completed"
+echo 

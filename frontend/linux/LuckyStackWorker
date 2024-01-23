@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# # # # # # # # # # # # # # # # # # # # # # # # #
+#                                               #
+#   LuckyStackWorker start-up script for Linux  #
+#                                               #
+# # # # # # # # # # # # # # # # # # # # # # # # #
+
+# change directory to LSW_INSTALLATION_FOLDER
+cd /opt/LuckyStackWorker/lsw-5.0.0-linux-x64/
+
+##
+##  COMMANDLINE    ./LuckyStackWorker
+##
+
+# either: the file/folder exists |or| we make it now
+# do it here, so it's owned by user and writable
+[[ -d ~/.lsw ]] || mkdir ~/.lsw
+
+# Set up the java runtime
+export LSW_INSTALLATION_FOLDER=$(pwd)
+export JAVA_HOME="$LSW_INSTALLATION_FOLDER"/jre
+export PATH=$JAVA_HOME/bin:$PATH
+
+[[ -f ~/.lsw/lsw.log ]] && logsize=`stat -c %s  ~/.lsw/lsw.log` ; echo $logsize
+if [[ "$logsize" -ge "999000" ]]
+ then
+	notify-send -u critical "WARNING:" "Lucky Stack Worker LOG is getting BIG\n\nit's in ~/.lsw/lsw.log"
+ fi
+
+# Start java backend as a background process
+java -Dspring.profiles.active=linux -Dlsw.version=5.0.0 -jar ./luckystackworker-5.0.0.jar >> ~/.lsw/lsw.log &
+
+# Start the frontend GUI in the foreground
+./lsw-gui #--trace-warnings
+
+
+
+
+##
+##  COMMANDLINE to capture start-script log
+##
+##  ./LuckyStackWorker 2>> ~/.lsw/start-lsw.log
+##

@@ -55,7 +55,7 @@ public class GmicService {
     public boolean isGmicAvailable(String activeOSProfile) {
         try {
             LswUtil.runCliCommand(activeOSProfile, getGmicCommand(activeOSProfile), true);
-            log.info("G'MIC is available");
+            log.warn("G'MIC is available");
             return true;
         } catch (Exception e) {
             log.error("G'MIC is unavailable, reason: " + e.getMessage());
@@ -66,8 +66,10 @@ public class GmicService {
     private List<String> getGmicCommand(String activeOSProfile) {
         if (Constants.SYSTEM_PROFILE_WINDOWS.equals(activeOSProfile)) {
             return Collections.singletonList("./gmic/gmic.exe");
-        } else {
+        } else if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile)) {
             return Arrays.asList("export", "PATH=/usr/local/bin:$PATH", "&&", "gmic");
+        } else {
+            return Arrays.asList("export", "PATH=/usr/bin:$PATH", "&&", "gmic");
         }
     }
 
