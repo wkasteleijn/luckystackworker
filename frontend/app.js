@@ -27,7 +27,7 @@ function createWindow() {
     if (process.platform === "darwin") {
       app.dock.hide();
     }
-    fetch("http://localhost:8080/api/profiles/exit", {
+    fetch("http://localhost:36469/api/profiles/exit", {
       method: "PUT",
     }).catch((error) => {});
   });

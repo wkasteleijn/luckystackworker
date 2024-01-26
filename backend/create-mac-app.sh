@@ -5,12 +5,12 @@ fi
 
 if [ "$2" = "x64" ]; then
     echo "Building the LSW for $2 architecture"
-    export JRE_HOME="/Library/Java/JavaVirtualMachines/temurin-17.jre/Contents/Home"
+    export JRE_HOME="/Users/wkasteleijn/Applications/jre-21.0.2-x64/Contents/Home"
 fi
 
 if [ "$2" = "arm64" ]; then
     echo "Building the LSW for $2 architecture"
-    export JRE_HOME="/Users/wkasteleijn/Applications/jre-arm64/Contents/Home"
+    export JRE_HOME="/Users/wkasteleijn/Applications/jre-21.0.2-arm64/Contents/Home"
 fi
 
 cd ~/git/luckystackworker/backend/target

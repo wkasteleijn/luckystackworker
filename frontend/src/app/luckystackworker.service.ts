@@ -7,7 +7,7 @@ import { Profile } from './model/profile';
   providedIn: 'root',
 })
 export class LuckyStackWorkerService {
-  private baseUrl = 'http://localhost:8080/api';
+  private baseUrl = 'http://localhost:36469/api';
 
   constructor(private http: HttpClient) {}
 
