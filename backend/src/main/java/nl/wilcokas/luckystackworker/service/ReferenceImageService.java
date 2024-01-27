@@ -589,14 +589,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         finalResultImage = new Opener().openImage(LswFileUtil.getIJFileFormat(this.filePath));
         boolean largeImage = false;
         if (finalResultImage != null) {
-            finalResultImage.show();
-            finalResultImage.getWindow().setVisible(false);
             if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame(), activeOSProfile)) {
                 return false;
             }
             if (profile.getScale() > 1.0) {
                 finalResultImage = operationService.scaleImage(finalResultImage, profile.getScale());
             }
+            operationService.correctExposure(finalResultImage);
             unprocessedImageLayers = getImageLayers(finalResultImage);
 
             log.info("Opened final result image image with id {}", finalResultImage.getID());

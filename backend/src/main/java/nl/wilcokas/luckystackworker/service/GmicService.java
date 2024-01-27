@@ -11,16 +11,26 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import ij.io.Opener;
 import ij.process.ImageProcessor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class GmicService {
+
+    private final SettingsService settingsService;
+
     public void callGmicCli(ImagePlus image, final String profileName, final List<String> commands) {
         try {
+            if (!settingsService.getSettings().isGmicAvailable()) {
+                log.warn("Attempt to call G'MIC while it in't available");
+                return;
+            }
+
             String activeOSProfile = LswUtil.getActiveOSProfile();
             String workFolder = LswFileUtil.getDataFolder(activeOSProfile);
             String inputFile = workFolder + "/temp_in.tif";

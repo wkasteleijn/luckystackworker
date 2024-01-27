@@ -10,7 +10,9 @@ XCOPY C:\Users\wkast\applications\gmic-3.3.2-cli-win64 .\LuckyStackWorker-win32-
 RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\src
 RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\node_modules
 RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\.angular
-RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\lsw-gui-linux-x64
+RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\LuckyStackWorker-linux-x64
+RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\linux
+DEL /Q .\LuckyStackWorker-win32-x64\resources\app\LuckyStackWorker-linux-x64.zip
 DEL /Q .\LuckyStackWorker-win32-x64\resources\app\createExe*.bat
 DEL /Q .\LuckyStackWorker-win32-x64\resources\app\reset_db.sql
 DEL /Q .\LuckyStackWorker-win32-x64\resources\app\launch4j_lsw.xml

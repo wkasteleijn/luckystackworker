@@ -10,6 +10,7 @@ LuckyStackWorker - RELEASE NOTES
 - Fixed bug in histogram not opening for monochrome image stacks
 - More compact layout
 - Revised processing core, resulting in a better (more quiet) user experience
+- Change TCP port number used for GUI-backend interaction to 36469.
 - Upgraded frontend & backend dependencies to the latest versions.
 
 03/10/2023 minor release 4.8.0:

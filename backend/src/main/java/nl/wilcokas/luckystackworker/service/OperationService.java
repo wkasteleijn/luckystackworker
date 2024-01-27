@@ -78,7 +78,14 @@ public class OperationService {
         applySaturation(image, profile);
     }
 
-    public void applySharpen(final ImagePlus image, Profile profile) {
+    public ImagePlus scaleImage(final ImagePlus image, final double scale) {
+        int newWidth = (int) (image.getWidth() * scale);
+        int newHeight = (int) (image.getHeight() * scale);
+        int depth = image.getStack().size();
+        return Scaler.resize(image, newWidth, newHeight, depth, "depth=%s interpolation=Bicubic create".formatted(depth));
+    }
+
+    private void applySharpen(final ImagePlus image, Profile profile) {
         int iterations = profile.getIterations() == 0 ? 1 : profile.getIterations();
         if (profile.getRadius() != null && profile.getAmount() != null) {
             log.info("Applying sharpen with radius {}, amount {}, iterations {} to image {}", profile.getRadius(),
@@ -117,7 +124,7 @@ public class OperationService {
         }
     }
 
-    public void applyLocalContrast(final ImagePlus image, Profile profile) {
+    private void applyLocalContrast(final ImagePlus image, Profile profile) {
         LSWSharpenMode mode = (profile.getLocalContrastMode() == null) ? LSWSharpenMode.LUMINANCE
                 : LSWSharpenMode.valueOf(profile.getLocalContrastMode());
         if (profile.getLocalContrastFine() != 0) {
@@ -131,7 +138,7 @@ public class OperationService {
         }
     }
 
-    public void applySigmaDenoise1(final ImagePlus image, final Profile profile) {
+    private void applySigmaDenoise1(final ImagePlus image, final Profile profile) {
         if (Constants.DENOISE_ALGORITHM_SIGMA1.equals(profile.getDenoiseAlgorithm1())) {
             int iterations = profile.getDenoise1Iterations() == 0 ? 1 : profile.getDenoise1Iterations();
             log.info("Applying Sigma denoise mode 1 with value {} to image {}", profile.getDenoise1Amount(), image.getID());
@@ -144,7 +151,7 @@ public class OperationService {
         }
     }
 
-    public void applySigmaDenoise2(final ImagePlus image, final Profile profile) {
+    private void applySigmaDenoise2(final ImagePlus image, final Profile profile) {
         if (Constants.DENOISE_ALGORITHM_SIGMA2.equals(profile.getDenoiseAlgorithm2())) {
             int iterations = profile.getDenoise1Iterations() == 0 ? 1 : profile.getDenoise1Iterations();
             log.info("Applying Sigma denoise mode 2 with value {} to image {}", profile.getDenoise1Amount(), image.getID());
@@ -156,7 +163,7 @@ public class OperationService {
         }
     }
 
-    public void applyIansNoiseReduction(final ImagePlus image, final Profile profile) throws IOException, InterruptedException {
+    private void applyIansNoiseReduction(final ImagePlus image, final Profile profile) throws IOException, InterruptedException {
         if (Constants.DENOISE_ALGORITHM_IANS.equals(profile.getDenoiseAlgorithm1())) {
             log.info("Applying Ian's noise reduction to image {}", image.getID());
             IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(profile.getIansAmount()).medium(BigDecimal.ZERO)
@@ -165,7 +172,7 @@ public class OperationService {
         }
     }
 
-    public void applyGamma(final ImagePlus image, final Profile profile) {
+    private void applyGamma(final ImagePlus image, final Profile profile) {
         if (profile.getGamma() != null && (profile.getGamma().compareTo(BigDecimal.ONE) != 0)) {
             log.info("Applying gamma correction with value {} to image {}", profile.getGamma(), image.getID());
             for (int slice = 1; slice <= image.getStack().getSize(); slice++) {
@@ -176,7 +183,7 @@ public class OperationService {
 
     }
 
-    public void applyRGBBalance(final ImagePlus image, final Profile profile) {
+    private void applyRGBBalance(final ImagePlus image, final Profile profile) {
         if ((profile.getRed() != null && (!profile.getRed().equals(BigDecimal.ZERO)))
                 || (profile.getGreen() != null && (!profile.getGreen().equals(BigDecimal.ZERO)))
                 || (profile.getBlue() != null && (!profile.getBlue().equals(BigDecimal.ZERO)))) {
@@ -189,7 +196,7 @@ public class OperationService {
         }
     }
 
-    public void applySaturation(final ImagePlus image, final Profile profile) {
+    private void applySaturation(final ImagePlus image, final Profile profile) {
         if (profile.getSaturation() != null) {
             if (validateRGBStack(image)) {
                 log.info("Applying saturation increase with factor {} to image {}", profile.getSaturation(),
@@ -201,12 +208,12 @@ public class OperationService {
         }
     }
 
-    public void applyEqualizeLocalHistorgrams(final ImagePlus image, final Profile profile) throws IOException, InterruptedException {
+    private void applyEqualizeLocalHistorgrams(final ImagePlus image, final Profile profile) throws IOException, InterruptedException {
         log.info("Applying equalize local historgrams with strength {} to image {}", profile.getEqualizeLocalHistogramsStrength(), image.getID());
         equalizeLocalHistogramsFilter.apply(image, profile.getName(), profile.getEqualizeLocalHistogramsStrength());
     }
 
-    public void applyBrightnessAndContrast(ImagePlus image, final Profile profile, boolean copyMinMax) {
+    private void applyBrightnessAndContrast(ImagePlus image, final Profile profile, boolean copyMinMax) {
         if (profile.getContrast() != 0 || profile.getBrightness() != 0 || profile.getBackground() != 0) {
             if (copyMinMax) {
                 LswImageProcessingUtil.copyMinMax(image, image);
@@ -232,7 +239,7 @@ public class OperationService {
         }
     }
 
-    public void applySavitzkyGolayDenoise(ImagePlus image, final Profile profile) {
+    private void applySavitzkyGolayDenoise(ImagePlus image, final Profile profile) {
         if (Constants.DENOISE_ALGORITHM_SAVGOLAY.equals(profile.getDenoiseAlgorithm2())) {
             log.info("Starting SavitzkyGolayDenoise filter");
             int iterations = profile.getSavitzkyGolayIterations() == 0 ? 1 : profile.getSavitzkyGolayIterations();
@@ -242,18 +249,11 @@ public class OperationService {
         }
     }
 
-    public void applyDispersionCorrection(final ImagePlus image, final Profile profile) {
+    private void applyDispersionCorrection(final ImagePlus image, final Profile profile) {
         if (profile.isDispersionCorrectionEnabled() && validateRGBStack(image)) {
             log.info("Applying dispersion correction");
             dispersionCorrectionFilter.apply(image, profile);
         }
-    }
-
-    public ImagePlus scaleImage(final ImagePlus image, final double scale) {
-        int newWidth = (int) (image.getWidth() * scale);
-        int newHeight = (int) (image.getHeight() * scale);
-        int depth = image.getStack().size();
-        return Scaler.resize(image, newWidth, newHeight, depth, "depth=%s interpolation=Bicubic create".formatted(depth));
     }
 
     private boolean validateLuminanceInclusion(LSWSharpenParameters parameters) {
