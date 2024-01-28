@@ -153,12 +153,11 @@ public class OperationService {
 
     private void applySigmaDenoise2(final ImagePlus image, final Profile profile) {
         if (Constants.DENOISE_ALGORITHM_SIGMA2.equals(profile.getDenoiseAlgorithm2())) {
-            int iterations = profile.getDenoise1Iterations() == 0 ? 1 : profile.getDenoise1Iterations();
-            log.info("Applying Sigma denoise mode 2 with value {} to image {}", profile.getDenoise1Amount(), image.getID());
-            BigDecimal factor = profile.getDenoise1Amount().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100) : profile.getDenoise1Amount();
-            BigDecimal minimum = factor.divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
+            int iterations = profile.getDenoise2Iterations() == 0 ? 1 : profile.getDenoise2Iterations();
+            log.info("Applying Sigma denoise mode 2 with radius {} and {} iterations to image {}", profile.getDenoise2Radius(), iterations,
+                    image.getID());
             for (int i = 0; i < iterations; i++) {
-                sigmaFilterPlusFilter.apply(image, profile.getDenoise1Radius().doubleValue(), 5D, minimum.doubleValue());
+                sigmaFilterPlusFilter.apply(image, profile.getDenoise2Radius().doubleValue(), 5D, 1D);
             }
         }
     }

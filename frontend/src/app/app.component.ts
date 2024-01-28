@@ -415,7 +415,7 @@ export class AppComponent implements OnInit {
 
   denoise2RadiusChanged(event: any, update: boolean) {
     this.profile.denoise2Radius = event.value;
-    this.denoise1Radius = event.value;
+    this.denoise2Radius = event.value;
     this.settings.operation = 'denoise2Radius';
     console.log('denoise2RadiusChanged called: ' + this.profile.denoise2Radius);
     if (update) {
