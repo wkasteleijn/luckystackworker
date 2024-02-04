@@ -52,7 +52,7 @@ public class ProfileService {
         profile.mapFromDTO(profileDTO);
         profiles.put(profile.getName(), profile);
         try {
-            objectMapper.writeValue(new File(LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + PROFILES_FILE), profiles);
+            objectMapper.writeValue(new File(LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + PROFILES_FILE), profiles.values());
         } catch (Exception e) {
             log.error("Error writing profiles: ", e);
         }
@@ -76,6 +76,7 @@ public class ProfileService {
         String json = null;
         try {
             json = Files.readString(Paths.get(LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + PROFILES_FILE));
+            System.out.println(json);
         } catch (Exception e) {
             log.warn("Profiles file not found");
         }

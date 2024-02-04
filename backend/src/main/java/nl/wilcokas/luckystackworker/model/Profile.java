@@ -64,7 +64,7 @@ public class Profile {
         this.luminanceIncludeBlue = profile.isLuminanceIncludeBlue();
         this.luminanceIncludeColor = profile.isLuminanceIncludeColor();
         this.scale = profile.getScale();
-        this.threshold = profile.getDeringThreshold();
+        this.deringThreshold = profile.getDeringThreshold();
         this.equalizeLocalHistogramsStrength = profile.getEqualizeLocalHistogramsStrength();
     }
 
@@ -114,7 +114,7 @@ public class Profile {
     private boolean luminanceIncludeBlue;
     private boolean luminanceIncludeColor;
     private double scale;
-    private int threshold;
+    private int deringThreshold;
     private int equalizeLocalHistogramsStrength;
 
     // Not used any longer, needed for historical reasons. Removing this would now

@@ -11,7 +11,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.yaml.snakeyaml.Yaml;
@@ -24,9 +23,17 @@ import nl.wilcokas.luckystackworker.util.LswUtil;
 
 @Slf4j
 @EnableScheduling
-@SpringBootApplication
-@EnableAutoConfiguration(exclude = { org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class,
-        org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration.class })
+@SpringBootApplication(exclude = {
+        org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.transaction.jta.JtaAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration.class })
 public class LuckystackWorkerApplication {
 
     public static void main(String[] args) throws IOException, InterruptedException {

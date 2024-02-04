@@ -95,7 +95,8 @@ public class OperationService {
             float deringStrength = profile.getDeringStrength() / 100f;
             UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radius(profile.getRadius().doubleValue()).amount(amount)
                     .iterations(iterations).clippingStrength(clippingStrength).clippingRange(100 - profile.getClippingRange())
-                    .deringRadius(profile.getDeringRadius().doubleValue()).deringStrength(deringStrength).deringThreshold(profile.getThreshold())
+                    .deringRadius(profile.getDeringRadius().doubleValue()).deringStrength(deringStrength)
+                    .deringThreshold(profile.getDeringThreshold())
                     .build();
             LSWSharpenMode mode = (profile.getSharpenMode() == null) ? LSWSharpenMode.LUMINANCE : LSWSharpenMode.valueOf(profile.getSharpenMode());
             LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(profile.isLuminanceIncludeBlue())

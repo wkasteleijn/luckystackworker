@@ -225,8 +225,8 @@ public class LswFileUtil {
                 }
 
                 // Added since v4.8.0, so older version written yaml needs to stay compatible.
-                if (profile.getThreshold() == 0) {
-                    profile.setThreshold(Constants.DEFAULT_THRESHOLD);
+                if (profile.getDeringThreshold() == 0) {
+                    profile.setDeringThreshold(Constants.DEFAULT_THRESHOLD);
                 }
                 if (profile.getScale() == 0D) {
                     profile.setScale(1D);

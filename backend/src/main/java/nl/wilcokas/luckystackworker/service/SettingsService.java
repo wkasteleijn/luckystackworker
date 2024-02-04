@@ -61,7 +61,9 @@ public class SettingsService {
             log.warn("Settings file not found");
         }
         log.info("Reverting to the default settings");
-        settings = getDefaultSettings();
+        if (settings == null) {
+            settings = getDefaultSettings();
+        }
     }
 
     private Settings getDefaultSettings() {
