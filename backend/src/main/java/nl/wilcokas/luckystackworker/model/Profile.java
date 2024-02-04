@@ -2,13 +2,6 @@ package nl.wilcokas.luckystackworker.model;
 
 import java.math.BigDecimal;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,8 +9,6 @@ import lombok.NoArgsConstructor;
 import nl.wilcokas.luckystackworker.dto.ProfileDTO;
 
 @Data
-@Entity
-@Table(name = "profiles")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -77,166 +68,62 @@ public class Profile {
         this.equalizeLocalHistogramsStrength = profile.getEqualizeLocalHistogramsStrength();
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private int id;
-
-    @Column(name = "name")
     private String name;
-
-    @Column(name = "radius")
     private BigDecimal radius;
-
-    @Column(name = "amount")
     private BigDecimal amount;
-
-    @Column(name = "iterations")
     private int iterations;
-
-    @Column(name = "level")
     private int level;
-
-    @Column(name = "denoise_algorithm_1")
     private String denoiseAlgorithm1;
-
-    @Column(name = "denoise_algorithm_2")
     private String denoiseAlgorithm2;
-
-    @Column(name = "denoise")
     private BigDecimal denoise1Amount;
-
-    @Column(name = "denoise_sigma")
-    private BigDecimal denoiseSigma; // Unused as of 5.0.0
-
-    @Column(name = "denoise_radius")
     private BigDecimal denoise1Radius;
-
-    @Column(name = "denoise_iterations")
     private int denoise1Iterations;
-
-    @Column(name = "ians_amount")
     private BigDecimal iansAmount;
-    @Column(name = "ians_recovery")
     private BigDecimal iansRecovery;
-
-    @Column(name = "denoise2_radius")
     private BigDecimal denoise2Radius;
-
-    @Column(name = "denoise2_iterations")
     private int denoise2Iterations;
-
-    @Column(name = "gamma")
     private BigDecimal gamma;
-
-    @Column(name = "red")
     private BigDecimal red;
-
-    @Column(name = "green")
     private BigDecimal green;
-
-    @Column(name = "blue")
     private BigDecimal blue;
-
-    @Column(name = "purple")
     private BigDecimal purple;
-
-    @Column(name = "saturation")
     private BigDecimal saturation;
-
-    @Column(name = "contrast")
     private int contrast;
-
-    @Column(name = "brightness")
     private int brightness;
-
-    @Column(name = "background")
     private int background;
-
-    @Column(name = "savitzkyGolaySize")
     private int savitzkyGolaySize;
-
-    @Column(name = "savitzkyGolayAmount")
     private int savitzkyGolayAmount;
-
-    @Column(name = "savitzkyGolayIterations")
     private int savitzkyGolayIterations;
-
-    @Column(name = "clippingStrength")
     private int clippingStrength;
-
-    @Column(name = "clippingRange")
     private int clippingRange;
-
-    @Column(name = "deringRadius")
     private BigDecimal deringRadius;
-
-    @Column(name = "deringStrength")
     private int deringStrength;
-
-    @Column(name = "sharpenMode")
     private String sharpenMode;
-
-    @Column(name = "localContrastMode")
     private String localContrastMode;
-
-    @Column(name = "localContrastFine")
     private int localContrastFine;
-
-    @Column(name = "localContrastMedium")
     private int localContrastMedium;
-
-    @Column(name = "localContrastLarge")
     private int localContrastLarge;
-
-    @Column(name = "dispersionCorrectionEnabled")
     private boolean dispersionCorrectionEnabled;
-
-    @Column(name = "dispersionCorrectionRedX")
     private int dispersionCorrectionRedX;
-
-    @Column(name = "dispersionCorrectionBlueX")
     private int dispersionCorrectionBlueX;
-
-    @Column(name = "dispersionCorrectionRedY")
     private int dispersionCorrectionRedY;
-
-    @Column(name = "dispersionCorrectionBlueY")
     private int dispersionCorrectionBlueY;
-
-    @Column(name = "luminanceIncludeRed")
     private boolean luminanceIncludeRed;
-
-    @Column(name = "luminanceIncludeGreen")
     private boolean luminanceIncludeGreen;
-
-    @Column(name = "luminanceIncludeBlue")
     private boolean luminanceIncludeBlue;
-
-    @Column(name = "luminanceIncludeColor")
     private boolean luminanceIncludeColor;
-
-    @Column(name = "scale")
     private double scale;
-
-    @Column(name = "threshold")
     private int threshold;
-
-    @Column(name = "eq_local_hist_strength")
     private int equalizeLocalHistogramsStrength;
 
     // Not used any longer, needed for historical reasons. Removing this would now
     // break the profile loading of old yaml files created prior to 4.1.0.
-    @Transient
+    private BigDecimal denoiseSigma; // Unused as of 5.0.0
     private String operation;
-    @Transient
     private String rootFolder;
-    @Transient
     private boolean isLargeImage;
-    @Transient
     private BigDecimal denoise;
-    @Transient
     private BigDecimal denoiseRadius;
-    @Transient
     private int denoiseIterations;
 }

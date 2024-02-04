@@ -22,16 +22,16 @@ import nl.wilcokas.luckystackworker.util.LswUtil;
 @Service
 public class GmicService {
 
-    private final SettingsService settingsService;
+    private Boolean gmicAvailable;
 
     public void callGmicCli(ImagePlus image, final String profileName, final List<String> commands) {
         try {
-            if (!settingsService.getSettings().isGmicAvailable()) {
+            String activeOSProfile = LswUtil.getActiveOSProfile();
+            if (!isGmicAvailable(activeOSProfile)) {
                 log.warn("Attempt to call G'MIC while it in't available");
                 return;
             }
 
-            String activeOSProfile = LswUtil.getActiveOSProfile();
             String workFolder = LswFileUtil.getDataFolder(activeOSProfile);
             String inputFile = workFolder + "/temp_in.tif";
             LswFileUtil.saveImage(image, profileName, inputFile, image.getStack().size() > 1, false, false, false);
@@ -63,14 +63,17 @@ public class GmicService {
     }
 
     public boolean isGmicAvailable(String activeOSProfile) {
-        try {
-            LswUtil.runCliCommand(activeOSProfile, getGmicCommand(activeOSProfile), true);
-            log.warn("G'MIC is available");
-            return true;
-        } catch (Exception e) {
-            log.error("G'MIC is unavailable, reason: " + e.getMessage());
-            return false;
+        if (gmicAvailable == null) {
+            try {
+                LswUtil.runCliCommand(activeOSProfile, getGmicCommand(activeOSProfile), true);
+                log.warn("G'MIC is available");
+                gmicAvailable = true;
+            } catch (Exception e) {
+                log.error("G'MIC is unavailable, reason: " + e.getMessage());
+                gmicAvailable = false;
+            }
         }
+        return gmicAvailable;
     }
 
     private List<String> getGmicCommand(String activeOSProfile) {

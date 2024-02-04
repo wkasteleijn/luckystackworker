@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.dto.VersionDTO;
 import nl.wilcokas.luckystackworker.model.Settings;
-import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ReferenceImageServiceTest {
@@ -30,8 +29,6 @@ class ReferenceImageServiceTest {
     private SettingsService settingsService;
     @Mock
     private HttpService httpService;
-    @Mock
-    private SettingsRepository settingsRepository;
     @Mock
     private ProfileService profileService;
     @Mock
