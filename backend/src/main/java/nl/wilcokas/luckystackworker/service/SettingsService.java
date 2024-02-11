@@ -60,8 +60,8 @@ public class SettingsService {
         } catch (Exception e) {
             log.warn("Settings file not found");
         }
-        log.info("Reverting to the default settings");
         if (settings == null) {
+            log.info("Reverting to the default settings");
             settings = getDefaultSettings();
         }
     }

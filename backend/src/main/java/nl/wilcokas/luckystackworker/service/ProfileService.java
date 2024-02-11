@@ -76,7 +76,6 @@ public class ProfileService {
         String json = null;
         try {
             json = Files.readString(Paths.get(LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + PROFILES_FILE));
-            System.out.println(json);
         } catch (Exception e) {
             log.warn("Profiles file not found");
         }
