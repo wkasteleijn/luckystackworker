@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
+import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import org.apache.commons.io.FileUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -140,7 +141,7 @@ public class WorkerService {
                     LuckyStackWorkerContext.statusUpdate("Processing : " + filename);
                 }
 
-                ImagePlus imp = new Opener().openImage(filePath);
+                ImagePlus imp = LswFileUtil.openImage(filePath, OpenImageModeEnum.RGB); // TODO: must use same opening mode as in GUI somehow
                 if (LswFileUtil.validateImageFormat(imp, null, null)) {
                     if (LswFileUtil.isPngRgbStack(imp, filePath)) {
                         imp = LswFileUtil.fixNonTiffOpeningSettings(imp);

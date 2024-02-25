@@ -9,10 +9,16 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.Executor;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import ij.ImageStack;
+import ij.gui.NewImage;
+import ij.io.Opener;
+import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
+import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import org.yaml.snakeyaml.Yaml;
 
 import ij.CompositeImage;
@@ -174,6 +180,7 @@ public class LswFileUtil {
     public static boolean isPngRgbStack(ImagePlus image, String filePath) {
         return isPng(image, filePath) && isStack(image);
     }
+
     public static boolean isPng(ImagePlus image, String filePath) {
         return filePath.toLowerCase().endsWith(".png");
     }
@@ -329,9 +336,106 @@ public class LswFileUtil {
         return dataFolder;
     }
 
+    public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode) {
+        ImagePlus image = new Opener().openImage(LswFileUtil.getIJFileFormat(filepath));
+        if (openImageMode != OpenImageModeEnum.RGB) {
+            LswImageLayersDto unprocessedImageLayers = getImageLayers(image);
+            image = create16BitRGBImage(filepath);
+            boolean includeRed = openImageMode == OpenImageModeEnum.RED || openImageMode == OpenImageModeEnum.RGB || openImageMode == OpenImageModeEnum.LRGB;
+            boolean includeGreen = openImageMode == OpenImageModeEnum.GREEN || openImageMode == OpenImageModeEnum.RGB || openImageMode == OpenImageModeEnum.LRGB;
+            boolean includeBlue = openImageMode == OpenImageModeEnum.BLUE || openImageMode == OpenImageModeEnum.RGB || openImageMode == OpenImageModeEnum.LRGB;
+            copyLayers(unprocessedImageLayers, image, includeRed, includeGreen, includeBlue);
+        }
+        return image;
+    }
+
+    public static LswImageLayersDto getImageLayers(ImagePlus image) {
+        ImageStack stack = image.getStack();
+        short[][] newPixels = new short[3][stack.getProcessor(1).getPixelCount()];
+        Executor executor = LswUtil.getParallelExecutor();
+        for (int layer = 1; layer <= stack.size(); layer++) {
+            int finalLayer = layer;
+            executor.execute(() -> {
+                ImageProcessor p = stack.getProcessor(finalLayer);
+                short[] pixels = (short[]) p.getPixels();
+                for (int i = 0; i < pixels.length; i++) {
+                    newPixels[finalLayer - 1][i] = pixels[i];
+                }
+            });
+        }
+        LswUtil.stopAndAwaitParallelExecutor(executor);
+        return LswImageLayersDto.builder().layers(newPixels).count(stack.size()).build();
+    }
+
+    public static void copyLayers(LswImageLayersDto layersDto, ImagePlus image, boolean includeRed, boolean includeGreen, boolean includeBlue) {
+        ImageStack stack = image.getStack();
+        Executor executor = LswUtil.getParallelExecutor();
+        short[][] layers = layersDto.getLayers();
+
+        if (includeRed) {
+            // Red
+            executor.execute(() -> {
+                ImageProcessor p = stack.getProcessor(1);
+                short[] pixels = (short[]) p.getPixels();
+                for (int i = 0; i < pixels.length; i++) {
+                    pixels[i] = layers[0][i];
+                }
+            });
+        }
+
+        if (includeGreen) {
+            // Green
+            executor.execute(() -> {
+                ImageProcessor p = stack.getProcessor(2);
+                short[] pixels = (short[]) p.getPixels();
+                for (int i = 0; i < pixels.length; i++) {
+                    pixels[i] = layers[1][i];
+                }
+            });
+        }
+
+        if (includeBlue) {
+            // Blue
+            executor.execute(() -> {
+                ImageProcessor p = stack.getProcessor(3);
+                short[] pixels = (short[]) p.getPixels();
+                for (int i = 0; i < pixels.length; i++) {
+                    pixels[i] = layers[2][i];
+                }
+            });
+        }
+
+        LswUtil.stopAndAwaitParallelExecutor(executor);
+    }
+
     private static void hackIncorrectPngFileInfo(LSWFileSaver saver) {
         FileInfo fileInfo = (FileInfo) LswUtil.getPrivateField(saver, LSWFileSaver.class, "fi");
         LswUtil.setPrivateField(fileInfo, FileInfo.class, "fileType", FileInfo.RGB48);
+    }
+
+    private static ImagePlus create16BitRGBImage(String filepath) {
+        // TODO: uncomment and complete
+//        boolean planar = fi.fileType==FileInfo.RGB48_PLANAR;
+//        Object[] pixelArray = (Object[])readPixels(fi);
+//        if (pixelArray==null) return null;
+//        int nChannels = 3;
+//        ImageStack stack = new ImageStack(width, height);
+//        stack.addSlice("Red", pixelArray[0]);
+//        stack.addSlice("Green", pixelArray[1]);
+//        stack.addSlice("Blue", pixelArray[2]);
+//
+//        ImagePlus imp = new ImagePlus(fi.fileName, stack);
+//        imp.setDimensions(nChannels, 1, 1);
+//        imp.setFileInfo(fi);
+//        int mode = IJ.COMPOSITE;
+//        imp = new CompositeImage(imp, mode);
+//        for (int c=1; c<=3; c++) {
+//            imp.setPosition(c, 1, 1);
+//            //imp.setDisplayRange(minValue, maxValue);
+//        }
+//        imp.setPosition(1, 1, 1);
+//        return imp;
+        return null;
     }
 
 }

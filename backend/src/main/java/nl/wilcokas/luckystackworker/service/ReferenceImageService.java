@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -163,10 +164,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         // profile, true);
         // setDefaultLayoutSettings(finalResultImage,
         // finalResultImage.getWindow().getLocation());
-        copyLayers(unprocessedImageLayers, this.finalResultImage);
+        LswFileUtil.copyLayers(unprocessedImageLayers, this.finalResultImage, true, true, true);
         operationService.applyAllOperations(finalResultImage, profile);
         finalResultImage.updateAndDraw();
-        copyLayers(getImageLayers(finalResultImage), displayedImage);
+        LswFileUtil.copyLayers(LswFileUtil.getImageLayers(finalResultImage), displayedImage, true, true, true);
         displayedImage.updateAndDraw();
         if (showHistogram && plotWindow != null) {
             drawHistogram(false);
@@ -586,7 +587,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             displayedImage.hide();
         }
 
-        finalResultImage = new Opener().openImage(LswFileUtil.getIJFileFormat(this.filePath));
+        finalResultImage = LswFileUtil.openImage(this.filePath, OpenImageModeEnum.RED);
         boolean largeImage = false;
         if (finalResultImage != null) {
             if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame(), activeOSProfile)) {
@@ -596,7 +597,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 finalResultImage = operationService.scaleImage(finalResultImage, profile.getScale());
             }
             operationService.correctExposure(finalResultImage);
-            unprocessedImageLayers = getImageLayers(finalResultImage);
+            unprocessedImageLayers = LswFileUtil.getImageLayers(finalResultImage);
 
             log.info("Opened final result image image with id {}", finalResultImage.getID());
 
@@ -673,41 +674,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             return false;
         }
         return true;
-    }
-
-    private LswImageLayersDto getImageLayers(ImagePlus image) {
-        ImageStack stack = image.getStack();
-        short[][] newPixels = new short[3][stack.getProcessor(1).getPixelCount()];
-        Executor executor = LswUtil.getParallelExecutor();
-        for (int layer = 1; layer <= stack.size(); layer++) {
-            int finalLayer = layer;
-            executor.execute(() -> {
-                ImageProcessor p = stack.getProcessor(finalLayer);
-                short[] pixels = (short[]) p.getPixels();
-                for (int i = 0; i < pixels.length; i++) {
-                    newPixels[finalLayer - 1][i] = pixels[i];
-                }
-            });
-        }
-        LswUtil.stopAndAwaitParallelExecutor(executor);
-        return LswImageLayersDto.builder().layers(newPixels).count(stack.size()).build();
-    }
-
-    private void copyLayers(LswImageLayersDto layersDto, ImagePlus image) {
-        ImageStack stack = image.getStack();
-        Executor executor = LswUtil.getParallelExecutor();
-        short[][] layers = layersDto.getLayers();
-        for (int layer = 1; layer <= stack.size(); layer++) {
-            final int finalLayer = layer;
-            executor.execute(() -> {
-                ImageProcessor p = stack.getProcessor(finalLayer);
-                short[] pixels = (short[]) p.getPixels();
-                for (int i = 0; i < pixels.length; i++) {
-                    pixels[i] = layers[finalLayer - 1][i];
-                }
-            });
-        }
-        LswUtil.stopAndAwaitParallelExecutor(executor);
     }
 
     final class MyFileChooser extends JFileChooser {

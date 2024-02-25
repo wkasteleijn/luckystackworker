@@ -6,6 +6,7 @@ import ij.ImagePlus;
 import ij.io.Opener;
 import ij.plugin.Scaler;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 
@@ -13,8 +14,8 @@ import nl.wilcokas.luckystackworker.util.LswUtil;
 public class Probeersels {
     public static void main(String[] args) throws InterruptedException, IOException {
 
-        ImagePlus image = new Opener()
-                .openImage("C:\\Users\\wkast\\archive\\Jup\\testsession\\denoise_test.tif");
+        ImagePlus image = LswFileUtil
+                .openImage("C:\\Users\\wkast\\archive\\Jup\\testsession\\denoise_test.tif", OpenImageModeEnum.RGB);
 
         image.show();
         // Set exposure back to original value

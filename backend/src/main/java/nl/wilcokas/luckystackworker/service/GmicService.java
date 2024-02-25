@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import org.springframework.stereotype.Service;
 
 import ij.ImagePlus;
@@ -46,7 +47,7 @@ public class GmicService {
             }
             arguments.addAll(Arrays.asList("-output", outputFile + ",int16"));
             LswUtil.runCliCommand(activeOSProfile, arguments, true);
-            ImagePlus outputImage = new Opener().openImage(LswFileUtil.getIJFileFormat(outputFile));
+            ImagePlus outputImage = LswFileUtil.openImage(LswFileUtil.getIJFileFormat(outputFile), OpenImageModeEnum.RGB);
             ImageStack outputStack = outputImage.getStack();
             ImageStack imageStack = image.getStack();
             for (int layer = 1; layer <= imageStack.getSize(); layer++) {
