@@ -33,6 +33,13 @@ export class AppComponent implements OnInit {
     { value: 'neptune', viewValue: 'Neptune' },
   ];
 
+  openImageModes: ProfileSelection[] = [
+    { value: 'RGB', viewValue: 'RGB' },
+    { value: 'RED', viewValue: 'Red' },
+    { value: 'GREEN', viewValue: 'Green' },
+    { value: 'BLUE', viewValue: 'Blue' },
+  ];
+
   title = 'LuckyStackWorker';
 
   // sharpen
@@ -109,6 +116,7 @@ export class AppComponent implements OnInit {
   realtimeEnabled: boolean = false;
   showHistogram: boolean = true;
   scale: string = '1';
+  openImageMode: string = 'RGB';
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
@@ -132,7 +140,7 @@ export class AppComponent implements OnInit {
 
   private callopenReferenceImage() {
     this.luckyStackWorkerService
-      .openReferenceImage(Number(this.scale))
+      .openReferenceImage(Number(this.scale), this.openImageMode)
       .subscribe(
         (data) => {
           console.log(data);
@@ -216,6 +224,12 @@ export class AppComponent implements OnInit {
         this.hideSpinner();
       }
     );
+  }
+
+  openImageModeChanged(event: any) {
+    console.log('openImageModeChanged called');
+    this.profile.openImageMode = event.value;
+    this.openImageMode = event.value;
   }
 
   radiusChanged(event: any, update: boolean) {

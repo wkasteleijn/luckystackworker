@@ -54,4 +54,5 @@ export class Profile {
   dispersionCorrectionRedY: number;
   dispersionCorrectionBlueY: number;
   scale: number;
+  openImageMode: string;
 }

@@ -46,8 +46,10 @@ export class LuckyStackWorkerService {
     return this.http.put(`${this.baseUrl}/profiles/stop`, null);
   }
 
-  openReferenceImage(scale: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/reference/open?scale=${scale}`);
+  openReferenceImage(scale: number, openImageMode: string): Observable<any> {
+    return this.http.get(
+      `${this.baseUrl}/reference/open?scale=${scale}&openImageMode=${openImageMode}`
+    );
   }
 
   scale(profile: Profile): Observable<any> {

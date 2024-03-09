@@ -7,6 +7,7 @@ import ij.ImageStack;
 import ij.gui.NewImage;
 import ij.io.Opener;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
+import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import org.apache.commons.lang3.tuple.Pair;
 
 import ij.IJ;
@@ -214,15 +215,16 @@ public class LswImageProcessingUtil {
     }
 
     public static void setNonPersistentSettings(Profile profile) {
-        setNonPersistentSettings(profile, profile.getScale());
+        setNonPersistentSettings(profile, profile.getScale(), profile.getOpenImageMode().toString());
     }
 
-    public static void setNonPersistentSettings(Profile profile, double scale) {
+    public static void setNonPersistentSettings(Profile profile, double scale, String openImageMode) {
         profile.setDispersionCorrectionEnabled(false); // dispersion correction is not meant to be persisted.
         profile.setLuminanceIncludeRed(true);
         profile.setLuminanceIncludeGreen(true);
         profile.setLuminanceIncludeBlue(true);
         profile.setLuminanceIncludeColor(true);
         profile.setScale(scale);
+        profile.setOpenImageMode(OpenImageModeEnum.valueOf(openImageMode));
     }
 }

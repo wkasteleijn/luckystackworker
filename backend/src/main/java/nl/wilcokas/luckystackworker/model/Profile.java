@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.wilcokas.luckystackworker.dto.ProfileDTO;
+import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 
 @Data
 @NoArgsConstructor
@@ -66,6 +67,7 @@ public class Profile {
         this.scale = profile.getScale();
         this.deringThreshold = profile.getDeringThreshold();
         this.equalizeLocalHistogramsStrength = profile.getEqualizeLocalHistogramsStrength();
+        this.openImageMode = profile.getOpenImageMode();
     }
 
     private int id;
@@ -116,6 +118,7 @@ public class Profile {
     private double scale;
     private int deringThreshold;
     private int equalizeLocalHistogramsStrength;
+    private OpenImageModeEnum openImageMode;
 
     // Not used any longer, needed for historical reasons. Removing this would now
     // break the profile loading of old yaml files created prior to 4.1.0.

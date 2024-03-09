@@ -37,19 +37,51 @@
       Open
     </button>
 
-    <mat-radio-group
-      [color]="colorTheme()"
-      [disabled]="shouldShowSpinner() || crop"
-      [(ngModel)]="scale"
-      (change)="scaleChanged($event)"
-      title="Select the scale used for opening the image stack. The selected scale is not persisted with the object profile."
-    >
-      <span class="labelColor relatedButtonsSpace">Scale</span>
-      <mat-radio-button value="1">1</mat-radio-button>
-      <mat-radio-button value="1.5">1.5</mat-radio-button>
-      <mat-radio-button value="2">2</mat-radio-button>
-      <mat-radio-button value="3">3</mat-radio-button>
-    </mat-radio-group>
+    <mat-form-field appearance="fill" class="profileSelectorSpace">
+      <mat-label class="dropdown_label">as</mat-label>
+      <select
+        matNativeControl
+        [disabled]="shouldShowSpinner() || crop"
+        [(ngModel)]="openImageMode"
+        name="openAs"
+        (change)="openImageModeChanged($event)"
+        title="Select the scale used for opening the image stack. The selected scale is not persisted with the object profile."
+        class="{{
+          !refImageSelected || !openRefImageEnabled()
+            ? 'dropdownMargin dropdown_disabled'
+            : nightModeEnabled()
+            ? 'dropdownMargin dropdown activeColorNight'
+            : 'dropdownMargin dropdown activeColor'
+        }}"
+      >
+        <option *ngFor="let mode of openImageModes" [value]="mode.value">
+          {{ mode.viewValue }}
+        </option>
+      </select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="profileSelectorSpace">
+      <mat-label class="dropdown_label">Scale</mat-label>
+      <select
+        matNativeControl
+        [disabled]="shouldShowSpinner() || crop"
+        [(ngModel)]="scale"
+        (change)="scaleChanged($event)"
+        title="Select the scale used for opening the image stack. The selected scale is not persisted with the object profile."
+        class="{{
+          !refImageSelected || !openRefImageEnabled()
+            ? 'dropdownMargin dropdown_disabled'
+            : nightModeEnabled()
+            ? 'dropdownMargin dropdown activeColorNight'
+            : 'dropdownMargin dropdown activeColor'
+        }}"
+      >
+        <option [value]="1">1</option>
+        <option [value]="1.5">1.5</option>
+        <option [value]="2">2</option>
+        <option [value]="3">3</option>
+      </select>
+    </mat-form-field>
 
     <mat-form-field appearance="fill" class="profileSelectorSpace">
       <select

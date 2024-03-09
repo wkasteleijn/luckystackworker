@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.wilcokas.luckystackworker.model.Profile;
+import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 
 @Data
 @NoArgsConstructor
@@ -65,6 +66,7 @@ public class ProfileDTO {
         this.scale = profile.getScale();
         this.deringThreshold = profile.getDeringThreshold();
         this.equalizeLocalHistogramsStrength = profile.getEqualizeLocalHistogramsStrength();
+        this.openImageMode = profile.getOpenImageMode();
     }
 
     private String name;
@@ -117,4 +119,5 @@ public class ProfileDTO {
     private double scale;
     private int deringThreshold;
     private int equalizeLocalHistogramsStrength;
+    private OpenImageModeEnum openImageMode;
 }

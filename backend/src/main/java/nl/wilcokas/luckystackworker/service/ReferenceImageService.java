@@ -90,6 +90,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private LswImageLayersDto unprocessedImageLayers;
 
     private static Image iconImage;
+
     static {
         try {
             iconImage = new ImageIcon(new ClassPathResource("/luckystackworker_icon.png").getURL()).getImage();
@@ -104,7 +105,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private final OperationService operationService;
 
     public ReferenceImageService(final SettingsService settingsService, final HttpService httpService, final ProfileService profileService,
-            final OperationService operationService, final GmicService gmicService) {
+                                 final OperationService operationService, final GmicService gmicService) {
         this.settingsService = settingsService;
         this.httpService = httpService;
         this.profileService = profileService;
@@ -120,7 +121,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
     }
 
-    public ResponseDTO selectReferenceImage(String filePath, double scale) throws IOException, InterruptedException {
+    public ResponseDTO selectReferenceImage(String filePath, double scale, String openImageMode) throws IOException, InterruptedException {
         JFrame frame = getParentFrame();
         JFileChooser jfc = getJFileChooser(filePath);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
@@ -144,7 +145,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 } else {
                     log.info("Profile file found, profile was loaded from there.");
                 }
-                LswImageProcessingUtil.setNonPersistentSettings(profile, scale);
+                LswImageProcessingUtil.setNonPersistentSettings(profile, scale, openImageMode);
                 profileService.updateProfile(new ProfileDTO(profile));
 
                 this.isLargeImage = openReferenceImage(selectedFilePath, profile);
@@ -587,7 +588,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             displayedImage.hide();
         }
 
-        finalResultImage = LswFileUtil.openImage(this.filePath, OpenImageModeEnum.RED);
+        finalResultImage = LswFileUtil.openImage(this.filePath, OpenImageModeEnum.RGB, finalResultImage);
         boolean largeImage = false;
         if (finalResultImage != null) {
             if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame(), activeOSProfile)) {

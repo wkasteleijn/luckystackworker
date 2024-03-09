@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.concurrent.Executor;
 
 import javax.swing.JFrame;
@@ -260,15 +261,12 @@ public class LswFileUtil {
                     profile.setClippingStrength(0);
                     profile.setClippingRange(50);
                 }
-                if (profile.getSavitzkyGolaySize() == 0
-                        && (profile.getDenoiseSigma() == null || BigDecimal.ZERO.equals(profile.getDenoiseSigma()))) {
+                if (profile.getSavitzkyGolaySize() == 0 && (profile.getDenoiseSigma() == null || BigDecimal.ZERO.equals(profile.getDenoiseSigma()))) {
                     // if prior to 3.0.0 no denoise was set, prefer the defaults for savitzky-golay
                     profile.setSavitzkyGolaySize(3);
                     profile.setSavitzkyGolayAmount(75);
                     profile.setSavitzkyGolayIterations(1);
-                } else if (profile.getSavitzkyGolaySize() > 0
-                        && (profile.getDenoiseSigma() != null
-                        || BigDecimal.ZERO.compareTo(profile.getDenoiseSigma()) < 0)) {
+                } else if (profile.getSavitzkyGolaySize() > 0 && (profile.getDenoiseSigma() != null || BigDecimal.ZERO.compareTo(profile.getDenoiseSigma()) < 0)) {
                     // Prevent both being set, prefer savitzky-golay in that case.
                     profile.setDenoiseSigma(BigDecimal.ZERO);
                 }
@@ -335,18 +333,25 @@ public class LswFileUtil {
         }
         return dataFolder;
     }
-
     public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode) {
-        ImagePlus image = new Opener().openImage(LswFileUtil.getIJFileFormat(filepath));
+        return openImage(filepath, openImageMode, null);
+    }
+
+    public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode, ImagePlus currentImage) {
+        ImagePlus newImage = new Opener().openImage(LswFileUtil.getIJFileFormat(filepath));
         if (openImageMode != OpenImageModeEnum.RGB) {
-            LswImageLayersDto unprocessedImageLayers = getImageLayers(image);
-            image = create16BitRGBImage(filepath);
-            boolean includeRed = openImageMode == OpenImageModeEnum.RED || openImageMode == OpenImageModeEnum.RGB || openImageMode == OpenImageModeEnum.LRGB;
-            boolean includeGreen = openImageMode == OpenImageModeEnum.GREEN || openImageMode == OpenImageModeEnum.RGB || openImageMode == OpenImageModeEnum.LRGB;
-            boolean includeBlue = openImageMode == OpenImageModeEnum.BLUE || openImageMode == OpenImageModeEnum.RGB || openImageMode == OpenImageModeEnum.LRGB;
-            copyLayers(unprocessedImageLayers, image, includeRed, includeGreen, includeBlue);
+            LswImageLayersDto unprocessedImageLayers = getImageLayers(newImage);
+            boolean includeRed = openImageMode == OpenImageModeEnum.RED || openImageMode == OpenImageModeEnum.LRGB;
+            boolean includeGreen = openImageMode == OpenImageModeEnum.GREEN || openImageMode == OpenImageModeEnum.LRGB;
+            boolean includeBlue = openImageMode == OpenImageModeEnum.BLUE || openImageMode == OpenImageModeEnum.LRGB;
+            if (currentImage==null || currentImage.getWidth() != newImage.getWidth() || currentImage.getHeight()!= newImage.getHeight()) {
+                newImage = create16BitRGBImage(filepath, unprocessedImageLayers, newImage.getWidth(), newImage.getHeight(), includeRed, includeGreen, includeBlue);
+            } else {
+                copyLayers(unprocessedImageLayers, currentImage, includeRed, includeGreen, includeBlue);
+                return currentImage;
+            }
         }
-        return image;
+        return newImage;
     }
 
     public static LswImageLayersDto getImageLayers(ImagePlus image) {
@@ -413,29 +418,45 @@ public class LswFileUtil {
         LswUtil.setPrivateField(fileInfo, FileInfo.class, "fileType", FileInfo.RGB48);
     }
 
-    private static ImagePlus create16BitRGBImage(String filepath) {
-        // TODO: uncomment and complete
-//        boolean planar = fi.fileType==FileInfo.RGB48_PLANAR;
-//        Object[] pixelArray = (Object[])readPixels(fi);
-//        if (pixelArray==null) return null;
-//        int nChannels = 3;
-//        ImageStack stack = new ImageStack(width, height);
-//        stack.addSlice("Red", pixelArray[0]);
-//        stack.addSlice("Green", pixelArray[1]);
-//        stack.addSlice("Blue", pixelArray[2]);
-//
-//        ImagePlus imp = new ImagePlus(fi.fileName, stack);
-//        imp.setDimensions(nChannels, 1, 1);
-//        imp.setFileInfo(fi);
-//        int mode = IJ.COMPOSITE;
-//        imp = new CompositeImage(imp, mode);
-//        for (int c=1; c<=3; c++) {
-//            imp.setPosition(c, 1, 1);
-//            //imp.setDisplayRange(minValue, maxValue);
-//        }
-//        imp.setPosition(1, 1, 1);
-//        return imp;
-        return null;
+    private static ImagePlus create16BitRGBImage(String filepath, LswImageLayersDto unprocessedImageLayers, int width, int height,
+                                                 boolean includeRed, boolean includeGreen, boolean includeBlue) {
+        short[] redPixels;
+        short[] emptyPixels = new short[width * height];
+        Arrays.fill(emptyPixels, (short) 0);
+        if (includeRed) {
+            redPixels = unprocessedImageLayers.getLayers()[0];
+        } else {
+            redPixels = Arrays.copyOf(emptyPixels, emptyPixels.length);
+        }
+        short[] greenPixels;
+        if (includeGreen) {
+            greenPixels = unprocessedImageLayers.getLayers()[1];
+        } else {
+            greenPixels = Arrays.copyOf(emptyPixels, emptyPixels.length);
+        }
+        short[] bluePixels;
+        if (includeBlue) {
+            bluePixels = unprocessedImageLayers.getLayers()[2];
+        } else {
+            bluePixels = Arrays.copyOf(emptyPixels, emptyPixels.length);
+        }
+
+        ImageStack stack = new ImageStack(width, height);
+        stack.addSlice("Red", redPixels);
+        stack.addSlice("Green", greenPixels);
+        stack.addSlice("Blue", bluePixels);
+
+        ImagePlus imp = new ImagePlus(filepath, stack);
+        imp.setDimensions(3, 1, 1);
+        //imp.setFileInfo(fi);
+        int mode = IJ.COMPOSITE;
+        imp = new CompositeImage(imp, mode);
+        for (int c = 1; c <= 3; c++) {
+            imp.setPosition(c, 1, 1);
+            //imp.setDisplayRange(minValue, maxValue);
+        }
+        imp.setPosition(1, 1, 1);
+        return imp;
     }
 
 }
