@@ -43,9 +43,9 @@ public class OperationService {
     static {
         try {
             histogramStretchMacro = LswFileUtil
-                    .readFromInputStream(new ClassPathResource("/histogramstretch.ijm").getInputStream());
+                    .readFromInputStream(new ClassPathResource("histogramstretch.ijm").getInputStream());
         } catch (IOException e) {
-            log.error("Error loading histogram stretch script");
+            log.error("Error loading histogram stretch script",e);
         }
     }
 

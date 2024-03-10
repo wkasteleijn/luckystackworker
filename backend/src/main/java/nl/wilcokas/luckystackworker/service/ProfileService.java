@@ -31,14 +31,13 @@ import nl.wilcokas.luckystackworker.util.LswUtil;
 @Slf4j
 public class ProfileService {
     private final ObjectMapper objectMapper;
-    private static final String PROFILES_FILE = "/profiles.json";
+    private static final String PROFILES_FILE = "profiles.json";
     private static String defaultProfilesJson;
     static {
         try {
             defaultProfilesJson = LswFileUtil.readFromInputStream(new ClassPathResource(PROFILES_FILE).getInputStream());
-
         } catch (IOException e) {
-            log.error("Error loading histogram stretch script");
+            log.error("Error loading profiles.json",e);
         }
     }
     private Map<String, Profile> profiles;

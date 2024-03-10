@@ -199,37 +199,39 @@ export class AppComponent implements OnInit {
     );
   }
 
-  scaleChanged(event: any) {
+  scaleChanged() {
     console.log('scaleChanged called');
-    this.profile.scale = event.value;
-    this.scale = event.value;
-    this.showSpinner();
-    this.luckyStackWorkerService.scale(this.profile).subscribe(
-      (data) => {
-        console.log(data);
-        this.refImageSelected = true;
-        this.crop = false;
-        if (data && data.profile.amount > 0) {
-          this.profile = data.profile;
-          this.settings = data.settings;
-          this.selectedProfile = this.profile.name;
-          this.rootFolder = data.settings.rootFolder;
-          this.updateProfileSettings();
+    if (this.profile) {
+      this.profile.scale = Number(this.scale);
+      this.showSpinner();
+      this.luckyStackWorkerService.scale(this.profile).subscribe(
+        (data) => {
+          console.log(data);
+          this.refImageSelected = true;
+          this.crop = false;
+          if (data && data.profile.amount > 0) {
+            this.profile = data.profile;
+            this.settings = data.settings;
+            this.selectedProfile = this.profile.name;
+            this.rootFolder = data.settings.rootFolder;
+            this.updateProfileSettings();
+          }
+          this.hideSpinner();
+          this.workerProgress = 0;
+        },
+        (error) => {
+          console.log(error);
+          this.hideSpinner();
         }
-        this.hideSpinner();
-        this.workerProgress = 0;
-      },
-      (error) => {
-        console.log(error);
-        this.hideSpinner();
-      }
-    );
+      );
+    }
   }
 
-  openImageModeChanged(event: any) {
+  openImageModeChanged() {
     console.log('openImageModeChanged called');
-    this.profile.openImageMode = event.value;
-    this.openImageMode = event.value;
+    if (this.profile) {
+      this.profile.openImageMode = this.openImageMode;
+    }
   }
 
   radiusChanged(event: any, update: boolean) {
@@ -586,7 +588,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  profileSelectionChanged(event: any) {
+  profileSelectionChanged() {
     console.log('profileChanged called: ' + this.selectedProfile);
     this.luckyStackWorkerService.getProfile(this.selectedProfile).subscribe(
       (data) => {

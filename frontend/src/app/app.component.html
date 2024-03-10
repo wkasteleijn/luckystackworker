@@ -44,7 +44,7 @@
         [disabled]="shouldShowSpinner() || crop"
         [(ngModel)]="openImageMode"
         name="openAs"
-        (change)="openImageModeChanged($event)"
+        (change)="openImageModeChanged()"
         title="Select the scale used for opening the image stack. The selected scale is not persisted with the object profile."
         class="{{
           !refImageSelected || !openRefImageEnabled()
@@ -61,12 +61,12 @@
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="profileSelectorSpace">
-      <mat-label class="dropdown_label">Scale</mat-label>
+      <mat-label class="dropdown_label">scale</mat-label>
       <select
         matNativeControl
         [disabled]="shouldShowSpinner() || crop"
         [(ngModel)]="scale"
-        (change)="scaleChanged($event)"
+        (change)="scaleChanged()"
         title="Select the scale used for opening the image stack. The selected scale is not persisted with the object profile."
         class="{{
           !refImageSelected || !openRefImageEnabled()
@@ -89,7 +89,7 @@
         [disabled]="!refImageSelected || !openRefImageEnabled()"
         [(ngModel)]="selectedProfile"
         name="profile"
-        (change)="profileSelectionChanged($event)"
+        (change)="profileSelectionChanged()"
         class="{{
           !refImageSelected || !openRefImageEnabled()
             ? 'dropdown_disabled'
