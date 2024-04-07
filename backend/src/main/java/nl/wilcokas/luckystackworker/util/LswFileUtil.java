@@ -333,21 +333,33 @@ public class LswFileUtil {
         }
         return dataFolder;
     }
+
     public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode) {
-        return openImage(filepath, openImageMode, null);
+        return openImage(filepath, openImageMode, null, null);
     }
 
-    public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode, ImagePlus currentImage) {
+    public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode, ImagePlus currentImage, LswImageLayersDto currentUnprocessedImageLayers) {
         ImagePlus newImage = new Opener().openImage(LswFileUtil.getIJFileFormat(filepath));
         if (openImageMode != OpenImageModeEnum.RGB) {
             LswImageLayersDto unprocessedImageLayers = getImageLayers(newImage);
             boolean includeRed = openImageMode == OpenImageModeEnum.RED || openImageMode == OpenImageModeEnum.LRGB;
             boolean includeGreen = openImageMode == OpenImageModeEnum.GREEN || openImageMode == OpenImageModeEnum.LRGB;
             boolean includeBlue = openImageMode == OpenImageModeEnum.BLUE || openImageMode == OpenImageModeEnum.LRGB;
-            if (currentImage==null || currentImage.getWidth() != newImage.getWidth() || currentImage.getHeight()!= newImage.getHeight()) {
+            if (currentImage == null || currentImage.getWidth() != newImage.getWidth() || currentImage.getHeight() != newImage.getHeight()) {
                 newImage = create16BitRGBImage(filepath, unprocessedImageLayers, newImage.getWidth(), newImage.getHeight(), includeRed, includeGreen, includeBlue);
             } else {
-                copyLayers(unprocessedImageLayers, currentImage, includeRed, includeGreen, includeBlue);
+                if (currentUnprocessedImageLayers != null) {
+                    copyLayers(currentUnprocessedImageLayers, currentImage, true, true, true);
+                }
+                if (includeRed) {
+                    copyLayer(unprocessedImageLayers, currentImage,1);
+                }
+                if (includeGreen) {
+                    copyLayer(unprocessedImageLayers, currentImage,2);
+                }
+                if (includeBlue) {
+                    copyLayer(unprocessedImageLayers, currentImage,3);
+                }
                 return currentImage;
             }
         }
@@ -410,6 +422,21 @@ public class LswFileUtil {
             });
         }
 
+        LswUtil.stopAndAwaitParallelExecutor(executor);
+    }
+
+    public static void copyLayer(LswImageLayersDto layersDto, ImagePlus image, int layer) {
+        ImageStack stack = image.getStack();
+        Executor executor = LswUtil.getParallelExecutor();
+        short[][] layers = layersDto.getLayers();
+        // Red
+        executor.execute(() -> {
+            ImageProcessor p = stack.getProcessor(layer);
+            short[] pixels = (short[]) p.getPixels();
+            for (int i = 0; i < pixels.length; i++) {
+                pixels[i] = layers[0][i];
+            }
+        });
         LswUtil.stopAndAwaitParallelExecutor(executor);
     }
 

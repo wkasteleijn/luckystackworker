@@ -161,10 +161,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void updateProcessing(Profile profile, String operationValue) throws IOException, InterruptedException {
-        // Util.copyInto(displayedImage, finalResultImage, finalResultImage.getRoi(),
-        // profile, true);
-        // setDefaultLayoutSettings(finalResultImage,
-        // finalResultImage.getWindow().getLocation());
         LswFileUtil.copyLayers(unprocessedImageLayers, this.finalResultImage, true, true, true);
         operationService.applyAllOperations(finalResultImage, profile);
         finalResultImage.updateAndDraw();
@@ -587,8 +583,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             // Can only have 1 image open at a time.
             displayedImage.hide();
         }
-
-        finalResultImage = LswFileUtil.openImage(this.filePath, profile.getOpenImageMode(), finalResultImage);
+        finalResultImage = LswFileUtil.openImage(this.filePath, profile.getOpenImageMode(), finalResultImage, unprocessedImageLayers);
         boolean largeImage = false;
         if (finalResultImage != null) {
             if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame(), activeOSProfile)) {
