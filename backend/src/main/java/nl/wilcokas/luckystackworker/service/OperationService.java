@@ -168,7 +168,7 @@ public class OperationService {
             log.info("Applying Ian's noise reduction to image {}", image.getID());
             IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(profile.getIansAmount()).medium(BigDecimal.ZERO)
                     .large(BigDecimal.ZERO).recovery(profile.getIansRecovery()).build();
-            iansNoiseReductionFilter.apply(image, profile.getName(), parameters);
+            iansNoiseReductionFilter.apply(image, profile.getName(), parameters, profile.getScale());
         }
     }
 
@@ -210,7 +210,7 @@ public class OperationService {
 
     private void applyEqualizeLocalHistorgrams(final ImagePlus image, final Profile profile) throws IOException, InterruptedException {
         log.info("Applying equalize local historgrams with strength {} to image {}", profile.getEqualizeLocalHistogramsStrength(), image.getID());
-        equalizeLocalHistogramsFilter.apply(image, profile.getName(), profile.getEqualizeLocalHistogramsStrength());
+        equalizeLocalHistogramsFilter.apply(image, profile.getName(), profile.getEqualizeLocalHistogramsStrength(), profile.getScale());
     }
 
     private void applyBrightnessAndContrast(ImagePlus image, final Profile profile, boolean copyMinMax) {

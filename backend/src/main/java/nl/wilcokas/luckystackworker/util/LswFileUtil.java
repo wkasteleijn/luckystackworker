@@ -334,34 +334,34 @@ public class LswFileUtil {
         return dataFolder;
     }
 
-    public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode) {
-        return openImage(filepath, openImageMode, null, null);
+    public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode, double scale) {
+        return openImage(filepath, openImageMode, null, null, scale);
     }
 
-    public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode, ImagePlus currentImage, LswImageLayersDto currentUnprocessedImageLayers) {
+    public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode, ImagePlus currentImage, LswImageLayersDto currentUnprocessedImageLayers, double scale) {
         ImagePlus newImage = new Opener().openImage(LswFileUtil.getIJFileFormat(filepath));
-        if (openImageMode != OpenImageModeEnum.RGB) {
-            LswImageLayersDto unprocessedImageLayers = getImageLayers(newImage);
-            boolean includeRed = openImageMode == OpenImageModeEnum.RED || openImageMode == OpenImageModeEnum.LRGB;
-            boolean includeGreen = openImageMode == OpenImageModeEnum.GREEN || openImageMode == OpenImageModeEnum.LRGB;
-            boolean includeBlue = openImageMode == OpenImageModeEnum.BLUE || openImageMode == OpenImageModeEnum.LRGB;
-            if (currentImage == null || currentImage.getWidth() != newImage.getWidth() || currentImage.getHeight() != newImage.getHeight()) {
-                newImage = create16BitRGBImage(filepath, unprocessedImageLayers, newImage.getWidth(), newImage.getHeight(), includeRed, includeGreen, includeBlue);
-            } else {
-                if (currentUnprocessedImageLayers != null) {
-                    copyLayers(currentUnprocessedImageLayers, currentImage, true, true, true);
-                }
-                if (includeRed) {
-                    copyLayer(unprocessedImageLayers, currentImage,1);
-                }
-                if (includeGreen) {
-                    copyLayer(unprocessedImageLayers, currentImage,2);
-                }
-                if (includeBlue) {
-                    copyLayer(unprocessedImageLayers, currentImage,3);
-                }
-                return currentImage;
+        LswImageLayersDto unprocessedImageLayers = getImageLayers(newImage);
+        boolean includeRed = openImageMode == OpenImageModeEnum.RED || openImageMode == OpenImageModeEnum.RGB;
+        boolean includeGreen = openImageMode == OpenImageModeEnum.GREEN || openImageMode == OpenImageModeEnum.RGB;
+        boolean includeBlue = openImageMode == OpenImageModeEnum.BLUE || openImageMode == OpenImageModeEnum.RGB;
+
+        // TODO: fix broken scale comparison
+        if (currentImage == null || currentImage.getWidth() != (newImage.getWidth() * scale) || currentImage.getHeight() != (newImage.getHeight() * scale)) {
+            newImage = create16BitRGBImage(filepath, unprocessedImageLayers, newImage.getWidth(), newImage.getHeight(), includeRed, includeGreen, includeBlue);
+        } else {
+            if (currentUnprocessedImageLayers != null) {
+                copyLayers(currentUnprocessedImageLayers, currentImage, true, true, true);
             }
+            if (includeRed) {
+                copyLayer(unprocessedImageLayers, currentImage, 1);
+            }
+            if (includeGreen) {
+                copyLayer(unprocessedImageLayers, currentImage, 2);
+            }
+            if (includeBlue) {
+                copyLayer(unprocessedImageLayers, currentImage, 3);
+            }
+            return currentImage;
         }
         return newImage;
     }
@@ -445,8 +445,7 @@ public class LswFileUtil {
         LswUtil.setPrivateField(fileInfo, FileInfo.class, "fileType", FileInfo.RGB48);
     }
 
-    private static ImagePlus create16BitRGBImage(String filepath, LswImageLayersDto unprocessedImageLayers, int width, int height,
-                                                 boolean includeRed, boolean includeGreen, boolean includeBlue) {
+    private static ImagePlus create16BitRGBImage(String filepath, LswImageLayersDto unprocessedImageLayers, int width, int height, boolean includeRed, boolean includeGreen, boolean includeBlue) {
         short[] redPixels;
         short[] emptyPixels = new short[width * height];
         Arrays.fill(emptyPixels, (short) 0);

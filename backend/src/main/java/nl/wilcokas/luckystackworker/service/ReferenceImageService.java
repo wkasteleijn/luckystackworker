@@ -95,7 +95,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         try {
             iconImage = new ImageIcon(new ClassPathResource("luckystackworker_icon.png").getURL()).getImage();
         } catch (IOException e) {
-            log.error("Error loading the icon png",e);
+            log.error("Error loading the icon png", e);
         }
     }
 
@@ -583,7 +583,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             // Can only have 1 image open at a time.
             displayedImage.hide();
         }
-        finalResultImage = LswFileUtil.openImage(this.filePath, profile.getOpenImageMode(), finalResultImage, unprocessedImageLayers);
+        finalResultImage = LswFileUtil.openImage(this.filePath, profile.getOpenImageMode(), finalResultImage, unprocessedImageLayers, profile.getScale());
         boolean largeImage = false;
         if (finalResultImage != null) {
             if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame(), activeOSProfile)) {

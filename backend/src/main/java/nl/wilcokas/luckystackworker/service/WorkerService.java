@@ -141,14 +141,14 @@ public class WorkerService {
                     LuckyStackWorkerContext.statusUpdate("Processing : " + filename);
                 }
 
-                ImagePlus imp = LswFileUtil.openImage(filePath, OpenImageModeEnum.RGB); // TODO: must use same opening mode as in GUI somehow
+                Profile profile = profileService.findByName(profileName)
+                        .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName)));
+                ImagePlus imp = LswFileUtil.openImage(filePath, OpenImageModeEnum.RGB, profile.getScale());
                 if (LswFileUtil.validateImageFormat(imp, null, null)) {
                     if (LswFileUtil.isPngRgbStack(imp, filePath)) {
                         imp = LswFileUtil.fixNonTiffOpeningSettings(imp);
                     }
                     operationService.correctExposure(imp);
-                    Profile profile = profileService.findByName(profileName)
-                            .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName)));
                     if (profile.getScale() > 1.0) {
                         imp = operationService.scaleImage(imp, profile.getScale());
                     }

@@ -15,7 +15,7 @@ public class Probeersels {
     public static void main(String[] args) throws InterruptedException, IOException {
 
         ImagePlus image = LswFileUtil
-                .openImage("C:\\Users\\wkast\\archive\\Jup\\testsession\\denoise_test.tif", OpenImageModeEnum.RGB);
+                .openImage("C:\\Users\\wkast\\archive\\Jup\\testsession\\denoise_test.tif", OpenImageModeEnum.RGB,1);
 
         image.show();
         // Set exposure back to original value

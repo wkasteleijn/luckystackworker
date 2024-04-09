@@ -25,7 +25,7 @@ public class GmicService {
 
     private Boolean gmicAvailable;
 
-    public void callGmicCli(ImagePlus image, final String profileName, final List<String> commands) {
+    public void callGmicCli(ImagePlus image, final String profileName, final double scale, final List<String> commands) {
         try {
             String activeOSProfile = LswUtil.getActiveOSProfile();
             if (!isGmicAvailable(activeOSProfile)) {
@@ -47,7 +47,7 @@ public class GmicService {
             }
             arguments.addAll(Arrays.asList("-output", outputFile + ",int16"));
             LswUtil.runCliCommand(activeOSProfile, arguments, true);
-            ImagePlus outputImage = LswFileUtil.openImage(LswFileUtil.getIJFileFormat(outputFile), OpenImageModeEnum.RGB);
+            ImagePlus outputImage = LswFileUtil.openImage(LswFileUtil.getIJFileFormat(outputFile), OpenImageModeEnum.RGB, scale);
             ImageStack outputStack = outputImage.getStack();
             ImageStack imageStack = image.getStack();
             for (int layer = 1; layer <= imageStack.getSize(); layer++) {
