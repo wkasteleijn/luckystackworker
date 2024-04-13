@@ -35,6 +35,7 @@ export class AppComponent implements OnInit {
 
   openImageModes: ProfileSelection[] = [
     { value: 'RGB', viewValue: 'RGB' },
+    { value: 'RGB', viewValue: 'Gray' },
     { value: 'RED', viewValue: 'Red' },
     { value: 'GREEN', viewValue: 'Green' },
     { value: 'BLUE', viewValue: 'Blue' },
