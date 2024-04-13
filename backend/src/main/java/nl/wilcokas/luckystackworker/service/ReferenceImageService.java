@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.time.LocalDateTime;
 import java.util.concurrent.Executor;
+import java.util.function.Function;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -583,14 +584,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             // Can only have 1 image open at a time.
             displayedImage.hide();
         }
-        finalResultImage = LswFileUtil.openImage(this.filePath, profile.getOpenImageMode(), finalResultImage, unprocessedImageLayers, profile.getScale());
+        finalResultImage = LswFileUtil.openImage(this.filePath, profile.getOpenImageMode(), finalResultImage, unprocessedImageLayers, profile.getScale(), img -> operationService.scaleImage(img, profile.getScale()));
         boolean largeImage = false;
         if (finalResultImage != null) {
             if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame(), activeOSProfile)) {
                 return false;
-            }
-            if (profile.getScale() > 1.0) {
-                finalResultImage = operationService.scaleImage(finalResultImage, profile.getScale());
             }
             operationService.correctExposure(finalResultImage);
             unprocessedImageLayers = LswFileUtil.getImageLayers(finalResultImage);

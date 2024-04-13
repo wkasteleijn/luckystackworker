@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -334,36 +336,40 @@ public class LswFileUtil {
         return dataFolder;
     }
 
-    public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode, double scale) {
-        return openImage(filepath, openImageMode, null, null, scale);
+    public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode, double scale, UnaryOperator<ImagePlus> scaler) {
+        return openImage(filepath, openImageMode, null, null, scale, scaler);
     }
 
-    public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode, ImagePlus currentImage, LswImageLayersDto currentUnprocessedImageLayers, double scale) {
+    public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode, ImagePlus currentImage, LswImageLayersDto currentUnprocessedImageLayers, double scale, UnaryOperator<ImagePlus> scaler) {
         ImagePlus newImage = new Opener().openImage(LswFileUtil.getIJFileFormat(filepath));
-        LswImageLayersDto unprocessedImageLayers = getImageLayers(newImage);
+        if (scale > 1.0) {
+            newImage = scaler.apply(newImage);
+        }
+        LswImageLayersDto unprocessedNewImageLayers = getImageLayers(newImage);
         boolean includeRed = openImageMode == OpenImageModeEnum.RED || openImageMode == OpenImageModeEnum.RGB;
         boolean includeGreen = openImageMode == OpenImageModeEnum.GREEN || openImageMode == OpenImageModeEnum.RGB;
         boolean includeBlue = openImageMode == OpenImageModeEnum.BLUE || openImageMode == OpenImageModeEnum.RGB;
+        if (unprocessedNewImageLayers.getCount() == 3 && includeRed && includeGreen && includeBlue) {
+            return newImage;
+        }
 
-        // TODO: fix broken scale comparison
-        if (currentImage == null || currentImage.getWidth() != (newImage.getWidth() * scale) || currentImage.getHeight() != (newImage.getHeight() * scale)) {
-            newImage = create16BitRGBImage(filepath, unprocessedImageLayers, newImage.getWidth(), newImage.getHeight(), includeRed, includeGreen, includeBlue);
+        if (currentImage == null || currentImage.getWidth() != newImage.getWidth() || currentImage.getHeight() != newImage.getHeight()) {
+            return create16BitRGBImage(filepath, unprocessedNewImageLayers, newImage.getWidth(), newImage.getHeight(), includeRed, includeGreen, includeBlue);
         } else {
             if (currentUnprocessedImageLayers != null) {
                 copyLayers(currentUnprocessedImageLayers, currentImage, true, true, true);
             }
             if (includeRed) {
-                copyLayer(unprocessedImageLayers, currentImage, 1);
+                copyLayer(unprocessedNewImageLayers, currentImage, 1);
             }
             if (includeGreen) {
-                copyLayer(unprocessedImageLayers, currentImage, 2);
+                copyLayer(unprocessedNewImageLayers, currentImage, 2);
             }
             if (includeBlue) {
-                copyLayer(unprocessedImageLayers, currentImage, 3);
+                copyLayer(unprocessedNewImageLayers, currentImage, 3);
             }
             return currentImage;
         }
-        return newImage;
     }
 
     public static LswImageLayersDto getImageLayers(ImagePlus image) {
@@ -429,12 +435,13 @@ public class LswFileUtil {
         ImageStack stack = image.getStack();
         Executor executor = LswUtil.getParallelExecutor();
         short[][] layers = layersDto.getLayers();
+        int sourceLayer = layersDto.getCount() == 1 ? 0 : layer-1;
         // Red
         executor.execute(() -> {
             ImageProcessor p = stack.getProcessor(layer);
             short[] pixels = (short[]) p.getPixels();
             for (int i = 0; i < pixels.length; i++) {
-                pixels[i] = layers[0][i];
+                pixels[i] = layers[sourceLayer][i];
             }
         });
         LswUtil.stopAndAwaitParallelExecutor(executor);
@@ -456,13 +463,13 @@ public class LswFileUtil {
         }
         short[] greenPixels;
         if (includeGreen) {
-            greenPixels = unprocessedImageLayers.getLayers()[1];
+            greenPixels = unprocessedImageLayers.getLayers()[unprocessedImageLayers.getCount() == 1 ? 0 : 1];
         } else {
             greenPixels = Arrays.copyOf(emptyPixels, emptyPixels.length);
         }
         short[] bluePixels;
         if (includeBlue) {
-            bluePixels = unprocessedImageLayers.getLayers()[2];
+            bluePixels = unprocessedImageLayers.getLayers()[unprocessedImageLayers.getCount() == 1 ? 0 : 2];
         } else {
             bluePixels = Arrays.copyOf(emptyPixels, emptyPixels.length);
         }

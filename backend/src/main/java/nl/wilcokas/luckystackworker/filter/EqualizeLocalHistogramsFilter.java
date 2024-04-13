@@ -2,6 +2,7 @@ package nl.wilcokas.luckystackworker.filter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.function.UnaryOperator;
 
 import org.springframework.stereotype.Component;
 

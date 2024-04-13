@@ -128,7 +128,7 @@ public class WorkerService {
     private boolean processFile(final File file, boolean realtime) {
         String filePath = file.getAbsolutePath();
         Optional<String> profileOpt = Optional.ofNullable(LswFileUtil.deriveProfileFromImageName(file.getAbsolutePath()));
-        if (!profileOpt.isPresent()) {
+        if (profileOpt.isEmpty()) {
             log.info("Could not determine a profile for file {}", filePath);
             return false;
         }
@@ -143,15 +143,12 @@ public class WorkerService {
 
                 Profile profile = profileService.findByName(profileName)
                         .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName)));
-                ImagePlus imp = LswFileUtil.openImage(filePath, OpenImageModeEnum.RGB, profile.getScale());
+                ImagePlus imp = LswFileUtil.openImage(filePath, OpenImageModeEnum.RGB, profile.getScale(),img -> operationService.scaleImage(img, profile.getScale()));
                 if (LswFileUtil.validateImageFormat(imp, null, null)) {
                     if (LswFileUtil.isPngRgbStack(imp, filePath)) {
                         imp = LswFileUtil.fixNonTiffOpeningSettings(imp);
                     }
                     operationService.correctExposure(imp);
-                    if (profile.getScale() > 1.0) {
-                        imp = operationService.scaleImage(imp, profile.getScale());
-                    }
                     operationService.applyAllOperations(imp, profile);
                     imp.updateAndDraw();
                     if (LuckyStackWorkerContext.getSelectedRoi() != null) {

@@ -40,12 +40,13 @@ import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 public class OperationService {
 
     private static String histogramStretchMacro;
+
     static {
         try {
             histogramStretchMacro = LswFileUtil
                     .readFromInputStream(new ClassPathResource("histogramstretch.ijm").getInputStream());
         } catch (IOException e) {
-            log.error("Error loading histogram stretch script",e);
+            log.error("Error loading histogram stretch script", e);
         }
     }
 
