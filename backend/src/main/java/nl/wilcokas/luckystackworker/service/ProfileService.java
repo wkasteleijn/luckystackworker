@@ -31,7 +31,7 @@ import nl.wilcokas.luckystackworker.util.LswUtil;
 @Slf4j
 public class ProfileService {
     private final ObjectMapper objectMapper;
-    private static final String PROFILES_FILE = "profiles.json";
+    private static final String PROFILES_FILE = "/profiles.json";
     private static String defaultProfilesJson;
     static {
         try {
