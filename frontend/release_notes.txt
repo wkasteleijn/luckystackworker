@@ -1,5 +1,11 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+14/04/2024 minor release 5.2.0:
+- Added ability to open stacks for a specific channel (RGB, gray, red, green, blue).
+- Profiles will persist with the intallation of a new version from now on.
+- Removed usage of internal database which was no longer needed
+- Improved startup time of the backend
+
 21/01/2024: major release 5.0.0:
 - Created seperate tab for denoise controls
 - Added possibility to apply denoising in 2 passes with different algorithms of choice
