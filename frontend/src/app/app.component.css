@@ -196,7 +196,7 @@
   border-radius: 8px;
 }
 .relatedButtonsSpace {
-  margin-left: 8px;
+  margin-left: 6px;
 }
 
 .profileSelectorSpace {
@@ -204,11 +204,11 @@
 }
 
 .crop {
-  margin-left: 21px;
+  margin-left: 19px;
 }
 
 .plusZoom {
-  margin-left: 16px;
+  margin-left: 20px;
 }
 
 .buttonDisabledZoom {

@@ -203,6 +203,11 @@ public class LswFileUtil {
             if (profileStr != null) {
                 Profile profile = new Yaml().load(profileStr);
 
+                // Added since v5.2.0, so older version written yaml needs to stay compatible.
+                if (profile.getOpenImageMode() == null) {
+                    profile.setOpenImageMode(OpenImageModeEnum.RGB);
+                }
+
                 // Added since v5.0.0, so older version written yaml needs to stay compatible.
                 if (profile.getIansAmount() == null) {
                     profile.setIansAmount(BigDecimal.ZERO);
@@ -221,7 +226,8 @@ public class LswFileUtil {
                 }
 
                 // Renamed since v5.0.0
-                if (BigDecimal.valueOf(2).compareTo(profile.getDenoiseSigma()) < 0) {
+                BigDecimal oldDenoiseSigma = profile.getDenoiseSigma() == null ? BigDecimal.ZERO : profile.getDenoiseSigma();
+                if (BigDecimal.valueOf(2).compareTo(oldDenoiseSigma) < 0) {
                     profile.setDenoiseAlgorithm2(Constants.DENOISE_ALGORITHM_SIGMA2);
                     profile.setDenoise2Radius(profile.getDenoiseRadius());
                     profile.setDenoise2Iterations(profile.getDenoiseIterations());
@@ -263,12 +269,12 @@ public class LswFileUtil {
                     profile.setClippingStrength(0);
                     profile.setClippingRange(50);
                 }
-                if (profile.getSavitzkyGolaySize() == 0 && (profile.getDenoiseSigma() == null || BigDecimal.ZERO.equals(profile.getDenoiseSigma()))) {
+                if (profile.getSavitzkyGolaySize() == 0 && BigDecimal.ZERO.equals(oldDenoiseSigma)) {
                     // if prior to 3.0.0 no denoise was set, prefer the defaults for savitzky-golay
                     profile.setSavitzkyGolaySize(3);
                     profile.setSavitzkyGolayAmount(75);
                     profile.setSavitzkyGolayIterations(1);
-                } else if (profile.getSavitzkyGolaySize() > 0 && (profile.getDenoiseSigma() != null || BigDecimal.ZERO.compareTo(profile.getDenoiseSigma()) < 0)) {
+                } else if (profile.getSavitzkyGolaySize() > 0 && BigDecimal.ZERO.compareTo(oldDenoiseSigma) < 0) {
                     // Prevent both being set, prefer savitzky-golay in that case.
                     profile.setDenoiseSigma(BigDecimal.ZERO);
                 }
@@ -293,6 +299,7 @@ public class LswFileUtil {
                 return profile;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             log.warn("No profile file found or profile file is corrupt for {}", filePath);
         }
         return null;

@@ -69,7 +69,7 @@ public class SettingsService {
     private Settings getDefaultSettings() {
         String activeOs = LswUtil.getActiveOSProfile();
         return Settings.builder().defaultProfile("moon").extensions("tif,png,tiff").gmicAvailable(gmicService.isGmicAvailable(activeOs))
-                .latestKnownVersion(LswUtil.getLswVersion()).latestKnownVersionChecked(null).outputFormat("tif")
+                .latestKnownVersion(null).latestKnownVersionChecked(null).outputFormat("tif")
                 .rootFolder(Constants.SYSTEM_PROFILE_WINDOWS.equals(activeOs) ? "C:/" : "~").build();
     }
 }

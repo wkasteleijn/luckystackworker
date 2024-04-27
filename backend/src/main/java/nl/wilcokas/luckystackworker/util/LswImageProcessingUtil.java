@@ -215,16 +215,17 @@ public class LswImageProcessingUtil {
     }
 
     public static void setNonPersistentSettings(Profile profile) {
-        setNonPersistentSettings(profile, profile.getScale(), profile.getOpenImageMode().toString());
+        setNonPersistentSettings(profile, profile.getScale(), profile.getOpenImageMode() == null ? OpenImageModeEnum.RGB.name() : profile.getOpenImageMode().name());
     }
 
-    public static void setNonPersistentSettings(Profile profile, double scale, String openImageMode) {
+    public static void setNonPersistentSettings(Profile profile, double scale,
+                                                String openImageMode) {
         profile.setDispersionCorrectionEnabled(false); // dispersion correction is not meant to be persisted.
         profile.setLuminanceIncludeRed(true);
         profile.setLuminanceIncludeGreen(true);
         profile.setLuminanceIncludeBlue(true);
         profile.setLuminanceIncludeColor(true);
         profile.setScale(scale);
-        profile.setOpenImageMode(OpenImageModeEnum.valueOf(openImageMode));
+        profile.setOpenImageMode(openImageMode == null ? OpenImageModeEnum.RGB :  OpenImageModeEnum.valueOf(openImageMode));
     }
 }
