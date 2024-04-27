@@ -122,7 +122,14 @@ public class Profile {
 
     // Not used any longer, needed for historical reasons. Removing this would now
     // break the profile loading of old yaml files created prior to 4.1.0.
-    private BigDecimal denoiseSigma; // Unused as of 5.0.0
+
+    // Unused as of 5.2.0
+    private int threshold;
+
+    // Unused as of 5.0.0
+    private BigDecimal denoiseSigma;
+
+    // Unused as of 4.1.0
     private String operation;
     private String rootFolder;
     private boolean isLargeImage;

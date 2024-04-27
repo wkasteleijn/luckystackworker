@@ -299,7 +299,7 @@ public class LswFileUtil {
                 return profile;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error:",e);
             log.warn("No profile file found or profile file is corrupt for {}", filePath);
         }
         return null;
