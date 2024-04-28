@@ -30,7 +30,6 @@ public class Initializer {
         log.warn("Java vendor is {}", System.getProperty("java.vendor"));
         log.warn("Java version is {}", System.getProperty("java.version"));
         log.warn("Active profile is {}", System.getProperty("spring.profiles.active"));
-        log.warn("Current folder is {}", System.getProperty("user.dir"));
         log.warn("User home folder is {}", System.getProperty("user.home"));
 
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

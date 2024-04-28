@@ -6,6 +6,7 @@ LuckyStackWorker - RELEASE NOTES
 - Removed usage of internal database which was no longer needed
 - Improved startup time of the backend
 - Upgraded GUI to the latest version of Electron.
+- Fixed problem on MacOS with GUI processes not being terminated when app is closed.
 
 21/01/2024: major release 5.0.0:
 - Created seperate tab for denoise controls

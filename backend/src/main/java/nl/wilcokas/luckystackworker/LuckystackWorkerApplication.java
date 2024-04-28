@@ -40,8 +40,9 @@ public class LuckystackWorkerApplication {
         String osProfile = LswUtil.getActiveOSProfile();
         String dataFolder = LswFileUtil.getDataFolder(osProfile);
         createDataFolderWhenMissing(dataFolder);
+        log.info("Current folder is "+System.getProperty("user.dir"));
         if (Constants.SYSTEM_PROFILE_WINDOWS.equals(osProfile)) {
-            log.info("Starting electron GUI");
+            log.info("Starting electron GUI from windows in current folder");
             try {
                 LswUtil.runCliCommand(osProfile, Arrays.asList("./lsw_gui.exe", ">>", dataFolder + "/lsw-gui.log"), false);
             } catch (Exception e) {

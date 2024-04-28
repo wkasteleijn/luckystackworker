@@ -8,8 +8,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     resizable: false,
     autoHideMenuBar: true,
-    width: 698,
-    height: 668,
+    width: process.platform === "darwin" ? 688 : 698,
+    height: process.platform === "darwin" ? 660 : 668,
     x: 64,
     y: 64,
   });
