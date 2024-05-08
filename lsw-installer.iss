@@ -12,13 +12,14 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{F811B04C-3095-4F0E-87B3-1BB831C562A1}
 AppName={#MyAppName}
-AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
+;AppVersion={#MyAppVersion} ;NOTE: version not relevant
+AppVerName={#MyAppName}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
+ArchitecturesInstallIn64BitMode=x64
 DisableProgramGroupPage=yes
 LicenseFile=C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\LICENSE_LSW.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
@@ -35,16 +36,20 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkablealone
 
+[Code]
+procedure InitializeWizard;
+begin
+  WizardForm.LicenseAcceptedRadio.Checked := True;
+end;
+
 [Files]
 Source: "C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\lsw_db.mv.db"; DestDir: "{localappdata}\LuckyStackWorker"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
-
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

@@ -64,7 +64,7 @@ public class LuckystackWorkerApplication {
                     System.exit(1);
                 }
             }
-            writeDataInfoFile(lswVersion, dataFolder, dataInfo == null ? null : dataInfo.getInstalationDate());
+            writeDataInfoFile(dataFolder, dataInfo == null ? null : dataInfo.getInstalationDate());
         } else {
             log.warn("Could not determine app version");
         }
@@ -91,10 +91,10 @@ public class LuckystackWorkerApplication {
         }
     }
 
-    private static void writeDataInfoFile(String lswVersion, String dataFolder, String installationDate) throws IOException {
+    private static void writeDataInfoFile(String dataFolder, String installationDate) throws IOException {
         DataInfo dataInfo;
         String now = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now());
-        dataInfo = DataInfo.builder().version(lswVersion).instalationDate(installationDate == null ? now : installationDate).lastExecutionTime(now)
+        dataInfo = DataInfo.builder().instalationDate(installationDate == null ? now : installationDate).lastExecutionTime(now)
                 .build();
         String dataInfoStr = new Yaml().dump(dataInfo);
         Files.writeString(Paths.get(dataFolder + "/data-info.yml"), dataInfoStr);

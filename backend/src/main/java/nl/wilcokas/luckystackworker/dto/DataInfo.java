@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DataInfo {
-    private String version;
     private String instalationDate;
     private String lastExecutionTime;
 }
