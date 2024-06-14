@@ -1,4 +1,4 @@
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 1 ]; then
   echo "Usage: $0 [architecture] (x64 or arm64)"
   exit 1
 fi
