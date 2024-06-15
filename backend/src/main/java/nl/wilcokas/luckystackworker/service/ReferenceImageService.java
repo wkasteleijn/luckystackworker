@@ -1,12 +1,6 @@
 package nl.wilcokas.luckystackworker.service;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.HeadlessException;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Taskbar;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
@@ -26,7 +20,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import ij.io.FileInfo;
+import ij.process.ColorProcessor;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
+import nl.wilcokas.luckystackworker.util.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -56,9 +53,7 @@ import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
-import nl.wilcokas.luckystackworker.util.LswFileUtil;
-import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
-import nl.wilcokas.luckystackworker.util.LswUtil;
+import org.springframework.util.ReflectionUtils;
 
 @Slf4j
 @Service
@@ -68,7 +63,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private String activeOSProfile;
 
     @Getter
-    private ImagePlus displayedImage;
+    private LswImageViewer displayedImage;
 
     @Getter
     private boolean isLargeImage = false;
@@ -162,10 +157,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void updateProcessing(Profile profile, String operationValue) throws IOException, InterruptedException {
-        LswFileUtil.copyLayers(unprocessedImageLayers, this.finalResultImage, true, true, true);
+        LswImageProcessingUtil.copyLayers(unprocessedImageLayers, this.finalResultImage, true, true, true);
         operationService.applyAllOperations(finalResultImage, profile);
         finalResultImage.updateAndDraw();
-        LswFileUtil.copyLayers(LswFileUtil.getImageLayers(finalResultImage), displayedImage, true, true, true);
+        LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage), displayedImage, true, true, true);
         displayedImage.updateAndDraw();
         if (showHistogram && plotWindow != null) {
             drawHistogram(false);
@@ -176,7 +171,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         String pathNoExt = LswFileUtil.getPathWithoutExtension(path);
         String savePath = pathNoExt + "." + (asJpg ? "jpg" : Constants.DEFAULT_OUTPUT_FORMAT);
         log.info("Saving image to  {}", savePath);
-        LswFileUtil.saveImage(displayedImage, null, savePath, LswFileUtil.isPngRgbStack(displayedImage, filePath) || profile.getScale() > 1.0, roiActive, asJpg,
+        LswFileUtil.saveImage(finalResultImage, null, savePath, LswFileUtil.isPngRgbStack(finalResultImage, filePath) || profile.getScale() > 1.0, roiActive, asJpg,
                 false);
         writeProfile(pathNoExt);
     }
@@ -591,16 +586,16 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 return false;
             }
             operationService.correctExposure(finalResultImage);
-            unprocessedImageLayers = LswFileUtil.getImageLayers(finalResultImage);
+            unprocessedImageLayers = LswImageProcessingUtil.getImageLayers(finalResultImage);
 
             log.info("Opened final result image image with id {}", finalResultImage.getID());
 
-            displayedImage = finalResultImage.duplicate();
-            if (LswFileUtil.isPng(displayedImage, this.filePath)) {
-                displayedImage = LswFileUtil.fixNonTiffOpeningSettings(displayedImage);
+            // Display the image in a seperate color image window (8-bit RGB color).
+            displayedImage = createColorImageFrom(finalResultImage, unprocessedImageLayers, this.filePath);
+            if (LswFileUtil.isPng(finalResultImage, this.filePath)) {
+                finalResultImage = LswFileUtil.fixNonTiffOpeningSettings(finalResultImage);
             }
             operationService.correctExposure(displayedImage);
-            displayedImage.show(this.filePath);
             largeImage = setZoom(displayedImage, false);
             setDefaultLayoutSettings(displayedImage,
                     new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y));
@@ -613,8 +608,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 updateProcessing(profile, null);
             }
 
-            displayedImage.setTitle(this.filePath);
-
             if (showHistogram) {
                 createHistogram();
             }
@@ -622,9 +615,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return largeImage;
     }
 
-    private void setDefaultLayoutSettings(ImagePlus image, Point location) {
+    private void setDefaultLayoutSettings(LswImageViewer image, Point location) {
         image.setColor(Color.BLACK);
         image.setBorderColor(Color.BLACK);
+        image.show(this.filePath);
         ImageWindow window = image.getWindow();
         window.setIconImage(iconImage);
         if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile)) {
@@ -637,6 +631,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         image.getRoi().addRoiListener(this);
         image.getWindow().addWindowListener(this);
         image.getWindow().addComponentListener(this);
+
+        // TODO: create tray icon instead of taskbar icon
+        TrayIcon trayIcon = new TrayIcon(iconImage, "LuckyStackWorker", null);
     }
 
     private boolean setZoom(ImagePlus image, boolean isUpdate) {
@@ -668,6 +665,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             return false;
         }
         return true;
+    }
+
+    private LswImageViewer createColorImageFrom(ImagePlus image, LswImageLayersDto layersDto, String title) {
+        LswImageViewer singleLayerColorImage = new LswImageViewer(title, new ColorProcessor(image.getWidth(), image.getHeight()));
+        LswImageProcessingUtil.convertLayersToColorImage(layersDto.getLayers(), singleLayerColorImage);
+        return singleLayerColorImage;
     }
 
     final class MyFileChooser extends JFileChooser {

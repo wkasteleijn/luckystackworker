@@ -3,6 +3,7 @@ package nl.wilcokas.luckystackworker.util;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import ij.CompositeImage;
 import ij.ImageStack;
 import ij.gui.NewImage;
 import ij.io.Opener;
@@ -22,6 +23,7 @@ import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.model.Profile;
 
+import java.util.Arrays;
 import java.util.concurrent.Executor;
 
 @Slf4j
@@ -65,7 +67,7 @@ public class LswImageProcessingUtil {
     }
 
     public static void copyInto(final ImagePlus origin, final ImagePlus destination, Roi roi, Profile profile,
-            boolean copyMinMax) {
+                                boolean copyMinMax) {
         log.info("Copying image {} into image {}", origin.getID(), destination.getID());
         destination.setImage(origin);
         destination.setTitle("PROCESSING");
@@ -90,8 +92,8 @@ public class LswImageProcessingUtil {
     }
 
     public static float[] rgbToHsl(float red, float green, float blue, boolean includeRed, boolean includeGreen,
-            boolean includeBlue, boolean includeColor,
-            LSWSharpenMode mode) {
+                                   boolean includeBlue, boolean includeColor,
+                                   LSWSharpenMode mode) {
         float max = Math.max(Math.max(red, green), blue);
         float min = Math.min(Math.min(red, green), blue);
         float c = max - min;
@@ -176,7 +178,7 @@ public class LswImageProcessingUtil {
         float red = ((r_ + m) + 0.5f) * (1f + hueCorrectionFactor);
         float green = ((g_ + m) + 0.5f) * (1f - hueCorrectionFactor);
         float blue = ((b_ + m) + 0.5f) * (1f + hueCorrectionFactor);
-        return new float[] { red, green, blue };
+        return new float[]{red, green, blue};
     }
 
     public static boolean validateImageFormat(ImagePlus image, JFrame parentFrame, String activeOSProfile) {
@@ -226,6 +228,140 @@ public class LswImageProcessingUtil {
         profile.setLuminanceIncludeBlue(true);
         profile.setLuminanceIncludeColor(true);
         profile.setScale(scale);
-        profile.setOpenImageMode(openImageMode == null ? OpenImageModeEnum.RGB :  OpenImageModeEnum.valueOf(openImageMode));
+        profile.setOpenImageMode(openImageMode == null ? OpenImageModeEnum.RGB : OpenImageModeEnum.valueOf(openImageMode));
     }
+
+    public static void convertLayersToColorImage(short[][] layers, ImagePlus image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int[] rgbPixels = new int[width * height];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int red = convertToUnsignedInt(layers[0][y * width + x]) >> 8;
+                int green = convertToUnsignedInt(layers[1][y * width + x]) >> 8;
+                int blue = convertToUnsignedInt(layers[2][y * width + x]) >> 8;
+                rgbPixels[y * width + x] = red << 16 | green << 8 | blue;
+            }
+        }
+        ImageProcessor processor = image.getProcessor();
+        processor.setPixels(rgbPixels);
+    }
+
+    public static LswImageLayersDto getImageLayers(ImagePlus image) {
+        ImageStack stack = image.getStack();
+        short[][] newPixels = new short[3][stack.getProcessor(1).getPixelCount()];
+        Executor executor = LswUtil.getParallelExecutor();
+        for (int layer = 1; layer <= stack.size(); layer++) {
+            int finalLayer = layer;
+            executor.execute(() -> {
+                ImageProcessor p = stack.getProcessor(finalLayer);
+                short[] pixels = (short[]) p.getPixels();
+                for (int i = 0; i < pixels.length; i++) {
+                    newPixels[finalLayer - 1][i] = pixels[i];
+                }
+            });
+        }
+        LswUtil.stopAndAwaitParallelExecutor(executor);
+        return LswImageLayersDto.builder().layers(newPixels).count(stack.size()).build();
+    }
+
+    public static void copyLayers(LswImageLayersDto layersDto, ImagePlus image, boolean includeRed, boolean includeGreen, boolean includeBlue) {
+        short[][] layers = layersDto.getLayers();
+        if (image.getProcessor() instanceof ColorProcessor) {
+            convertLayersToColorImage(layers, image);
+        } else {
+            ImageStack stack = image.getStack();
+            Executor executor = LswUtil.getParallelExecutor();
+            if (includeRed) {
+                // Red
+                executor.execute(() -> {
+                    ImageProcessor p = stack.getProcessor(1);
+                    short[] pixels = (short[]) p.getPixels();
+                    for (int i = 0; i < pixels.length; i++) {
+                        pixels[i] = layers[0][i];
+                    }
+                });
+            }
+
+            if (includeGreen) {
+                // Green
+                executor.execute(() -> {
+                    ImageProcessor p = stack.getProcessor(2);
+                    short[] pixels = (short[]) p.getPixels();
+                    for (int i = 0; i < pixels.length; i++) {
+                        pixels[i] = layers[1][i];
+                    }
+                });
+            }
+
+            if (includeBlue) {
+                // Blue
+                executor.execute(() -> {
+                    ImageProcessor p = stack.getProcessor(3);
+                    short[] pixels = (short[]) p.getPixels();
+                    for (int i = 0; i < pixels.length; i++) {
+                        pixels[i] = layers[2][i];
+                    }
+                });
+            }
+            LswUtil.stopAndAwaitParallelExecutor(executor);
+        }
+    }
+
+    public static void copyLayer(LswImageLayersDto layersDto, ImagePlus image, int layer) {
+        ImageStack stack = image.getStack();
+        Executor executor = LswUtil.getParallelExecutor();
+        short[][] layers = layersDto.getLayers();
+        int sourceLayer = layersDto.getCount() == 1 ? 0 : layer - 1;
+        // Red
+        executor.execute(() -> {
+            ImageProcessor p = stack.getProcessor(layer);
+            short[] pixels = (short[]) p.getPixels();
+            for (int i = 0; i < pixels.length; i++) {
+                pixels[i] = layers[sourceLayer][i];
+            }
+        });
+        LswUtil.stopAndAwaitParallelExecutor(executor);
+    }
+
+    public static ImagePlus create16BitRGBImage(String filepath, LswImageLayersDto unprocessedImageLayers, int width, int height, boolean includeRed, boolean includeGreen, boolean includeBlue) {
+        short[] redPixels;
+        short[] emptyPixels = new short[width * height];
+        Arrays.fill(emptyPixels, (short) 0);
+        if (includeRed) {
+            redPixels = unprocessedImageLayers.getLayers()[0];
+        } else {
+            redPixels = Arrays.copyOf(emptyPixels, emptyPixels.length);
+        }
+        short[] greenPixels;
+        if (includeGreen) {
+            greenPixels = unprocessedImageLayers.getLayers()[unprocessedImageLayers.getCount() == 1 ? 0 : 1];
+        } else {
+            greenPixels = Arrays.copyOf(emptyPixels, emptyPixels.length);
+        }
+        short[] bluePixels;
+        if (includeBlue) {
+            bluePixels = unprocessedImageLayers.getLayers()[unprocessedImageLayers.getCount() == 1 ? 0 : 2];
+        } else {
+            bluePixels = Arrays.copyOf(emptyPixels, emptyPixels.length);
+        }
+
+        ImageStack stack = new ImageStack(width, height);
+        stack.addSlice("Red", redPixels);
+        stack.addSlice("Green", greenPixels);
+        stack.addSlice("Blue", bluePixels);
+
+        ImagePlus imp = new ImagePlus(filepath, stack);
+        imp.setDimensions(3, 1, 1);
+        //imp.setFileInfo(fi);
+        int mode = IJ.COMPOSITE;
+        imp = new CompositeImage(imp, mode);
+        for (int c = 1; c <= 3; c++) {
+            imp.setPosition(c, 1, 1);
+            //imp.setDisplayRange(minValue, maxValue);
+        }
+        imp.setPosition(1, 1, 1);
+        return imp;
+    }
+
 }
