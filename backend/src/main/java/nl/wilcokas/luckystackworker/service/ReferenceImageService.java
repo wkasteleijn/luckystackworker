@@ -9,8 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.time.LocalDateTime;
-import java.util.concurrent.Executor;
-import java.util.function.Function;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -20,9 +18,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import ij.io.FileInfo;
 import ij.process.ColorProcessor;
-import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
+import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.util.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,15 +28,12 @@ import org.springframework.stereotype.Service;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.ImageStack;
 import ij.gui.ImageWindow;
 import ij.gui.Plot;
 import ij.gui.PlotWindow;
 import ij.gui.RoiListener;
 import ij.gui.Toolbar;
-import ij.io.Opener;
 import ij.measure.Measurements;
-import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +47,6 @@ import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
-import org.springframework.util.ReflectionUtils;
 
 @Slf4j
 @Service
@@ -202,12 +195,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void zoomIn() {
-        IJ.run(displayedImage, "In [+]", null);
+        displayedImage.getImageWindow().zoomIn();
         zoomFactor++;
     }
 
     public void zoomOut() {
-        IJ.run(displayedImage, "Out [-]", null);
+        displayedImage.getImageWindow().zoomOut();
         zoomFactor--;
     }
 
@@ -591,14 +584,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             log.info("Opened final result image image with id {}", finalResultImage.getID());
 
             // Display the image in a seperate color image window (8-bit RGB color).
-            displayedImage = createColorImageFrom(finalResultImage, unprocessedImageLayers, this.filePath);
+            displayedImage = createColorImageFrom(finalResultImage, unprocessedImageLayers, LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(this.filePath)));
             if (LswFileUtil.isPng(finalResultImage, this.filePath)) {
                 finalResultImage = LswFileUtil.fixNonTiffOpeningSettings(finalResultImage);
             }
             operationService.correctExposure(displayedImage);
             largeImage = setZoom(displayedImage, false);
-            setDefaultLayoutSettings(displayedImage,
-                    new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y));
+            setDefaultLayoutSettings(displayedImage,new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y));
             zoomFactor = 0;
             roiActive = false;
 
@@ -631,9 +623,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         image.getRoi().addRoiListener(this);
         image.getWindow().addWindowListener(this);
         image.getWindow().addComponentListener(this);
-
-        // TODO: create tray icon instead of taskbar icon
-        TrayIcon trayIcon = new TrayIcon(iconImage, "LuckyStackWorker", null);
     }
 
     private boolean setZoom(ImagePlus image, boolean isUpdate) {
