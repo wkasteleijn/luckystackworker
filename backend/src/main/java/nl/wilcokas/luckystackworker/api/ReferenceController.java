@@ -85,6 +85,16 @@ public class ReferenceController {
         referenceImageService.zoomOut();
     }
 
+    @PutMapping("/minimize")
+    public void minimize() {
+        referenceImageService.minimize();
+    }
+
+    @PutMapping("/maximize")
+    public void maximize() {
+        referenceImageService.maximize();
+    }
+
     @PutMapping("/crop")
     public void crop() {
         referenceImageService.crop();

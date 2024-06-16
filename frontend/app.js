@@ -31,6 +31,18 @@ function createWindow() {
       method: "PUT",
     }).catch((error) => {});
   });
+
+  mainWindow.on("minimize", () => {
+    fetch("http://localhost:36469/api/reference/minimize", {
+      method: "PUT",
+    }).catch((error) => {});
+  });
+
+  mainWindow.on("restore", () => {
+    fetch("http://localhost:36469/api/reference/maximize", {
+      method: "PUT",
+    }).catch((error) => {});
+  });
 }
 
 app.on("ready", createWindow);

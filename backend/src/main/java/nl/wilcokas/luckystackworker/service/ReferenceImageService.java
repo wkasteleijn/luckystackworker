@@ -204,6 +204,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         zoomFactor--;
     }
 
+    public void minimize() {
+        displayedImage.getImageWindow().setState(Frame.ICONIFIED);
+    }
+
+    public void maximize() {
+        displayedImage.getImageWindow().setState(Frame.NORMAL);
+    }
+
     public void crop() {
         if (!roiActive) {
             int width = displayedImage.getWidth() / 2;
