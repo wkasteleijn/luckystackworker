@@ -82,7 +82,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     static {
         try {
-            iconImage = new ImageIcon(new ClassPathResource("luckystackworker_icon.png").getURL()).getImage();
+            iconImage = new ImageIcon(new ClassPathResource("image_icon.png").getURL()).getImage();
         } catch (IOException e) {
             log.error("Error loading the icon png", e);
         }
