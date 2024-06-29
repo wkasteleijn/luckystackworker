@@ -4,12 +4,9 @@ import ij.*;
 import ij.process.ImageProcessor;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 
-import java.awt.*;
-
 public class LswImageViewer extends ImagePlus {
 
     private LswImageWindow imageWindow;
-
 
     public LswImageViewer(String title, ImageProcessor ip) {
         super(title, ip);
@@ -37,15 +34,14 @@ public class LswImageViewer extends ImagePlus {
         return imageWindow;
     }
 
+    @Override
+    public synchronized void updateAndDraw() {
+        super.updateAndDraw();
+        imageWindow.repaint();
+    }
+
     private void setActivated(boolean activated) {
         LswUtil.setPrivateField(this, LswImageViewer.class, "activated", activated);
     }
 
-    private int getImageType() {
-        return (Integer) LswUtil.getPrivateField(this, LswImageViewer.class, "imageType");
-    }
-
-    private int getDefault16bitDisplayRange() {
-        return (Integer) LswUtil.getPrivateField(this, LswImageViewer.class, "default16bitDisplayRange");
-    }
 }

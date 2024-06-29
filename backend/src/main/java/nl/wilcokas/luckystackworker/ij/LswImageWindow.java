@@ -2,15 +2,14 @@ package nl.wilcokas.luckystackworker.ij;
 
 import ij.*;
 import ij.gui.*;
+import ij.measure.Measurements;
+import ij.process.ImageStatistics;
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.util.ReflectionUtils;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -19,9 +18,17 @@ import java.util.Arrays;
 @Slf4j
 public class LswImageWindow extends ImageWindow implements MouseMotionListener {
 
-    private final double SCALE = Prefs.getGuiScale();
-    private int TEXT_GAP = 11;
+    private static final double SCALE = Prefs.getGuiScale();
+    private static final Color TITLEBAR_COLOR = new Color(32, 32, 32);
+    private static final Color TITLE_COLOR = new Color(100, 100, 100);
+    private static final Color HISTOGRAM_COLOR_DAY = new Color(0, 128, 0);
+    private static final Color BORDER_COLOR = new Color(64, 64, 64);
+    private static final int OFFSET_TOP = 32;
+    private static final int HISTOGRAM_MARGIN_LEFT = 8;
+    private static final int HISTOGRAM_MARGIN_TOP = 8;
+    private static final int HISTOGRAM_HEIGHT = 56;
 
+    private int TEXT_GAP = 11;
     private ImagePlus image;
 
     private Point dragPreviousLocation;
@@ -44,7 +51,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
             setBackground(Color.white);
         ij = IJ.getInstance();
         this.imp = imp;
-        ic = new ImageCanvas(imp);
+        ic = new LswImageCanvas(imp);
         ic.setSize(imp.getWidth(), imp.getHeight());
         setNewCanvas(true);
         setLayout(new LswImageLayout(ic));
@@ -66,6 +73,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
             if (img != null) try {
                 setIconImage(img);
             } catch (Exception e) {
+                log.error("Error setting icon image", e);
             }
         }
         show();
@@ -74,20 +82,51 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
+        paintHistogram(g);
+        drawBorders(g);
+    }
+
+    private void drawBorders(Graphics g) {
         int thickness = 1;
         int width = getWidth();
         int height = getHeight();
-        g.setColor(new Color(32, 32, 32));
-        g.fillRect(0, 0, width, 32);
-        g.setColor(new Color(64, 64, 64));
+        g.setColor(TITLEBAR_COLOR);
+        g.fillRect(0, 0, width, OFFSET_TOP);
+        g.setColor(BORDER_COLOR);
         g.fillRect(0, 0, width, thickness);
-        g.fillRect(0, height-1, width, thickness);
+        g.fillRect(0, height - 1, width, thickness);
         g.fillRect(0, 0, thickness, height);
         g.fillRect(width - thickness, 0, thickness, height);
-        g.setColor(new Color(100, 100, 100));
+        g.fillRect(0, HISTOGRAM_MARGIN_TOP + OFFSET_TOP +HISTOGRAM_MARGIN_TOP+ HISTOGRAM_HEIGHT, width, thickness);
+        g.setColor(TITLE_COLOR);
         int textWidth = g.getFontMetrics().stringWidth(image.getTitle());
         int x = (getWidth() - textWidth) / 2;
         g.drawString(image.getTitle(), x, 22);
+    }
+
+    private void paintHistogram(Graphics g) {
+        ImageStatistics stats = image.getStatistics(Measurements.AREA + Measurements.MEAN + Measurements.MODE + Measurements.MIN_MAX, HISTOGRAM_HEIGHT);
+        double[] histogram = smoothen(stats.histogram());
+        double maxValue = 1;
+        for (int i = 8; i < histogram.length - 8; i++) {
+            if (histogram[i] > maxValue) {
+                maxValue = histogram[i];
+            }
+        }
+        for (int i = 0; i < histogram.length; i++) {
+            int intValue = (int) ((histogram[i] / maxValue) * HISTOGRAM_HEIGHT);
+            if (intValue > HISTOGRAM_HEIGHT) intValue = HISTOGRAM_HEIGHT;
+            int blackSpace = HISTOGRAM_HEIGHT - intValue;
+            g.setColor(new Color(0, 0, 0));
+            g.fillRect(HISTOGRAM_MARGIN_LEFT + i * 2, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 2, blackSpace);
+            g.setColor(HISTOGRAM_COLOR_DAY);
+            g.fillRect(HISTOGRAM_MARGIN_LEFT + i * 2, blackSpace + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1, 2, HISTOGRAM_HEIGHT - blackSpace);
+        }
+        g.setColor(HISTOGRAM_COLOR_DAY);
+        g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, HISTOGRAM_HEIGHT * 2, 1);
+        g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT, HISTOGRAM_HEIGHT * 2, 1);
+        g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 1, HISTOGRAM_HEIGHT);
+        g.fillRect(HISTOGRAM_HEIGHT * 2 - 1 + HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 1, HISTOGRAM_HEIGHT);
     }
 
     public void zoomIn() {
@@ -105,7 +144,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     @Override
     public void mouseDragged(MouseEvent e) {
         synchronized (this) {
-            this.setLocation(e.getXOnScreen() - (image.getWidth()/2), e.getYOnScreen() - 16);
+            this.setLocation(e.getXOnScreen() - (image.getWidth() / 2), e.getYOnScreen() - 16);
         }
     }
 
@@ -136,5 +175,17 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         } catch (IllegalAccessException | InvocationTargetException e) {
             log.warn("Could not call setLocationAndSize: ", e);
         }
+    }
+
+    private double[] smoothen(double[] histogram) {
+        double[] newHistogram = new double[histogram.length];
+        for (int i = 0; i < histogram.length; i++) {
+            if (i == 0 || i == histogram.length - 1) {
+                newHistogram[i] = histogram[i];
+            } else {
+                newHistogram[i] = (histogram[i] + histogram[i - 1] + histogram[i + 1]) / 3;
+            }
+        }
+        return newHistogram;
     }
 }

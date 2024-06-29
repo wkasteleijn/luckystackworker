@@ -167,10 +167,6 @@ public class ProfileController {
         if (referenceImageService.getDisplayedImage() != null) {
             referenceImageService.getDisplayedImage().hide();
         }
-        if (referenceImageService.getPlotWindow() != null) {
-            referenceImageService.getPlotWindow().setVisible(false);
-        }
-
         System.exit(0);
     }
 }

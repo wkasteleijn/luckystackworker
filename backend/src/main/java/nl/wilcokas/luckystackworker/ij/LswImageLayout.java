@@ -9,7 +9,7 @@ import java.awt.*;
 /* Duplication of the ImageJ ImageLayout class, so that we can set the gap image and the custom titlebar. */
 public class LswImageLayout implements LayoutManager {
         int hgap = ImageWindow.HGAP;
-        int vgap = 32;
+        int vgap = 96;
         ImageCanvas ic;
         boolean ignoreNonImageWidths;
 
@@ -40,7 +40,7 @@ public class LswImageLayout implements LayoutManager {
             }
             Insets insets = target.getInsets();
             dim.width += insets.left + insets.right + hgap*2;
-            dim.height += insets.top + insets.bottom + vgap*2;
+            dim.height += insets.top + insets.bottom + vgap;
             return dim;
         }
 
@@ -84,7 +84,7 @@ public class LswImageLayout implements LayoutManager {
                 extraHeight += d.height+vgap;
             }
             d = target.getSize();
-            int maxheight = d.height - (insets.top + insets.bottom + vgap*2);
+            int maxheight = d.height - (insets.top + insets.bottom + vgap);
             Dimension psize = preferredLayoutSize(target);
             int x = insets.left + hgap + (d.width - psize.width)/2;
             int y = 0;
