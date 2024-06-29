@@ -40,7 +40,7 @@ public class LswImageLayout implements LayoutManager {
             }
             Insets insets = target.getInsets();
             dim.width += insets.left + insets.right + hgap*2;
-            dim.height += insets.top + insets.bottom + vgap;
+            dim.height += insets.top + insets.bottom + vgap+1;
             return dim;
         }
 
@@ -84,7 +84,7 @@ public class LswImageLayout implements LayoutManager {
                 extraHeight += d.height+vgap;
             }
             d = target.getSize();
-            int maxheight = d.height - (insets.top + insets.bottom + vgap);
+            int maxheight = d.height - (insets.top + insets.bottom + vgap+1);
             Dimension psize = preferredLayoutSize(target);
             int x = insets.left + hgap + (d.width - psize.width)/2;
             int y = 0;

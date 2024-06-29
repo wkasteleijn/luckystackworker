@@ -21,8 +21,9 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     private static final double SCALE = Prefs.getGuiScale();
     private static final Color TITLEBAR_COLOR = new Color(32, 32, 32);
     private static final Color TITLE_COLOR = new Color(100, 100, 100);
-    private static final Color HISTOGRAM_COLOR_DAY = new Color(0, 128, 0);
+    private static final Color HISTOGRAM_COLOR_DAY = new Color(80, 174, 80);
     private static final Color BORDER_COLOR = new Color(64, 64, 64);
+    private static final Color BACKGROUND_COLOR = new Color(43, 43, 43);
     private static final int OFFSET_TOP = 32;
     private static final int HISTOGRAM_MARGIN_LEFT = 8;
     private static final int HISTOGRAM_MARGIN_TOP = 8;
@@ -82,8 +83,8 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        paintHistogram(g);
         drawBorders(g);
+        paintHistogram(g);
     }
 
     private void drawBorders(Graphics g) {
@@ -97,10 +98,11 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         g.fillRect(0, height - 1, width, thickness);
         g.fillRect(0, 0, thickness, height);
         g.fillRect(width - thickness, 0, thickness, height);
-        g.fillRect(0, HISTOGRAM_MARGIN_TOP + OFFSET_TOP +HISTOGRAM_MARGIN_TOP+ HISTOGRAM_HEIGHT, width, thickness);
-        g.setColor(TITLE_COLOR);
+        g.setColor(BACKGROUND_COLOR);
+        g.fillRect(0, 32, width, 72);
         int textWidth = g.getFontMetrics().stringWidth(image.getTitle());
         int x = (getWidth() - textWidth) / 2;
+        g.setColor(TITLE_COLOR);
         g.drawString(image.getTitle(), x, 22);
     }
 
@@ -117,7 +119,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
             int intValue = (int) ((histogram[i] / maxValue) * HISTOGRAM_HEIGHT);
             if (intValue > HISTOGRAM_HEIGHT) intValue = HISTOGRAM_HEIGHT;
             int blackSpace = HISTOGRAM_HEIGHT - intValue;
-            g.setColor(new Color(0, 0, 0));
+            g.setColor(BACKGROUND_COLOR);
             g.fillRect(HISTOGRAM_MARGIN_LEFT + i * 2, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 2, blackSpace);
             g.setColor(HISTOGRAM_COLOR_DAY);
             g.fillRect(HISTOGRAM_MARGIN_LEFT + i * 2, blackSpace + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1, 2, HISTOGRAM_HEIGHT - blackSpace);
@@ -127,6 +129,21 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT, HISTOGRAM_HEIGHT * 2, 1);
         g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 1, HISTOGRAM_HEIGHT);
         g.fillRect(HISTOGRAM_HEIGHT * 2 - 1 + HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 1, HISTOGRAM_HEIGHT);
+        int textOffsetX = HISTOGRAM_HEIGHT * 2+12;
+        int textOffsetY = 49;
+        int textHeight= 12;
+        g.drawString("Histogram",textOffsetX , textOffsetY);
+        g.drawString("Red :      75%", textOffsetX, textOffsetY+textHeight);
+        g.drawString("Green :  74%", textOffsetX, textOffsetY+textHeight*2);
+        g.drawString("Blue :     70%", textOffsetX, textOffsetY+textHeight*3);
+        g.drawString("Lum. :    72%", textOffsetX, textOffsetY+textHeight*4);
+
+        g.drawString("Object",textOffsetX+80 , textOffsetY);
+        g.drawString("Name : Jupiter", textOffsetX+80, textOffsetY+textHeight);
+        g.drawString("Date :    2024-08-16", textOffsetX+80, textOffsetY+textHeight*2);
+        g.drawString("Time :   22:35 UTC", textOffsetX+80, textOffsetY+textHeight*3);
+        g.drawString("Size :    1024 x 768", textOffsetX+80, textOffsetY+textHeight*4);
+
     }
 
     public void zoomIn() {

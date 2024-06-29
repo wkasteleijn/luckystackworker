@@ -1841,12 +1841,6 @@
       *ngIf="showVersionButton()"
       class="distanceBetweenNewVersionAndHistogram"
     ></span>
-    <mat-slide-toggle
-      [(ngModel)]="showHistogram"
-      [color]="colorTheme()"
-      (change)="histogramSelectionChanged()"
-      ><span class="sliderLabel">Histogram</span></mat-slide-toggle
-    >
     <button
       type="button"
       mat-button
@@ -1873,9 +1867,6 @@
       Save
     </button>
     <span *ngIf="!openRefImageEnabled()" class="spanNoNewVersion"></span>
-    <mat-slide-toggle disabled
-      ><span class="sliderLabel">Histogram</span></mat-slide-toggle
-    >
     <button
       *ngIf="!openRefImageEnabled()"
       type="button"
