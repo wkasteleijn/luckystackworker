@@ -3,6 +3,7 @@ package nl.wilcokas.luckystackworker.ij;
 import ij.gui.ImageCanvas;
 import ij.gui.ImageWindow;
 import ij.gui.ScrollbarWithLabel;
+import nl.wilcokas.luckystackworker.constants.Constants;
 
 import java.awt.*;
 
@@ -41,6 +42,7 @@ public class LswImageLayout implements LayoutManager {
             Insets insets = target.getInsets();
             dim.width += insets.left + insets.right + hgap*2;
             dim.height += insets.top + insets.bottom + vgap+1;
+            dim.width = Math.max(dim.width, Constants.MINIMUM_WINDOW_WIDTH);
             return dim;
         }
 

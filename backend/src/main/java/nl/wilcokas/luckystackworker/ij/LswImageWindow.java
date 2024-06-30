@@ -36,7 +36,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     private int TEXT_GAP = 11;
     private ImagePlus image;
     private LswImageMetadata metadata;
-    private double progressPercentage = 50;
+    private double progressPercentage = 0;
 
     /*
      * Override the ImageWindow constructor so that we can create a custom ImageWindow (LswImageWindow),
@@ -91,10 +91,16 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         if (metadata != null) {
             paintHistogram(g);
         }
+        paintProgressBar(g);
     }
 
     public void updateMetadata(final LswImageMetadata metadata) {
         this.metadata = metadata;
+        repaint();
+    }
+
+    public void updateProgress(final int progressPercentage) {
+        this.progressPercentage = progressPercentage;
         repaint();
     }
 
@@ -158,9 +164,13 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         g.drawString("Date :    %s".formatted(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(metadata.getTime())), textOffsetX + 80, textOffsetY + textHeight * 2);
         g.drawString("Time :   %s UTC".formatted(DateTimeFormatter.ofPattern("HH:mm").format(metadata.getTime())), textOffsetX + 80, textOffsetY + textHeight * 3);
         g.drawString("Size :    %s x %s".formatted(metadata.getWidth(),metadata.getHeight()), textOffsetX + 80, textOffsetY + textHeight * 4);
+    }
 
+    private void paintProgressBar(Graphics g) {
         g.setColor(PROGRESSBAR_COLOR);
-        g.fillRect(0, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT + 6, (int) (image.getWidth() * (progressPercentage / 100D)), 4);
+        if (progressPercentage>0) {
+            g.fillRect(0, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT + 6, (int) (image.getWidth() * (progressPercentage / 100D)), 4);
+        }
     }
 
     public void zoomIn() {

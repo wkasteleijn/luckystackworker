@@ -45,6 +45,10 @@ public class LswImageViewer extends ImagePlus {
         imageWindow.updateMetadata(metadata);
     }
 
+    public void updateProgress(final int progressPercentage) {
+        imageWindow.updateProgress(progressPercentage);
+    }
+
     private void setActivated(boolean activated) {
         LswUtil.setPrivateField(this, LswImageViewer.class, "activated", activated);
     }

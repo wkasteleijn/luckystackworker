@@ -96,7 +96,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public ResponseDTO scale(Profile profile) throws IOException, InterruptedException {
-        this.isLargeImage = openReferenceImage(null, profile,null);
+        this.isLargeImage = openReferenceImage(this.imageMetadata.getFilePath(), profile, LswFileUtil.getObjectDateTime(this.imageMetadata.getFilePath()));
         SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
         settingsDTO.setLargeImage(this.isLargeImage);
         LuckyStackWorkerContext.setSelectedProfile(profile.getName());
@@ -144,7 +144,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     public void updateProcessing(Profile profile, String operationValue) throws IOException, InterruptedException {
         LswImageProcessingUtil.copyLayers(unprocessedImageLayers, finalResultImage, true, true, true);
-        operationService.applyAllOperations(finalResultImage, profile);
+        operationService.applyAllOperations(finalResultImage, displayedImage, profile);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage), displayedImage, true, true, true);
         updateHistogramMetadata();
@@ -187,13 +187,17 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void zoomIn() {
-        displayedImage.getImageWindow().zoomIn();
-        zoomFactor++;
+        if (zoomFactor <= 5) {
+            displayedImage.getImageWindow().zoomIn();
+            zoomFactor++;
+        }
     }
 
     public void zoomOut() {
-        displayedImage.getImageWindow().zoomOut();
-        zoomFactor--;
+        if (zoomFactor >= 0) {
+            displayedImage.getImageWindow().zoomOut();
+            zoomFactor--;
+        }
     }
 
     public void minimize() {
@@ -377,20 +381,20 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         int greenMax = getHistogramMax(histogramValuesRed);
         int blueMax = getHistogramMax(histogramValuesRed);
         for (int i = 99; i >= 0; i--) {
-            if ((histogramValuesRed[i]*100)/redMax > 0) {
-                redPercentage = i+1;
+            if ((histogramValuesRed[i] * 100) / redMax > 0) {
+                redPercentage = i + 1;
                 break;
             }
         }
         for (int i = 99; i >= 0; i--) {
-            if ((histogramValuesGreen[i]*100)/greenMax > 0) {
-                greenPercentage = i+1;
+            if ((histogramValuesGreen[i] * 100) / greenMax > 0) {
+                greenPercentage = i + 1;
                 break;
             }
         }
         for (int i = 99; i >= 0; i--) {
-            if ((histogramValuesBlue[i]*100)/blueMax > 0) {
-                bluePercentage = i+1;
+            if ((histogramValuesBlue[i] * 100) / blueMax > 0) {
+                bluePercentage = i + 1;
                 break;
             }
         }
@@ -537,7 +541,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 finalResultImage = LswFileUtil.fixNonTiffOpeningSettings(finalResultImage);
             }
             operationService.correctExposure(displayedImage);
-            largeImage = setZoom(displayedImage, false);
+            largeImage = displayedImage.getWidth() > Constants.MAX_WINDOW_SIZE;
+
             setDefaultLayoutSettings(displayedImage, new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y));
             zoomFactor = 0;
             roiActive = false;
@@ -567,25 +572,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         image.getRoi().addRoiListener(this);
         image.getWindow().addWindowListener(this);
         image.getWindow().addComponentListener(this);
-    }
-
-    private boolean setZoom(ImagePlus image, boolean isUpdate) {
-        boolean isLargeImage = image.getWidth() > Constants.MAX_WINDOW_SIZE;
-        if (!isUpdate && isLargeImage) {
-            // zoomOut(); // ImageJ already does some zoomout if window is too large, even
-            // though not enough.
-        } else if (isUpdate) {
-            if (zoomFactor < 0) {
-                for (int i = 0; i < Math.abs(zoomFactor); i++) {
-                    IJ.run(displayedImage, "Out [-]", null);
-                }
-            } else if (zoomFactor > 0) {
-                for (int i = 0; i < zoomFactor; i++) {
-                    IJ.run(displayedImage, "In [+]", null);
-                }
-            }
-        }
-        return isLargeImage;
     }
 
     private boolean validateSelectedFile(String path) {
