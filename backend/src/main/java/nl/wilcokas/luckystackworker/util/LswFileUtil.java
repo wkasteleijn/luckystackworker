@@ -9,6 +9,9 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
@@ -22,6 +25,7 @@ import ij.gui.NewImage;
 import ij.io.Opener;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import ij.CompositeImage;
@@ -376,6 +380,21 @@ public class LswFileUtil {
             }
             return currentImage;
         }
+    }
+
+    public static LocalDateTime getObjectDateTime(final String filePath) throws IOException {
+        // Attempt to derive from filename hopefully winjupos formatted (e.g. 2024-04-16-1857_6_...)
+        String filename = LswFileUtil.getFilenameFromPath(LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(filePath)));
+        String[] parts = filename.split("-");
+        if (parts[0].length() == 4 && NumberUtils.isCreatable(parts[0]) && parts[3].length() >= 4 && NumberUtils.isCreatable(parts[3].substring(0,4))) {
+            try {
+                return LocalDateTime.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3].substring(0,2)), Integer.parseInt(parts[3].substring(2,4)), 0, 0);
+            } catch (Exception e) {
+                log.warn("Unable to parse date/time from filename {}", filename);
+            }
+        }
+        // Use file date as a fallback
+        return LocalDateTime.ofInstant(((FileTime) Files.getAttribute(Paths.get(filePath), "creationTime")).toInstant(), ZoneOffset.UTC);
     }
 
     private static void hackIncorrectPngFileInfo(LSWFileSaver saver) {

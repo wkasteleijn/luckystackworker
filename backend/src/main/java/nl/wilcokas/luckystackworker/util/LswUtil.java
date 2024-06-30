@@ -96,4 +96,18 @@ public class LswUtil {
         ReflectionUtils.makeAccessible(field);
         return ReflectionUtils.getField(field, object);
     }
+
+    public static String getFullObjectName(String profileName) {
+        return switch (profileName) {
+            case "sun" -> "Sun";
+            case "mer" -> "Mercury";
+            case "ven" -> "Venus";
+            case "mar" -> "Mars";
+            case "jup" -> "Jupiter";
+            case "sat" -> "Saturn";
+            case "uranus" -> "Uranus";
+            case "nep" -> "Neptune";
+            default -> "Moon";
+        };
+    }
 }

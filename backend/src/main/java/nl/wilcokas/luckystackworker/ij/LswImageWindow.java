@@ -5,6 +5,7 @@ import ij.gui.*;
 import ij.measure.Measurements;
 import ij.process.ImageStatistics;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.util.ReflectionUtils;
 
@@ -13,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 @Slf4j
@@ -22,8 +24,10 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     private static final Color TITLEBAR_COLOR = new Color(32, 32, 32);
     private static final Color TITLE_COLOR = new Color(100, 100, 100);
     private static final Color HISTOGRAM_COLOR_DAY = new Color(80, 174, 80);
+    private static final Color HISTOGRAM_COLOR_WARN = new Color(174, 80, 80);
     private static final Color BORDER_COLOR = new Color(64, 64, 64);
     private static final Color BACKGROUND_COLOR = new Color(43, 43, 43);
+    private static final Color PROGRESSBAR_COLOR = new Color(80, 80, 255);
     private static final int OFFSET_TOP = 32;
     private static final int HISTOGRAM_MARGIN_LEFT = 8;
     private static final int HISTOGRAM_MARGIN_TOP = 8;
@@ -31,8 +35,8 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
 
     private int TEXT_GAP = 11;
     private ImagePlus image;
-
-    private Point dragPreviousLocation;
+    private LswImageMetadata metadata;
+    private double progressPercentage = 50;
 
     /*
      * Override the ImageWindow constructor so that we can create a custom ImageWindow (LswImageWindow),
@@ -84,7 +88,14 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     public void paint(Graphics g) {
         super.paint(g);
         drawBorders(g);
-        paintHistogram(g);
+        if (metadata != null) {
+            paintHistogram(g);
+        }
+    }
+
+    public void updateMetadata(final LswImageMetadata metadata) {
+        this.metadata = metadata;
+        repaint();
     }
 
     private void drawBorders(Graphics g) {
@@ -108,15 +119,15 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
 
     private void paintHistogram(Graphics g) {
         ImageStatistics stats = image.getStatistics(Measurements.AREA + Measurements.MEAN + Measurements.MODE + Measurements.MIN_MAX, HISTOGRAM_HEIGHT);
-        double[] histogram = smoothen(stats.histogram());
+        double[] luminanceHistogram = smoothen(stats.histogram());
         double maxValue = 1;
-        for (int i = 8; i < histogram.length - 8; i++) {
-            if (histogram[i] > maxValue) {
-                maxValue = histogram[i];
+        for (int i = 8; i < luminanceHistogram.length - 8; i++) {
+            if (luminanceHistogram[i] > maxValue) {
+                maxValue = luminanceHistogram[i];
             }
         }
-        for (int i = 0; i < histogram.length; i++) {
-            int intValue = (int) ((histogram[i] / maxValue) * HISTOGRAM_HEIGHT);
+        for (int i = 0; i < luminanceHistogram.length; i++) {
+            int intValue = (int) ((luminanceHistogram[i] / maxValue) * HISTOGRAM_HEIGHT);
             if (intValue > HISTOGRAM_HEIGHT) intValue = HISTOGRAM_HEIGHT;
             int blackSpace = HISTOGRAM_HEIGHT - intValue;
             g.setColor(BACKGROUND_COLOR);
@@ -124,26 +135,32 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
             g.setColor(HISTOGRAM_COLOR_DAY);
             g.fillRect(HISTOGRAM_MARGIN_LEFT + i * 2, blackSpace + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1, 2, HISTOGRAM_HEIGHT - blackSpace);
         }
-        g.setColor(HISTOGRAM_COLOR_DAY);
         g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, HISTOGRAM_HEIGHT * 2, 1);
         g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT, HISTOGRAM_HEIGHT * 2, 1);
         g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 1, HISTOGRAM_HEIGHT);
         g.fillRect(HISTOGRAM_HEIGHT * 2 - 1 + HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 1, HISTOGRAM_HEIGHT);
-        int textOffsetX = HISTOGRAM_HEIGHT * 2+12;
+        int textOffsetX = HISTOGRAM_HEIGHT * 2 + 12;
         int textOffsetY = 49;
-        int textHeight= 12;
-        g.drawString("Histogram",textOffsetX , textOffsetY);
-        g.drawString("Red :      75%", textOffsetX, textOffsetY+textHeight);
-        g.drawString("Green :  74%", textOffsetX, textOffsetY+textHeight*2);
-        g.drawString("Blue :     70%", textOffsetX, textOffsetY+textHeight*3);
-        g.drawString("Lum. :    72%", textOffsetX, textOffsetY+textHeight*4);
+        int textHeight = 12;
+        g.drawString("Histogram", textOffsetX, textOffsetY);
+        setHistogramColor(g, metadata.getRed());
+        g.drawString("Red :      %s".formatted(metadata.getRed()), textOffsetX, textOffsetY + textHeight);
+        setHistogramColor(g, metadata.getGreen());
+        g.drawString("Green :  %s".formatted(metadata.getGreen()), textOffsetX, textOffsetY + textHeight * 2);
+        setHistogramColor(g, metadata.getBlue());
+        g.drawString("Blue :     %s".formatted(metadata.getBlue()), textOffsetX, textOffsetY + textHeight * 3);
+        setHistogramColor(g, metadata.getLuminance());
+        g.drawString("Lum. :    %s".formatted(metadata.getLuminance()), textOffsetX, textOffsetY + textHeight * 4);
 
-        g.drawString("Object",textOffsetX+80 , textOffsetY);
-        g.drawString("Name : Jupiter", textOffsetX+80, textOffsetY+textHeight);
-        g.drawString("Date :    2024-08-16", textOffsetX+80, textOffsetY+textHeight*2);
-        g.drawString("Time :   22:35 UTC", textOffsetX+80, textOffsetY+textHeight*3);
-        g.drawString("Size :    1024 x 768", textOffsetX+80, textOffsetY+textHeight*4);
+        g.setColor(HISTOGRAM_COLOR_DAY);
+        g.drawString("Object", textOffsetX + 80, textOffsetY);
+        g.drawString("Name : %s".formatted(metadata.getName()), textOffsetX + 80, textOffsetY + textHeight);
+        g.drawString("Date :    %s".formatted(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(metadata.getTime())), textOffsetX + 80, textOffsetY + textHeight * 2);
+        g.drawString("Time :   %s UTC".formatted(DateTimeFormatter.ofPattern("HH:mm").format(metadata.getTime())), textOffsetX + 80, textOffsetY + textHeight * 3);
+        g.drawString("Size :    %s x %s".formatted(metadata.getWidth(),metadata.getHeight()), textOffsetX + 80, textOffsetY + textHeight * 4);
 
+        g.setColor(PROGRESSBAR_COLOR);
+        g.fillRect(0, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT + 6, (int) (image.getWidth() * (progressPercentage / 100D)), 4);
     }
 
     public void zoomIn() {
@@ -169,6 +186,14 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     @Override
     public void mouseMoved(MouseEvent e) {
         super.mouseMoved(e.getX(), e.getY());
+    }
+
+    private void setHistogramColor(Graphics g, int histogramMax) {
+        if (histogramMax == 100) {
+            g.setColor(HISTOGRAM_COLOR_WARN);
+        } else {
+            g.setColor(HISTOGRAM_COLOR_DAY);
+        }
     }
 
     private void setTextGap(int gap) {

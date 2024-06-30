@@ -20,8 +20,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ij.process.ColorProcessor;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
+import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.util.*;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -29,12 +29,8 @@ import org.springframework.stereotype.Service;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
-import ij.gui.Plot;
-import ij.gui.PlotWindow;
 import ij.gui.RoiListener;
 import ij.gui.Toolbar;
-import ij.measure.Measurements;
-import ij.process.ImageStatistics;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
@@ -63,7 +59,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     private ImagePlus finalResultImage;
 
-    private String filePath;
+    private LswImageMetadata imageMetadata;
 
     private boolean roiActive = false;
     private JFrame roiIndicatorFrame = null;
@@ -100,7 +96,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public ResponseDTO scale(Profile profile) throws IOException, InterruptedException {
-        this.isLargeImage = openReferenceImage(null, profile);
+        this.isLargeImage = openReferenceImage(null, profile,null);
         SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
         settingsDTO.setLargeImage(this.isLargeImage);
         LuckyStackWorkerContext.setSelectedProfile(profile.getName());
@@ -134,11 +130,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 LswImageProcessingUtil.setNonPersistentSettings(profile, scale, openImageMode);
                 profileService.updateProfile(new ProfileDTO(profile));
 
-                this.isLargeImage = openReferenceImage(selectedFilePath, profile);
+                isLargeImage = openReferenceImage(selectedFilePath, profile, LswFileUtil.getObjectDateTime(selectedFilePath));
 
                 final String rootFolder = LswFileUtil.getFileDirectory(selectedFilePath);
                 SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
-                settingsDTO.setLargeImage(this.isLargeImage);
+                settingsDTO.setLargeImage(isLargeImage);
                 LuckyStackWorkerContext.setSelectedProfile(profile.getName());
                 return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
             }
@@ -147,10 +143,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void updateProcessing(Profile profile, String operationValue) throws IOException, InterruptedException {
-        LswImageProcessingUtil.copyLayers(unprocessedImageLayers, this.finalResultImage, true, true, true);
+        LswImageProcessingUtil.copyLayers(unprocessedImageLayers, finalResultImage, true, true, true);
         operationService.applyAllOperations(finalResultImage, profile);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage), displayedImage, true, true, true);
+        updateHistogramMetadata();
+        displayedImage.updateMetadata(imageMetadata);
         displayedImage.updateAndDraw();
     }
 
@@ -158,7 +156,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         String pathNoExt = LswFileUtil.getPathWithoutExtension(path);
         String savePath = pathNoExt + "." + (asJpg ? "jpg" : Constants.DEFAULT_OUTPUT_FORMAT);
         log.info("Saving image to  {}", savePath);
-        LswFileUtil.saveImage(finalResultImage, null, savePath, LswFileUtil.isPngRgbStack(finalResultImage, filePath) || profile.getScale() > 1.0, roiActive, asJpg,
+        LswFileUtil.saveImage(finalResultImage, null, savePath, LswFileUtil.isPngRgbStack(finalResultImage, imageMetadata.getFilePath()) || profile.getScale() > 1.0, roiActive, asJpg,
                 false);
         writeProfile(pathNoExt);
     }
@@ -248,7 +246,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void writeProfile() throws IOException {
-        String fileNameNoExt = LswFileUtil.getPathWithoutExtension(filePath);
+        String fileNameNoExt = LswFileUtil.getPathWithoutExtension(imageMetadata.getFilePath());
         writeProfile(fileNameNoExt);
     }
 
@@ -264,7 +262,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public String getFilePath() {
-        return filePath;
+        return imageMetadata.getFilePath();
     }
 
     public VersionDTO getLatestVersion(LocalDateTime currentDate) {
@@ -368,6 +366,50 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         roiIndicatorFrame.setVisible(false);
     }
 
+    public void updateHistogramMetadata() {
+        int[] histogramValuesRed = finalResultImage.getStack().getProcessor(1).getHistogram(100);
+        int[] histogramValuesGreen = finalResultImage.getStack().getProcessor(2).getHistogram(100);
+        int[] histogramValuesBlue = finalResultImage.getStack().getProcessor(3).getHistogram(100);
+        int redPercentage = 0;
+        int greenPercentage = 0;
+        int bluePercentage = 0;
+        int redMax = getHistogramMax(histogramValuesRed);
+        int greenMax = getHistogramMax(histogramValuesRed);
+        int blueMax = getHistogramMax(histogramValuesRed);
+        for (int i = 99; i >= 0; i--) {
+            if ((histogramValuesRed[i]*100)/redMax > 0) {
+                redPercentage = i+1;
+                break;
+            }
+        }
+        for (int i = 99; i >= 0; i--) {
+            if ((histogramValuesGreen[i]*100)/greenMax > 0) {
+                greenPercentage = i+1;
+                break;
+            }
+        }
+        for (int i = 99; i >= 0; i--) {
+            if ((histogramValuesBlue[i]*100)/blueMax > 0) {
+                bluePercentage = i+1;
+                break;
+            }
+        }
+        imageMetadata.setRed(redPercentage);
+        imageMetadata.setGreen(greenPercentage);
+        imageMetadata.setBlue(bluePercentage);
+        imageMetadata.setLuminance((redPercentage + greenPercentage + bluePercentage) / 3);
+    }
+
+    private void setImageMetadata(final String filePath, final Profile profile, final LocalDateTime dateTime) {
+        this.imageMetadata = LswImageMetadata.builder()
+                .filePath(filePath)
+                .name(LswUtil.getFullObjectName(profile.getName()))
+                .width(finalResultImage.getWidth())
+                .height(finalResultImage.getHeight())
+                .time(dateTime)
+                .build();
+    }
+
     private void createRoiIndicator() {
         roiIndicatorFrame = new JFrame();
         roiIndicatorFrame.setType(javax.swing.JFrame.Type.UTILITY);
@@ -383,6 +425,16 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         roiIndicatorTextField.setBorder(null);
         roiIndicatorTextField.setSelectedTextColor(Color.LIGHT_GRAY);
         roiIndicatorFrame.add(roiIndicatorTextField);
+    }
+
+    private int getHistogramMax(int[] histogramValues) {
+        int max = 1;
+        for (int i = 0; i < histogramValues.length; i++) {
+            if (histogramValues[i] > max) {
+                max = histogramValues[i];
+            }
+        }
+        return max;
     }
 
     private void showRoiIndicator() {
@@ -462,32 +514,31 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return true;
     }
 
-    private boolean openReferenceImage(String filePath, Profile profile) throws IOException, InterruptedException {
-        this.filePath = filePath == null ? this.filePath : filePath;
-
+    private boolean openReferenceImage(String filePath, Profile profile, LocalDateTime dateTime) throws IOException, InterruptedException {
         if (displayedImage != null) {
             // Can only have 1 image open at a time.
             displayedImage.hide();
         }
-        finalResultImage = LswFileUtil.openImage(this.filePath, profile.getOpenImageMode(), finalResultImage, unprocessedImageLayers, profile.getScale(), img -> operationService.scaleImage(img, profile.getScale()));
+        finalResultImage = LswFileUtil.openImage(filePath, profile.getOpenImageMode(), finalResultImage, unprocessedImageLayers, profile.getScale(), img -> operationService.scaleImage(img, profile.getScale()));
         boolean largeImage = false;
         if (finalResultImage != null) {
             if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame(), activeOSProfile)) {
                 return false;
             }
+            setImageMetadata(filePath, profile, dateTime);
             operationService.correctExposure(finalResultImage);
             unprocessedImageLayers = LswImageProcessingUtil.getImageLayers(finalResultImage);
 
             log.info("Opened final result image image with id {}", finalResultImage.getID());
 
             // Display the image in a seperate color image window (8-bit RGB color).
-            displayedImage = createColorImageFrom(finalResultImage, unprocessedImageLayers, LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(this.filePath)));
-            if (LswFileUtil.isPng(finalResultImage, this.filePath)) {
+            displayedImage = createColorImageFrom(finalResultImage, unprocessedImageLayers, LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(imageMetadata.getFilePath())));
+            if (LswFileUtil.isPng(finalResultImage, imageMetadata.getFilePath())) {
                 finalResultImage = LswFileUtil.fixNonTiffOpeningSettings(finalResultImage);
             }
             operationService.correctExposure(displayedImage);
             largeImage = setZoom(displayedImage, false);
-            setDefaultLayoutSettings(displayedImage,new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y));
+            setDefaultLayoutSettings(displayedImage, new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y));
             zoomFactor = 0;
             roiActive = false;
 
@@ -503,7 +554,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private void setDefaultLayoutSettings(LswImageViewer image, Point location) {
         image.setColor(Color.BLACK);
         image.setBorderColor(Color.BLACK);
-        image.show(this.filePath);
+        image.show(imageMetadata.getFilePath());
         ImageWindow window = image.getWindow();
         window.setIconImage(iconImage);
         if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile)) {

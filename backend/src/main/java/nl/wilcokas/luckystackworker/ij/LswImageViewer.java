@@ -2,6 +2,7 @@ package nl.wilcokas.luckystackworker.ij;
 
 import ij.*;
 import ij.process.ImageProcessor;
+import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 
 public class LswImageViewer extends ImagePlus {
@@ -38,6 +39,10 @@ public class LswImageViewer extends ImagePlus {
     public synchronized void updateAndDraw() {
         super.updateAndDraw();
         imageWindow.repaint();
+    }
+
+    public void updateMetadata(final LswImageMetadata metadata) {
+        imageWindow.updateMetadata(metadata);
     }
 
     private void setActivated(boolean activated) {
