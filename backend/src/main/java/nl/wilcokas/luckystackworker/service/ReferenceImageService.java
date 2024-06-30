@@ -194,7 +194,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void zoomOut() {
-        if (zoomFactor >= 0) {
+        if (zoomFactor >= -3) {
             displayedImage.getImageWindow().zoomOut();
             zoomFactor--;
         }

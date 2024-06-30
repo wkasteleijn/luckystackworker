@@ -71,39 +71,38 @@ public class OperationService {
     }
 
     public void applyAllOperations(ImagePlus image, LswImageViewer viewer, Profile profile) throws IOException, InterruptedException {
-        updateProgress(viewer,0, true);
+        updateProgress(viewer, 0, true);
         applySharpen(image, profile);
-        updateProgress(viewer,8);
+        updateProgress(viewer, 8);
         applySigmaDenoise1(image, profile);
         updateProgress(viewer, 16, true);
         applyIansNoiseReduction(image, profile);
-        updateProgress(viewer,24);
+        updateProgress(viewer, 24);
         applySigmaDenoise2(image, profile);
-        updateProgress(viewer,32);
+        updateProgress(viewer, 32);
         applySavitzkyGolayDenoise(image, profile);
-        updateProgress(viewer,40, true);
+        updateProgress(viewer, 40, true);
         applyEqualizeLocalHistorgrams(image, profile);
-        updateProgress(viewer,48);
+        updateProgress(viewer, 48);
         applyLocalContrast(image, profile);
-        updateProgress(viewer,56);
+        updateProgress(viewer, 56);
         applyDispersionCorrection(image, profile);
-        updateProgress(viewer,64);
+        updateProgress(viewer, 64);
         applyBrightnessAndContrast(image, profile, true);
-        updateProgress(viewer,72);
+        updateProgress(viewer, 72);
         applyRGBBalance(image, profile);
-        updateProgress(viewer,80);
+        updateProgress(viewer, 80);
         applyGamma(image, profile);
-        updateProgress(viewer,92);
+        updateProgress(viewer, 92);
         applySaturation(image, profile);
-        updateProgress(viewer,100);
-
+        updateProgress(viewer, 100);
         Timer resetProgressTimer = new Timer();
         resetProgressTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 displayedProgress = 0;
                 resetProgressTimer.cancel();
-                if (viewer!= null) {
+                if (viewer != null) {
                     viewer.updateProgress(displayedProgress);
                 }
             }
@@ -116,13 +115,16 @@ public class OperationService {
         int depth = image.getStack().size();
         return Scaler.resize(image, newWidth, newHeight, depth, "depth=%s interpolation=Bicubic create".formatted(depth));
     }
-    private void updateProgress(LswImageViewer viewer,int progress) {
-        updateProgress(viewer,progress, false);
+
+    private void updateProgress(LswImageViewer viewer, int progress) {
+        updateProgress(viewer, progress, false);
     }
 
-    private void updateProgress(LswImageViewer viewer,int progress, boolean slowOperationNext) {
-        displayedProgress = progress;
-        if (viewer!= null) {
+    private void updateProgress(LswImageViewer viewer, int progress, boolean slowOperationNext) {
+        if (displayedProgress < progress) {
+            displayedProgress = progress;
+        }
+        if (viewer != null) {
             viewer.updateProgress(displayedProgress);
         }
         if (slowOperationNext) {
@@ -130,7 +132,7 @@ public class OperationService {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    if (viewer!= null) {
+                    if (viewer != null) {
                         viewer.updateProgress(displayedProgress++);
                     }
                 }
@@ -138,7 +140,9 @@ public class OperationService {
         } else {
             timer.cancel();
         }
-    };
+    }
+
+    ;
 
     private void applySharpen(final ImagePlus image, Profile profile) {
         int iterations = profile.getIterations() == 0 ? 1 : profile.getIterations();

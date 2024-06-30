@@ -91,7 +91,6 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         if (metadata != null) {
             paintHistogram(g);
         }
-        paintProgressBar(g);
     }
 
     public void updateMetadata(final LswImageMetadata metadata) {
@@ -101,7 +100,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
 
     public void updateProgress(final int progressPercentage) {
         this.progressPercentage = progressPercentage;
-        repaint();
+        paintProgressBar(getGraphics());
     }
 
     private void drawBorders(Graphics g) {
@@ -167,10 +166,12 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     }
 
     private void paintProgressBar(Graphics g) {
-        g.setColor(PROGRESSBAR_COLOR);
         if (progressPercentage>0) {
-            g.fillRect(0, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT + 6, (int) (image.getWidth() * (progressPercentage / 100D)), 4);
+            g.setColor(PROGRESSBAR_COLOR);
+        } else {
+            g.setColor(BACKGROUND_COLOR);
         }
+        g.fillRect(0, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT + 6, (int) (image.getWidth() * (progressPercentage / 100D)), 4);
     }
 
     public void zoomIn() {
