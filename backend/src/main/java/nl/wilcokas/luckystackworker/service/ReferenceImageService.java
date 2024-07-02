@@ -433,7 +433,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     private int getHistogramMax(int[] histogramValues) {
         int max = 1;
-        for (int i = 0; i < histogramValues.length; i++) {
+        for (int i = 16; i < histogramValues.length-16; i++) {
             if (histogramValues[i] > max) {
                 max = histogramValues[i];
             }
