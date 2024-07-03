@@ -1,6 +1,6 @@
 @use "@angular/material" as mat;
 
-$my-primary: mat.define-palette(mat.$blue-gray-palette, 500);
+$my-primary: mat.define-palette(mat.$green-palette, 500);
 $my-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
 $my-warn: mat.define-palette(mat.$orange-palette);
 
@@ -31,7 +31,7 @@ body {
 }
 
 .activeColor {
-  border-color: #607d8b !important;
+  border-color: hsl(0, 0%, 55%) !important;
 }
 
 .activeColorNight {
@@ -39,12 +39,11 @@ body {
 }
 
 .button {
-  border: 3px;
+  border: 0px;
   border-style: solid;
-  font-weight: bold;
   font-size: 12px;
-  color: rgb(168, 168, 168);
-  background-color: black;
+  color: rgb(226, 226, 226);
+  background-color: #404040;
   padding: 3px;
   padding-left: 12px;
   padding-right: 12px;
@@ -52,18 +51,18 @@ body {
 }
 
 button:hover {
-  color: rgb(210, 210, 210);
-  border-color: rgb(80, 80, 255) !important;
+  color: rgb(226, 226, 226) !important;
+  background-color: #304f72 !important;
 }
 
 input:hover {
-  color: rgb(210, 210, 210) !important;
-  border-color: rgb(80, 80, 255) !important;
+  color: rgb(226, 226, 226) !important;
+  background-color: #304f72 !important;
 }
 
 select:hover {
-  color: rgb(210, 210, 210) !important;
-  border-color: rgb(80, 80, 255) !important;
+  color: rgb(226, 226, 226) !important;
+  background-color: #304f72 !important;
 }
 
 .mat-slider-thumb-label {
@@ -85,7 +84,7 @@ select:hover {
 }
 
 .mat-slider {
-  width: 428px;
+  width: 350px;
 }
 
 .card {
@@ -110,7 +109,7 @@ select:hover {
 }
 
 .mat-card-title {
-  font-size: 14px !important;
+  font-size: 12px !important;
 }
 
 .mat-card-content {
@@ -130,6 +129,7 @@ select:hover {
 .mat-tab-label {
   color: lightgreen;
   background-color: rgb(25, 25, 25);
+  min-width: 80px !important;
 }
 
 .mat-tab-label:hover {
@@ -149,7 +149,7 @@ select:hover {
 }
 
 .mat-tab-group {
-  max-width: 648px !important;
+  max-width: 550px !important;
 }
 
 .sliderTabs {
@@ -201,5 +201,5 @@ select:hover {
   height: 12px !important;
 }
 .material-icons {
-  font-size: 14px;
+  font-size: 12px;
 }
