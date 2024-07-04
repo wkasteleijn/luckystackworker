@@ -38,6 +38,14 @@ body {
   border-color: #b96900 !important;
 }
 
+.activeColorCrop {
+  background-color: #304f72 !important;
+}
+
+.activeColorNightCrop {
+  background-color: #304f72 !important;
+}
+
 .button {
   border: 0px;
   border-style: solid;
@@ -132,24 +140,26 @@ select:hover {
   min-width: 80px !important;
 }
 
+/*
 .mat-tab-label:hover {
   color: rgb(255, 255, 255);
   background-color: rgb(0, 0, 0);
 }
 
-.mat-tab-body-content {
-  background-color: rgb(25, 25, 25);
-}
-.mat-tab-body {
-  height: 352px;
-}
 
 .mat-ink-bar {
   background-color: lightgreen !important;
 }
 
+*/
 .mat-tab-group {
   max-width: 550px !important;
+}
+.mat-tab-body {
+  height: 352px;
+}
+.mat-tab-body-content {
+  background-color: rgb(25, 25, 25);
 }
 
 .sliderTabs {

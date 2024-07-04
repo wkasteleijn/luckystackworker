@@ -1033,16 +1033,17 @@ export class AppComponent implements OnInit {
   }
 
   nightModeEnabled(): boolean {
-    if (this.nightMode) {
-      document.body.style.backgroundColor = '#000000';
-    } else {
-      document.body.style.backgroundColor = 'rgb(43,43,43)';
-    }
     return this.nightMode;
   }
 
   nightModeChanged() {
     console.log('nightModeChanged called');
+    this.nightMode = !this.nightMode;
+    if (this.nightMode) {
+      document.body.style.backgroundColor = '#000000';
+    } else {
+      document.body.style.backgroundColor = 'rgb(43,43,43)';
+    }
     this.luckyStackWorkerService.nightModeChanged(this.nightMode).subscribe(
       (data) => {
         console.log('Response');
@@ -1053,12 +1054,17 @@ export class AppComponent implements OnInit {
 
   cropSelectionChanged() {
     console.log('cropSelectionChanged called');
+    this.crop = !this.crop;
     this.luckyStackWorkerService.cropSelectionChanged().subscribe(
       (data) => {
         console.log('Response');
       },
       (error) => console.log(error)
     );
+  }
+
+  cropEnabled() {
+    return this.crop;
   }
 
   histogramSelectionChanged() {

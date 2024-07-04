@@ -351,3 +351,6 @@
 .dropdownMargin {
   margin-left: 12px;
 }
+.zoomIcon {
+  transform: scale(2);
+}
