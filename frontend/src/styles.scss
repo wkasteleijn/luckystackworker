@@ -38,39 +38,92 @@ body {
   border-color: #b96900 !important;
 }
 
-.activeColorCrop {
+.activeColorPressed {
   background-color: #304f72 !important;
 }
 
-.activeColorNightCrop {
+.activeColorNightPressed {
   background-color: #304f72 !important;
 }
 
 .button {
   border: 0px;
-  border-style: solid;
   font-size: 12px;
   color: rgb(226, 226, 226);
   background-color: #404040;
-  padding: 3px;
-  padding-left: 12px;
-  padding-right: 12px;
-  border-radius: 8px;
+  padding-left: 14px;
+  padding-right: 14px;
+  border-radius: 20px;
+}
+.button_disabled {
+  border: 0px;
+  border-color: rgb(43, 43, 43);
+  font-size: 12px;
+  color: rgb(168, 168, 168);
+  background-color: black;
+  padding-left: 14px;
+  padding-right: 14px;
+  border-radius: 20px;
+}
+.buttonZoom {
+  font-size: 12px;
+  border: 0px;
+  color: rgb(226, 226, 226);
+  background-color: #404040;
+  border-radius: 24px;
+  padding-left: 14px;
+  padding-right: 14px;
+  border-radius: 20px;
+}
+.buttonBottom {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.buttonDisabledZoom {
+  font-size: 18px;
+  border: 0px;
+  border-color: rgb(43, 43, 43);
+  color: rgb(43, 43, 43);
+  background-color: black;
+  border-radius: 24px;
+  padding: 10px;
+  padding-left: 14px;
+  padding-right: 14px;
+  border-radius: 20px;
+}
+.dropdown {
+  color: rgb(226, 226, 226);
+  background-color: #404040;
+  border-width: 0px;
+  padding: 10px;
+  padding-left: 14px;
+  padding-right: 14px;
+  border-radius: 20px;
+}
+.dropdown_disabled {
+  color: rgb(168, 168, 168);
+  background-color: black;
+  border-color: black;
+  padding: 10px;
+  padding-left: 14px;
+  padding-right: 14px;
+  border-radius: 20px;
 }
 
 button:hover {
   color: rgb(226, 226, 226) !important;
-  background-color: #304f72 !important;
+  background-color: #505050 !important;
 }
 
 input:hover {
-  color: rgb(226, 226, 226) !important;
-  background-color: #304f72 !important;
+  color: rgb(100, 100, 100) !important;
+  background-color: #505050 !important;
 }
 
 select:hover {
   color: rgb(226, 226, 226) !important;
-  background-color: #304f72 !important;
+  background-color: #505050 !important;
 }
 
 .mat-slider-thumb-label {
@@ -155,6 +208,10 @@ select:hover {
 .mat-tab-group {
   max-width: 550px !important;
 }
+.mat-tab-label {
+  height: 32px !important;
+  line-height: 32px !important;
+}
 .mat-tab-body {
   height: 352px;
 }
@@ -163,7 +220,7 @@ select:hover {
 }
 
 .sliderTabs {
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .mat-radio-button {

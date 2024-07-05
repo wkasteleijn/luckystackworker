@@ -178,7 +178,7 @@
       class="{{
         'buttonZoom ' +
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-          (cropEnabled() ? 'Crop' : '')
+          (cropEnabled() ? 'Pressed' : '')
       }}"
       title="Crop"
     >
@@ -235,7 +235,7 @@
       class="{{
         'buttonZoom ' +
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-          (nightModeEnabled() ? 'Crop' : '')
+          (nightModeEnabled() ? 'Pressed' : '')
       }}"
       title="Night mode"
     >
@@ -1198,31 +1198,41 @@
 
       <!-- Dispersion corrector-->
       <div class="sliderRow" title="{{ dispersionCorrectorTitle }}">
-        <div
-          class="sliderRowCategoryTitle {{
-            nightModeEnabled()
-              ? 'sliderRowCategoryTitleColorNight'
-              : 'sliderRowCategoryTitleColor'
-          }}"
-        >
-          Dispersion Correction
-        </div>
-        <div class="dispersionPanel" title="{{ dispersionCorrectorTitle }}">
-          <mat-checkbox
-            [(ngModel)]="dispersionCorrectionEnabled"
-            (change)="dispersionCorrectionEnabledChanged()"
-            [color]="colorTheme()"
-          ></mat-checkbox
-          ><span
-            class="dispersionLabel {{
-              dispersionCorrectionEnabled
-                ? nightModeEnabled()
-                  ? 'sliderRowCategoryTitleColorNight'
-                  : 'sliderRowCategoryTitleColor'
-                : 'labelColor'
-            }}"
-            >On</span
-          >
+        <div>
+          <div class="dispersionPanelRow">
+            <button
+              *ngIf="openRefImageEnabled() && refImageSelected"
+              type="button"
+              mat-button
+              (click)="dispersionCorrectionEnabledChanged()"
+              class="{{
+                'buttonZoom ' +
+                  (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+                  (dispersionCorrectionIsEnabled() ? 'Pressed' : '')
+              }}"
+              title="Crop"
+            >
+              Dispersion Correction
+            </button>
+          </div>
+          <div class="dispersionPanelRow">
+            <button
+              *ngIf="dispersionCorrectionEnabled"
+              type="button"
+              mat-button
+              class="buttonZoom {{
+                nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+              }}"
+              (click)="resetDispersionCorrection()"
+              title="Reset"
+            >
+              <mat-icon
+                aria-hidden="false"
+                class="zoomIcon"
+                fontIcon="undo"
+              ></mat-icon>
+            </button>
+          </div>
         </div>
         <div class="dispersionPanel">
           <section *ngIf="dispersionCorrectionEnabled">
@@ -1498,19 +1508,6 @@
                   />
                 </button>
               </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  *ngIf="dispersionCorrectionEnabled"
-                  type="button"
-                  mat-button
-                  class="dispersionRestButton button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="resetDispersionCorrection()"
-                >
-                  Reset
-                </button>
-              </div>
             </div>
             <div class="dispersionPanelRow">
               <div class="dispersionPanelColumn">
@@ -1540,7 +1537,6 @@
                   <img src="assets/images/right.png" class="dispersionArrow" />
                 </button>
               </div>
-              <div class="dispersionPanelColumn">&nbsp;</div>
             </div>
             <div class="dispersionPanelRow">
               <div class="dispersionPanelColumn">
@@ -1585,7 +1581,6 @@
                   />
                 </button>
               </div>
-              <div class="dispersionPanelColumn">&nbsp;</div>
             </div>
             <div class="dispersionIndicators">
               <div class="{{ dispersionIndicatorRedColor() }}">Red</div>
@@ -1636,17 +1631,6 @@
                   />
                 </button>
               </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  *ngIf="!dispersionCorrectionEnabled"
-                  type="button"
-                  disabled
-                  mat-button
-                  class="dispersionRestButton button_disabled"
-                >
-                  Reset
-                </button>
-              </div>
             </div>
             <div class="dispersionPanelRow">
               <div class="dispersionPanelColumn">
@@ -1672,7 +1656,6 @@
                   <img src="assets/images/right.png" class="dispersionArrow" />
                 </button>
               </div>
-              <div class="dispersionPanelColumn">&nbsp;</div>
             </div>
             <div class="dispersionPanelRow">
               <div class="dispersionPanelColumn">
@@ -1711,7 +1694,6 @@
                   />
                 </button>
               </div>
-              <div class="dispersionPanelColumn">&nbsp;</div>
             </div>
           </section>
         </div>
@@ -1836,7 +1818,11 @@
       }}"
       title="This will save the currently open stack with all applied the post-processing. You can save it as a 16-bit TIFF or a 100% quality JPG. To do so add the applicable extension to the filename (filename.tif, filename.jpg)."
     >
-      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="save"></mat-icon>
+      <mat-icon
+        aria-hidden="false"
+        class="zoomIcon buttonBottom"
+        fontIcon="save"
+      ></mat-icon>
     </button>
     <button
       *ngIf="!refImageSelected"
@@ -1845,7 +1831,11 @@
       disabled
       class="button_disabled"
     >
-      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="save"></mat-icon>
+      <mat-icon
+        aria-hidden="false"
+        class="zoomIcon buttonBottom"
+        fontIcon="save"
+      ></mat-icon>
     </button>
     <button
       *ngIf="showVersionButton()"
@@ -1880,7 +1870,7 @@
     >
       <mat-icon
         aria-hidden="false"
-        class="zoomIcon"
+        class="zoomIcon buttonBottom"
         fontIcon="info_i"
       ></mat-icon>
     </button>
@@ -1894,7 +1884,7 @@
     >
       <mat-icon
         aria-hidden="false"
-        class="zoomIcon"
+        class="zoomIcon buttonBottom"
         fontIcon="power_settings_new"
       ></mat-icon>
     </button>
@@ -1911,7 +1901,11 @@
       disabled
       class="button_about button_disabled"
     >
-      <mat-icon aria-hidden="false" fontIcon="info_i"></mat-icon>
+      <mat-icon
+        aria-hidden="false"
+        fontIcon="info_i"
+        class="zoomIcon buttonBottom"
+      ></mat-icon>
     </button>
     <button
       type="button"
@@ -1921,7 +1915,7 @@
     >
       <mat-icon
         aria-hidden="false"
-        class="zoomIcon"
+        class="zoomIcon buttonBottom"
         fontIcon="power_settings_new"
       ></mat-icon>
     </button>

@@ -89,27 +89,6 @@
   white-space: nowrap;
 }
 
-.dropdown {
-  color: rgb(226, 226, 226);
-  background-color: #404040;
-  border-width: 0px;
-  padding-left: 12px;
-  padding-right: 12px;
-  padding: 3px;
-  border-radius: 8px;
-}
-
-.dropdown_disabled {
-  color: rgb(168, 168, 168);
-  background-color: black;
-  border-color: black;
-  border-width: 3px;
-  padding-left: 12px;
-  padding-right: 12px;
-  padding: 3px;
-  border-radius: 8px;
-}
-
 .rootFolder {
   width: 284px;
   border-style: solid;
@@ -129,26 +108,14 @@
 }
 
 .button_container_top {
-  margin-bottom: 4px;
+  margin-bottom: 0px;
 }
 
 .button_container {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  margin-top: 12px;
-}
-
-.button_disabled {
-  border: 3px;
-  border-color: rgb(43, 43, 43);
-  font-size: 12px;
-  color: rgb(168, 168, 168);
-  background-color: black;
-  padding: 3px;
-  padding-left: 12px;
-  padding-right: 12px;
-  border-radius: 8px;
+  margin-top: 4px;
 }
 
 .buttonDivider {
@@ -183,13 +150,6 @@
   left: 280px;
 }
 
-.buttonZoom {
-  font-size: 18px;
-  border: 0px;
-  color: rgb(226, 226, 226);
-  background-color: #404040;
-  border-radius: 24px;
-}
 .relatedButtonsSpace {
   margin-left: 6px;
 }
@@ -204,15 +164,6 @@
 
 .plusZoom {
   margin-left: 20px;
-}
-
-.buttonDisabledZoom {
-  font-size: 18px;
-  border: 3px;
-  border-color: rgb(43, 43, 43);
-  color: rgb(43, 43, 43);
-  background-color: black;
-  border-radius: 8px;
 }
 
 .colorNewversion {
@@ -317,19 +268,12 @@
 }
 .dispersionPanel {
   margin-top: 8px;
-  margin-left: 14px;
 }
 .dispersionLabel {
   margin-left: 8px;
 }
-.dispersionGutter {
-  margin: 8px;
-}
 .labelColor {
   color: rgb(168, 168, 168);
-}
-.dispersionRestButton {
-  margin-left: 38px;
 }
 .histogramToggle {
   position: fixed;
@@ -342,15 +286,15 @@
   width: 40px;
   z-index: 100;
   top: 416px;
-  left: 568px;
+  left: 468px;
 }
 .dispersionIndicatorBlue {
-  left: 608px;
+  left: 508px;
   top: 416px;
 }
 .dropdownMargin {
   margin-left: 12px;
 }
 .zoomIcon {
-  transform: scale(2);
+  transform: scale(1.6);
 }

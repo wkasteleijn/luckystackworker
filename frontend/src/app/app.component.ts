@@ -687,9 +687,14 @@ export class AppComponent implements OnInit {
       'dispersionCorrectionEnabledChanged called: ' +
         this.dispersionCorrectionEnabled
     );
+    this.dispersionCorrectionEnabled = !this.dispersionCorrectionEnabled;
     this.settings.operation = 'dispersionCorrection';
     this.profile.dispersionCorrectionEnabled = this.dispersionCorrectionEnabled;
     this.resetDispersionCorrection();
+  }
+
+  dispersionCorrectionIsEnabled() {
+    return this.dispersionCorrectionEnabled;
   }
 
   resetDispersionCorrection() {
