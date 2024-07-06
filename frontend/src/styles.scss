@@ -148,8 +148,9 @@ select:hover {
 
 .card {
   max-width: 518px;
-  margin-top: 8px;
+  margin-top: 6px;
   color: rgb(168, 168, 168);
+  height: 32px;
 }
 
 .cardTitle {
@@ -185,33 +186,19 @@ select:hover {
   margin-top: 56px !important;
 }
 
-.mat-tab-label {
-  color: lightgreen;
-  background-color: rgb(25, 25, 25);
-  min-width: 88px !important;
-}
-
-/*
-.mat-tab-label:hover {
-  color: rgb(255, 255, 255);
-  background-color: rgb(0, 0, 0);
-}
-
-
-.mat-ink-bar {
-  background-color: lightgreen !important;
-}
-
-*/
 .mat-tab-group {
   max-width: 550px !important;
 }
 .mat-tab-label {
+  color: lightgreen;
+  background-color: rgb(25, 25, 25);
   height: 32px !important;
   line-height: 32px !important;
+  max-width: 130px !important;
+  min-width: 72px !important;
 }
 .mat-tab-body {
-  height: 368px;
+  height: 378px;
 }
 .mat-tab-body-content {
   background-color: rgb(25, 25, 25);

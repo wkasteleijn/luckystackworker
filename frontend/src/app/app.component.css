@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  margin-left: 16px;
+  margin-left: 8px;
 }
 
 .containerColor {
@@ -60,6 +60,7 @@
   align-items: baseline;
   max-height: 32px;
   color: rgb(168, 168, 168);
+  margin-top: 2px;
 }
 
 .sliderRowCategoryTitle {
@@ -80,7 +81,7 @@
 }
 
 .workerLabel {
-  margin-right: 52px;
+  margin-right: 12px;
 }
 
 .workerLabelStatus {
@@ -89,6 +90,9 @@
   white-space: nowrap;
 }
 
+.batchBar {
+  margin-top: -8px !important;
+}
 .rootFolder {
   width: 284px;
   border-style: solid;
@@ -107,15 +111,17 @@
   margin-top: 4px;
 }
 
-.button_container_top {
-  margin-bottom: 0px;
-}
-
 .button_container {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   margin-top: 4px;
+}
+.bottomButtonContainer {
+  margin-top: 8px;
+}
+.topButtonContainer {
+  margin-top: 6px;
 }
 
 .buttonDivider {
@@ -123,6 +129,11 @@
 }
 .button_exit {
   margin-left: 20px;
+}
+
+.resetButton {
+  min-height: 38px;
+  min-width: 44px;
 }
 
 .button_about {
@@ -270,10 +281,14 @@
   margin-top: 8px;
 }
 .dispersionButton {
+  margin-top: 0px;
   margin-left: 16px;
 }
+.dispersionInnerButton {
+  height: 8px !important;
+}
 .dispersionLeftButtons {
-  min-width: 136px;
+  min-width: 64px;
 }
 .labelColor {
   color: rgb(168, 168, 168);

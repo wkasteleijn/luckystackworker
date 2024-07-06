@@ -14,7 +14,7 @@
       : 'container containerColor'
   }}"
 >
-  <div class="button_container">
+  <div class="button_container topButtonContainer">
     <button
       *ngIf="openRefImageEnabled()"
       type="button"
@@ -1198,6 +1198,15 @@
 
       <!-- Dispersion corrector-->
       <div class="sliderRow" title="{{ dispersionCorrectorTitle }}">
+        <div
+          class="sliderRowCategoryTitle {{
+            nightModeEnabled()
+              ? 'sliderRowCategoryTitleColorNight'
+              : 'sliderRowCategoryTitleColor'
+          }}"
+        >
+          Dispersion
+        </div>
         <div class="dispersionLeftButtons">
           <div class="dispersionPanelRow dispersionButton">
             <button
@@ -1206,7 +1215,7 @@
               mat-button
               (click)="dispersionCorrectionEnabledChanged()"
               class="{{
-                'buttonZoom ' +
+                'buttonZoom dispersionInnerButton' +
                   (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
                   (dispersionCorrectionIsEnabled() ? 'Pressed' : '')
               }}"
@@ -1223,42 +1232,6 @@
               title="Dipersion Correction"
             >
               <img src="assets/images/dispersion.png" class="dispersionArrow" />
-            </button>
-          </div>
-          <div class="dispersionPanelRow dispersionButton">
-            <button
-              *ngIf="dispersionCorrectionEnabled"
-              type="button"
-              mat-button
-              class="buttonZoom {{
-                nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-              }}"
-              (click)="resetDispersionCorrection()"
-              title="Reset"
-            >
-              <mat-icon
-                aria-hidden="false"
-                class="zoomIcon"
-                fontIcon="undo"
-              ></mat-icon>
-            </button>
-            <button
-              *ngIf="
-                !dispersionCorrectionEnabled ||
-                !openRefImageEnabled() ||
-                !refImageSelected
-              "
-              type="button"
-              mat-button
-              disabled
-              class="buttonDisabledZoom"
-              title="Reset"
-            >
-              <mat-icon
-                aria-hidden="false"
-                class="zoomIcon"
-                fontIcon="undo"
-              ></mat-icon>
             </button>
           </div>
         </div>
@@ -1536,6 +1509,7 @@
                   />
                 </button>
               </div>
+              <div class="dispersionPanelColumn">&nbsp;</div>
             </div>
             <div class="dispersionPanelRow">
               <div class="dispersionPanelColumn">
@@ -1565,6 +1539,7 @@
                   <img src="assets/images/right.png" class="dispersionArrow" />
                 </button>
               </div>
+              <div class="dispersionPanelColumn">&nbsp;</div>
             </div>
             <div class="dispersionPanelRow">
               <div class="dispersionPanelColumn">
@@ -1607,6 +1582,24 @@
                     src="assets/images/right-down.png"
                     class="dispersionArrow"
                   />
+                </button>
+              </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  *ngIf="dispersionCorrectionEnabled"
+                  type="button"
+                  mat-button
+                  class="buttonZoom resetButton {{
+                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                  }}"
+                  (click)="resetDispersionCorrection()"
+                  title="Reset"
+                >
+                  <mat-icon
+                    aria-hidden="false"
+                    class="zoomIcon"
+                    fontIcon="undo"
+                  ></mat-icon>
                 </button>
               </div>
             </div>
@@ -1659,6 +1652,7 @@
                   />
                 </button>
               </div>
+              <div class="dispersionPanelColumn">&nbsp;</div>
             </div>
             <div class="dispersionPanelRow">
               <div class="dispersionPanelColumn">
@@ -1684,6 +1678,7 @@
                   <img src="assets/images/right.png" class="dispersionArrow" />
                 </button>
               </div>
+              <div class="dispersionPanelColumn">&nbsp;</div>
             </div>
             <div class="dispersionPanelRow">
               <div class="dispersionPanelColumn">
@@ -1722,6 +1717,26 @@
                   />
                 </button>
               </div>
+              <div class="dispersionPanelColumn">
+                <button
+                  *ngIf="
+                    !dispersionCorrectionEnabled ||
+                    !openRefImageEnabled() ||
+                    !refImageSelected
+                  "
+                  type="button"
+                  mat-button
+                  disabled
+                  class="buttonDisabledZoom resetButton"
+                  title="Reset"
+                >
+                  <mat-icon
+                    aria-hidden="false"
+                    class="zoomIcon"
+                    fontIcon="undo"
+                  ></mat-icon>
+                </button>
+              </div>
             </div>
           </section>
         </div>
@@ -1731,7 +1746,7 @@
 
   <!-- Worker panel -->
   <mat-card class="card cardColor">
-    <mat-card-content>
+    <mat-card-content class="batchBar">
       <div class="sliderRow">
         <span
           class="workerLabel {{
@@ -1739,7 +1754,7 @@
               ? 'sliderRowCategoryTitleColorNight'
               : 'sliderRowCategoryTitleColor'
           }}"
-          >Batch Worker</span
+          >Batch</span
         >
         <button
           *ngIf="openRefImageEnabled() && refImageSelected"
@@ -1835,7 +1850,10 @@
     </mat-card-content>
   </mat-card>
 
-  <div class="button_container" *ngIf="buttonBarEnabled()">
+  <div
+    class="button_container bottomButtonContainer"
+    *ngIf="buttonBarEnabled()"
+  >
     <button
       type="button"
       *ngIf="refImageSelected"
@@ -1917,7 +1935,10 @@
       ></mat-icon>
     </button>
   </div>
-  <div class="button_container" *ngIf="!buttonBarEnabled()">
+  <div
+    class="button_container bottomButtonContainer"
+    *ngIf="!buttonBarEnabled()"
+  >
     <button type="button" mat-button disabled class="button_disabled">
       <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="save"></mat-icon>
     </button>
