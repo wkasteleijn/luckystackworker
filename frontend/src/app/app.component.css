@@ -126,7 +126,7 @@
 }
 
 .button_about {
-  margin-left: 236px;
+  margin-left: 196px;
 }
 
 .spanNoNewVersion {
@@ -269,8 +269,11 @@
 .dispersionPanel {
   margin-top: 8px;
 }
-.dispersionLabel {
-  margin-left: 8px;
+.dispersionButton {
+  margin-left: 16px;
+}
+.dispersionLeftButtons {
+  min-width: 136px;
 }
 .labelColor {
   color: rgb(168, 168, 168);
@@ -285,12 +288,12 @@
   position: fixed;
   width: 40px;
   z-index: 100;
-  top: 416px;
+  top: 368px;
   left: 468px;
 }
 .dispersionIndicatorBlue {
   left: 508px;
-  top: 416px;
+  top: 368px;
 }
 .dropdownMargin {
   margin-left: 12px;

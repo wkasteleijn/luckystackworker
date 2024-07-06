@@ -1198,8 +1198,8 @@
 
       <!-- Dispersion corrector-->
       <div class="sliderRow" title="{{ dispersionCorrectorTitle }}">
-        <div>
-          <div class="dispersionPanelRow">
+        <div class="dispersionLeftButtons">
+          <div class="dispersionPanelRow dispersionButton">
             <button
               *ngIf="openRefImageEnabled() && refImageSelected"
               type="button"
@@ -1210,12 +1210,22 @@
                   (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
                   (dispersionCorrectionIsEnabled() ? 'Pressed' : '')
               }}"
-              title="Crop"
+              title="Dipersion Correction"
             >
-              Dispersion Correction
+              <img src="assets/images/dispersion.png" class="dispersionArrow" />
+            </button>
+            <button
+              *ngIf="!openRefImageEnabled() || !refImageSelected"
+              type="button"
+              mat-button
+              disabled
+              class="buttonDisabledZoom"
+              title="Dipersion Correction"
+            >
+              <img src="assets/images/dispersion.png" class="dispersionArrow" />
             </button>
           </div>
-          <div class="dispersionPanelRow">
+          <div class="dispersionPanelRow dispersionButton">
             <button
               *ngIf="dispersionCorrectionEnabled"
               type="button"
@@ -1224,6 +1234,24 @@
                 nightModeEnabled() ? 'activeColorNight' : 'activeColor'
               }}"
               (click)="resetDispersionCorrection()"
+              title="Reset"
+            >
+              <mat-icon
+                aria-hidden="false"
+                class="zoomIcon"
+                fontIcon="undo"
+              ></mat-icon>
+            </button>
+            <button
+              *ngIf="
+                !dispersionCorrectionEnabled ||
+                !openRefImageEnabled() ||
+                !refImageSelected
+              "
+              type="button"
+              mat-button
+              disabled
+              class="buttonDisabledZoom"
               title="Reset"
             >
               <mat-icon
