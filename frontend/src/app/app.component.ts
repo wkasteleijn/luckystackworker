@@ -670,6 +670,7 @@ export class AppComponent implements OnInit {
 
   realtimeEnabledChanged() {
     console.log('realtimeEnabledChanged called: ' + this.realtimeEnabled);
+    this.realtimeEnabled = !this.realtimeEnabled;
     this.luckyStackWorkerService
       .realtimeChanged(this.realtimeEnabled)
       .subscribe(

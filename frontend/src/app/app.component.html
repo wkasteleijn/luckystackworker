@@ -45,7 +45,7 @@
       ></mat-icon>
     </button>
 
-    <mat-form-field appearance="fill" class="profileSelectorSpace">
+    <mat-form-field appearance="fill">
       <select
         matNativeControl
         [disabled]="shouldShowSpinner() || crop"
@@ -67,7 +67,7 @@
       </select>
     </mat-form-field>
 
-    <mat-form-field appearance="fill" class="profileSelectorSpace">
+    <mat-form-field appearance="fill">
       <select
         matNativeControl
         [disabled]="shouldShowSpinner() || crop"
@@ -89,7 +89,7 @@
       </select>
     </mat-form-field>
 
-    <mat-form-field appearance="fill" class="profileSelectorSpace">
+    <mat-form-field appearance="fill">
       <select
         matNativeControl
         [disabled]="!refImageSelected || !openRefImageEnabled()"
@@ -98,17 +98,114 @@
         (change)="profileSelectionChanged()"
         class="{{
           !refImageSelected || !openRefImageEnabled()
-            ? 'dropdown_disabled'
+            ? 'dropdownMargin dropdown_disabled'
             : nightModeEnabled()
-            ? 'dropdown activeColorNight'
-            : 'dropdown activeColor'
+            ? 'dropdownMargin dropdown activeColorNight'
+            : 'dropdownMargin dropdown activeColor'
         }}"
+        title="Select the object profile"
       >
         <option *ngFor="let profile of profiles" [value]="profile.value">
           {{ profile.viewValue }}
         </option>
       </select>
     </mat-form-field>
+
+    <button
+      *ngIf="openRefImageEnabled() && refImageSelected"
+      type="button"
+      mat-button
+      class="button buttonMargin {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      (click)="loadProfile()"
+      title="Load profile"
+    >
+      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="tune"></mat-icon>
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled() || !refImageSelected"
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled buttonMargin"
+      title="Load profile"
+    >
+      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="tune"></mat-icon>
+    </button>
+
+    <button
+      *ngIf="openRefImageEnabled() && refImageSelected"
+      type="button"
+      mat-button
+      (click)="cropSelectionChanged()"
+      class="{{
+        'buttonZoom buttonMargin ' +
+          (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+          (cropEnabled() ? 'Pressed' : '')
+      }}"
+      title="Crop"
+    >
+      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="crop"></mat-icon>
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled() || !refImageSelected"
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled buttonMargin"
+      title="Crop"
+    >
+      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="crop"></mat-icon>
+    </button>
+
+    <button
+      *ngIf="showVersionButton()"
+      type="button"
+      mat-button
+      class="buttonNewVersion button colorNewVersion"
+      title="You are currently using an older version {{
+        getCurrentVersion()
+      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
+        getLatestKnownVersion()
+      }}."
+    >
+      <a
+        class="newVersionLink"
+        target="_blank"
+        href="https://github.com/wkasteleijn/luckystackworker/releases/latest"
+        >Download newer version!</a
+      >
+    </button>
+
+    <button
+      type="button"
+      mat-button
+      class="button buttonMargin {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      (click)="openAbout()"
+    >
+      <mat-icon
+        aria-hidden="false"
+        class="zoomIcon buttonBottom"
+        fontIcon="info_i"
+      ></mat-icon>
+    </button>
+
+    <button
+      *ngIf="!openRefImageEnabled()"
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled buttonMargin"
+    >
+      <mat-icon
+        aria-hidden="false"
+        fontIcon="info_i"
+        class="zoomIcon buttonBottom"
+      ></mat-icon>
+    </button>
 
     <button
       *ngIf="openRefImageEnabled() && refImageSelected"
@@ -131,11 +228,7 @@
       disabled
       class="plusZoom buttonDisabledZoom"
     >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon"
-        fontIcon="zoom_in"
-      ></mat-icon>
+      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="add"></mat-icon>
     </button>
 
     <button
@@ -145,8 +238,8 @@
       (click)="zoomOut()"
       class="{{
         nightModeEnabled()
-          ? 'buttonZoom relatedButtonsSpace activeColorNight'
-          : 'buttonZoom relatedButtonsSpace activeColor'
+          ? 'minZoom buttonZoom relatedButtonsSpace activeColorNight'
+          : 'minZoom buttonZoom relatedButtonsSpace activeColor'
       }}"
       title="Zoom out"
     >
@@ -161,7 +254,7 @@
       type="button"
       mat-button
       disabled
-      class="buttonDisabledZoom relatedButtonsSpace"
+      class="minZoom buttonDisabledZoom relatedButtonsSpace"
     >
       <mat-icon
         aria-hidden="false"
@@ -169,24 +262,39 @@
         fontIcon="remove"
       ></mat-icon>
     </button>
-
-    <button
-      *ngIf="openRefImageEnabled() && refImageSelected"
-      type="button"
-      mat-button
-      (click)="cropSelectionChanged()"
-      class="{{
-        'buttonZoom ' +
-          (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-          (cropEnabled() ? 'Pressed' : '')
-      }}"
-      title="Crop"
-    >
-      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="crop"></mat-icon>
-    </button>
   </div>
 
   <div class="button_container_top button_container">
+    <button
+      type="button"
+      *ngIf="openRefImageEnabled() && refImageSelected"
+      mat-button
+      (click)="saveReferenceImage()"
+      class="button {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      title="This will save the currently open stack with all applied the post-processing. You can save it as a 16-bit TIFF or a 100% quality JPG. To do so add the applicable extension to the filename (filename.tif, filename.jpg)."
+    >
+      <mat-icon
+        aria-hidden="false"
+        class="zoomIcon buttonBottom"
+        fontIcon="save"
+      ></mat-icon>
+    </button>
+    <button
+      *ngIf="!refImageSelected || !openRefImageEnabled()"
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled"
+    >
+      <mat-icon
+        aria-hidden="false"
+        class="zoomIcon buttonBottom"
+        fontIcon="save"
+      ></mat-icon>
+    </button>
+
     <mat-form-field appearance="fill">
       <input
         matInput
@@ -201,31 +309,9 @@
             ? ' activeColorNight dropdown rootFolder'
             : 'activeColor dropdown rootFolder'
         }}"
+        title="Select root folder"
       />
     </mat-form-field>
-
-    <span class="buttonDivider">&nbsp;</span>
-
-    <button
-      *ngIf="openRefImageEnabled() && refImageSelected"
-      type="button"
-      mat-button
-      class="button {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      (click)="loadProfile()"
-    >
-      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="tune"></mat-icon>
-    </button>
-    <button
-      *ngIf="!openRefImageEnabled() || !refImageSelected"
-      type="button"
-      mat-button
-      disabled
-      class="button_disabled"
-    >
-      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="tune"></mat-icon>
-    </button>
 
     <button
       *ngIf="openRefImageEnabled() && refImageSelected"
@@ -233,7 +319,7 @@
       mat-button
       (click)="nightModeChanged()"
       class="{{
-        'buttonZoom ' +
+        'buttonZoom buttonMargin ' +
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
           (nightModeEnabled() ? 'Pressed' : '')
       }}"
@@ -243,6 +329,48 @@
         aria-hidden="false"
         class="zoomIcon"
         fontIcon="nightlight"
+      ></mat-icon>
+    </button>
+    <button
+      *ngIf="!refImageSelected || !openRefImageEnabled()"
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled buttonMargin"
+    >
+      <mat-icon
+        aria-hidden="false"
+        class="zoomIcon buttonBottom"
+        fontIcon="nightlight"
+      ></mat-icon>
+    </button>
+
+    <button
+      *ngIf="openRefImageEnabled()"
+      type="button_exit"
+      mat-button
+      (click)="exit()"
+      class="button buttonMargin {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+    >
+      <mat-icon
+        aria-hidden="false"
+        class="zoomIcon buttonBottom"
+        fontIcon="power_settings_new"
+      ></mat-icon>
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled()"
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled buttonMargin"
+    >
+      <mat-icon
+        aria-hidden="false"
+        class="zoomIcon buttonBottom"
+        fontIcon="power_settings_new"
       ></mat-icon>
     </button>
   </div>
@@ -1215,9 +1343,9 @@
               mat-button
               (click)="dispersionCorrectionEnabledChanged()"
               class="{{
-                'buttonZoom dispersionInnerButton' +
+                'buttonZoom ' +
                   (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-                  (dispersionCorrectionIsEnabled() ? 'Pressed' : '')
+                  (dispersionCorrectionEnabled ? 'Pressed' : '')
               }}"
               title="Dipersion Correction"
             >
@@ -1814,26 +1942,40 @@
               : 'sliderRowCategoryTitleColor'
           }}"
         >
-          Status:
           {{ workerProgress === 100 ? "Done" : getWorkerStatusDisplayText() }}
         </div>
-        <mat-checkbox
-          [(ngModel)]="realtimeEnabled"
-          (change)="realtimeEnabledChanged()"
-          [color]="colorTheme()"
-          title="Activate real time processing of stacks as they are being produced in the root foder by external stacking software."
-        ></mat-checkbox
-        ><span
-          class="realtimeLabel {{
-            realtimeEnabled
-              ? nightModeEnabled()
-                ? 'sliderRowCategoryTitleColorNight'
-                : 'sliderRowCategoryTitleColor'
-              : ''
+        <button
+          *ngIf="openRefImageEnabled() && refImageSelected"
+          type="button"
+          mat-button
+          (click)="realtimeEnabledChanged()"
+          class="{{
+            'buttonZoom connectButton ' +
+              (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+              (realtimeEnabled ? 'Pressed' : '')
           }}"
-          title="Activate real time processing of stacks as they are being produced in the root foder by external stacking software."
-          >Realtime</span
+          title="Connect to stacking software"
         >
+          <mat-icon
+            aria-hidden="false"
+            class="zoomIcon"
+            fontIcon="link"
+          ></mat-icon>
+        </button>
+        <button
+          *ngIf="!openRefImageEnabled() || !refImageSelected"
+          type="button"
+          mat-button
+          disabled
+          class="buttonDisabledZoom connectButton"
+          title="Connect to stacking software"
+        >
+          <mat-icon
+            aria-hidden="false"
+            class="zoomIcon"
+            fontIcon="link"
+          ></mat-icon>
+        </button>
       </div>
       <div class="sliderRow">
         <mat-progress-bar
@@ -1849,124 +1991,4 @@
       </div>
     </mat-card-content>
   </mat-card>
-
-  <div
-    class="button_container bottomButtonContainer"
-    *ngIf="buttonBarEnabled()"
-  >
-    <button
-      type="button"
-      *ngIf="refImageSelected"
-      mat-button
-      (click)="saveReferenceImage()"
-      class="button {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      title="This will save the currently open stack with all applied the post-processing. You can save it as a 16-bit TIFF or a 100% quality JPG. To do so add the applicable extension to the filename (filename.tif, filename.jpg)."
-    >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon buttonBottom"
-        fontIcon="save"
-      ></mat-icon>
-    </button>
-    <button
-      *ngIf="!refImageSelected"
-      type="button"
-      mat-button
-      disabled
-      class="button_disabled"
-    >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon buttonBottom"
-        fontIcon="save"
-      ></mat-icon>
-    </button>
-    <button
-      *ngIf="showVersionButton()"
-      type="button"
-      mat-button
-      class="buttonNewVersion button colorNewVersion"
-      title="You are currently using an older version {{
-        getCurrentVersion()
-      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
-        getLatestKnownVersion()
-      }}."
-    >
-      <a
-        class="newVersionLink"
-        target="_blank"
-        href="https://github.com/wkasteleijn/luckystackworker/releases/latest"
-        >Download newer version!</a
-      >
-    </button>
-    <span *ngIf="!showVersionButton()" class="spanNoNewVersion"></span>
-    <span
-      *ngIf="showVersionButton()"
-      class="distanceBetweenNewVersionAndHistogram"
-    ></span>
-    <button
-      type="button"
-      mat-button
-      class="button_about button  {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      (click)="openAbout()"
-    >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon buttonBottom"
-        fontIcon="info_i"
-      ></mat-icon>
-    </button>
-    <button
-      type="button_exit"
-      mat-button
-      (click)="exit()"
-      class="button_exit button {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-    >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon buttonBottom"
-        fontIcon="power_settings_new"
-      ></mat-icon>
-    </button>
-  </div>
-  <div
-    class="button_container bottomButtonContainer"
-    *ngIf="!buttonBarEnabled()"
-  >
-    <button type="button" mat-button disabled class="button_disabled">
-      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="save"></mat-icon>
-    </button>
-    <span *ngIf="!openRefImageEnabled()" class="spanNoNewVersion"></span>
-    <button
-      *ngIf="!openRefImageEnabled()"
-      type="button"
-      mat-button
-      disabled
-      class="button_about button_disabled"
-    >
-      <mat-icon
-        aria-hidden="false"
-        fontIcon="info_i"
-        class="zoomIcon buttonBottom"
-      ></mat-icon>
-    </button>
-    <button
-      type="button"
-      mat-button
-      disabled
-      class="button_exit button_disabled"
-    >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon buttonBottom"
-        fontIcon="power_settings_new"
-      ></mat-icon>
-    </button>
-  </div>
 </div>

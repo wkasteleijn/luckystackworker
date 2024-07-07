@@ -85,25 +85,23 @@
 }
 
 .workerLabelStatus {
-  width: 298px;
+  width: 280px;
   text-overflow: clip;
   white-space: nowrap;
+}
+.connectButton {
+  height: 38px;
 }
 
 .batchBar {
   margin-top: -8px !important;
 }
 .rootFolder {
-  width: 284px;
-  border-style: solid;
-  margin-left: 16px;
+  width: 294px;
+  margin-left: 6px;
 }
 .dropdown_label {
   color: rgb(168, 168, 168);
-}
-
-.rootFolder_label {
-  margin-left: 4px;
 }
 
 .zoomLabel {
@@ -127,17 +125,10 @@
 .buttonDivider {
   margin-left: 16px;
 }
-.button_exit {
-  margin-left: 20px;
-}
 
 .resetButton {
   min-height: 38px;
   min-width: 44px;
-}
-
-.button_about {
-  margin-left: 196px;
 }
 
 .spanNoNewVersion {
@@ -166,7 +157,7 @@
 }
 
 .profileSelectorSpace {
-  margin-left: 14px;
+  margin-left: 8px;
 }
 
 .crop {
@@ -174,7 +165,21 @@
 }
 
 .plusZoom {
-  margin-left: 20px;
+  position: fixed;
+  top: 6px;
+  right: 10px;
+  z-index: 100;
+  height: 38px;
+}
+.minZoom {
+  position: fixed;
+  top: 49px;
+  right: 10px;
+  z-index: 100;
+  height: 38px;
+}
+.buttonMargin {
+  margin-left: 6px;
 }
 
 .colorNewversion {
@@ -247,7 +252,7 @@
 }
 .progressBarPercentage {
   margin-left: 24px;
-  margin-right: 32px;
+  margin-right: 16px;
   width: 24px;
 }
 .realtimeLabel {
@@ -281,11 +286,15 @@
   margin-top: 8px;
 }
 .dispersionButton {
-  margin-top: 0px;
+  margin-top: 8px;
   margin-left: 16px;
 }
 .dispersionInnerButton {
-  height: 8px !important;
+  max-width: 44px;
+  max-height: 40px;
+}
+.dispersionImage {
+  width: 20px;
 }
 .dispersionLeftButtons {
   min-width: 64px;
@@ -311,7 +320,7 @@
   top: 368px;
 }
 .dropdownMargin {
-  margin-left: 12px;
+  margin-left: 6px;
 }
 .zoomIcon {
   transform: scale(1.6);
