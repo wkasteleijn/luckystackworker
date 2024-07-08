@@ -165,7 +165,12 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         g.drawString("Name : %s".formatted(metadata.getName()), textOffsetX + 80, textOffsetY + textHeight);
         g.drawString("Date :    %s".formatted(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(metadata.getTime())), textOffsetX + 80, textOffsetY + textHeight * 2);
         g.drawString("Time :   %s UTC".formatted(DateTimeFormatter.ofPattern("HH:mm").format(metadata.getTime())), textOffsetX + 80, textOffsetY + textHeight * 3);
-        g.drawString("Size :     %s x %s".formatted(metadata.getWidth(), metadata.getHeight()), textOffsetX + 80, textOffsetY + textHeight * 4);
+
+        g.drawString("Image", textOffsetX + 200, textOffsetY);
+        g.drawString("Original Size : %s x %s".formatted(metadata.getWidth(), metadata.getHeight()), textOffsetX + 200, textOffsetY + textHeight);
+        g.drawString("Current Size :  %s x %s".formatted(metadata.getWidth(), metadata.getHeight()), textOffsetX + 200, textOffsetY + textHeight*2);
+        g.drawString("Crop :               %s x %s".formatted(metadata.getWidth(), metadata.getHeight()), textOffsetX + 200, textOffsetY + textHeight*3);
+        g.drawString("Zoom :             %s x %s".formatted(metadata.getWidth(), metadata.getHeight()), textOffsetX + 200, textOffsetY + textHeight*4);
     }
 
     private void paintProgressBar(Graphics g) {
