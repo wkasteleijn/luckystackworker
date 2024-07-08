@@ -110,6 +110,7 @@ export class AppComponent implements OnInit {
   _showSpinner = false;
   latestKnownVersion = version.version;
   private slowProcessing: boolean = false;
+  zoomFactor: number = 0;
 
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
@@ -1020,6 +1021,7 @@ export class AppComponent implements OnInit {
 
   zoomIn() {
     console.log('zoomIn called');
+    this.zoomFactor++;
     this.luckyStackWorkerService.zoomIn().subscribe(
       (data) => {
         console.log('Response');
@@ -1030,12 +1032,21 @@ export class AppComponent implements OnInit {
 
   zoomOut() {
     console.log('zoomOut called');
+    this.zoomFactor--;
     this.luckyStackWorkerService.zoomOut().subscribe(
       (data) => {
         console.log('Response');
       },
       (error) => console.log(error)
     );
+  }
+
+  isZoomedIn(): boolean {
+    return this.zoomFactor > 0;
+  }
+
+  isZoomedOut(): boolean {
+    return this.zoomFactor < 0;
   }
 
   nightModeEnabled(): boolean {
@@ -1047,8 +1058,13 @@ export class AppComponent implements OnInit {
     this.nightMode = !this.nightMode;
     if (this.nightMode) {
       document.body.style.backgroundColor = '#000000';
+      document.documentElement.style.setProperty('--lsw-tab-color', 'orange');
     } else {
       document.body.style.backgroundColor = 'rgb(43,43,43)';
+      document.documentElement.style.setProperty(
+        '--lsw-tab-color',
+        'lightgreen'
+      );
     }
     this.luckyStackWorkerService.nightModeChanged(this.nightMode).subscribe(
       (data) => {

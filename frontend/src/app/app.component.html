@@ -217,9 +217,9 @@
       mat-button
       (click)="zoomIn()"
       class="{{
-        nightModeEnabled()
+        (nightModeEnabled()
           ? 'plusZoom buttonZoom activeColorNight'
-          : 'plusZoom buttonZoom activeColor'
+          : 'plusZoom buttonZoom activeColor') + (isZoomedIn() ? 'Pressed' : '')
       }}"
       title="Zoom in"
     >
@@ -241,9 +241,10 @@
       mat-button
       (click)="zoomOut()"
       class="{{
-        nightModeEnabled()
+        (nightModeEnabled()
           ? 'minZoom buttonZoom relatedButtonsSpace activeColorNight'
-          : 'minZoom buttonZoom relatedButtonsSpace activeColor'
+          : 'minZoom buttonZoom relatedButtonsSpace activeColor') +
+          (isZoomedOut() ? 'Pressed' : '')
       }}"
       title="Zoom out"
     >
@@ -380,7 +381,7 @@
       ></mat-icon>
     </button>
   </div>
-  <mat-tab-group class="sliderTabs" selectedIndex="0" [color]="colorTheme()">
+  <mat-tab-group class="sliderTabs" selectedIndex="0">
     <mat-tab label="Sharpen">
       <!-- Sharpen panel -->
       <div class="sliderRow">

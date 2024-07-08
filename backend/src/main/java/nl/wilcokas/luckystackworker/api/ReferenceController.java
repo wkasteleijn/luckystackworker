@@ -103,7 +103,7 @@ public class ReferenceController {
 
     @PutMapping("/night")
     public void nightMode(@RequestParam boolean on) {
-        // TODO implement night mode feature
+        referenceImageService.nightMode(on);
     }
 
     @PutMapping("/realtime")

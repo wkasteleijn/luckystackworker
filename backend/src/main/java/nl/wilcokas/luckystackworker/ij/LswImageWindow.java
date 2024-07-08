@@ -24,6 +24,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     private static final Color TITLEBAR_COLOR = new Color(32, 32, 32);
     private static final Color TITLE_COLOR = new Color(100, 100, 100);
     private static final Color HISTOGRAM_COLOR_DAY = new Color(0x4c, 0xaf, 0x50);
+    private static final Color HISTOGRAM_COLOR_NIGHT = new Color(0x9f, 0x58, 0x00);
     private static final Color HISTOGRAM_COLOR_WARN = new Color(174, 80, 80);
     private static final Color BORDER_COLOR = new Color(64, 64, 64);
     private static final Color BACKGROUND_COLOR = new Color(43, 43, 43);
@@ -37,6 +38,8 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     private LswImageMetadata metadata;
     private double progressPercentage = 0;
     private int mouseX, mouseY;
+    private Color histogramColor = HISTOGRAM_COLOR_DAY;
+    private Color backgroundColor = BACKGROUND_COLOR;
 
     /*
      * Override the ImageWindow constructor so that we can create a custom ImageWindow (LswImageWindow),
@@ -114,7 +117,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         g.fillRect(0, height - 1, width, thickness);
         g.fillRect(0, 0, thickness, height);
         g.fillRect(width - thickness, 0, thickness, height);
-        g.setColor(BACKGROUND_COLOR);
+        g.setColor(backgroundColor);
         g.fillRect(0, 32, width, 72);
         int textWidth = g.getFontMetrics().stringWidth(image.getTitle());
         int x = (getWidth() - textWidth) / 2;
@@ -135,9 +138,9 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
             int intValue = (int) ((luminanceHistogram[i] / maxValue) * HISTOGRAM_HEIGHT);
             if (intValue > HISTOGRAM_HEIGHT) intValue = HISTOGRAM_HEIGHT;
             int blackSpace = HISTOGRAM_HEIGHT - intValue;
-            g.setColor(BACKGROUND_COLOR);
+            g.setColor(backgroundColor);
             g.fillRect(HISTOGRAM_MARGIN_LEFT + i * 2, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 2, blackSpace);
-            g.setColor(HISTOGRAM_COLOR_DAY);
+            g.setColor(histogramColor);
             g.fillRect(HISTOGRAM_MARGIN_LEFT + i * 2, blackSpace + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1, 2, HISTOGRAM_HEIGHT - blackSpace);
         }
         g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, HISTOGRAM_HEIGHT * 2, 1);
@@ -157,19 +160,19 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         setHistogramColor(g, metadata.getLuminance());
         g.drawString("Lum. :    %s".formatted(metadata.getLuminance()), textOffsetX, textOffsetY + textHeight * 4);
 
-        g.setColor(HISTOGRAM_COLOR_DAY);
+        g.setColor(histogramColor);
         g.drawString("Object", textOffsetX + 80, textOffsetY);
         g.drawString("Name : %s".formatted(metadata.getName()), textOffsetX + 80, textOffsetY + textHeight);
         g.drawString("Date :    %s".formatted(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(metadata.getTime())), textOffsetX + 80, textOffsetY + textHeight * 2);
         g.drawString("Time :   %s UTC".formatted(DateTimeFormatter.ofPattern("HH:mm").format(metadata.getTime())), textOffsetX + 80, textOffsetY + textHeight * 3);
-        g.drawString("Size :     %s x %s".formatted(metadata.getWidth(),metadata.getHeight()), textOffsetX + 80, textOffsetY + textHeight * 4);
+        g.drawString("Size :     %s x %s".formatted(metadata.getWidth(), metadata.getHeight()), textOffsetX + 80, textOffsetY + textHeight * 4);
     }
 
     private void paintProgressBar(Graphics g) {
-        if (progressPercentage>0) {
-            g.setColor(HISTOGRAM_COLOR_DAY);
+        if (progressPercentage > 0) {
+            g.setColor(histogramColor);
         } else {
-            g.setColor(BACKGROUND_COLOR);
+            g.setColor(backgroundColor);
         }
         g.fillRect(0, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT + 6, (int) (image.getWidth() * (progressPercentage / 100D)), 4);
     }
@@ -189,7 +192,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     @Override
     public void mouseDragged(MouseEvent e) {
         synchronized (this) {
-            if (mouseX==0 || mouseY==0) {
+            if (mouseX == 0 || mouseY == 0) {
                 mouseX = e.getX();
                 mouseY = e.getY();
                 return;
@@ -207,11 +210,22 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         super.mouseMoved(e.getX(), e.getY());
     }
 
+    public void nightMode(boolean nightMode) {
+        if (nightMode) {
+            histogramColor = HISTOGRAM_COLOR_NIGHT;
+            backgroundColor = Color.BLACK;
+        } else {
+            histogramColor = HISTOGRAM_COLOR_DAY;
+            backgroundColor = BACKGROUND_COLOR;
+        }
+        repaint();
+    }
+
     private void setHistogramColor(Graphics g, int histogramMax) {
         if (histogramMax == 100) {
             g.setColor(HISTOGRAM_COLOR_WARN);
         } else {
-            g.setColor(HISTOGRAM_COLOR_DAY);
+            g.setColor(histogramColor);
         }
     }
 

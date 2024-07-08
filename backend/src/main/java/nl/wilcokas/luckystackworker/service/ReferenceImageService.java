@@ -369,6 +369,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         imageMetadata.setLuminance((redPercentage + greenPercentage + bluePercentage) / 3);
     }
 
+    public void nightMode(boolean on) {
+        displayedImage.getImageWindow().nightMode(on);
+    }
+
     private void setImageMetadata(final String filePath, final Profile profile, final LocalDateTime dateTime) {
         this.imageMetadata = LswImageMetadata.builder()
                 .filePath(filePath)

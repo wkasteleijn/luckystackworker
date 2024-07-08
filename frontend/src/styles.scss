@@ -16,6 +16,10 @@ $my-theme: mat.define-light-theme(
 );
 @include mat.all-legacy-component-themes($my-theme);
 
+:root {
+  --lsw-tab-color: lightgreen;
+}
+
 html,
 body {
   height: 100%;
@@ -202,13 +206,17 @@ select:hover {
   max-width: 550px !important;
 }
 .mat-tab-label {
-  color: lightgreen;
+  color: var(--lsw-tab-color);
   background-color: rgb(25, 25, 25);
   height: 32px !important;
   line-height: 32px !important;
   max-width: 130px !important;
   min-width: 72px !important;
 }
+.mat-ink-bar {
+  color: var(--lsw-tab-color) !important;
+}
+
 .mat-tab-body {
   height: 378px;
 }
