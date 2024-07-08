@@ -196,13 +196,13 @@
 }
 
 .radioSizeButton {
-  margin-right: 24px;
+  margin-right: 8px;
 }
 .radioSizeButtonSharpen {
   margin-left: 46px;
 }
 .luminanceIncludeBox {
-  margin-left: 24px;
+  margin-left: 4px;
 }
 .denoiseMode {
   margin-left: 24px;
@@ -234,7 +234,7 @@
   vertical-align: center;
 }
 .sharpenModeRGB {
-  margin-left: 24px;
+  margin-left: 8px;
 }
 .sharpenIncludeCheckBox {
   margin-right: 8px;

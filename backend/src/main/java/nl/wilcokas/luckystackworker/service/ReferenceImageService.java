@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
 import ij.gui.RoiListener;
@@ -62,7 +61,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private LswImageMetadata imageMetadata;
 
     private boolean roiActive = false;
-    private JFrame roiIndicatorFrame = null;
     private JTextField roiIndicatorTextField = null;
 
     private boolean showHistogram = true;
@@ -92,7 +90,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         this.httpService = httpService;
         this.profileService = profileService;
         this.operationService = operationService;
-        createRoiIndicator();
     }
 
     public ResponseDTO scale(Profile profile) throws IOException, InterruptedException {
@@ -218,34 +215,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             new Toolbar().setTool(Toolbar.RECTANGLE);
             LuckyStackWorkerContext.setSelectedRoi(displayedImage.getRoi());
             roiActive = true;
-            showRoiIndicator();
+            updateRoiIndicator();
         } else {
             roiActive = false;
             displayedImage.deleteRoi();
             new Toolbar().setTool(Toolbar.HAND);
             LuckyStackWorkerContext.setSelectedRoi(null);
             hideRoiIndicator();
-        }
-    }
-
-    public void histogram() {
-        if (!showHistogram) {
-
-            // TODO: update the histogram
-
-            showHistogram = true;
-        } else {
-            showHistogram = false;
-        }
-    }
-
-    public void night(boolean on) {
-        if (showHistogram) {
-            if (on) {
-                // TODO: update the histogram color to RED
-            } else {
-                // TODO: update the histogram color to GREEN
-            }
         }
     }
 
@@ -312,7 +288,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     @Override
     public void roiModified(ImagePlus imp, int id) {
-        updateRoiText();
+        updateRoiIndicator();
     }
 
     @Override
@@ -325,21 +301,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     @Override
     public void windowClosed(WindowEvent e) {
-        roiIndicatorFrame.setVisible(false);
     }
 
     @Override
     public void windowIconified(WindowEvent e) {
-        if (roiActive) {
-            roiIndicatorFrame.setVisible(false);
-        }
     }
 
     @Override
     public void windowDeiconified(WindowEvent e) {
-        if (roiActive) {
-            roiIndicatorFrame.setVisible(true);
-        }
     }
 
     @Override
@@ -352,22 +321,18 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     @Override
     public void componentResized(ComponentEvent e) {
-        setRoiIndicatorLocation();
     }
 
     @Override
     public void componentMoved(ComponentEvent e) {
-        setRoiIndicatorLocation();
     }
 
     @Override
     public void componentShown(ComponentEvent e) {
-        roiIndicatorFrame.setVisible(true);
     }
 
     @Override
     public void componentHidden(ComponentEvent e) {
-        roiIndicatorFrame.setVisible(false);
     }
 
     public void updateHistogramMetadata() {
@@ -414,23 +379,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 .build();
     }
 
-    private void createRoiIndicator() {
-        roiIndicatorFrame = new JFrame();
-        roiIndicatorFrame.setType(javax.swing.JFrame.Type.UTILITY);
-        roiIndicatorFrame.setAlwaysOnTop(true);
-        roiIndicatorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        roiIndicatorFrame.getContentPane().setBackground(Color.BLACK);
-        roiIndicatorFrame.setUndecorated(true);
-        roiIndicatorFrame.setSize(72, 24);
-        roiIndicatorTextField = new JTextField();
-        roiIndicatorTextField.setBackground(Color.BLACK);
-        roiIndicatorTextField.setForeground(Color.LIGHT_GRAY);
-        roiIndicatorTextField.setEditable(false);
-        roiIndicatorTextField.setBorder(null);
-        roiIndicatorTextField.setSelectedTextColor(Color.LIGHT_GRAY);
-        roiIndicatorFrame.add(roiIndicatorTextField);
-    }
-
     private int getHistogramMax(int[] histogramValues) {
         int max = 1;
         for (int i = 16; i < histogramValues.length-16; i++) {
@@ -441,27 +389,16 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return max;
     }
 
-    private void showRoiIndicator() {
-        setRoiIndicatorLocation();
-        updateRoiText();
-        roiIndicatorFrame.setVisible(true);
-    }
-
-    private void updateRoiText() {
+    private void updateRoiIndicator() {
+        // TODO: call window to update indicated size on metadata.
         if (displayedImage.getRoi() != null) {
             roiIndicatorTextField.setText(((int) displayedImage.getRoi().getFloatWidth()) + " x " + ((int) displayedImage.getRoi().getFloatHeight()));
         }
 
     }
 
-    private void setRoiIndicatorLocation() {
-        Window parentWindow = displayedImage.getWindow();
-        Point location = parentWindow.getLocation();
-        roiIndicatorFrame.setLocation((int) location.getX() + 16, (int) (location.getY() + 32));
-    }
 
     private void hideRoiIndicator() {
-        roiIndicatorFrame.setVisible(false);
         roiActive = false;
     }
 

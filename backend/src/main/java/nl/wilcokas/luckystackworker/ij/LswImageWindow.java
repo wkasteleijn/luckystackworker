@@ -23,11 +23,10 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     private static final double SCALE = Prefs.getGuiScale();
     private static final Color TITLEBAR_COLOR = new Color(32, 32, 32);
     private static final Color TITLE_COLOR = new Color(100, 100, 100);
-    private static final Color HISTOGRAM_COLOR_DAY = new Color(80, 174, 80);
+    private static final Color HISTOGRAM_COLOR_DAY = new Color(0x4c, 0xaf, 0x50);
     private static final Color HISTOGRAM_COLOR_WARN = new Color(174, 80, 80);
     private static final Color BORDER_COLOR = new Color(64, 64, 64);
     private static final Color BACKGROUND_COLOR = new Color(43, 43, 43);
-    private static final Color PROGRESSBAR_COLOR = new Color(80, 80, 255);
     private static final int OFFSET_TOP = 32;
     private static final int HISTOGRAM_MARGIN_LEFT = 8;
     private static final int HISTOGRAM_MARGIN_TOP = 8;
@@ -37,6 +36,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     private ImagePlus image;
     private LswImageMetadata metadata;
     private double progressPercentage = 0;
+    private int mouseX, mouseY;
 
     /*
      * Override the ImageWindow constructor so that we can create a custom ImageWindow (LswImageWindow),
@@ -167,7 +167,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
 
     private void paintProgressBar(Graphics g) {
         if (progressPercentage>0) {
-            g.setColor(PROGRESSBAR_COLOR);
+            g.setColor(HISTOGRAM_COLOR_DAY);
         } else {
             g.setColor(BACKGROUND_COLOR);
         }
@@ -189,7 +189,15 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     @Override
     public void mouseDragged(MouseEvent e) {
         synchronized (this) {
-            this.setLocation(e.getXOnScreen() - (image.getWidth() / 2), e.getYOnScreen() - 16);
+            if (mouseX==0 || mouseY==0) {
+                mouseX = e.getX();
+                mouseY = e.getY();
+                return;
+            }
+            int dx = e.getX() - mouseX;
+            int dy = e.getY() - mouseY;
+            Point currentLocation = getLocation();
+            setLocation(new Point(currentLocation.x + dx, currentLocation.y + dy));
         }
     }
 

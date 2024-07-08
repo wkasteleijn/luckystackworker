@@ -160,31 +160,18 @@
     </button>
 
     <button
-      *ngIf="showVersionButton()"
+      *ngIf="openRefImageEnabled() && showVersionButton()"
       type="button"
       mat-button
-      class="buttonNewVersion button colorNewVersion"
+      class="newVersionButton buttonMargin {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      (click)="showVersionButton() ? openDownloadPage() : openAbout()"
       title="You are currently using an older version {{
         getCurrentVersion()
       }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
         getLatestKnownVersion()
       }}."
-    >
-      <a
-        class="newVersionLink"
-        target="_blank"
-        href="https://github.com/wkasteleijn/luckystackworker/releases/latest"
-        >Download newer version!</a
-      >
-    </button>
-
-    <button
-      type="button"
-      mat-button
-      class="button buttonMargin {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      (click)="openAbout()"
     >
       <mat-icon
         aria-hidden="false"
@@ -194,11 +181,28 @@
     </button>
 
     <button
-      *ngIf="!openRefImageEnabled()"
+      *ngIf="openRefImageEnabled() && !showVersionButton()"
+      type="button"
+      mat-button
+      class="button buttonMargin {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      (click)="openAbout()"
+      title="About"
+    >
+      <mat-icon
+        aria-hidden="false"
+        class="zoomIcon buttonBottom"
+        fontIcon="info_i"
+      ></mat-icon>
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled() && !showVersionButton()"
       type="button"
       mat-button
       disabled
       class="button_disabled buttonMargin"
+      title="About"
     >
       <mat-icon
         aria-hidden="false"
@@ -353,6 +357,7 @@
       class="button buttonMargin {{
         nightModeEnabled() ? 'activeColorNight' : 'activeColor'
       }}"
+      title="Exit"
     >
       <mat-icon
         aria-hidden="false"
@@ -366,6 +371,7 @@
       mat-button
       disabled
       class="button_disabled buttonMargin"
+      title="Exit"
     >
       <mat-icon
         aria-hidden="false"

@@ -1137,14 +1137,6 @@ export class AppComponent implements OnInit {
     }
   }
 
-  private showSpinner() {
-    this._showSpinner = true;
-  }
-
-  private hideSpinner() {
-    this._showSpinner = false;
-  }
-
   shouldShowSpinner(): boolean {
     return this._showSpinner;
   }
@@ -1163,6 +1155,21 @@ export class AppComponent implements OnInit {
 
   gmicUnavailableMessage() {
     return "This control is unavailable because G'MIC isn't installed on your machine. Open a terminal window and type: brew install gmic. If brew isn't installed either then go to https://docs.brew.sh/Installation and follow the instructions.";
+  }
+
+  openDownloadPage() {
+    window.open(
+      'https://github.com/wkasteleijn/luckystackworker/releases/latest',
+      '_blank'
+    );
+  }
+
+  private showSpinner() {
+    this._showSpinner = true;
+  }
+
+  private hideSpinner() {
+    this._showSpinner = false;
   }
 
   private checkLatestVersion() {

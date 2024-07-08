@@ -100,14 +100,10 @@ public class ReferenceController {
         referenceImageService.crop();
     }
 
-    @PutMapping("/histogram")
-    public void histogram() {
-        referenceImageService.histogram();
-    }
 
     @PutMapping("/night")
     public void nightMode(@RequestParam boolean on) {
-        referenceImageService.night(on);
+        // TODO implement night mode feature
     }
 
     @PutMapping("/realtime")
