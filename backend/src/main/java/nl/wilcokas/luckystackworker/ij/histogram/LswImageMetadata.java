@@ -17,7 +17,12 @@ public class LswImageMetadata {
     private int luminance;
     private String filePath;
     private String name;
-    private int width;
-    private int height;
+    private int originalWidth;
+    private int originalHeight;
+    private int currentWidth;
+    private int currentHeight;
     private LocalDateTime time;
+    private int cropWidth;
+    private int cropHeight;
+    private int zoomFactor;
 }

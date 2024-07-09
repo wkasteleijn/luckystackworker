@@ -153,6 +153,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         String pathNoExt = LswFileUtil.getPathWithoutExtension(path);
         String savePath = pathNoExt + "." + (asJpg ? "jpg" : Constants.DEFAULT_OUTPUT_FORMAT);
         log.info("Saving image to  {}", savePath);
+        if (LuckyStackWorkerContext.getSelectedRoi() != null) {
+            finalResultImage.setRoi(LuckyStackWorkerContext.getSelectedRoi());
+            finalResultImage = finalResultImage.crop();
+        }
         LswFileUtil.saveImage(finalResultImage, null, savePath, LswFileUtil.isPngRgbStack(finalResultImage, imageMetadata.getFilePath()) || profile.getScale() > 1.0, roiActive, asJpg,
                 false);
         writeProfile(pathNoExt);
@@ -187,6 +191,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         if (zoomFactor <= 5) {
             displayedImage.getImageWindow().zoomIn();
             zoomFactor++;
+            displayedImage.updateMetadata(imageMetadata);
         }
     }
 
@@ -194,6 +199,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         if (zoomFactor >= -3) {
             displayedImage.getImageWindow().zoomOut();
             zoomFactor--;
+            displayedImage.updateMetadata(imageMetadata);
         }
     }
 
@@ -212,6 +218,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             int x = (displayedImage.getWidth() - width) / 2;
             int y = (displayedImage.getHeight() - height) / 2;
             displayedImage.setRoi(x, y, width, height);
+            finalResultImage.setRoi(x, y, width, height);
             new Toolbar().setTool(Toolbar.RECTANGLE);
             LuckyStackWorkerContext.setSelectedRoi(displayedImage.getRoi());
             roiActive = true;
@@ -219,6 +226,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         } else {
             roiActive = false;
             displayedImage.deleteRoi();
+            finalResultImage.deleteRoi();
             new Toolbar().setTool(Toolbar.HAND);
             LuckyStackWorkerContext.setSelectedRoi(null);
             hideRoiIndicator();
@@ -373,19 +381,28 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         displayedImage.getImageWindow().nightMode(on);
     }
 
-    private void setImageMetadata(final String filePath, final Profile profile, final LocalDateTime dateTime) {
+    private void setImageMetadata(final String filePath, final Profile profile, final LocalDateTime dateTime, final ImagePlus finalResultImage, double scale, int zoomFactor) {
+
+        int currentWidth = finalResultImage.getWidth();
+        int currentHeight = finalResultImage.getHeight();
+        int originalWidth = (int) (finalResultImage.getWidth() / scale);
+        int originalHeight = (int) (finalResultImage.getHeight() / scale);
+
         this.imageMetadata = LswImageMetadata.builder()
                 .filePath(filePath)
                 .name(LswUtil.getFullObjectName(profile.getName()))
-                .width(finalResultImage.getWidth())
-                .height(finalResultImage.getHeight())
+                .currentWidth(currentWidth)
+                .currentHeight(currentHeight)
+                .originalWidth(originalWidth)
+                .originalHeight(originalHeight)
+                .zoomFactor(zoomFactor)
                 .time(dateTime)
                 .build();
     }
 
     private int getHistogramMax(int[] histogramValues) {
         int max = 1;
-        for (int i = 16; i < histogramValues.length-16; i++) {
+        for (int i = 16; i < histogramValues.length - 16; i++) {
             if (histogramValues[i] > max) {
                 max = histogramValues[i];
             }
@@ -394,15 +411,16 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     private void updateRoiIndicator() {
-        // TODO: call window to update indicated size on metadata.
-        if (displayedImage.getRoi() != null) {
-            roiIndicatorTextField.setText(((int) displayedImage.getRoi().getFloatWidth()) + " x " + ((int) displayedImage.getRoi().getFloatHeight()));
-        }
-
+        imageMetadata.setCropWidth((int)displayedImage.getRoi().getFloatWidth());
+        imageMetadata.setCropHeight((int) displayedImage.getRoi().getFloatHeight());
+        displayedImage.getImageWindow().updateCrop(imageMetadata);
     }
 
 
     private void hideRoiIndicator() {
+        imageMetadata.setCropWidth(0);
+        imageMetadata.setCropHeight(0);
+        displayedImage.getImageWindow().updateCrop(imageMetadata);
         roiActive = false;
     }
 
@@ -464,13 +482,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             // Can only have 1 image open at a time.
             displayedImage.hide();
         }
-        finalResultImage = LswFileUtil.openImage(filePath, profile.getOpenImageMode(), finalResultImage, unprocessedImageLayers, profile.getScale(), img -> operationService.scaleImage(img, profile.getScale()));
+        finalResultImage = LswFileUtil.openImage(filePath, profile.getOpenImageMode(), finalResultImage, unprocessedImageLayers, profile.getScale(),
+                img -> operationService.scaleImage(img, profile.getScale()));
         boolean largeImage = false;
         if (finalResultImage != null) {
             if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame(), activeOSProfile)) {
                 return false;
             }
-            setImageMetadata(filePath, profile, dateTime);
+            setImageMetadata(filePath, profile, dateTime, finalResultImage, profile.getScale(), zoomFactor);
             operationService.correctExposure(finalResultImage);
             unprocessedImageLayers = LswImageProcessingUtil.getImageLayers(finalResultImage);
 

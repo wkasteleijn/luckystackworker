@@ -32,6 +32,9 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     private static final int HISTOGRAM_MARGIN_LEFT = 8;
     private static final int HISTOGRAM_MARGIN_TOP = 8;
     private static final int HISTOGRAM_HEIGHT = 56;
+    private static final int textOffsetX = HISTOGRAM_HEIGHT * 2 + 12;
+    private static final int textOffsetY = 49;
+    private static final int textHeight = 12;
 
     private int TEXT_GAP = 11;
     private ImagePlus image;
@@ -106,6 +109,15 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         paintProgressBar(getGraphics());
     }
 
+    public void updateCrop(final LswImageMetadata metadata) {
+        this.metadata = metadata;
+        Graphics g = getGraphics();
+        g.setColor(backgroundColor);
+        g.fillRect(textOffsetX + 224, textOffsetY + textHeight*3-12, 128, 12);
+        g.setColor(histogramColor);
+        g.drawString("Crop :               %s".formatted(getCropString()), textOffsetX + 200, textOffsetY + textHeight*3);
+    }
+
     private void drawBorders(Graphics g) {
         int thickness = 1;
         int width = getWidth();
@@ -147,9 +159,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT, HISTOGRAM_HEIGHT * 2, 1);
         g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 1, HISTOGRAM_HEIGHT);
         g.fillRect(HISTOGRAM_HEIGHT * 2 - 1 + HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 1, HISTOGRAM_HEIGHT);
-        int textOffsetX = HISTOGRAM_HEIGHT * 2 + 12;
-        int textOffsetY = 49;
-        int textHeight = 12;
+
         g.drawString("Histogram", textOffsetX, textOffsetY);
         setHistogramColor(g, metadata.getRed());
         g.drawString("Red :      %s".formatted(metadata.getRed()), textOffsetX, textOffsetY + textHeight);
@@ -167,19 +177,10 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         g.drawString("Time :   %s UTC".formatted(DateTimeFormatter.ofPattern("HH:mm").format(metadata.getTime())), textOffsetX + 80, textOffsetY + textHeight * 3);
 
         g.drawString("Image", textOffsetX + 200, textOffsetY);
-        g.drawString("Original Size : %s x %s".formatted(metadata.getWidth(), metadata.getHeight()), textOffsetX + 200, textOffsetY + textHeight);
-        g.drawString("Current Size :  %s x %s".formatted(metadata.getWidth(), metadata.getHeight()), textOffsetX + 200, textOffsetY + textHeight*2);
-        g.drawString("Crop :               %s x %s".formatted(metadata.getWidth(), metadata.getHeight()), textOffsetX + 200, textOffsetY + textHeight*3);
-        g.drawString("Zoom :             %s x %s".formatted(metadata.getWidth(), metadata.getHeight()), textOffsetX + 200, textOffsetY + textHeight*4);
-    }
-
-    private void paintProgressBar(Graphics g) {
-        if (progressPercentage > 0) {
-            g.setColor(histogramColor);
-        } else {
-            g.setColor(backgroundColor);
-        }
-        g.fillRect(0, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT + 6, (int) (image.getWidth() * (progressPercentage / 100D)), 4);
+        g.drawString("Original size : %s x %s".formatted(metadata.getOriginalWidth(), metadata.getOriginalHeight()), textOffsetX + 200, textOffsetY + textHeight);
+        g.drawString("Current size :  %s x %s".formatted(metadata.getCurrentWidth(), metadata.getCurrentHeight()), textOffsetX + 200, textOffsetY + textHeight*2);
+        g.drawString("Crop :               %s".formatted(getCropString()), textOffsetX + 200, textOffsetY + textHeight*3);
+        g.drawString("Zoom :             %s".formatted(100 * (1+metadata.getZoomFactor())+"%"), textOffsetX + 200, textOffsetY + textHeight*4);
     }
 
     public void zoomIn() {
@@ -224,6 +225,23 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
             backgroundColor = BACKGROUND_COLOR;
         }
         repaint();
+    }
+
+    private String getCropString() {
+        String crop = "-";
+        if (metadata.getCropWidth() > 0 && metadata.getCropHeight() > 0) {
+            crop = "%s x %s".formatted(metadata.getCropWidth(), metadata.getCropHeight());
+        }
+        return crop;
+    }
+
+    private void paintProgressBar(Graphics g) {
+        if (progressPercentage > 0) {
+            g.setColor(histogramColor);
+        } else {
+            g.setColor(backgroundColor);
+        }
+        g.fillRect(0, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT + 6, (int) (image.getWidth() * (progressPercentage / 100D)), 4);
     }
 
     private void setHistogramColor(Graphics g, int histogramMax) {
