@@ -188,18 +188,18 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void zoomIn() {
-        if (zoomFactor <= 5) {
-            displayedImage.getImageWindow().zoomIn();
+        if (zoomFactor <= 4) {
             zoomFactor++;
-            displayedImage.updateMetadata(imageMetadata);
+            imageMetadata.setZoomFactor(zoomFactor);
+            displayedImage.getImageWindow().zoomIn(imageMetadata);
         }
     }
 
     public void zoomOut() {
-        if (zoomFactor >= -3) {
-            displayedImage.getImageWindow().zoomOut();
+        if (zoomFactor >= -2) {
             zoomFactor--;
-            displayedImage.updateMetadata(imageMetadata);
+            imageMetadata.setZoomFactor(zoomFactor);
+            displayedImage.getImageWindow().zoomOut(imageMetadata);
         }
     }
 
@@ -381,7 +381,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         displayedImage.getImageWindow().nightMode(on);
     }
 
-    private void setImageMetadata(final String filePath, final Profile profile, final LocalDateTime dateTime, final ImagePlus finalResultImage, double scale, int zoomFactor) {
+    private void setImageMetadata(final String filePath, final Profile profile, final LocalDateTime dateTime, final ImagePlus finalResultImage, double scale) {
 
         int currentWidth = finalResultImage.getWidth();
         int currentHeight = finalResultImage.getHeight();
@@ -395,7 +395,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 .currentHeight(currentHeight)
                 .originalWidth(originalWidth)
                 .originalHeight(originalHeight)
-                .zoomFactor(zoomFactor)
                 .time(dateTime)
                 .build();
     }
@@ -411,8 +410,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     private void updateRoiIndicator() {
-        imageMetadata.setCropWidth((int)displayedImage.getRoi().getFloatWidth());
-        imageMetadata.setCropHeight((int) displayedImage.getRoi().getFloatHeight());
+        int cropWidth = 0;
+        int cropHeight = 0;
+        if (displayedImage.getRoi()!= null) {
+            cropWidth = (int) displayedImage.getRoi().getFloatWidth();
+            cropHeight = (int) displayedImage.getRoi().getFloatHeight();
+        }
+        imageMetadata.setCropWidth(cropWidth);
+        imageMetadata.setCropHeight(cropHeight);
         displayedImage.getImageWindow().updateCrop(imageMetadata);
     }
 
@@ -489,7 +494,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame(), activeOSProfile)) {
                 return false;
             }
-            setImageMetadata(filePath, profile, dateTime, finalResultImage, profile.getScale(), zoomFactor);
+            setImageMetadata(filePath, profile, dateTime, finalResultImage, profile.getScale());
             operationService.correctExposure(finalResultImage);
             unprocessedImageLayers = LswImageProcessingUtil.getImageLayers(finalResultImage);
 
@@ -532,6 +537,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         image.getRoi().addRoiListener(this);
         image.getWindow().addWindowListener(this);
         image.getWindow().addComponentListener(this);
+        image.getWindow().getCanvas().zoom100Percent();
     }
 
     private boolean validateSelectedFile(String path) {

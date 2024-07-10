@@ -113,9 +113,9 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         this.metadata = metadata;
         Graphics g = getGraphics();
         g.setColor(backgroundColor);
-        g.fillRect(textOffsetX + 224, textOffsetY + textHeight*3-12, 128, 12);
+        g.fillRect(textOffsetX + 224, textOffsetY + textHeight * 3 - 12, 128, 12);
         g.setColor(histogramColor);
-        g.drawString("Crop :               %s".formatted(getCropString()), textOffsetX + 200, textOffsetY + textHeight*3);
+        g.drawString("Crop :               %s".formatted(getCropString()), textOffsetX + 200, textOffsetY + textHeight * 3);
     }
 
     private void drawBorders(Graphics g) {
@@ -178,21 +178,25 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
 
         g.drawString("Image", textOffsetX + 200, textOffsetY);
         g.drawString("Original size : %s x %s".formatted(metadata.getOriginalWidth(), metadata.getOriginalHeight()), textOffsetX + 200, textOffsetY + textHeight);
-        g.drawString("Current size :  %s x %s".formatted(metadata.getCurrentWidth(), metadata.getCurrentHeight()), textOffsetX + 200, textOffsetY + textHeight*2);
-        g.drawString("Crop :               %s".formatted(getCropString()), textOffsetX + 200, textOffsetY + textHeight*3);
-        g.drawString("Zoom :             %s".formatted(100 * (1+metadata.getZoomFactor())+"%"), textOffsetX + 200, textOffsetY + textHeight*4);
+        g.drawString("Current size :  %s x %s".formatted(metadata.getCurrentWidth(), metadata.getCurrentHeight()), textOffsetX + 200, textOffsetY + textHeight * 2);
+        g.drawString("Crop :               %s".formatted(getCropString()), textOffsetX + 200, textOffsetY + textHeight * 3);
+        g.drawString("Zoom :             %s".formatted(getZoomPercentage() + "%"), textOffsetX + 200, textOffsetY + textHeight * 4);
     }
 
-    public void zoomIn() {
+    public void zoomIn(final LswImageMetadata metadata) {
+        this.metadata = metadata;
         int x = ic.screenX(image.getWidth() / 2);
         int y = ic.screenY(image.getHeight() / 2);
         ic.zoomIn(x, y);
+        repaint();
     }
 
-    public void zoomOut() {
+    public void zoomOut(final LswImageMetadata metadata) {
+        this.metadata = metadata;
         int x = ic.screenX(image.getWidth() / 2);
         int y = ic.screenY(image.getHeight() / 2);
         ic.zoomOut(x, y);
+        repaint();
     }
 
     @Override
@@ -225,6 +229,15 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
             backgroundColor = BACKGROUND_COLOR;
         }
         repaint();
+    }
+
+
+    private int getZoomPercentage() {
+        if (metadata.getZoomFactor() >= 0) {
+            return 100 + (metadata.getZoomFactor() * 25);
+        } else {
+            return 100 - (Math.abs(metadata.getZoomFactor()) * 25);
+        }
     }
 
     private String getCropString() {
