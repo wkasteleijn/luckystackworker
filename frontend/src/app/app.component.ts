@@ -1021,24 +1021,28 @@ export class AppComponent implements OnInit {
 
   zoomIn() {
     console.log('zoomIn called');
-    this.zoomFactor++;
-    this.luckyStackWorkerService.zoomIn().subscribe(
-      (data) => {
-        console.log('Response');
-      },
-      (error) => console.log(error)
-    );
+    if (this.zoomFactor <= 4) {
+      this.zoomFactor++;
+      this.luckyStackWorkerService.zoomIn().subscribe(
+        (data) => {
+          console.log('Response');
+        },
+        (error) => console.log(error)
+      );
+    }
   }
 
   zoomOut() {
-    console.log('zoomOut called');
-    this.zoomFactor--;
-    this.luckyStackWorkerService.zoomOut().subscribe(
-      (data) => {
-        console.log('Response');
-      },
-      (error) => console.log(error)
-    );
+    if (this.zoomFactor >= -2) {
+      console.log('zoomOut called');
+      this.zoomFactor--;
+      this.luckyStackWorkerService.zoomOut().subscribe(
+        (data) => {
+          console.log('Response');
+        },
+        (error) => console.log(error)
+      );
+    }
   }
 
   isZoomedIn(): boolean {

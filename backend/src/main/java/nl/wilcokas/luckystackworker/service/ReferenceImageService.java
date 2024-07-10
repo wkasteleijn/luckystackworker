@@ -188,19 +188,15 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void zoomIn() {
-        if (zoomFactor <= 4) {
-            zoomFactor++;
-            imageMetadata.setZoomFactor(zoomFactor);
-            displayedImage.getImageWindow().zoomIn(imageMetadata);
-        }
+        zoomFactor++;
+        imageMetadata.setZoomFactor(zoomFactor);
+        displayedImage.getImageWindow().zoomIn(imageMetadata);
     }
 
     public void zoomOut() {
-        if (zoomFactor >= -2) {
-            zoomFactor--;
-            imageMetadata.setZoomFactor(zoomFactor);
-            displayedImage.getImageWindow().zoomOut(imageMetadata);
-        }
+        zoomFactor--;
+        imageMetadata.setZoomFactor(zoomFactor);
+        displayedImage.getImageWindow().zoomOut(imageMetadata);
     }
 
     public void minimize() {
@@ -412,7 +408,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private void updateRoiIndicator() {
         int cropWidth = 0;
         int cropHeight = 0;
-        if (displayedImage.getRoi()!= null) {
+        if (displayedImage.getRoi() != null) {
             cropWidth = (int) displayedImage.getRoi().getFloatWidth();
             cropHeight = (int) displayedImage.getRoi().getFloatHeight();
         }
