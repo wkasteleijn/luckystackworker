@@ -41,14 +41,14 @@ public class LuckystackWorkerApplication {
         String dataFolder = LswFileUtil.getDataFolder(osProfile);
         createDataFolderWhenMissing(dataFolder);
         log.info("Current folder is "+System.getProperty("user.dir"));
-        if (Constants.SYSTEM_PROFILE_WINDOWS.equals(osProfile)) {
-            log.info("Starting electron GUI from windows in current folder");
-            try {
-                LswUtil.runCliCommand(osProfile, Arrays.asList("./lsw_gui.exe", ">>", dataFolder + "/lsw-gui.log"), false);
-            } catch (Exception e) {
-                log.warn("GUI wasn't started, are you running on windows in development mode?");
-            }
-        }
+//        if (Constants.SYSTEM_PROFILE_WINDOWS.equals(osProfile)) {
+//            log.info("Starting electron GUI from windows in current folder");
+//            try {
+//                LswUtil.runCliCommand(osProfile, Arrays.asList("./lsw_gui.exe", ">>", dataFolder + "/lsw-gui.log"), false);
+//            } catch (Exception e) {
+//                log.warn("GUI wasn't started, are you running on windows in development mode?");
+//            }
+//        }
 
         log.info("Determining database version and replace it if needed..");
         String lswVersion = LswUtil.getLswVersion();

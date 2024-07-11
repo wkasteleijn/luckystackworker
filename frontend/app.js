@@ -1,6 +1,7 @@
 const { app, BrowserWindow } = require("electron");
 const url = require("url");
 const path = require("path");
+const child = require("child_process");
 
 let mainWindow;
 
@@ -45,14 +46,24 @@ function createWindow() {
   });
 }
 
-app.on("ready", createWindow);
+app.on("ready", function () {
+  var bgStarter;
+  switch (process.platform) {
+    case "win32":
+      bgStarter = "\\lsworker.bat";
+      break;
+    case "darwin":
+      bgStarter = "./lsworker_darwin.zsh";
+      break;
+    default:
+      bgStarter = "./lsworker_linux.sh";
+  }
+  child.spawn(app.getAppPath() + bgStarter);
+  createWindow();
+});
 
 app.on("window-all-closed", function () {
   if (process.platform !== "darwin") {
     app.quit();
   }
-});
-
-app.on("activate", function () {
-  if (mainWindow === null) createWindow();
 });
