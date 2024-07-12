@@ -1,3 +1,3 @@
 set JAVA_HOME=resources\app\jre
 set PATH=%JAVA_HOME%\bin;%PATH%
-%JAVA_HOME%\bin\java.exe -Dspring.profiles.active=win -jar luckystackworker.jar >> lsworker.log
+%JAVA_HOME%\bin\java.exe -Dspring.profiles.active=win -jar luckystackworker.jar
