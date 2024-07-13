@@ -1,7 +1,7 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, dialog } = require("electron");
 const url = require("url");
 const path = require("path");
-const child = require("child_process");
+const { spawn } = require("child_process");
 
 let mainWindow;
 
@@ -9,8 +9,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     resizable: false,
     autoHideMenuBar: true,
-    width: process.platform !== "win32" ? 676 : 584,
-    height: process.platform !== "win32" ? 650 : 618,
+    width: process.platform !== "win32" ? 568 : 584,
+    height: process.platform !== "win32" ? 608 : 618,
     x: 64,
     y: 64,
   });
@@ -31,6 +31,7 @@ function createWindow() {
     fetch("http://localhost:36469/api/profiles/exit", {
       method: "PUT",
     }).catch((error) => {});
+    app.quit();
   });
 
   mainWindow.on("minimize", () => {
@@ -47,23 +48,18 @@ function createWindow() {
 }
 
 app.on("ready", function () {
-  var bgStarter;
   switch (process.platform) {
     case "win32":
-      bgStarter = "\\lsworker.bat";
+      spawn("\\lsworker.bat");
       break;
     case "darwin":
-      bgStarter = "./lsworker_darwin.zsh";
+      const pathParts = app.getAppPath().split("/");
+      const strippedPath = pathParts.slice(0, -3).join("/");
+      spawn(`${app.getAppPath()}/lsworker-mac.sh`,[strippedPath]);
       break;
     default:
+      spawn(`${app.getAppPath()}/lsworker-linux.sh`);
       bgStarter = "./lsworker_linux.sh";
   }
-  child.spawn(app.getAppPath() + bgStarter);
   createWindow();
-});
-
-app.on("window-all-closed", function () {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
 });

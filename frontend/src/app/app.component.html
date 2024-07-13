@@ -350,6 +350,7 @@
       ></mat-icon>
     </button>
 
+    <div *ngIf="exitButtonAvailable()">
     <button
       *ngIf="openRefImageEnabled()"
       type="button_exit"
@@ -380,6 +381,7 @@
         fontIcon="power_settings_new"
       ></mat-icon>
     </button>
+    </div>
   </div>
   <mat-tab-group class="sliderTabs" selectedIndex="0">
     <mat-tab label="Sharpen">
