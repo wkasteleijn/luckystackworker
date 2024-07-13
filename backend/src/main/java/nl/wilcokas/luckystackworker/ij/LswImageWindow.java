@@ -96,6 +96,9 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         drawBorders(g);
         if (metadata != null) {
             paintHistogram(g);
+            paintHistogramDetails(g);
+            paintObjectDetails(g);
+            paintImageDetails(g);
         }
     }
 
@@ -113,74 +116,9 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         this.metadata = metadata;
         Graphics g = getGraphics();
         g.setColor(backgroundColor);
-        g.fillRect(textOffsetX + 224, textOffsetY + textHeight * 3 - 12, 128, 12);
+        g.fillRect(textOffsetX + 318, textOffsetY + textHeight * 4 - 11, 128, 12);
         g.setColor(histogramColor);
-        g.drawString("Crop :               %s".formatted(getCropString()), textOffsetX + 200, textOffsetY + textHeight * 3);
-    }
-
-    private void drawBorders(Graphics g) {
-        int thickness = 1;
-        int width = getWidth();
-        int height = getHeight();
-        g.setColor(TITLEBAR_COLOR);
-        g.fillRect(0, 0, width, OFFSET_TOP);
-        g.setColor(BORDER_COLOR);
-        g.fillRect(0, 0, width, thickness);
-        g.fillRect(0, height - 1, width, thickness);
-        g.fillRect(0, 0, thickness, height);
-        g.fillRect(width - thickness, 0, thickness, height);
-        g.setColor(backgroundColor);
-        g.fillRect(0, 32, width, 72);
-        int textWidth = g.getFontMetrics().stringWidth(image.getTitle());
-        int x = (getWidth() - textWidth) / 2;
-        g.setColor(TITLE_COLOR);
-        g.drawString(image.getTitle(), x, 22);
-    }
-
-    private void paintHistogram(Graphics g) {
-        ImageStatistics stats = image.getStatistics(Measurements.AREA + Measurements.MEAN + Measurements.MODE + Measurements.MIN_MAX, HISTOGRAM_HEIGHT);
-        double[] luminanceHistogram = smoothen(stats.histogram());
-        double maxValue = 1;
-        for (int i = 8; i < luminanceHistogram.length - 8; i++) {
-            if (luminanceHistogram[i] > maxValue) {
-                maxValue = luminanceHistogram[i];
-            }
-        }
-        for (int i = 0; i < luminanceHistogram.length; i++) {
-            int intValue = (int) ((luminanceHistogram[i] / maxValue) * HISTOGRAM_HEIGHT);
-            if (intValue > HISTOGRAM_HEIGHT) intValue = HISTOGRAM_HEIGHT;
-            int blackSpace = HISTOGRAM_HEIGHT - intValue;
-            g.setColor(backgroundColor);
-            g.fillRect(HISTOGRAM_MARGIN_LEFT + i * 2, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 2, blackSpace);
-            g.setColor(histogramColor);
-            g.fillRect(HISTOGRAM_MARGIN_LEFT + i * 2, blackSpace + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1, 2, HISTOGRAM_HEIGHT - blackSpace);
-        }
-        g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, HISTOGRAM_HEIGHT * 2, 1);
-        g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT, HISTOGRAM_HEIGHT * 2, 1);
-        g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 1, HISTOGRAM_HEIGHT);
-        g.fillRect(HISTOGRAM_HEIGHT * 2 - 1 + HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 1, HISTOGRAM_HEIGHT);
-
-        g.drawString("Histogram", textOffsetX, textOffsetY);
-        setHistogramColor(g, metadata.getRed());
-        g.drawString("Red :      %s".formatted(metadata.getRed()), textOffsetX, textOffsetY + textHeight);
-        setHistogramColor(g, metadata.getGreen());
-        g.drawString("Green :  %s".formatted(metadata.getGreen()), textOffsetX, textOffsetY + textHeight * 2);
-        setHistogramColor(g, metadata.getBlue());
-        g.drawString("Blue :     %s".formatted(metadata.getBlue()), textOffsetX, textOffsetY + textHeight * 3);
-        setHistogramColor(g, metadata.getLuminance());
-        g.drawString("Lum. :    %s".formatted(metadata.getLuminance()), textOffsetX, textOffsetY + textHeight * 4);
-
-        g.setColor(histogramColor);
-        g.drawString("Object", textOffsetX + 80, textOffsetY);
-        g.drawString("Name : %s".formatted(metadata.getName()), textOffsetX + 80, textOffsetY + textHeight);
-        g.drawString("Date :    %s".formatted(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(metadata.getTime())), textOffsetX + 80, textOffsetY + textHeight * 2);
-        g.drawString("Time :   %s UTC".formatted(DateTimeFormatter.ofPattern("HH:mm").format(metadata.getTime())), textOffsetX + 80, textOffsetY + textHeight * 3);
-
-        g.drawString("Image", textOffsetX + 200, textOffsetY);
-        g.drawString("Original size : %s x %s".formatted(metadata.getOriginalWidth(), metadata.getOriginalHeight()), textOffsetX + 200, textOffsetY + textHeight);
-        g.drawString("Current size :  %s x %s".formatted(metadata.getCurrentWidth(), metadata.getCurrentHeight()), textOffsetX + 200, textOffsetY + textHeight * 2);
-        g.drawString("Crop :               %s".formatted(getCropString()), textOffsetX + 200, textOffsetY + textHeight * 3);
-        g.drawString("Zoom :             %s".formatted(getZoomPercentage() + "%"), textOffsetX + 200, textOffsetY + textHeight * 4);
+        g.drawString(getCropString(), textOffsetX + 318, textOffsetY + textHeight * 4);
     }
 
     public void zoomIn(final LswImageMetadata metadata) {
@@ -231,6 +169,98 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         repaint();
     }
 
+    private void drawBorders(Graphics g) {
+        int thickness = 1;
+        int width = getWidth();
+        int height = getHeight();
+        g.setColor(TITLEBAR_COLOR);
+        g.fillRect(0, 0, width, OFFSET_TOP);
+        g.setColor(BORDER_COLOR);
+        g.fillRect(0, 0, width, thickness);
+        g.fillRect(0, height - 1, width, thickness);
+        g.fillRect(0, 0, thickness, height);
+        g.fillRect(width - thickness, 0, thickness, height);
+        g.setColor(backgroundColor);
+        g.fillRect(0, 32, width, 72);
+        int textWidth = g.getFontMetrics().stringWidth(image.getTitle());
+        int x = (getWidth() - textWidth) / 2;
+        g.setColor(TITLE_COLOR);
+        g.drawString(image.getTitle(), x, 22);
+    }
+
+    private void paintHistogram(Graphics g) {
+        ImageStatistics stats = image.getStatistics(Measurements.AREA + Measurements.MEAN + Measurements.MODE + Measurements.MIN_MAX, HISTOGRAM_HEIGHT);
+        double[] luminanceHistogram = smoothen(stats.histogram());
+        double maxValue = 1;
+        for (int i = 8; i < luminanceHistogram.length - 8; i++) {
+            if (luminanceHistogram[i] > maxValue) {
+                maxValue = luminanceHistogram[i];
+            }
+        }
+        for (int i = 0; i < luminanceHistogram.length; i++) {
+            int intValue = (int) ((luminanceHistogram[i] / maxValue) * HISTOGRAM_HEIGHT);
+            if (intValue > HISTOGRAM_HEIGHT) intValue = HISTOGRAM_HEIGHT;
+            int blackSpace = HISTOGRAM_HEIGHT - intValue;
+            g.setColor(backgroundColor);
+            g.fillRect(HISTOGRAM_MARGIN_LEFT + i * 2, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 2, blackSpace);
+            g.setColor(histogramColor);
+            g.fillRect(HISTOGRAM_MARGIN_LEFT + i * 2, blackSpace + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1, 2, HISTOGRAM_HEIGHT - blackSpace);
+        }
+        g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, HISTOGRAM_HEIGHT * 2, 1);
+        g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT, HISTOGRAM_HEIGHT * 2, 1);
+        g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 1, HISTOGRAM_HEIGHT);
+        g.fillRect(HISTOGRAM_HEIGHT * 2 - 1 + HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 1, HISTOGRAM_HEIGHT);
+    }
+
+    private void paintHistogramDetails(Graphics g) {
+        g.drawString("Histogram", textOffsetX, textOffsetY);
+
+        setHistogramColor(g, metadata.getRed());
+        g.drawString("Red :", textOffsetX, textOffsetY + textHeight);
+        g.drawString(metadata.getRed()+"%", textOffsetX+46, textOffsetY + textHeight);
+
+        setHistogramColor(g, metadata.getGreen());
+        g.drawString("Green :", textOffsetX, textOffsetY + textHeight * 2);
+        g.drawString(metadata.getGreen()+"%", textOffsetX+46, textOffsetY + textHeight * 2);
+
+        setHistogramColor(g, metadata.getBlue());
+        g.drawString("Blue :", textOffsetX, textOffsetY + textHeight * 3);
+        g.drawString(metadata.getBlue()+"%", textOffsetX+46, textOffsetY + textHeight * 3);
+
+        setHistogramColor(g, metadata.getLuminance());
+        g.drawString("Lum. :", textOffsetX, textOffsetY + textHeight * 4);
+        g.drawString(metadata.getLuminance()+"%", textOffsetX+46, textOffsetY + textHeight * 4);
+    }
+
+    private void paintObjectDetails(Graphics g) {
+        g.setColor(histogramColor);
+        g.drawString("Object", textOffsetX + 88, textOffsetY);
+
+        g.drawString("Name :", textOffsetX + 88, textOffsetY + textHeight);
+        g.drawString(metadata.getName(), textOffsetX + 136, textOffsetY + textHeight);
+
+        g.drawString("Date :", textOffsetX + 88, textOffsetY + textHeight * 2);
+        g.drawString(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(metadata.getTime()), textOffsetX + 136, textOffsetY + textHeight * 2);
+
+        g.drawString("Time :", textOffsetX + 88, textOffsetY + textHeight * 3);
+        g.drawString("%s UTC".formatted(DateTimeFormatter.ofPattern("HH:mm").format(metadata.getTime())), textOffsetX + 136, textOffsetY + textHeight * 3);
+    }
+
+    private void paintImageDetails(Graphics g) {
+        g.drawString("Image", textOffsetX + 228, textOffsetY);
+
+        g.drawString("Original size :", textOffsetX + 228, textOffsetY + textHeight);
+        g.drawString("%s x %s".formatted(metadata.getOriginalWidth(), metadata.getOriginalHeight()), textOffsetX + 318, textOffsetY + textHeight);
+
+        g.drawString("Current size :", textOffsetX + 228, textOffsetY + textHeight * 2);
+        g.drawString("%s x %s".formatted(metadata.getCurrentWidth(), metadata.getCurrentHeight()), textOffsetX + 318, textOffsetY + textHeight * 2);
+
+        g.drawString("Zoom :", textOffsetX + 228, textOffsetY + textHeight * 3);
+        g.drawString(getZoomPercentage() + "%", textOffsetX + 318, textOffsetY + textHeight * 3);
+
+        g.drawString("Crop :", textOffsetX + 228, textOffsetY + textHeight * 4);
+        g.drawString(getCropString(), textOffsetX + 318, textOffsetY + textHeight * 4);
+    }
 
     private int getZoomPercentage() {
         if (metadata.getZoomFactor() >= 0) {

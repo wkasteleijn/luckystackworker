@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class DataInfo {
     private String instalationDate;
     private String lastExecutionTime;
+    private String version;
 }
