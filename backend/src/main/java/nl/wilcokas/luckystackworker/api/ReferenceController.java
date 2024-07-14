@@ -90,6 +90,15 @@ public class ReferenceController {
         referenceImageService.minimize();
     }
 
+    @PutMapping("/focus")
+    public void focus() {
+        referenceImageService.focus();
+    }
+
+    @PutMapping("/move")
+    public void move(@RequestParam int x, @RequestParam int y) {
+        referenceImageService.move(x,y);
+    }
     @PutMapping("/maximize")
     public void maximize() {
         referenceImageService.maximize();

@@ -7,11 +7,14 @@ import ij.process.ImageStatistics;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.util.LswUtil;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ReflectionUtils;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +38,15 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     private static final int textOffsetX = HISTOGRAM_HEIGHT * 2 + 12;
     private static final int textOffsetY = 49;
     private static final int textHeight = 12;
+
+    private static Image maximizeImage;
+    static {
+        try {
+            maximizeImage = new ImageIcon(new ClassPathResource("maximize.png").getURL()).getImage();
+        } catch (IOException e) {
+            log.error("Error loading the icon png", e);
+        }
+    }
 
     private int TEXT_GAP = 11;
     private ImagePlus image;

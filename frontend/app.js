@@ -3,6 +3,8 @@ const url = require("url");
 const path = require("path");
 const { spawn } = require("child_process");
 
+const apiUrl = "http://localhost:36469/api";
+
 let mainWindow;
 
 function createWindow() {
@@ -28,20 +30,46 @@ function createWindow() {
     if (process.platform === "darwin") {
       app.dock.hide();
     }
-    fetch("http://localhost:36469/api/profiles/exit", {
+    fetch(`${apiUrl}/profiles/exit`, {
       method: "PUT",
     }).catch((error) => {});
     app.quit();
   });
 
   mainWindow.on("minimize", () => {
-    fetch("http://localhost:36469/api/reference/minimize", {
+    fetch(`${apiUrl}/reference/minimize`, {
       method: "PUT",
     }).catch((error) => {});
   });
 
   mainWindow.on("restore", () => {
-    fetch("http://localhost:36469/api/reference/maximize", {
+    fetch(`${apiUrl}/reference/maximize`, {
+      method: "PUT",
+    }).catch((error) => {});
+  });
+
+  mainWindow.on("focus", () => {
+    fetch(`${apiUrl}/reference/focus`, {
+      method: "PUT",
+    }).catch((error) => {});
+  });
+
+  mainWindow.on("show", () => {
+    callPassOnPosition();
+  });
+
+  function callPassOnPosition() {
+    const [x, y] = mainWindow.getPosition();
+    fetch(`${apiUrl}/reference/move?x=${x}&y=${y}`, {
+      method: "PUT",
+    }).catch((error) => {
+      setTimeout(() => callPassOnPosition(), 250);
+    });
+  }
+
+  mainWindow.on("moved", () => {
+    const [x, y] = mainWindow.getPosition();
+    fetch(`${apiUrl}/reference/move?x=${x}&y=${y}`, {
       method: "PUT",
     }).catch((error) => {});
   });
