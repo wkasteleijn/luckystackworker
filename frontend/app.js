@@ -58,6 +58,12 @@ function createWindow() {
     callPassOnPosition();
   });
 
+  mainWindow.on("ready-to-show", () => {
+    if (process.platform === "win32") {
+      callPassOnPosition();
+    }
+  });
+
   function callPassOnPosition() {
     const [x, y] = mainWindow.getPosition();
     fetch(`${apiUrl}/reference/move?x=${x}&y=${y}`, {
@@ -78,12 +84,12 @@ function createWindow() {
 app.on("ready", function () {
   switch (process.platform) {
     case "win32":
-      spawn("\\lsworker.bat");
+      spawn(`${app.getAppPath()}\\lsworker.bat`);
       break;
     case "darwin":
       const pathParts = app.getAppPath().split("/");
       const strippedPath = pathParts.slice(0, -3).join("/");
-      spawn(`${app.getAppPath()}/lsworker-mac.sh`,[strippedPath]);
+      spawn(`${app.getAppPath()}/lsworker-mac.sh`, [strippedPath]);
       break;
     default:
       spawn(`${app.getAppPath()}/lsworker-linux.sh`);
