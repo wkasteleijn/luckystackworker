@@ -1,6 +1,7 @@
 COPY ..\backend\target\luckystackworker.jar .\LuckyStackWorker-win32-x64\luckystackworker.jar
 COPY .\LuckyStackWorker-win32-x64\\resources\app\LICENSE_LSW.txt .\LuckyStackWorker-win32-x64
 COPY .\LuckyStackWorker-win32-x64\\resources\app\release_notes.txt .\LuckyStackWorker-win32-x64
+COPY .\LuckyStackWorker-win32-x64\\resources\app\lsworker.bat .\LuckyStackWorker-win32-x64
 MKDIR .\LuckyStackWorker-win32-x64\gmic
 XCOPY C:\Users\wkast\applications\gmic-3.3.2-cli-win64 .\LuckyStackWorker-win32-x64\gmic /E /H /C /I
 RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\src
