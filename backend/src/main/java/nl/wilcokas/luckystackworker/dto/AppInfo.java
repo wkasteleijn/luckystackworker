@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DataInfo {
-    private String instalationDate;
+public class AppInfo {
+    private String installationDate;
     private String lastExecutionTime;
-    private String version;
 }
