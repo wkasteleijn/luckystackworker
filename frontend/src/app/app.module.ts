@@ -13,6 +13,7 @@ import { MatLegacySlideToggleModule } from '@angular/material/legacy-slide-toggl
 import { MatLegacySliderModule } from '@angular/material/legacy-slider';
 import { MatLegacySnackBarModule } from '@angular/material/legacy-snack-bar';
 import { MatLegacyTabsModule } from '@angular/material/legacy-tabs';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import {
   BrowserAnimationsModule,
   NoopAnimationsModule,
@@ -40,6 +41,7 @@ import { AppComponent } from './app.component';
     MatLegacyRadioModule,
     MatLegacyCheckboxModule,
     MatIconModule,
+    MatTooltipModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

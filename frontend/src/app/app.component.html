@@ -23,7 +23,7 @@
       class="{{
         nightModeEnabled() ? 'activeColorNight button' : 'activeColor button'
       }}"
-      title="Open a 16-bit image stack for processing."
+      matTooltip="Open a 16-bit image stack for processing."
     >
       <mat-icon
         aria-hidden="false"
@@ -52,7 +52,7 @@
         [(ngModel)]="openImageMode"
         name="openAs"
         (change)="openImageModeChanged()"
-        title="Select the desired channel used for opening the image stack."
+        matTooltip="Select the desired channel used for opening the image stack."
         class="{{
           !refImageSelected || !openRefImageEnabled()
             ? 'dropdownMargin dropdown_disabled'
@@ -73,7 +73,7 @@
         [disabled]="shouldShowSpinner() || crop"
         [(ngModel)]="scale"
         (change)="scaleChanged()"
-        title="Select the scale used for opening the image stack. The selected scale is not persisted with the object profile."
+        matTooltip="Select the scale used for opening the image stack. The selected scale is not persisted with the object profile."
         class="{{
           !refImageSelected || !openRefImageEnabled()
             ? 'dropdownMargin dropdown_disabled'
@@ -103,7 +103,7 @@
             ? 'dropdownMargin dropdown activeColorNight'
             : 'dropdownMargin dropdown activeColor'
         }}"
-        title="Select the object profile"
+        matTooltip="Select the object profile"
       >
         <option *ngFor="let profile of profiles" [value]="profile.value">
           {{ profile.viewValue }}
@@ -119,7 +119,7 @@
         nightModeEnabled() ? 'activeColorNight' : 'activeColor'
       }}"
       (click)="loadProfile()"
-      title="Load profile"
+      matTooltip="Load profile"
     >
       <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="tune"></mat-icon>
     </button>
@@ -129,7 +129,7 @@
       mat-button
       disabled
       class="button_disabled buttonMargin"
-      title="Load profile"
+      matTooltip="Load profile"
     >
       <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="tune"></mat-icon>
     </button>
@@ -144,7 +144,7 @@
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
           (cropEnabled() ? 'Pressed' : '')
       }}"
-      title="Crop"
+      matTooltip="Crop"
     >
       <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="crop"></mat-icon>
     </button>
@@ -154,7 +154,7 @@
       mat-button
       disabled
       class="button_disabled buttonMargin"
-      title="Crop"
+      matTooltip="Crop"
     >
       <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="crop"></mat-icon>
     </button>
@@ -167,7 +167,7 @@
         nightModeEnabled() ? 'activeColorNight' : 'activeColor'
       }}"
       (click)="showVersionButton() ? openDownloadPage() : openAbout()"
-      title="You are currently using an older version {{
+      matTooltip="You are currently using an older version {{
         getCurrentVersion()
       }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
         getLatestKnownVersion()
@@ -188,7 +188,7 @@
         nightModeEnabled() ? 'activeColorNight' : 'activeColor'
       }}"
       (click)="openAbout()"
-      title="About"
+      matTooltip="About"
     >
       <mat-icon
         aria-hidden="false"
@@ -202,7 +202,7 @@
       mat-button
       disabled
       class="button_disabled buttonMargin"
-      title="About"
+      matTooltip="About"
     >
       <mat-icon
         aria-hidden="false"
@@ -221,7 +221,7 @@
           ? 'plusZoom buttonZoom activeColorNight'
           : 'plusZoom buttonZoom activeColor') + (isZoomedIn() ? 'Pressed' : '')
       }}"
-      title="Zoom in"
+      matTooltip="Zoom in"
     >
       <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="add"></mat-icon>
     </button>
@@ -246,7 +246,7 @@
           : 'minZoom buttonZoom relatedButtonsSpace activeColor') +
           (isZoomedOut() ? 'Pressed' : '')
       }}"
-      title="Zoom out"
+      matTooltip="Zoom out"
     >
       <mat-icon
         aria-hidden="false"
@@ -278,7 +278,7 @@
       class="button {{
         nightModeEnabled() ? 'activeColorNight' : 'activeColor'
       }}"
-      title="This will save the currently open stack with all applied the post-processing. You can save it as a 16-bit TIFF or a 100% quality JPG. To do so add the applicable extension to the filename (filename.tif, filename.jpg)."
+      matTooltip="This will save the currently open stack with all applied the post-processing. You can save it as a 16-bit TIFF or a 100% quality JPG. To do so add the applicable extension to the filename (filename.tif, filename.jpg)."
     >
       <mat-icon
         aria-hidden="false"
@@ -314,7 +314,7 @@
             ? ' activeColorNight dropdown rootFolder'
             : 'activeColor dropdown rootFolder'
         }}"
-        title="Select root folder"
+        matTooltip="Select root folder"
       />
     </mat-form-field>
 
@@ -328,7 +328,7 @@
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
           (nightModeEnabled() ? 'Pressed' : '')
       }}"
-      title="Night mode"
+      matTooltip="Night mode"
     >
       <mat-icon
         aria-hidden="false"
@@ -351,36 +351,36 @@
     </button>
 
     <div *ngIf="exitButtonAvailable()">
-    <button
-      *ngIf="openRefImageEnabled()"
-      type="button_exit"
-      mat-button
-      (click)="exit()"
-      class="button buttonMargin {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      title="Exit"
-    >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon buttonBottom"
-        fontIcon="power_settings_new"
-      ></mat-icon>
-    </button>
-    <button
-      *ngIf="!openRefImageEnabled()"
-      type="button"
-      mat-button
-      disabled
-      class="button_disabled buttonMargin"
-      title="Exit"
-    >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon buttonBottom"
-        fontIcon="power_settings_new"
-      ></mat-icon>
-    </button>
+      <button
+        *ngIf="openRefImageEnabled()"
+        type="button_exit"
+        mat-button
+        (click)="exit()"
+        class="button buttonMargin {{
+          nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+        }}"
+        matTooltip="Exit"
+      >
+        <mat-icon
+          aria-hidden="false"
+          class="zoomIcon buttonBottom"
+          fontIcon="power_settings_new"
+        ></mat-icon>
+      </button>
+      <button
+        *ngIf="!openRefImageEnabled()"
+        type="button"
+        mat-button
+        disabled
+        class="button_disabled buttonMargin"
+        matTooltip="Exit"
+      >
+        <mat-icon
+          aria-hidden="false"
+          class="zoomIcon buttonBottom"
+          fontIcon="power_settings_new"
+        ></mat-icon>
+      </button>
     </div>
   </div>
   <mat-tab-group class="sliderTabs" selectedIndex="0">
@@ -682,7 +682,7 @@
             value="IAN"
             class="denoiseMode"
             disabled="{{ !this.settings?.gmicAvailable }}"
-            title="{{
+            matTooltip="{{
               this.settings?.gmicAvailable
                 ? 'Warning: slows down processing, but is very effective!'
                 : gmicUnavailableMessage()
@@ -1014,7 +1014,7 @@
       </div>
       <div
         class="sliderRow"
-        title="{{
+        matTooltip="{{
           this.settings?.gmicAvailable
             ? 'Warning: slows down processing, but is very effective!'
             : gmicUnavailableMessage()
@@ -1334,7 +1334,7 @@
       </div>
 
       <!-- Dispersion corrector-->
-      <div class="sliderRow" title="{{ dispersionCorrectorTitle }}">
+      <div class="sliderRow" matTooltip="{{ dispersionCorrectorTitle }}">
         <div
           class="sliderRowCategoryTitle {{
             nightModeEnabled()
@@ -1356,7 +1356,7 @@
                   (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
                   (dispersionCorrectionEnabled ? 'Pressed' : '')
               }}"
-              title="Dipersion Correction"
+              matTooltip="Dipersion Correction"
             >
               <img src="assets/images/dispersion.png" class="dispersionArrow" />
             </button>
@@ -1366,7 +1366,7 @@
               mat-button
               disabled
               class="buttonDisabledZoom"
-              title="Dipersion Correction"
+              matTooltip="Dipersion Correction"
             >
               <img src="assets/images/dispersion.png" class="dispersionArrow" />
             </button>
@@ -1730,7 +1730,7 @@
                     nightModeEnabled() ? 'activeColorNight' : 'activeColor'
                   }}"
                   (click)="resetDispersionCorrection()"
-                  title="Reset"
+                  matTooltip="Reset"
                 >
                   <mat-icon
                     aria-hidden="false"
@@ -1865,7 +1865,7 @@
                   mat-button
                   disabled
                   class="buttonDisabledZoom resetButton"
-                  title="Reset"
+                  matTooltip="Reset"
                 >
                   <mat-icon
                     aria-hidden="false"
@@ -1901,7 +1901,7 @@
           class="button {{
             nightModeEnabled() ? 'activeColorNight' : 'activeColor'
           }}"
-          title="Start batch worker to process all {{
+          matTooltip="Start batch worker to process all {{
             selectedProfile
           }} stacks found in the root folder."
         >
@@ -1928,7 +1928,7 @@
           class="relatedButtonsSpace button {{
             nightModeEnabled() ? 'activeColorNight' : 'activeColor'
           }}"
-          title="Stop batch process when running."
+          matTooltip="Stop batch process when running."
         >
           <mat-icon aria-hidden="false" fontIcon="rectangle"></mat-icon>
         </button>
@@ -1938,7 +1938,7 @@
           mat-button
           disabled
           class="relatedButtonsSpace button_disabled"
-          title="Stop batch process when running."
+          matTooltip="Stop batch process when running."
         >
           <mat-icon aria-hidden="false" fontIcon="rectangle"></mat-icon>
         </button>
@@ -1963,7 +1963,7 @@
               (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
               (realtimeEnabled ? 'Pressed' : '')
           }}"
-          title="Connect to stacking software"
+          matTooltip="Connect to stacking software"
         >
           <mat-icon
             aria-hidden="false"
@@ -1977,7 +1977,7 @@
           mat-button
           disabled
           class="buttonDisabledZoom connectButton"
-          title="Connect to stacking software"
+          matTooltip="Connect to stacking software"
         >
           <mat-icon
             aria-hidden="false"
