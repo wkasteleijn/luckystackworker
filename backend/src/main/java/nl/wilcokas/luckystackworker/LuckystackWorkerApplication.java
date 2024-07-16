@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,14 +14,13 @@ import org.yaml.snakeyaml.Yaml;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.dto.DataInfo;
+import nl.wilcokas.luckystackworker.dto.AppInfo;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 
 @Slf4j
 @EnableScheduling
-@SpringBootApplication(exclude = {
-        org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class,
+@SpringBootApplication(exclude = { org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class,
         org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration.class,
         org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration.class,
         org.springframework.boot.autoconfigure.transaction.jta.JtaAutoConfiguration.class,
@@ -40,37 +38,32 @@ public class LuckystackWorkerApplication {
         String osProfile = LswUtil.getActiveOSProfile();
         String dataFolder = LswFileUtil.getDataFolder(osProfile);
         createDataFolderWhenMissing(dataFolder);
-        log.info("Current folder is "+System.getProperty("user.dir"));
-        String lswVersion = LswUtil.getLswVersion();
-        if (lswVersion != null) {
-            log.info("Current app version is {}", lswVersion);
-            DataInfo dataInfo = getDataInfo(dataFolder);
-            // This is to prevent double servers running when the user accidentally double
-            // clicked the icon instead of single click.
-            if (dataInfo != null && dataInfo.getLastExecutionTime() != null) {
-                LocalDateTime lastExecutionTime = LocalDateTime.parse(dataInfo.getLastExecutionTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                if (lastExecutionTime.plusSeconds(Constants.SECONDS_AFTER_NEXT_EXECUTION).isAfter(LocalDateTime.now())) {
-                    log.error("Another instance was already started, shutting down!");
-                    System.exit(1);
-                }
+        log.info("Current folder is " + System.getProperty("user.dir"));
+        AppInfo appInfo = getAppInfo(dataFolder);
+        // This is to prevent double servers running when the user accidentally double
+        // clicked the icon instead of single click.
+        if (appInfo != null && appInfo.getLastExecutionTime() != null) {
+            LocalDateTime lastExecutionTime = LocalDateTime.parse(appInfo.getLastExecutionTime(),
+                                                                  DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            if (lastExecutionTime.plusSeconds(Constants.SECONDS_AFTER_NEXT_EXECUTION).isAfter(LocalDateTime.now())) {
+                log.error("Another instance was already started, shutting down!");
+                System.exit(1);
             }
-            writeDataInfoFile(dataFolder, dataInfo == null ? null : dataInfo.getInstalationDate());
-        } else {
-            log.warn("Could not determine app version");
         }
+        writeAppInfoFile(dataFolder, appInfo == null ? null : appInfo.getInstallationDate());
 
         SpringApplication.run(LuckystackWorkerApplication.class, args);
     }
 
-    private static DataInfo getDataInfo(String dataFolder) {
-        DataInfo dataInfo = null;
+    private static AppInfo getAppInfo(String dataFolder) {
+        AppInfo appInfo = null;
         try {
-            String dataInfoStr = Files.readString(Paths.get(dataFolder + "/data-info.yml"));
-            dataInfo = new Yaml().load(dataInfoStr);
+            String appInfoStr = Files.readString(Paths.get(dataFolder + "/app-info.yml"));
+            appInfo = new Yaml().load(appInfoStr);
         } catch (IOException e) {
-            log.info("Data info file not found on app data folder {}", dataFolder);
+            log.info("App info file not found on app data folder {}", dataFolder);
         }
-        return dataInfo;
+        return appInfo;
     }
 
     private static void createDataFolderWhenMissing(String dataFolder) throws IOException {
@@ -81,12 +74,12 @@ public class LuckystackWorkerApplication {
         }
     }
 
-    private static void writeDataInfoFile(String dataFolder, String installationDate) throws IOException {
-        DataInfo dataInfo;
+    private static void writeAppInfoFile(String dataFolder, String installationDate) throws IOException {
+        AppInfo appInfo;
         String now = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now());
-        dataInfo = DataInfo.builder().instalationDate(installationDate == null ? now : installationDate).lastExecutionTime(now)
-                .build();
-        String dataInfoStr = new Yaml().dump(dataInfo);
-        Files.writeString(Paths.get(dataFolder + "/data-info.yml"), dataInfoStr);
+        appInfo = AppInfo.builder().installationDate(installationDate == null ? now : installationDate)
+                .lastExecutionTime(now).build();
+        String dataInfoStr = new Yaml().dump(appInfo);
+        Files.writeString(Paths.get(dataFolder + "/app-info.yml"), dataInfoStr);
     }
 }
