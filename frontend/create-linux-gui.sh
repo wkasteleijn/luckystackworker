@@ -1,6 +1,5 @@
 rm -rf LuckyStackWorker-linux-x64
-npx electron-packager . lsw-gui --platform linux --arch x64 --icon ../luckystackworker_icon.png --overwrite
-mv lsw-gui-linux-x64 LuckyStackWorker-linux-x64
+npx electron-packager . LuckyStackWorker --platform linux --arch x64 --icon ../luckystackworker_icon.png --overwrite
 cp ../backend/target/luckystackworker.jar ./LuckyStackWorker-linux-x64
 cd ./LuckyStackWorker-linux-x64/resources/app
 rm -rf node_modules

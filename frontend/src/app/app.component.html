@@ -267,6 +267,39 @@
         fontIcon="remove"
       ></mat-icon>
     </button>
+
+    <button
+      *ngIf="openRefImageEnabled() && refImageSelected"
+      type="button"
+      mat-button
+      (click)="maximize()"
+      class="{{
+        (nightModeEnabled()
+          ? 'maximize buttonZoom relatedButtonsSpace activeColorNight'
+          : 'maximize buttonZoom relatedButtonsSpace activeColor') +
+          (isZoomedOut() ? 'Pressed' : '')
+      }}"
+      matTooltip="Maximize"
+    >
+      <mat-icon
+        aria-hidden="false"
+        class="zoomIcon"
+        fontIcon="check_box_outline_blank"
+      ></mat-icon>
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled() || !refImageSelected"
+      type="button"
+      mat-button
+      disabled
+      class="maximize buttonDisabledZoom relatedButtonsSpace"
+    >
+      <mat-icon
+        aria-hidden="false"
+        class="zoomIcon"
+        fontIcon="check_box_outline_blank"
+      ></mat-icon>
+    </button>
   </div>
 
   <div class="button_container_top button_container">

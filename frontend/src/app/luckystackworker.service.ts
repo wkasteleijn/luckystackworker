@@ -72,6 +72,10 @@ export class LuckyStackWorkerService {
     return this.http.put(`${this.baseUrl}/reference/zoomout`, null);
   }
 
+  maximize(): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/reference/maximize`, null);
+  }
+
   cropSelectionChanged(): Observable<Object> {
     return this.http.put(`${this.baseUrl}/reference/crop`, null);
   }

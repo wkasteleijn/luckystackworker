@@ -1045,6 +1045,16 @@ export class AppComponent implements OnInit {
     }
   }
 
+  maximize() {
+    console.log('maximize called');
+    this.luckyStackWorkerService.maximize().subscribe(
+      (data) => {
+        console.log('Response');
+      },
+      (error) => console.log(error)
+    );
+  }
+
   isZoomedIn(): boolean {
     return this.zoomFactor > 0;
   }

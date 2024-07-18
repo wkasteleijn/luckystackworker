@@ -20,6 +20,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ij.process.ColorProcessor;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
+import nl.wilcokas.luckystackworker.ij.LswImageWindow;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.util.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -233,7 +234,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
   public void maximize() {
     if (displayedImage != null) {
-      displayedImage.getImageWindow().setState(Frame.NORMAL);
+      LswImageWindow window = displayedImage.getImageWindow();
+      Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+      window.setMaximizedBounds(rectangle);
+      window.setLocationAndSize(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+      //window.setLocation(0, 0);
     }
   }
 
