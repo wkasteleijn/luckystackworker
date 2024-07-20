@@ -111,6 +111,7 @@ export class AppComponent implements OnInit {
   latestKnownVersion = version.version;
   private slowProcessing: boolean = false;
   zoomFactor: number = 0;
+  isMaximized: boolean = false;
 
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
@@ -1047,6 +1048,7 @@ export class AppComponent implements OnInit {
 
   maximize() {
     console.log('maximize called');
+    this.isMaximized = !this.isMaximized;
     this.luckyStackWorkerService.maximize().subscribe(
       (data) => {
         console.log('Response');

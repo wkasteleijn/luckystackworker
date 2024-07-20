@@ -277,9 +277,9 @@
         (nightModeEnabled()
           ? 'maximize buttonZoom relatedButtonsSpace activeColorNight'
           : 'maximize buttonZoom relatedButtonsSpace activeColor') +
-          (isZoomedOut() ? 'Pressed' : '')
+          (isMaximized ? 'Pressed' : '')
       }}"
-      matTooltip="Maximize"
+      matTooltip="Show image at 100% scale"
     >
       <mat-icon
         aria-hidden="false"

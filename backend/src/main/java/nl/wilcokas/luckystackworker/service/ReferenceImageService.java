@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ij.process.ColorProcessor;
+import nl.wilcokas.luckystackworker.exceptions.HasFocusException;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.ij.LswImageWindow;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
@@ -234,11 +235,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
   public void maximize() {
     if (displayedImage != null) {
-      LswImageWindow window = displayedImage.getImageWindow();
-      Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-      window.setMaximizedBounds(rectangle);
-      window.setLocationAndSize(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-      //window.setLocation(0, 0);
+      displayedImage.getImageWindow().maximize();
     }
   }
 
@@ -252,6 +249,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     log.info("Moving window to {}, {}", x, y);
     controllerLastKnownPositionX = x;
     controllerLastKnownPositionY = y;
+  }
+
+  public boolean checkIfFocussed() {
+    // TODO: check if file windows are open, if so return false..
+    return displayedImage.getImageWindow().hasFocus();
   }
 
   public void crop() {
@@ -583,7 +585,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile)) {
       Taskbar.getTaskbar().setIconImage(iconImage);
     }
-    if (controllerLastKnownPositionX > 0) {
+    Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
+    if ((image.getWidth() + controllerLastKnownPositionX + Constants.CONTROL_PANEL_WIDTH) > screenDimension.getWidth()
+      || (image.getHeight() + controllerLastKnownPositionY) > screenDimension.getHeight()) {
+      window.setLocation(0,0);
+    } else if (controllerLastKnownPositionX > 0) {
       int positionX = controllerLastKnownPositionX + Constants.CONTROL_PANEL_WIDTH;
       if (Constants.SYSTEM_PROFILE_WINDOWS.equals(LswUtil.getActiveOSProfile())) {
         positionX += 8;
