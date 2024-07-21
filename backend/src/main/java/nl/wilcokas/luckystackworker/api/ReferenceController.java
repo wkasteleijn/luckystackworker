@@ -97,23 +97,19 @@ public class ReferenceController {
     referenceImageService.focus();
   }
 
-  @PutMapping("/focussed")
-  public ResponseEntity<Object> isFocussed() {
-    if (referenceImageService.checkIfFocussed()) {
-      log.info("Window is focused");
-      return new ResponseEntity<>(null, HttpStatus.CONFLICT);
-    }
-    return new ResponseEntity<>(null, HttpStatus.OK);
-  }
-
   @PutMapping("/move")
   public void move(@RequestParam int x, @RequestParam int y) {
     referenceImageService.move(x, y);
   }
 
   @PutMapping("/maximize")
-  public void maximize() {
-    referenceImageService.maximize();
+  public int maximize() {
+    return referenceImageService.maximize();
+  }
+
+  @PutMapping("/restore")
+  public void restore() {
+    referenceImageService.restore();
   }
 
   @PutMapping("/crop")

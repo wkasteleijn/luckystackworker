@@ -185,16 +185,17 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     repaint();
   }
 
-  @Override
-  public void maximize() {
+  public double showFullSizeImage() {
     if (isMaximized) {
       isMaximized = false;
       setLocationAndSize(originalBounds.x, originalBounds.y, originalBounds.width, originalBounds.height);
+      return getCanvas().getMagnification();
     } else {
       isMaximized = true;
       originalBounds = getBounds();
       this.setLocation(0, 0);
       getCanvas().zoom100Percent();
+      return 1.0;
     }
   }
 

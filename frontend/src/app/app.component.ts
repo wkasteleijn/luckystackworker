@@ -154,6 +154,7 @@ export class AppComponent implements OnInit {
             this.settings = data.settings;
             this.selectedProfile = this.profile.name;
             this.rootFolder = data.settings.rootFolder;
+            this.zoomFactor = data.settings.zoomFactor;
             this.checkLatestVersion();
             this.updateProfileSettings();
           }
@@ -1049,8 +1050,12 @@ export class AppComponent implements OnInit {
   maximize() {
     console.log('maximize called');
     this.isMaximized = !this.isMaximized;
+    if (this.isMaximized) {
+      this.zoomFactor = 0;
+    }
     this.luckyStackWorkerService.maximize().subscribe(
       (data) => {
+        this.zoomFactor = Number(data);
         console.log('Response');
       },
       (error) => console.log(error)

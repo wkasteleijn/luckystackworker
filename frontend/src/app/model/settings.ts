@@ -3,4 +3,5 @@ export class Settings {
   operation: string;
   largeImage: boolean;
   gmicAvailable: boolean;
+  zoomFactor: number;
 }

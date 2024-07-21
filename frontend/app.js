@@ -43,7 +43,7 @@ function createWindow() {
   });
 
   mainWindow.on("restore", () => {
-    fetch(`${apiUrl}/reference/maximize`, {
+    fetch(`${apiUrl}/reference/restore`, {
       method: "PUT",
     }).catch((error) => {});
   });
@@ -79,32 +79,6 @@ function createWindow() {
       method: "PUT",
     }).catch((error) => {});
   });
-
-  mainWindow.on("blur", () => {
-    requestFocus();
-  });
-
-  mainWindow.on("focus", () => {
-    mainWindow.setAlwaysOnTop(false, "screen");
-  });
-
-  function requestFocus() {
-    fetch(`${apiUrl}/reference/focussed`, {
-      method: "PUT",
-    })
-      .catch((error) => {})
-      .then((response) => {
-        console.log("Error: " + response.status);
-        if (response.status === 409) {
-          mainWindow.setAlwaysOnTop(true, "screen");
-          /*
-          if (!mainWindow.isFocused()) {
-            setTimeout(() => requestFocus(), 250);
-          }
-          */
-        }
-      });
-  }
 }
 
 app.on("ready", function () {

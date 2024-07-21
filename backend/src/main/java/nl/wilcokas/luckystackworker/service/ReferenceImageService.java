@@ -15,11 +15,11 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import ij.gui.ImageCanvas;
 import ij.process.ColorProcessor;
-import nl.wilcokas.luckystackworker.exceptions.HasFocusException;
+import nl.wilcokas.luckystackworker.ij.LswImageCanvas;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.ij.LswImageWindow;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
@@ -63,9 +63,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
   private LswImageMetadata imageMetadata;
 
   private boolean roiActive = false;
-  private JTextField roiIndicatorTextField = null;
-
-  private boolean showHistogram = true;
 
   private int zoomFactor = 0;
 
@@ -146,6 +143,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         final String rootFolder = LswFileUtil.getFileDirectory(selectedFilePath);
         SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
         settingsDTO.setLargeImage(isLargeImage);
+        settingsDTO.setZoomFactor(zoomFactor);
         LuckyStackWorkerContext.setSelectedProfile(profile.getName());
         return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
       }
@@ -233,9 +231,20 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
   }
 
-  public void maximize() {
+  public int maximize() {
     if (displayedImage != null) {
-      displayedImage.getImageWindow().maximize();
+      double magnification = displayedImage.getImageWindow().showFullSizeImage();
+      zoomFactor = convertMagnificationToZoomFactor(magnification);
+      imageMetadata.setZoomFactor(zoomFactor);
+      displayedImage.getImageWindow().updateMetadata(imageMetadata);
+      return zoomFactor;
+    }
+    return 0;
+  }
+
+  public void restore() {
+    if (displayedImage != null) {
+      displayedImage.getImageWindow().setState(Frame.NORMAL);
     }
   }
 
@@ -249,11 +258,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     log.info("Moving window to {}, {}", x, y);
     controllerLastKnownPositionX = x;
     controllerLastKnownPositionY = y;
-  }
-
-  public boolean checkIfFocussed() {
-    // TODO: check if file windows are open, if so return false..
-    return displayedImage.getImageWindow().hasFocus();
   }
 
   public void crop() {
@@ -563,8 +567,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
       operationService.correctExposure(displayedImage);
       largeImage = displayedImage.getWidth() > Constants.MAX_WINDOW_SIZE;
 
-      setDefaultLayoutSettings(displayedImage);
-      zoomFactor = 0;
+      zoomFactor = setDefaultLayoutSettings(displayedImage);
+
       roiActive = false;
 
       log.info("Opened reference image image with id {}", displayedImage.getID());
@@ -576,33 +580,53 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     return largeImage;
   }
 
-  private void setDefaultLayoutSettings(LswImageViewer image) {
+  private int setDefaultLayoutSettings(LswImageViewer image) {
     image.setColor(Color.BLACK);
     image.setBorderColor(Color.BLACK);
     image.show(imageMetadata.getFilePath());
-    ImageWindow window = image.getWindow();
+    LswImageWindow window = (LswImageWindow)image.getWindow();
     window.setIconImage(iconImage);
     if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile)) {
       Taskbar.getTaskbar().setIconImage(iconImage);
     }
     Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
-    if ((image.getWidth() + controllerLastKnownPositionX + Constants.CONTROL_PANEL_WIDTH) > screenDimension.getWidth()
-      || (image.getHeight() + controllerLastKnownPositionY) > screenDimension.getHeight()) {
-      window.setLocation(0,0);
-    } else if (controllerLastKnownPositionX > 0) {
-      int positionX = controllerLastKnownPositionX + Constants.CONTROL_PANEL_WIDTH;
+    int positionX = Constants.DEFAULT_WINDOWS_POSITION_X;
+    int positionY = Constants.DEFAULT_WINDOWS_POSITION_Y;
+    if (controllerLastKnownPositionX >= 0 || controllerLastKnownPositionY >= 0) {
+      positionX = controllerLastKnownPositionX + Constants.CONTROL_PANEL_WIDTH;
       if (Constants.SYSTEM_PROFILE_WINDOWS.equals(LswUtil.getActiveOSProfile())) {
         positionX += 8;
       }
-      window.setLocation(positionX, controllerLastKnownPositionY);
+      positionY = controllerLastKnownPositionY;
+    }
+    ImageCanvas canvas = window.getCanvas();
+    int newZoomFactor = 0;
+    if ((image.getWidth() + positionX) > screenDimension.getWidth()
+      || (image.getHeight() + positionY) > screenDimension.getHeight()) {
+      int remainingWidth = ((int) screenDimension.getWidth()) -  positionX;
+      int remainingHeight = ((int) screenDimension.getHeight()) - controllerLastKnownPositionY;
+      canvas.zoomOut(remainingWidth, remainingHeight);
+      newZoomFactor = convertMagnificationToZoomFactor(canvas.getMagnification());
+      log.info("Adjusted window size to fit on screen. New zoom factor: {}", newZoomFactor);
+      imageMetadata.setZoomFactor(newZoomFactor);
+      window.updateMetadata(imageMetadata);
     } else {
-      window.setLocation(new Point(Constants.DEFAULT_WINDOWS_POSITION_X, Constants.DEFAULT_WINDOWS_POSITION_Y));
+      canvas.zoom100Percent();
     }
     new Toolbar().setTool(Toolbar.HAND);
     image.getRoi().addRoiListener(this);
-    image.getWindow().addWindowListener(this);
-    image.getWindow().addComponentListener(this);
-    image.getWindow().getCanvas().zoom100Percent();
+    window.addWindowListener(this);
+    window.addComponentListener(this);
+    window.setLocation(positionX, positionY);
+    return newZoomFactor;
+  }
+
+  private int convertMagnificationToZoomFactor(double magnification) {
+    if (magnification < 1) {
+      return -(int)((1.0 - magnification) / 0.25);
+    } else {
+      return (int)((magnification-1) * 4.0);
+    }
   }
 
   private boolean validateSelectedFile(String path) {

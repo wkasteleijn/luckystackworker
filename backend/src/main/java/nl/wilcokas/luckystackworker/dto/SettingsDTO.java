@@ -31,4 +31,5 @@ public class SettingsDTO {
     private String operation;
     private boolean largeImage;
     private boolean gmicAvailable;
+    private int zoomFactor;
 }

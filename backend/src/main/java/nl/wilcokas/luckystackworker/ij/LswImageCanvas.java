@@ -16,4 +16,8 @@ public class LswImageCanvas extends ImageCanvas {
         super.paint(g);
     }
 
+    public double getMagnification() {
+      return super.magnification;
+    }
+
 }
