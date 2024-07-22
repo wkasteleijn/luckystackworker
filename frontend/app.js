@@ -82,17 +82,17 @@ function createWindow() {
 }
 
 app.on("ready", function () {
+  const pathParts = app.getAppPath().split("/");
+  const basePath = pathParts.slice(0, -3).join("/");
   switch (process.platform) {
     case "win32":
       spawn(`${app.getAppPath()}\\lsworker.bat`);
       break;
     case "darwin":
-      const pathParts = app.getAppPath().split("/");
-      const strippedPath = pathParts.slice(0, -3).join("/");
-      spawn(`${app.getAppPath()}/lsworker-mac.sh`, [strippedPath]);
+      spawn(`${app.getAppPath()}/lsworker-mac.sh`, [basePath]);
       break;
     default:
-      spawn(`${app.getAppPath()}/lsworker-linux.sh`);
+      spawn(`${basePath}/lsworker-linux.sh`);
       bgStarter = "./lsworker_linux.sh";
   }
   createWindow();

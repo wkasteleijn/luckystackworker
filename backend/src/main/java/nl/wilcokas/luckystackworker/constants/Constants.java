@@ -24,7 +24,7 @@ public class Constants {
     public static final String VERSION_URL_ENDMARKER = "}";
     public static final int VERSION_REQUEST_TIMEOUT = 5; // seconds
     public static final int VERSION_REQUEST_FREQUENCY = 14; // days
-    public static final int DEFAULT_WINDOWS_POSITION_X = 700;
+    public static final int DEFAULT_WINDOWS_POSITION_X = 754;
     public static final int DEFAULT_WINDOWS_POSITION_Y = 64;
     public static final int SHORT_HALF_SIZE = 32768;
     public static final int UNSIGNED_INT_SIZE = 65536;
@@ -36,9 +36,6 @@ public class Constants {
     public static final BigDecimal LOCAL_CONTRAST_FINE_RADIUS = BigDecimal.valueOf(4);
     public static final BigDecimal LOCAL_CONTRAST_MEDIUM_RADIUS = BigDecimal.valueOf(16);
     public static final BigDecimal LOCAL_CONTRAST_LARGE_RADIUS = BigDecimal.valueOf(64);
-    public static final int DEFAULT_HISTOGRAM_WINDOW_WIDTH = 272;
-    public static final int DEFAULT_HISTOGRAM_WINDOW_HEIGHT = 128;
-    public static final int MAX_IMAGE_WIDTH_HISTOGRAM = 800;
     public static final int DEFAULT_THRESHOLD = 4;
     public static final int RED_LAYER_INDEX = 1;
     public static final int GREEN_LAYER_INDEX = 2;
