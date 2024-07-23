@@ -71,6 +71,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
   private int controllerLastKnownPositionX = -1;
   private int controllerLastKnownPositionY = -1;
 
+  private String visibleChannel = "RGB";
+
   private static Image iconImage;
 
   static {
@@ -432,6 +434,23 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     displayedImage.getImageWindow().nightMode(on);
   }
 
+  public void showChannel(String channel) {
+    //LswImageProcessingUtil.convertLayersToColorImage(unprocessedImageLayers.getLayers(), displayedImage, channel);
+    boolean includeRed = channel.equals("RGB") || channel.equals("R");
+    boolean includeGreen = channel.equals("RGB") || channel.equals("G");
+    boolean includeBlue = channel.equals("RGB") || channel.equals("B");
+    LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
+      displayedImage,
+      includeRed,
+      includeGreen,
+      includeBlue);
+    updateHistogramMetadata();
+    visibleChannel = channel;
+    imageMetadata.setChannel(visibleChannel);
+    displayedImage.updateMetadata(imageMetadata);
+    displayedImage.updateAndDraw();
+  }
+
   private void setImageMetadata(
     final String filePath,
     final Profile profile,
@@ -447,6 +466,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     this.imageMetadata = LswImageMetadata.builder().filePath(filePath)
       .name(LswUtil.getFullObjectName(profile.getName())).currentWidth(currentWidth)
       .currentHeight(currentHeight).originalWidth(originalWidth).originalHeight(originalHeight).time(dateTime)
+      .channel(visibleChannel)
       .build();
   }
 
@@ -584,7 +604,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     image.setColor(Color.BLACK);
     image.setBorderColor(Color.BLACK);
     image.show(imageMetadata.getFilePath());
-    LswImageWindow window = (LswImageWindow)image.getWindow();
+    LswImageWindow window = (LswImageWindow) image.getWindow();
     window.setIconImage(iconImage);
     if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile)) {
       Taskbar.getTaskbar().setIconImage(iconImage);
@@ -603,7 +623,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     int newZoomFactor = 0;
     if ((image.getWidth() + positionX) > screenDimension.getWidth()
       || (image.getHeight() + positionY) > screenDimension.getHeight()) {
-      int remainingWidth = ((int) screenDimension.getWidth()) -  positionX;
+      int remainingWidth = ((int) screenDimension.getWidth()) - positionX;
       int remainingHeight = ((int) screenDimension.getHeight()) - controllerLastKnownPositionY;
       canvas.zoomOut(remainingWidth, remainingHeight);
       newZoomFactor = convertMagnificationToZoomFactor(canvas.getMagnification());
@@ -623,9 +643,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
   private int convertMagnificationToZoomFactor(double magnification) {
     if (magnification < 1) {
-      return -(int)((1.0 - magnification) / 0.25);
+      return -(int) ((1.0 - magnification) / 0.25);
     } else {
-      return (int)((magnification-1) * 4.0);
+      return (int) ((magnification - 1) * 4.0);
     }
   }
 

@@ -275,6 +275,9 @@
 .dispersionArrow {
   width: 16px;
 }
+.channelSwitcher {
+  width: 32px;
+}
 .dispersionPanelRow {
   display: flex;
   margin-top: 4px;

@@ -134,6 +134,11 @@ public class ReferenceController {
     }
   }
 
+  @PutMapping("/channel")
+  public void channelChanged(@RequestBody String channel) {
+    referenceImageService.showChannel(channel);
+  }
+
   private boolean asJpeg(File selectedFile) {
     String fileExtension = LswFileUtil.getFilenameExtension(selectedFile).toLowerCase();
     return "jpg".equals(fileExtension) || "jpeg".equals(fileExtension);

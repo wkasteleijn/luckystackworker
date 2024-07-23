@@ -181,6 +181,68 @@
     </button>
 
     <button
+      *ngIf="openRefImageEnabled() && refImageSelected"
+      type="button"
+      mat-button
+      (click)="channelChanged()"
+      class="{{
+        'buttonChannelSwitcher buttonMargin ' +
+          (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
+      }}"
+      matTooltip="Switch channel"
+    >
+      <img
+        *ngIf="visibleChannel === 'RGB'"
+        src="assets/images/rgb.png"
+        class="channelSwitcher"
+      />
+      <img
+        *ngIf="visibleChannel === 'R'"
+        src="assets/images/red.png"
+        class="channelSwitcher"
+      />
+      <img
+        *ngIf="visibleChannel === 'G'"
+        src="assets/images/green.png"
+        class="channelSwitcher"
+      />
+      <img
+        *ngIf="visibleChannel === 'B'"
+        src="assets/images/blue.png"
+        class="channelSwitcher"
+      />
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled() || !refImageSelected"
+      type="button"
+      mat-button
+      disabled
+      class="buttonChannelSwitcherDisabled buttonMargin"
+      matTooltip="Switch channel"
+    >
+      <img
+        *ngIf="visibleChannel === 'RGB'"
+        src="assets/images/rgb.png"
+        class="channelSwitcher"
+      />
+      <img
+        *ngIf="visibleChannel === 'R'"
+        src="assets/images/red.png"
+        class="channelSwitcher"
+      />
+      <img
+        *ngIf="visibleChannel === 'G'"
+        src="assets/images/green.png"
+        class="channelSwitcher"
+      />
+      <img
+        *ngIf="visibleChannel === 'B'"
+        src="assets/images/blue.png"
+        class="channelSwitcher"
+      />
+    </button>
+
+    <button
       *ngIf="openRefImageEnabled() && !showVersionButton()"
       type="button"
       mat-button

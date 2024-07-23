@@ -98,4 +98,8 @@ export class LuckyStackWorkerService {
   realtimeChanged(realtime: boolean): Observable<any> {
     return this.http.put(`${this.baseUrl}/reference/realtime`, realtime);
   }
+
+  channelChanged(channel: string) {
+    return this.http.put(`${this.baseUrl}/reference/channel`, channel);
+  }
 }

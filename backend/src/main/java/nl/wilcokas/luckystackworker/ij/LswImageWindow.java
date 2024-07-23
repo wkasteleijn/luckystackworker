@@ -267,13 +267,16 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     g.drawString("Object", textOffsetX + 88, textOffsetY);
 
     g.drawString("Name :", textOffsetX + 88, textOffsetY + textHeight);
-    g.drawString(metadata.getName(), textOffsetX + 136, textOffsetY + textHeight);
+    g.drawString(metadata.getName(), textOffsetX + 144, textOffsetY + textHeight);
 
     g.drawString("Date :", textOffsetX + 88, textOffsetY + textHeight * 2);
-    g.drawString(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(metadata.getTime()), textOffsetX + 136, textOffsetY + textHeight * 2);
+    g.drawString(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(metadata.getTime()), textOffsetX + 144, textOffsetY + textHeight * 2);
 
     g.drawString("Time :", textOffsetX + 88, textOffsetY + textHeight * 3);
-    g.drawString("%s UTC".formatted(DateTimeFormatter.ofPattern("HH:mm").format(metadata.getTime())), textOffsetX + 136, textOffsetY + textHeight * 3);
+    g.drawString("%s UTC".formatted(DateTimeFormatter.ofPattern("HH:mm").format(metadata.getTime())), textOffsetX + 144, textOffsetY + textHeight * 3);
+
+    g.drawString("Channel :", textOffsetX + 88, textOffsetY + textHeight * 4);
+    g.drawString(getChannelDescription(), textOffsetX + 144, textOffsetY + textHeight * 4);
   }
 
   private void paintImageDetails(Graphics g) {
@@ -298,6 +301,15 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     } else {
       return 100 - (Math.abs(metadata.getZoomFactor()) * 25);
     }
+  }
+
+  private String getChannelDescription() {
+    return switch (metadata.getChannel()) {
+      case "R" -> "Red";
+      case "G" -> "Green";
+      case "B" -> "Blue";
+      default -> "RGB";
+    };
   }
 
   private String getCropString() {

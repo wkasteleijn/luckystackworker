@@ -120,6 +120,7 @@ export class AppComponent implements OnInit {
   showHistogram: boolean = true;
   scale: string = '1';
   openImageMode: string = 'RGB';
+  visibleChannel: string = 'RGB';
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
@@ -1099,6 +1100,32 @@ export class AppComponent implements OnInit {
     console.log('cropSelectionChanged called');
     this.crop = !this.crop;
     this.luckyStackWorkerService.cropSelectionChanged().subscribe(
+      (data) => {
+        console.log('Response');
+      },
+      (error) => console.log(error)
+    );
+  }
+
+  channelChanged() {
+    console.log('channel called');
+    switch (this.visibleChannel) {
+      case 'RGB':
+        this.visibleChannel = 'R';
+        break;
+      case 'R':
+        this.visibleChannel = 'G';
+        break;
+      case 'G':
+        this.visibleChannel = 'B';
+        break;
+      case 'B':
+        this.visibleChannel = 'RGB';
+        break;
+      default:
+        this.visibleChannel = 'RGB';
+    }
+    this.luckyStackWorkerService.channelChanged(this.visibleChannel).subscribe(
       (data) => {
         console.log('Response');
       },
