@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.1.7</version>
+		<version>3.3.2</version>
 		<relativePath />
 	</parent>
 
@@ -18,10 +18,10 @@
 
 	<properties>
 		<java.version>21</java.version>
-		<commons-io.version>2.15.1</commons-io.version>
+		<commons-io.version>2.16.1</commons-io.version>
 		<velocity.version>2.3</velocity.version>
-		<commons-text.version>1.11.0</commons-text.version>
-		<imagej.version>1.54h</imagej.version>
+		<commons-text.version>1.12.0</commons-text.version>
+		<imagej.version>1.54j</imagej.version>
 	</properties>
 
 	<dependencies>
