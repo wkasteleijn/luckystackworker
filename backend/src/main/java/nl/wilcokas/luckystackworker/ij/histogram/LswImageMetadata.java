@@ -4,6 +4,7 @@ package nl.wilcokas.luckystackworker.ij.histogram;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import nl.wilcokas.luckystackworker.model.ChannelEnum;
 
 import java.time.LocalDateTime;
 
@@ -25,5 +26,5 @@ public class LswImageMetadata {
     private int cropWidth;
     private int cropHeight;
     private int zoomFactor;
-    private String channel;
+    private ChannelEnum channel;
 }

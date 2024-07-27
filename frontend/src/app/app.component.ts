@@ -121,6 +121,7 @@ export class AppComponent implements OnInit {
   scale: string = '1';
   openImageMode: string = 'RGB';
   visibleChannel: string = 'RGB';
+  applySharpenToChannel: string = 'RGB';
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
@@ -380,6 +381,13 @@ export class AppComponent implements OnInit {
     }
     console.log('edgeArtefactSupressionMode called: ' + event.value);
     this.updateProfile();
+  }
+
+  applySharpenToChannelChanged(event: any) {
+    console.log('applySharpenToChannelChanged called: ' + event.value);
+    this.settings.operation = 'applySharpenToChannel';
+    this.profile.clippingStrength = 0;
+    this.profile.deringStrength = 0;
   }
 
   denoise1AmountChanged(event: any, update: boolean) {

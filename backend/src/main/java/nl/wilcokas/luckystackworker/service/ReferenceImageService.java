@@ -23,6 +23,7 @@ import nl.wilcokas.luckystackworker.ij.LswImageCanvas;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.ij.LswImageWindow;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
+import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.util.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -71,7 +72,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
   private int controllerLastKnownPositionX = -1;
   private int controllerLastKnownPositionY = -1;
 
-  private String visibleChannel = "RGB";
+  private ChannelEnum visibleChannel = ChannelEnum.RGB;
 
   private static Image iconImage;
 
@@ -437,7 +438,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     displayedImage.getImageWindow().nightMode(on);
   }
 
-  public void showChannel(String channel) {
+  public void showChannel(ChannelEnum channel) {
     boolean includeRed = channel.equals("RGB") || channel.equals("R");
     boolean includeGreen = channel.equals("RGB") || channel.equals("G");
     boolean includeBlue = channel.equals("RGB") || channel.equals("B");

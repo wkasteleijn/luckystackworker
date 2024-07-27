@@ -7,6 +7,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -135,7 +136,7 @@ public class ReferenceController {
   }
 
   @PutMapping("/channel")
-  public void channelChanged(@RequestBody String channel) {
+  public void channelChanged(@RequestBody ChannelEnum channel) {
     referenceImageService.showChannel(channel);
   }
 

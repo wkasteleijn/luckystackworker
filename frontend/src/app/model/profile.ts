@@ -1,9 +1,18 @@
 export class Profile {
   name: string;
+
+  // sharpen
   radius: number;
   amount: number;
   level: number;
   iterations: number;
+  clippingStrength: number;
+  clippingRange: number;
+  deringRadius: number;
+  deringStrength: number;
+  deringThreshold: number;
+  sharpenMode: string;
+  applySharpenToChannel: string;
 
   // denoise 1
   denoiseAlgorithm1: string;
@@ -42,12 +51,6 @@ export class Profile {
   blue: number;
   purple: number;
   saturation: number;
-  clippingStrength: number;
-  clippingRange: number;
-  deringRadius: number;
-  deringStrength: number;
-  deringThreshold: number;
-  sharpenMode: string;
   dispersionCorrectionEnabled: boolean;
   dispersionCorrectionRedX: number;
   dispersionCorrectionBlueX: number;

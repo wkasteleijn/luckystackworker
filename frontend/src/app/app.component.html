@@ -542,6 +542,28 @@
             >Color</mat-checkbox
           >
         </div>
+        <div *ngIf="sharpenMode === 'RGB'">
+          <mat-radio-group
+            [color]="colorTheme()"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [(ngModel)]="applySharpenToChannel"
+            (change)="applySharpenToChannelChanged($event)"
+            class="sharpenMode"
+          >
+            <mat-radio-button value="RGB" class="denoiseMode"
+              >All</mat-radio-button
+            >
+            <mat-radio-button value="R" class="denoiseMode"
+              >Red
+            </mat-radio-button>
+            <mat-radio-button value="G" class="denoiseMode"
+              >Green</mat-radio-button
+            >
+            <mat-radio-button value="B" class="denoiseMode"
+              >Blue</mat-radio-button
+            >
+          </mat-radio-group>
+        </div>
       </div>
       <div class="sliderRow">
         <div class="sliderLabel">Radius</div>
