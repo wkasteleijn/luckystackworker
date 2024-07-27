@@ -6,6 +6,7 @@ import ij.measure.Measurements;
 import ij.process.ImageStatistics;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
+import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ReflectionUtils;
@@ -305,9 +306,9 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
 
   private String getChannelDescription() {
     return switch (metadata.getChannel()) {
-      case "R" -> "Red";
-      case "G" -> "Green";
-      case "B" -> "Blue";
+      case ChannelEnum.R -> "Red";
+      case ChannelEnum.G -> "Green";
+      case ChannelEnum.B -> "Blue";
       default -> "RGB";
     };
   }

@@ -152,12 +152,56 @@ public class OperationService {
             float amount = profile.getAmount().divide(new BigDecimal("10000")).floatValue();
             float clippingStrength = (profile.getClippingStrength()) / 500f;
             float deringStrength = profile.getDeringStrength() / 100f;
-            UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radius(profile.getRadius().doubleValue()).amount(amount)
-                    .iterations(iterations).clippingStrength(clippingStrength).clippingRange(100 - profile.getClippingRange())
-                    .deringRadius(profile.getDeringRadius().doubleValue()).deringStrength(deringStrength)
-                    .deringThreshold(profile.getDeringThreshold())
-                    .build();
+            UnsharpMaskParameters usParams;
             LSWSharpenMode mode = (profile.getSharpenMode() == null) ? LSWSharpenMode.LUMINANCE : LSWSharpenMode.valueOf(profile.getSharpenMode());
+            if (mode == LSWSharpenMode.LUMINANCE) {
+                usParams = UnsharpMaskParameters.builder()
+                        .radiusLuminance(profile.getRadius().doubleValue())
+                        .amountLuminance(amount)
+                        .iterationsLuminance(iterations)
+                        .clippingStrengthLuminance(clippingStrength)
+                        .clippingRangeLuminance(100 - profile.getClippingRange())
+                        .deringRadiusLuminance(profile.getDeringRadius().doubleValue())
+                        .deringStrengthLuminance(deringStrength)
+                        .deringThresholdLuminance(profile.getDeringThreshold())
+                        .build();
+            } else {
+                int iterationsGreen = profile.getIterationsGreen() == 0 ? 1 : profile.getIterationsGreen();
+                int iterationsBlue = profile.getIterationsBlue() == 0 ? 1 : profile.getIterationsBlue();
+                float amountGreen = profile.getAmountGreen().divide(new BigDecimal("10000")).floatValue();
+                float clippingStrengthGreen = (profile.getClippingStrengthGreen()) / 500f;
+                float deringStrengthGreen = profile.getDeringStrengthGreen() / 100f;
+                float amountBlue = profile.getAmountBlue().divide(new BigDecimal("10000")).floatValue();
+                float clippingStrengthBlue = (profile.getClippingStrengthBlue()) / 500f;
+                float deringStrengthBlue = profile.getDeringStrengthBlue() / 100f;
+                usParams = UnsharpMaskParameters.builder()
+                        .radiusRed(profile.getRadius().doubleValue())
+                        .amountRed(amount)
+                        .iterationsRed(iterations)
+                        .clippingStrengthRed(clippingStrength)
+                        .clippingRangeRed(100 - profile.getClippingRange())
+                        .deringRadiusRed(profile.getDeringRadius().doubleValue())
+                        .deringStrengthRed(deringStrength)
+                        .deringThresholdRed(profile.getDeringThreshold())
+                        .radiusGreen(profile.getRadiusGreen().doubleValue())
+                        .amountGreen(amountGreen)
+                        .iterationsGreen(iterationsGreen)
+                        .clippingStrengthGreen(clippingStrengthGreen)
+                        .clippingRangeGreen(100 - profile.getClippingRangeGreen())
+                        .deringRadiusGreen(profile.getDeringRadiusGreen().doubleValue())
+                        .deringStrengthGreen(deringStrengthGreen)
+                        .deringThresholdGreen(profile.getDeringThresholdGreen())
+                        .radiusBlue(profile.getRadiusBlue().doubleValue())
+                        .amountBlue(amountBlue)
+                        .iterationsBlue(iterationsBlue)
+                        .clippingStrengthBlue(clippingStrengthBlue)
+                        .clippingRangeBlue(100 - profile.getClippingRangeBlue())
+                        .deringRadiusBlue(profile.getDeringRadiusBlue().doubleValue())
+                        .deringStrengthBlue(deringStrengthBlue)
+                        .deringThresholdBlue(profile.getDeringThresholdBlue())
+                        .build();
+            }
+
             LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(profile.isLuminanceIncludeBlue())
                     .includeGreen(profile.isLuminanceIncludeGreen()) //
                     .includeRed(profile.isLuminanceIncludeRed()).includeColor(profile.isLuminanceIncludeColor())
@@ -322,7 +366,7 @@ public class OperationService {
     private void applyLocalContrast(final ImagePlus image, int amount, BigDecimal radius, LSWSharpenMode localContrastMode) {
         log.info("Applying local contrast with mode {}, radius {} amount {} to image {}", localContrastMode, radius, amount, image.getID());
         float famount = (amount) / 100f;
-        UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radius(radius.doubleValue()).amount(famount).iterations(1).build();
+        UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radiusLuminance(radius.doubleValue()).amountLuminance(famount).iterationsLuminance(1).build();
         LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
                 .saturation(1f).unsharpMaskParameters(usParams).mode(localContrastMode).build();
         lswSharpenFilter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
