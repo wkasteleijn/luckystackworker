@@ -19,47 +19,40 @@ public class Profile {
         mapFromDTO(profile);
     }
 
-    public void mapFromDTO(final ProfileDTO profile) {
+    private void mapFromDTO(final ProfileDTO profile) {
         this.name = profile.getName();
-
 
         // sharpen
         this.applySharpenToChannel = profile.getApplySharpenToChannel();
-        if (applySharpenToChannel == ChannelEnum.RGB || applySharpenToChannel == ChannelEnum.R) {
-            this.radius = profile.getRadius();
-            this.amount = profile.getAmount();
-            this.iterations = profile.getIterations();
-            this.level = profile.getLevel();
-            this.clippingStrength = profile.getClippingStrength();
-            this.clippingRange = profile.getClippingRange();
-            this.deringRadius = profile.getDeringRadius();
-            this.deringStrength = profile.getDeringStrength();
-            this.deringThreshold = profile.getDeringThreshold();
-        }
+        this.radius = profile.getRadius();
+        this.amount = profile.getAmount();
+        this.iterations = profile.getIterations();
+        this.level = profile.getLevel();
+        this.clippingStrength = profile.getClippingStrength();
+        this.clippingRange = profile.getClippingRange();
+        this.deringRadius = profile.getDeringRadius();
+        this.deringStrength = profile.getDeringStrength();
+        this.deringThreshold = profile.getDeringThreshold();
 
-        if (applySharpenToChannel == ChannelEnum.RGB || applySharpenToChannel == ChannelEnum.G) {
-            this.radiusGreen = profile.getRadius();
-            this.amountGreen = profile.getAmount();
-            this.iterationsGreen = profile.getIterations();
-            this.levelGreen = profile.getLevel();
-            this.clippingStrengthGreen = profile.getClippingStrength();
-            this.clippingRangeGreen = profile.getClippingRange();
-            this.deringRadiusGreen = profile.getDeringRadius();
-            this.deringStrengthGreen = profile.getDeringStrength();
-            this.deringThresholdGreen = profile.getDeringThreshold();
-        }
+        this.radiusGreen = profile.getRadiusGreen();
+        this.amountGreen = profile.getAmountGreen();
+        this.iterationsGreen = profile.getIterationsGreen();
+        this.levelGreen = profile.getLevelGreen();
+        this.clippingStrengthGreen = profile.getClippingStrengthGreen();
+        this.clippingRangeGreen = profile.getClippingRangeGreen();
+        this.deringRadiusGreen = profile.getDeringRadiusGreen();
+        this.deringStrengthGreen = profile.getDeringStrengthGreen();
+        this.deringThresholdGreen = profile.getDeringThresholdGreen();
 
-        if (applySharpenToChannel == ChannelEnum.RGB || applySharpenToChannel == ChannelEnum.B) {
-            this.radiusBlue = profile.getRadius();
-            this.amountBlue = profile.getAmount();
-            this.iterationsBlue = profile.getIterations();
-            this.levelBlue = profile.getLevel();
-            this.clippingStrengthBlue = profile.getClippingStrength();
-            this.clippingRangeBlue = profile.getClippingRange();
-            this.deringRadiusBlue = profile.getDeringRadius();
-            this.deringStrengthBlue = profile.getDeringStrength();
-            this.deringThresholdBlue = profile.getDeringThreshold();
-        }
+        this.radiusBlue = profile.getRadiusBlue();
+        this.amountBlue = profile.getAmountBlue();
+        this.iterationsBlue = profile.getIterationsBlue();
+        this.levelBlue = profile.getLevelBlue();
+        this.clippingStrengthBlue = profile.getClippingStrengthBlue();
+        this.clippingRangeBlue = profile.getClippingRangeBlue();
+        this.deringRadiusBlue = profile.getDeringRadiusBlue();
+        this.deringStrengthBlue = profile.getDeringStrengthBlue();
+        this.deringThresholdBlue = profile.getDeringThresholdBlue();
 
         this.sharpenMode = profile.getSharpenMode();
         this.luminanceIncludeRed = profile.isLuminanceIncludeRed();
@@ -122,14 +115,6 @@ public class Profile {
     private int deringStrength;
     private int deringThreshold;
 
-    // general sharpen settings
-    private String sharpenMode;
-    private boolean luminanceIncludeRed;
-    private boolean luminanceIncludeGreen;
-    private boolean luminanceIncludeBlue;
-    private boolean luminanceIncludeColor;
-    private ChannelEnum applySharpenToChannel;
-
     // sharpen green
     private BigDecimal radiusGreen;
     private BigDecimal amountGreen;
@@ -151,6 +136,14 @@ public class Profile {
     private BigDecimal deringRadiusBlue;
     private int deringStrengthBlue;
     private int deringThresholdBlue;
+
+    // general sharpen settings
+    private String sharpenMode;
+    private boolean luminanceIncludeRed;
+    private boolean luminanceIncludeGreen;
+    private boolean luminanceIncludeBlue;
+    private boolean luminanceIncludeColor;
+    private ChannelEnum applySharpenToChannel;
 
     // denoise (red and all channels)
     private String denoiseAlgorithm1;

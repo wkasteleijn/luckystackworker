@@ -27,33 +27,60 @@ public class LSWSharpenFilter {
     public void applyRGBMode(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) {
         ImageStack stack = image.getStack();
 
-        final ImageStack maskStack = createDeringMaskStack(unsharpMaskParameters, stack);
 
-        // TODO: finish
+        // Run every stack in a seperate thread to increase performance.
+        Executor executor = LswUtil.getParallelExecutor();
 
-
-        for (int i = 0; i < unsharpMaskParameters.getIterationsLuminance(); i++) {
-
-            // Run every stack in a seperate thread to increase performance.
-            Executor executor = LswUtil.getParallelExecutor();
-            for (int slice = 1; slice <= stack.getSize(); slice++) {
-                int finalLayer = slice;
-                executor.execute(() -> {
-                    ImageProcessor ip = stack.getProcessor(finalLayer);
-                    FloatProcessor fp = ip.toFloat(finalLayer, null);
-                    fp.snapshot();
-                    if (maskStack == null) {
-                        doUnsharpMask(unsharpMaskParameters.getRadiusLuminance(), unsharpMaskParameters.getAmountLuminance(), fp);
-                    } else {
-                        ImageProcessor ipMask = maskStack.getProcessor(finalLayer);
-                        doUnsharpMaskDeringing(unsharpMaskParameters.getRadiusLuminance(), unsharpMaskParameters.getAmountLuminance(),
-                                unsharpMaskParameters.getDeringStrengthLuminance(), fp, ipMask);
-                    }
-                    ip.setPixels(finalLayer, fp);
-                });
+        executor.execute(() -> {
+            final ImageProcessor ipMask = createDeringMaskProcessor(unsharpMaskParameters.getDeringStrengthRed(), unsharpMaskParameters.getDeringRadiusRed(), unsharpMaskParameters.getDeringThresholdRed(), stack.getProcessor(1));
+            for (int i = 0; i < unsharpMaskParameters.getIterationsRed(); i++) {
+                ImageProcessor ip = stack.getProcessor(1);
+                FloatProcessor fp = ip.toFloat(1, null);
+                fp.snapshot();
+                if (ipMask == null) {
+                    doUnsharpMask(unsharpMaskParameters.getRadiusRed(), unsharpMaskParameters.getAmountRed(), fp);
+                } else {
+                    doUnsharpMaskDeringing(unsharpMaskParameters.getRadiusRed(), unsharpMaskParameters.getAmountRed(),
+                            unsharpMaskParameters.getDeringStrengthRed(), fp, ipMask);
+                }
+                ip.setPixels(1, fp);
             }
-            LswUtil.stopAndAwaitParallelExecutor(executor);
-        }
+        });
+
+        executor.execute(() -> {
+            final ImageProcessor ipMask = createDeringMaskProcessor(unsharpMaskParameters.getDeringStrengthGreen(), unsharpMaskParameters.getDeringRadiusGreen(), unsharpMaskParameters.getDeringThresholdGreen(), stack.getProcessor(2));
+            for (int i = 0; i < unsharpMaskParameters.getIterationsGreen(); i++) {
+                ImageProcessor ip = stack.getProcessor(2);
+                FloatProcessor fp = ip.toFloat(2, null);
+                fp.snapshot();
+                if (ipMask == null) {
+                    doUnsharpMask(unsharpMaskParameters.getRadiusGreen(), unsharpMaskParameters.getAmountGreen(), fp);
+                } else {
+                    doUnsharpMaskDeringing(unsharpMaskParameters.getRadiusGreen(), unsharpMaskParameters.getAmountGreen(),
+                            unsharpMaskParameters.getDeringStrengthGreen(), fp, ipMask);
+                }
+                ip.setPixels(2, fp);
+            }
+        });
+
+        executor.execute(() -> {
+            final ImageProcessor ipMask = createDeringMaskProcessor(unsharpMaskParameters.getDeringStrengthBlue(), unsharpMaskParameters.getDeringRadiusBlue(), unsharpMaskParameters.getDeringThresholdBlue(), stack.getProcessor(3));
+            for (int i = 0; i < unsharpMaskParameters.getIterationsBlue(); i++) {
+                ImageProcessor ip = stack.getProcessor(3);
+                FloatProcessor fp = ip.toFloat(3, null);
+                fp.snapshot();
+                if (ipMask == null) {
+                    doUnsharpMask(unsharpMaskParameters.getRadiusBlue(), unsharpMaskParameters.getAmountBlue(), fp);
+                } else {
+                    doUnsharpMaskDeringing(unsharpMaskParameters.getRadiusBlue(), unsharpMaskParameters.getAmountBlue(),
+                            unsharpMaskParameters.getDeringStrengthBlue(), fp, ipMask);
+                }
+                ip.setPixels(3, fp);
+            }
+        });
+
+
+        LswUtil.stopAndAwaitParallelExecutor(executor);
     }
 
     public void applyRGBModeClippingPrevention(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) {
@@ -187,7 +214,7 @@ public class LSWSharpenFilter {
             if (unsharpMaskParameters.getDeringStrengthLuminance() > 0.0f) {
                 ImageProcessor ipLum = new ShortProcessor(image.getWidth(), image.getHeight());
                 ipLum.setPixels(1, fpLum);
-                final FloatProcessor fpMask = createDeringMaskStack(unsharpMaskParameters.getDeringRadiusLuminance(),
+                final FloatProcessor fpMask = createDeringMaskFloatProcessor(unsharpMaskParameters.getDeringRadiusLuminance(),
                         unsharpMaskParameters.getDeringThresholdLuminance(), ipLum);
                 ImageProcessor ipLumMask = new ShortProcessor(image.getWidth(), image.getHeight());
                 ipLumMask.setPixels(1, fpMask);
@@ -309,27 +336,17 @@ public class LSWSharpenFilter {
         }
     }
 
-    private ImageStack createDeringMaskStack(final UnsharpMaskParameters unsharpMaskParameters, ImageStack originalStack) {
-        if (unsharpMaskParameters.getDeringStrengthLuminance() > 0.0f) {
-            ImageStack maskStack = originalStack.duplicate();
-            double radius = unsharpMaskParameters.getDeringRadiusLuminance();
-
-            Executor executor = LswUtil.getParallelExecutor();
-            for (int layer = 1; layer <= maskStack.size(); layer++) {
-                int finalLayer = layer;
-                executor.execute(() -> {
-                    ImageProcessor ip = maskStack.getProcessor(finalLayer);
-                    FloatProcessor fp = createDeringMaskStack(radius, unsharpMaskParameters.getDeringThresholdLuminance(), ip);
-                    ip.setPixels(1, fp);
-                });
-            }
-            LswUtil.stopAndAwaitParallelExecutor(executor);
-            return maskStack;
+    private ImageProcessor createDeringMaskProcessor(float deringStrength, double deringRadius, int deringThreshold, ImageProcessor ip) {
+        if (deringStrength > 0.0f) {
+            ImageProcessor maskIp = ip.duplicate();
+            FloatProcessor fp = createDeringMaskFloatProcessor(deringRadius, deringThreshold, maskIp);
+            maskIp.setPixels(1, fp);
+            return maskIp;
         }
         return null;
     }
 
-    private FloatProcessor createDeringMaskStack(double radius, int threshold, ImageProcessor ip) {
+    private FloatProcessor createDeringMaskFloatProcessor(double radius, int threshold, ImageProcessor ip) {
         int minValue = 65535;
         int maxValue = 0;
         short[] maskPixels = (short[]) ip.getPixels();

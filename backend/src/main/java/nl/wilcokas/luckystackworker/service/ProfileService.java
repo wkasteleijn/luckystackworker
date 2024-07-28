@@ -33,28 +33,30 @@ public class ProfileService {
     private final ObjectMapper objectMapper;
     private static final String PROFILES_FILE = "/profiles.json";
     private static String defaultProfilesJson;
+
     static {
         try {
             defaultProfilesJson = LswFileUtil.readFromInputStream(new ClassPathResource(PROFILES_FILE).getInputStream());
         } catch (IOException e) {
-            log.error("Error loading profiles.json",e);
+            log.error("Error loading profiles.json", e);
         }
     }
+
     private Map<String, Profile> profiles;
 
-    public void updateProfile(ProfileDTO profileDTO) {
+    public Profile updateProfile(ProfileDTO profileDTO) {
         log.info("updateProfile called with profile {}", profileDTO);
         if (profiles == null) {
             readProfiles();
         }
-        Profile profile = Profile.builder().build();
-        profile.mapFromDTO(profileDTO);
+        Profile profile = new Profile(profileDTO);
         profiles.put(profile.getName(), profile);
         try {
             objectMapper.writeValue(new File(LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + PROFILES_FILE), profiles.values());
         } catch (Exception e) {
             log.error("Error writing profiles: ", e);
         }
+        return profile;
     }
 
     public Optional<Profile> findByName(String profileName) {

@@ -38,7 +38,7 @@ import nl.wilcokas.luckystackworker.service.SettingsService;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 
-@CrossOrigin(origins = { "http://localhost:4200" })
+@CrossOrigin(origins = {"http://localhost:4200"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/profiles")
@@ -105,7 +105,7 @@ public class ProfileController {
     }
 
     @PutMapping
-    public ResponseEntity<String> updateProfile(@RequestBody ProfileDTO profile, @RequestParam String operation)
+    public ResponseEntity<String> updateProfile(@RequestBody ProfileDTO profileDTO, @RequestParam String operation)
             throws IOException, InterruptedException {
         // Rate limiting added to prevent overloading whenever scroll keys are held down
         // or pressed very quickly.
@@ -114,8 +114,8 @@ public class ProfileController {
                 || LocalDateTime.now()
                 .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
             LuckyStackWorkerContext.setActiveOperationTime(LocalDateTime.now());
-            profileService.updateProfile(profile);
-            referenceImageService.updateProcessing(new Profile(profile), operation);
+            Profile profile = profileService.updateProfile(profileDTO);
+            referenceImageService.updateProcessing(profile, operation);
             LuckyStackWorkerContext.setActiveOperationTime(null);
         } else {
             log.warn("Attempt to update image while another operation was in progress");
@@ -151,9 +151,9 @@ public class ProfileController {
     }
 
     @PutMapping("/scale")
-    public ResponseDTO scale(@RequestBody ProfileDTO profile) throws IOException, InterruptedException {
-        profileService.updateProfile(profile);
-        return referenceImageService.scale(new Profile(profile));
+    public ResponseDTO scale(@RequestBody ProfileDTO profileDTO) throws IOException, InterruptedException {
+        Profile profile = profileService.updateProfile(profileDTO);
+        return referenceImageService.scale(profile);
     }
 
     @PutMapping("/stop")

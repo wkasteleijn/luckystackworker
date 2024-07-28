@@ -155,9 +155,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
   }
 
   public void updateProcessing(Profile profile, String operationValue) throws IOException, InterruptedException {
-    boolean includeRed = visibleChannel.equals("RGB") || visibleChannel.equals("R");
-    boolean includeGreen = visibleChannel.equals("RGB") || visibleChannel.equals("G");
-    boolean includeBlue = visibleChannel.equals("RGB") || visibleChannel.equals("B");
+    boolean includeRed = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.R;
+    boolean includeGreen = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G;
+    boolean includeBlue = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B;
     LswImageProcessingUtil.copyLayers(unprocessedImageLayers, finalResultImage, true, true, true);
     operationService.applyAllOperations(finalResultImage, displayedImage, profile);
     finalResultImage.updateAndDraw();
@@ -439,9 +439,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
   }
 
   public void showChannel(ChannelEnum channel) {
-    boolean includeRed = channel.equals("RGB") || channel.equals("R");
-    boolean includeGreen = channel.equals("RGB") || channel.equals("G");
-    boolean includeBlue = channel.equals("RGB") || channel.equals("B");
+    boolean includeRed = channel == ChannelEnum.RGB || channel == ChannelEnum.R;
+    boolean includeGreen = channel == ChannelEnum.RGB || channel == ChannelEnum.G;
+    boolean includeBlue = channel == ChannelEnum.RGB || channel == ChannelEnum.B;
     LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
       displayedImage,
       includeRed,

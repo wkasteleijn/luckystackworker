@@ -1,7 +1,7 @@
 export class Profile {
   name: string;
 
-  // sharpen
+  // sharpen red or all channels
   radius: number;
   amount: number;
   level: number;
@@ -11,6 +11,29 @@ export class Profile {
   deringRadius: number;
   deringStrength: number;
   deringThreshold: number;
+
+  // sharpen green
+  radiusGreen: number;
+  amountGreen: number;
+  levelGreen: number;
+  iterationsGreen: number;
+  clippingStrengthGreen: number;
+  clippingRangeGreen: number;
+  deringRadiusGreen: number;
+  deringStrengthGreen: number;
+  deringThresholdGreen: number;
+
+  // sharpen blue
+  radiusBlue: number;
+  amountBlue: number;
+  levelBlue: number;
+  iterationsBlue: number;
+  clippingStrengthBlue: number;
+  clippingRangeBlue: number;
+  deringRadiusBlue: number;
+  deringStrengthBlue: number;
+  deringThresholdBlue: number;
+
   sharpenMode: string;
   applySharpenToChannel: string;
 

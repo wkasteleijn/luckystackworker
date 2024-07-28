@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import ij.ImageStack;
 import ij.gui.NewImage;
 import ij.io.Opener;
+import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -213,6 +214,28 @@ public class LswFileUtil {
           tag -> tag.getClassName().equals(Profile.class.getName());
         loaderoptions.setTagInspector(taginspector);
         Profile profile = new Yaml(new Constructor(Profile.class, loaderoptions)).load(profileStr);
+
+        if (profile.getApplySharpenToChannel() == null) {
+          profile.setApplySharpenToChannel(ChannelEnum.RGB);
+          profile.setRadiusGreen(profile.getRadius());
+          profile.setAmountGreen(profile.getAmount());
+          profile.setIterationsGreen(profile.getIterations());
+          profile.setLevelGreen(profile.getLevel());
+          profile.setClippingStrengthGreen(profile.getClippingStrength());
+          profile.setClippingRangeGreen(profile.getClippingRange());
+          profile.setDeringRadiusGreen(profile.getDeringRadius());
+          profile.setDeringStrengthGreen(profile.getDeringStrength());
+          profile.setDeringThresholdGreen(profile.getDeringThreshold());
+          profile.setRadiusBlue(profile.getRadius());
+          profile.setAmountBlue(profile.getAmount());
+          profile.setIterationsBlue(profile.getIterations());
+          profile.setLevelBlue(profile.getLevel());
+          profile.setClippingStrengthBlue(profile.getClippingStrength());
+          profile.setClippingRangeBlue(profile.getClippingRange());
+          profile.setDeringRadiusBlue(profile.getDeringRadius());
+          profile.setDeringStrengthBlue(profile.getDeringStrength());
+          profile.setDeringThresholdBlue(profile.getDeringThreshold());
+        }
 
         // Added since v5.2.0, so older version written yaml needs to stay compatible.
         if (profile.getOpenImageMode() == null) {

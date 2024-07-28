@@ -241,7 +241,16 @@ export class AppComponent implements OnInit {
   }
 
   radiusChanged(event: any, update: boolean) {
-    this.profile.radius = event.value;
+    switch (this.applySharpenToChannel) {
+      case 'G':
+        this.profile.radiusGreen = event.value;
+        break;
+      case 'B':
+        this.profile.radiusBlue = event.value;
+        break;
+      default:
+        this.profile.radius = event.value;
+    }
     this.radius = event.value;
     this.settings.operation = 'radius';
     console.log('radiusChanged called: ' + this.profile.radius);
@@ -251,7 +260,16 @@ export class AppComponent implements OnInit {
   }
 
   amountChanged(event: any, update: boolean) {
-    this.profile.amount = event.value;
+    switch (this.applySharpenToChannel) {
+      case 'G':
+        this.profile.amountGreen = event.value;
+        break;
+      case 'B':
+        this.profile.amountBlue = event.value;
+        break;
+      default:
+        this.profile.amount = event.value;
+    }
     this.amount = event.value;
     this.settings.operation = 'amount';
     console.log('amountChanged called: ' + this.profile.amount);
@@ -261,7 +279,16 @@ export class AppComponent implements OnInit {
   }
 
   iterationsChanged(event: any, update: boolean) {
-    this.profile.iterations = event.value;
+    switch (this.applySharpenToChannel) {
+      case 'G':
+        this.profile.iterationsGreen = event.value;
+        break;
+      case 'B':
+        this.profile.iterationsBlue = event.value;
+        break;
+      default:
+        this.profile.iterations = event.value;
+    }
     this.iterations = event.value;
     this.settings.operation = 'iterations';
     console.log('iterationsChanged called: ' + this.profile.iterations);
@@ -271,7 +298,16 @@ export class AppComponent implements OnInit {
   }
 
   clippingStrengthChanged(event: any, update: boolean) {
-    this.profile.clippingStrength = event.value;
+    switch (this.applySharpenToChannel) {
+      case 'G':
+        this.profile.clippingStrengthGreen = event.value;
+        break;
+      case 'B':
+        this.profile.clippingStrengthBlue = event.value;
+        break;
+      default:
+        this.profile.clippingStrength = event.value;
+    }
     this.clippingStrength = event.value;
     this.settings.operation = 'clippingStrength';
     console.log('clippingStrength called: ' + this.profile.clippingStrength);
@@ -281,7 +317,16 @@ export class AppComponent implements OnInit {
   }
 
   clippingRangeChanged(event: any, update: boolean) {
-    this.profile.clippingRange = event.value;
+    switch (this.applySharpenToChannel) {
+      case 'G':
+        this.profile.clippingRangeGreen = event.value;
+        break;
+      case 'B':
+        this.profile.clippingRangeBlue = event.value;
+        break;
+      default:
+        this.profile.clippingRange = event.value;
+    }
     this.clippingRange = event.value;
     this.settings.operation = 'clippingRange';
     console.log('clippingRange called: ' + this.profile.clippingRange);
@@ -291,7 +336,16 @@ export class AppComponent implements OnInit {
   }
 
   deringRadiusChanged(event: any, update: boolean) {
-    this.profile.deringRadius = event.value;
+    switch (this.applySharpenToChannel) {
+      case 'G':
+        this.profile.deringRadiusGreen = event.value;
+        break;
+      case 'B':
+        this.profile.deringRadiusBlue = event.value;
+        break;
+      default:
+        this.profile.deringRadius = event.value;
+    }
     this.deringRadius = event.value;
     this.settings.operation = 'deringRadius';
     console.log('deringRadius called: ' + this.profile.deringRadius);
@@ -301,7 +355,16 @@ export class AppComponent implements OnInit {
   }
 
   deringThresholdChanged(event: any, update: boolean) {
-    this.profile.deringThreshold = event.value;
+    switch (this.applySharpenToChannel) {
+      case 'G':
+        this.profile.deringThresholdGreen = event.value;
+        break;
+      case 'B':
+        this.profile.deringThresholdBlue = event.value;
+        break;
+      default:
+        this.profile.deringThreshold = event.value;
+    }
     this.deringThreshold = event.value;
     this.settings.operation = 'deringThreshold';
     console.log('deringThreshold called: ' + this.profile.deringThreshold);
@@ -311,7 +374,16 @@ export class AppComponent implements OnInit {
   }
 
   deringStrengthChanged(event: any, update: boolean) {
-    this.profile.deringStrength = event.value;
+    switch (this.applySharpenToChannel) {
+      case 'G':
+        this.profile.deringStrengthGreen = event.value;
+        break;
+      case 'B':
+        this.profile.deringStrengthBlue = event.value;
+        break;
+      default:
+        this.profile.deringStrength = event.value;
+    }
     this.deringStrength = event.value;
     this.settings.operation = 'deringStrength';
     console.log('deringStrength called: ' + this.profile.deringStrength);
@@ -386,8 +458,42 @@ export class AppComponent implements OnInit {
   applySharpenToChannelChanged(event: any) {
     console.log('applySharpenToChannelChanged called: ' + event.value);
     this.settings.operation = 'applySharpenToChannel';
-    this.profile.clippingStrength = 0;
-    this.profile.deringStrength = 0;
+    this.profile.applySharpenToChannel = this.applySharpenToChannel;
+    switch (this.applySharpenToChannel) {
+      case 'G':
+        this.radius = this.profile.radiusGreen;
+        this.amount = this.profile.amountGreen;
+        this.iterations = this.profile.iterationsGreen;
+        this.clippingStrength = this.profile.clippingStrengthGreen;
+        this.clippingRange = this.profile.clippingRangeGreen;
+        this.deringRadius = this.profile.deringRadiusGreen;
+        this.deringStrength = this.profile.deringStrengthGreen;
+        break;
+      case 'B':
+        this.radius = this.profile.radiusBlue;
+        this.amount = this.profile.amountBlue;
+        this.iterations = this.profile.iterationsBlue;
+        this.clippingStrength = this.profile.clippingStrengthBlue;
+        this.clippingRange = this.profile.clippingRangeBlue;
+        this.deringRadius = this.profile.deringRadiusBlue;
+        this.deringStrength = this.profile.deringStrengthBlue;
+        break;
+      default:
+        this.radius = this.profile.radius;
+        this.amount = this.profile.amount;
+        this.iterations = this.profile.iterations;
+        this.clippingStrength = this.profile.clippingStrength;
+        this.clippingRange = this.profile.clippingRange;
+        this.deringRadius = this.profile.deringRadius;
+        this.deringStrength = this.profile.deringStrength;
+    }
+    this.visibleChannel = this.applySharpenToChannel;
+    this.luckyStackWorkerService.channelChanged(this.visibleChannel).subscribe(
+      (data) => {
+        console.log('Response');
+      },
+      (error) => console.log(error)
+    );
   }
 
   denoise1AmountChanged(event: any, update: boolean) {

@@ -7,7 +7,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
+import nl.wilcokas.luckystackworker.service.ProfileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -37,111 +39,112 @@ import nl.wilcokas.luckystackworker.util.LswFileUtil;
 @Slf4j
 public class ReferenceController {
 
-  private final SettingsService settingsService;
-  private final ReferenceImageService referenceImageService;
+    private final SettingsService settingsService;
+    private final ReferenceImageService referenceImageService;
+    private final ProfileService profileService;
 
-  @GetMapping("/open")
-  public ResponseDTO openReferenceImage(@RequestParam double scale, @RequestParam String openImageMode) throws IOException, InterruptedException {
-    return referenceImageService.selectReferenceImage(settingsService.getSettings().getRootFolder(), scale, openImageMode);
-  }
-
-  @GetMapping("/rootfolder")
-  public SettingsDTO selectRootFolder() {
-    JFrame frame = referenceImageService.getParentFrame();
-    SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
-    JFileChooser jfc = referenceImageService
-      .getJFileChooser(settingsDTO.getRootFolder());
-    jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-    int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, false);
-    if (returnValue == JFileChooser.APPROVE_OPTION) {
-      File selectedFolder = jfc.getSelectedFile();
-      String rootFolder = LswFileUtil.getIJFileFormat(selectedFolder.getAbsolutePath());
-      log.info("RootFolder selected {} ", rootFolder);
-      settingsDTO = new SettingsDTO(referenceImageService.updateSettingsForRootFolder(rootFolder));
+    @GetMapping("/open")
+    public ResponseDTO openReferenceImage(@RequestParam double scale, @RequestParam String openImageMode) throws IOException, InterruptedException {
+        return referenceImageService.selectReferenceImage(settingsService.getSettings().getRootFolder(), scale, openImageMode);
     }
-    return settingsDTO;
-  }
 
-  @PutMapping("/save")
-  public void saveReferenceImage(@RequestBody ProfileDTO profile) throws IOException {
-    JFrame frame = referenceImageService.getParentFrame();
-    JFileChooser jfc = referenceImageService.getJFileChooser(settingsService.getRootFolder());
-    jfc.setFileFilter(new FileNameExtensionFilter("TIFF, JPG", "tif", "tiff", "jpg", "jpeg"));
-    String fileNameNoExt = LswFileUtil.getFilename(referenceImageService.getFilePath());
-    jfc.setSelectedFile(
-      new File(fileNameNoExt + Constants.OUTPUT_POSTFIX_SAVE + "." + Constants.DEFAULT_OUTPUT_FORMAT));
-    int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, "Save reference image", true);
-    frame.dispose();
-    if (returnValue == JFileChooser.APPROVE_OPTION) {
-      File selectedFile = jfc.getSelectedFile();
-      referenceImageService.saveReferenceImage(selectedFile.getAbsolutePath(), asJpeg(selectedFile), new Profile(profile));
+    @GetMapping("/rootfolder")
+    public SettingsDTO selectRootFolder() {
+        JFrame frame = referenceImageService.getParentFrame();
+        SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
+        JFileChooser jfc = referenceImageService
+                .getJFileChooser(settingsDTO.getRootFolder());
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, false);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFolder = jfc.getSelectedFile();
+            String rootFolder = LswFileUtil.getIJFileFormat(selectedFolder.getAbsolutePath());
+            log.info("RootFolder selected {} ", rootFolder);
+            settingsDTO = new SettingsDTO(referenceImageService.updateSettingsForRootFolder(rootFolder));
+        }
+        return settingsDTO;
     }
-  }
 
-  @PutMapping("/zoomin")
-  public void zoomIn() {
-    referenceImageService.zoomIn();
-  }
-
-  @PutMapping("/zoomout")
-  public void zoomOut() {
-    referenceImageService.zoomOut();
-  }
-
-  @PutMapping("/minimize")
-  public void minimize() {
-    referenceImageService.minimize();
-  }
-
-  @PutMapping("/focus")
-  public void focus() {
-    referenceImageService.focus();
-  }
-
-  @PutMapping("/move")
-  public void move(@RequestParam int x, @RequestParam int y) {
-    referenceImageService.move(x, y);
-  }
-
-  @PutMapping("/maximize")
-  public int maximize() {
-    return referenceImageService.maximize();
-  }
-
-  @PutMapping("/restore")
-  public void restore() {
-    referenceImageService.restore();
-  }
-
-  @PutMapping("/crop")
-  public void crop() {
-    referenceImageService.crop();
-  }
-
-
-  @PutMapping("/night")
-  public void nightMode(@RequestParam boolean on) {
-    referenceImageService.nightMode(on);
-  }
-
-  @PutMapping("/realtime")
-  public void realTimeChanged(@RequestBody boolean realtime) {
-    if (realtime) {
-      log.info("Re-enabling realtime processing");
-      LuckyStackWorkerContext.enableRealTimeEnabled();
-    } else {
-      log.info("Disabling realtime processing");
-      LuckyStackWorkerContext.disableRealTimeEnabled();
+    @PutMapping("/save")
+    public void saveReferenceImage(@RequestBody ProfileDTO profile) throws IOException {
+        JFrame frame = referenceImageService.getParentFrame();
+        JFileChooser jfc = referenceImageService.getJFileChooser(settingsService.getRootFolder());
+        jfc.setFileFilter(new FileNameExtensionFilter("TIFF, JPG", "tif", "tiff", "jpg", "jpeg"));
+        String fileNameNoExt = LswFileUtil.getFilename(referenceImageService.getFilePath());
+        jfc.setSelectedFile(
+                new File(fileNameNoExt + Constants.OUTPUT_POSTFIX_SAVE + "." + Constants.DEFAULT_OUTPUT_FORMAT));
+        int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, "Save reference image", true);
+        frame.dispose();
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = jfc.getSelectedFile();
+            referenceImageService.saveReferenceImage(selectedFile.getAbsolutePath(), asJpeg(selectedFile), new Profile(profile));
+        }
     }
-  }
 
-  @PutMapping("/channel")
-  public void channelChanged(@RequestBody ChannelEnum channel) {
-    referenceImageService.showChannel(channel);
-  }
+    @PutMapping("/zoomin")
+    public void zoomIn() {
+        referenceImageService.zoomIn();
+    }
 
-  private boolean asJpeg(File selectedFile) {
-    String fileExtension = LswFileUtil.getFilenameExtension(selectedFile).toLowerCase();
-    return "jpg".equals(fileExtension) || "jpeg".equals(fileExtension);
-  }
+    @PutMapping("/zoomout")
+    public void zoomOut() {
+        referenceImageService.zoomOut();
+    }
+
+    @PutMapping("/minimize")
+    public void minimize() {
+        referenceImageService.minimize();
+    }
+
+    @PutMapping("/focus")
+    public void focus() {
+        referenceImageService.focus();
+    }
+
+    @PutMapping("/move")
+    public void move(@RequestParam int x, @RequestParam int y) {
+        referenceImageService.move(x, y);
+    }
+
+    @PutMapping("/maximize")
+    public int maximize() {
+        return referenceImageService.maximize();
+    }
+
+    @PutMapping("/restore")
+    public void restore() {
+        referenceImageService.restore();
+    }
+
+    @PutMapping("/crop")
+    public void crop() {
+        referenceImageService.crop();
+    }
+
+
+    @PutMapping("/night")
+    public void nightMode(@RequestParam boolean on) {
+        referenceImageService.nightMode(on);
+    }
+
+    @PutMapping("/realtime")
+    public void realTimeChanged(@RequestBody boolean realtime) {
+        if (realtime) {
+            log.info("Re-enabling realtime processing");
+            LuckyStackWorkerContext.enableRealTimeEnabled();
+        } else {
+            log.info("Disabling realtime processing");
+            LuckyStackWorkerContext.disableRealTimeEnabled();
+        }
+    }
+
+    @PutMapping("/channel")
+    public void channelChanged(@RequestBody String channel) {
+        referenceImageService.showChannel(ChannelEnum.valueOf(channel));
+    }
+
+    private boolean asJpeg(File selectedFile) {
+        String fileExtension = LswFileUtil.getFilenameExtension(selectedFile).toLowerCase();
+        return "jpg".equals(fileExtension) || "jpeg".equals(fileExtension);
+    }
 }
