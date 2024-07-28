@@ -34,25 +34,48 @@ public class Profile {
         this.deringStrength = profile.getDeringStrength();
         this.deringThreshold = profile.getDeringThreshold();
 
-        this.radiusGreen = profile.getRadiusGreen();
-        this.amountGreen = profile.getAmountGreen();
-        this.iterationsGreen = profile.getIterationsGreen();
-        this.levelGreen = profile.getLevelGreen();
-        this.clippingStrengthGreen = profile.getClippingStrengthGreen();
-        this.clippingRangeGreen = profile.getClippingRangeGreen();
-        this.deringRadiusGreen = profile.getDeringRadiusGreen();
-        this.deringStrengthGreen = profile.getDeringStrengthGreen();
-        this.deringThresholdGreen = profile.getDeringThresholdGreen();
+        if (applySharpenToChannel == ChannelEnum.RGB) {
+            this.radiusGreen = profile.getRadius();
+            this.amountGreen = profile.getAmount();
+            this.iterationsGreen = profile.getIterations();
+            this.levelGreen = profile.getLevel();
+            this.clippingStrengthGreen = profile.getClippingStrength();
+            this.clippingRangeGreen = profile.getClippingRange();
+            this.deringRadiusGreen = profile.getDeringRadius();
+            this.deringStrengthGreen = profile.getDeringStrength();
+            this.deringThresholdGreen = profile.getDeringThreshold();
 
-        this.radiusBlue = profile.getRadiusBlue();
-        this.amountBlue = profile.getAmountBlue();
-        this.iterationsBlue = profile.getIterationsBlue();
-        this.levelBlue = profile.getLevelBlue();
-        this.clippingStrengthBlue = profile.getClippingStrengthBlue();
-        this.clippingRangeBlue = profile.getClippingRangeBlue();
-        this.deringRadiusBlue = profile.getDeringRadiusBlue();
-        this.deringStrengthBlue = profile.getDeringStrengthBlue();
-        this.deringThresholdBlue = profile.getDeringThresholdBlue();
+            this.radiusBlue = profile.getRadius();
+            this.amountBlue = profile.getAmount();
+            this.iterationsBlue = profile.getIterations();
+            this.levelBlue = profile.getLevel();
+            this.clippingStrengthBlue = profile.getClippingStrength();
+            this.clippingRangeBlue = profile.getClippingRange();
+            this.deringRadiusBlue = profile.getDeringRadius();
+            this.deringStrengthBlue = profile.getDeringStrength();
+            this.deringThresholdBlue = profile.getDeringThreshold();
+
+        } else {
+            this.radiusGreen = profile.getRadiusGreen();
+            this.amountGreen = profile.getAmountGreen();
+            this.iterationsGreen = profile.getIterationsGreen();
+            this.levelGreen = profile.getLevelGreen();
+            this.clippingStrengthGreen = profile.getClippingStrengthGreen();
+            this.clippingRangeGreen = profile.getClippingRangeGreen();
+            this.deringRadiusGreen = profile.getDeringRadiusGreen();
+            this.deringStrengthGreen = profile.getDeringStrengthGreen();
+            this.deringThresholdGreen = profile.getDeringThresholdGreen();
+
+            this.radiusBlue = profile.getRadiusBlue();
+            this.amountBlue = profile.getAmountBlue();
+            this.iterationsBlue = profile.getIterationsBlue();
+            this.levelBlue = profile.getLevelBlue();
+            this.clippingStrengthBlue = profile.getClippingStrengthBlue();
+            this.clippingRangeBlue = profile.getClippingRangeBlue();
+            this.deringRadiusBlue = profile.getDeringRadiusBlue();
+            this.deringStrengthBlue = profile.getDeringStrengthBlue();
+            this.deringThresholdBlue = profile.getDeringThresholdBlue();
+        }
 
         this.sharpenMode = profile.getSharpenMode();
         this.luminanceIncludeRed = profile.isLuminanceIncludeRed();

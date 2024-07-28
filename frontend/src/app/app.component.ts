@@ -248,8 +248,14 @@ export class AppComponent implements OnInit {
       case 'B':
         this.profile.radiusBlue = event.value;
         break;
-      default:
+      case 'R':
         this.profile.radius = event.value;
+        break;
+      default:
+        this.equalizeChannels();
+        this.profile.radius = event.value;
+        this.profile.radiusGreen = event.value;
+        this.profile.radiusBlue = event.value;
     }
     this.radius = event.value;
     this.settings.operation = 'radius';
@@ -267,8 +273,14 @@ export class AppComponent implements OnInit {
       case 'B':
         this.profile.amountBlue = event.value;
         break;
-      default:
+      case 'R':
         this.profile.amount = event.value;
+        break;
+      default:
+        this.equalizeChannels();
+        this.profile.amount = event.value;
+        this.profile.amountGreen = event.value;
+        this.profile.amountBlue = event.value;
     }
     this.amount = event.value;
     this.settings.operation = 'amount';
@@ -286,8 +298,14 @@ export class AppComponent implements OnInit {
       case 'B':
         this.profile.iterationsBlue = event.value;
         break;
-      default:
+      case 'R':
         this.profile.iterations = event.value;
+        break;
+      default:
+        this.equalizeChannels();
+        this.profile.iterations = event.value;
+        this.profile.iterationsGreen = event.value;
+        this.profile.iterationsBlue = event.value;
     }
     this.iterations = event.value;
     this.settings.operation = 'iterations';
@@ -305,8 +323,14 @@ export class AppComponent implements OnInit {
       case 'B':
         this.profile.clippingStrengthBlue = event.value;
         break;
-      default:
+      case 'R':
         this.profile.clippingStrength = event.value;
+        break;
+      default:
+        this.equalizeChannels();
+        this.profile.clippingStrength = event.value;
+        this.profile.clippingStrengthGreen = event.value;
+        this.profile.clippingStrengthBlue = event.value;
     }
     this.clippingStrength = event.value;
     this.settings.operation = 'clippingStrength';
@@ -324,8 +348,14 @@ export class AppComponent implements OnInit {
       case 'B':
         this.profile.clippingRangeBlue = event.value;
         break;
-      default:
+      case 'R':
         this.profile.clippingRange = event.value;
+        break;
+      default:
+        this.equalizeChannels();
+        this.profile.clippingRange = event.value;
+        this.profile.clippingRangeGreen = event.value;
+        this.profile.clippingRangeBlue = event.value;
     }
     this.clippingRange = event.value;
     this.settings.operation = 'clippingRange';
@@ -343,8 +373,14 @@ export class AppComponent implements OnInit {
       case 'B':
         this.profile.deringRadiusBlue = event.value;
         break;
-      default:
+      case 'R':
         this.profile.deringRadius = event.value;
+        break;
+      default:
+        this.equalizeChannels();
+        this.profile.deringRadius = event.value;
+        this.profile.deringRadiusGreen = event.value;
+        this.profile.deringRadiusBlue = event.value;
     }
     this.deringRadius = event.value;
     this.settings.operation = 'deringRadius';
@@ -362,8 +398,14 @@ export class AppComponent implements OnInit {
       case 'B':
         this.profile.deringThresholdBlue = event.value;
         break;
-      default:
+      case 'R':
         this.profile.deringThreshold = event.value;
+        break;
+      default:
+        this.equalizeChannels();
+        this.profile.deringThreshold = event.value;
+        this.profile.deringThresholdGreen = event.value;
+        this.profile.deringThresholdBlue = event.value;
     }
     this.deringThreshold = event.value;
     this.settings.operation = 'deringThreshold';
@@ -381,8 +423,14 @@ export class AppComponent implements OnInit {
       case 'B':
         this.profile.deringStrengthBlue = event.value;
         break;
-      default:
+      case 'R':
         this.profile.deringStrength = event.value;
+        break;
+      default:
+        this.equalizeChannels();
+        this.profile.deringStrength = event.value;
+        this.profile.deringStrengthGreen = event.value;
+        this.profile.deringStrengthBlue = event.value;
     }
     this.deringStrength = event.value;
     this.settings.operation = 'deringStrength';
@@ -1368,5 +1416,24 @@ export class AppComponent implements OnInit {
       },
       (error) => console.log(error)
     );
+  }
+
+  private equalizeChannels() {
+    this.profile.radiusGreen = this.radius;
+    this.profile.amountGreen = this.amount;
+    this.profile.iterationsGreen = this.iterations;
+    this.profile.clippingStrengthGreen = this.clippingStrength;
+    this.profile.clippingRangeGreen = this.clippingRange;
+    this.profile.deringRadiusGreen = this.deringRadius;
+    this.profile.deringStrengthGreen = this.deringStrength;
+    this.profile.deringThresholdGreen = this.deringThreshold;
+    this.profile.radiusBlue = this.radius;
+    this.profile.amountBlue = this.amount;
+    this.profile.iterationsBlue = this.iterations;
+    this.profile.clippingStrengthBlue = this.clippingStrength;
+    this.profile.clippingRangeBlue = this.clippingRange;
+    this.profile.deringRadiusBlue = this.deringRadius;
+    this.profile.deringStrengthBlue = this.deringStrength;
+    this.profile.deringThresholdBlue = this.deringThreshold;
   }
 }
