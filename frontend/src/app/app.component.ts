@@ -1390,11 +1390,6 @@ export class AppComponent implements OnInit {
     );
   }
 
-  exitButtonAvailable(): boolean {
-    const userAgent = navigator.userAgent.toLowerCase();
-    return userAgent.indexOf('mac') === -1;
-  }
-
   private showSpinner() {
     this._showSpinner = true;
   }

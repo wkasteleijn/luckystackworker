@@ -366,7 +366,11 @@ public class OperationService {
     private void applyLocalContrast(final ImagePlus image, int amount, BigDecimal radius, LSWSharpenMode localContrastMode) {
         log.info("Applying local contrast with mode {}, radius {} amount {} to image {}", localContrastMode, radius, amount, image.getID());
         float famount = (amount) / 100f;
-        UnsharpMaskParameters usParams = UnsharpMaskParameters.builder().radiusLuminance(radius.doubleValue()).amountLuminance(famount).iterationsLuminance(1).build();
+        UnsharpMaskParameters usParams = UnsharpMaskParameters.builder()
+                .radiusRed(radius.doubleValue()).amountRed(famount).iterationsRed(1)
+                .radiusGreen(radius.doubleValue()).amountGreen(famount).iterationsGreen(1)
+                .radiusBlue(radius.doubleValue()).amountBlue(famount).iterationsBlue(1)
+                .build();
         LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
                 .saturation(1f).unsharpMaskParameters(usParams).mode(localContrastMode).build();
         lswSharpenFilter.applyRGBMode(image, parameters.getUnsharpMaskParameters());

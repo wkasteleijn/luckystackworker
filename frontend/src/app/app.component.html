@@ -444,39 +444,6 @@
         fontIcon="nightlight"
       ></mat-icon>
     </button>
-
-    <div *ngIf="exitButtonAvailable()">
-      <button
-        *ngIf="openRefImageEnabled()"
-        type="button_exit"
-        mat-button
-        (click)="exit()"
-        class="button buttonMargin {{
-          nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-        }}"
-        matTooltip="Exit"
-      >
-        <mat-icon
-          aria-hidden="false"
-          class="zoomIcon buttonBottom"
-          fontIcon="power_settings_new"
-        ></mat-icon>
-      </button>
-      <button
-        *ngIf="!openRefImageEnabled()"
-        type="button"
-        mat-button
-        disabled
-        class="button_disabled buttonMargin"
-        matTooltip="Exit"
-      >
-        <mat-icon
-          aria-hidden="false"
-          class="zoomIcon buttonBottom"
-          fontIcon="power_settings_new"
-        ></mat-icon>
-      </button>
-    </div>
   </div>
   <mat-tab-group class="sliderTabs" selectedIndex="0">
     <mat-tab label="Sharpen">
