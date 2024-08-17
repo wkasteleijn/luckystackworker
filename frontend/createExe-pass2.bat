@@ -3,7 +3,7 @@ COPY .\LuckyStackWorker-win32-x64\\resources\app\LICENSE_LSW.txt .\LuckyStackWor
 COPY .\LuckyStackWorker-win32-x64\\resources\app\release_notes.txt .\LuckyStackWorker-win32-x64
 COPY .\LuckyStackWorker-win32-x64\\resources\app\lsworker.bat .\LuckyStackWorker-win32-x64
 MKDIR .\LuckyStackWorker-win32-x64\gmic
-XCOPY C:\Users\wkast\applications\gmic-3.3.2-cli-win64 .\LuckyStackWorker-win32-x64\gmic /E /H /C /I
+XCOPY C:\Users\wkast\applications\gmic-3.4.0-cli-win64 .\LuckyStackWorker-win32-x64\gmic /E /H /C /I
 RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\src
 RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\node_modules
 RMDIR /Q /S .\LuckyStackWorker-win32-x64\resources\app\.angular

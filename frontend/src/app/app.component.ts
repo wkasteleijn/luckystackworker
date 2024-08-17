@@ -122,6 +122,7 @@ export class AppComponent implements OnInit {
   openImageMode: string = 'RGB';
   visibleChannel: string = 'RGB';
   applySharpenToChannel: string = 'RGB';
+  applyDenoiseToChannel: string = 'RGB';
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
@@ -536,6 +537,69 @@ export class AppComponent implements OnInit {
         this.deringStrength = this.profile.deringStrength;
     }
     this.visibleChannel = this.applySharpenToChannel;
+    this.luckyStackWorkerService.channelChanged(this.visibleChannel).subscribe(
+      (data) => {
+        console.log('Response');
+      },
+      (error) => console.log(error)
+    );
+  }
+
+  applyDenoiseToChannelChanged(event: any) {
+    console.log('applyDenoiseToChannelChanged called: ' + event.value);
+    this.settings.operation = 'applyDenoiseToChannel';
+    this.profile.applyDenoiseToChannel = this.applyDenoiseToChannel;
+    switch (this.applyDenoiseToChannel) {
+      case 'G':
+        this.denoiseAlgorithm1 = this.profile.denoiseAlgorithm1Green;
+        this.denoise1Amount = this.profile.denoise1AmountGreen;
+        this.denoise1Radius = this.profile.denoise1RadiusGreen;
+        this.denoise1Iterations = this.profile.denoise1IterationsGreen;
+        this.iansAmount = this.profile.iansAmountGreen;
+        this.iansRecovery = this.profile.iansRecoveryGreen;
+        this.denoiseAlgorithm2 = this.profile.denoiseAlgorithm2Green;
+        this.savitzkyGolaySize = this.profile.savitzkyGolaySizeGreen
+          ? this.profile.savitzkyGolaySizeGreen.toString()
+          : '0';
+        this.savitzkyGolayAmount = this.profile.savitzkyGolayAmountGreen;
+        this.savitzkyGolayIterations =
+          this.profile.savitzkyGolayIterationsGreen;
+        this.denoise2Radius = this.profile.denoise2RadiusGreen;
+        this.denoise2Iterations = this.profile.denoise2IterationsGreen;
+        break;
+      case 'B':
+        this.denoiseAlgorithm1 = this.profile.denoiseAlgorithm1Blue;
+        this.denoise1Amount = this.profile.denoise1AmountBlue;
+        this.denoise1Radius = this.profile.denoise1RadiusBlue;
+        this.denoise1Iterations = this.profile.denoise1IterationsBlue;
+        this.iansAmount = this.profile.iansAmountBlue;
+        this.iansRecovery = this.profile.iansRecoveryBlue;
+        this.denoiseAlgorithm2 = this.profile.denoiseAlgorithm2Blue;
+        this.savitzkyGolaySize = this.profile.savitzkyGolaySizeBlue
+          ? this.profile.savitzkyGolaySizeBlue.toString()
+          : '0';
+        this.savitzkyGolayAmount = this.profile.savitzkyGolayAmountBlue;
+        this.savitzkyGolayIterations = this.profile.savitzkyGolayIterationsBlue;
+        this.denoise2Radius = this.profile.denoise2RadiusBlue;
+        this.denoise2Iterations = this.profile.denoise2IterationsBlue;
+        break;
+      default:
+        this.denoiseAlgorithm1 = this.profile.denoiseAlgorithm1;
+        this.denoise1Amount = this.profile.denoise1Amount;
+        this.denoise1Radius = this.profile.denoise1Radius;
+        this.denoise1Iterations = this.profile.denoise1Iterations;
+        this.iansAmount = this.profile.iansAmount;
+        this.iansRecovery = this.profile.iansRecovery;
+        this.denoiseAlgorithm2 = this.profile.denoiseAlgorithm2;
+        this.savitzkyGolaySize = this.profile.savitzkyGolaySize
+          ? this.profile.savitzkyGolaySize.toString()
+          : '0';
+        this.savitzkyGolayAmount = this.profile.savitzkyGolayAmount;
+        this.savitzkyGolayIterations = this.profile.savitzkyGolayIterations;
+        this.denoise2Radius = this.profile.denoise2Radius;
+        this.denoise2Iterations = this.profile.denoise2Iterations;
+    }
+    this.visibleChannel = this.applyDenoiseToChannel;
     this.luckyStackWorkerService.channelChanged(this.visibleChannel).subscribe(
       (data) => {
         console.log('Response');

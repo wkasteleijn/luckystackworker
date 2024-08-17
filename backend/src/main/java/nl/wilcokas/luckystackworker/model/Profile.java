@@ -97,6 +97,60 @@ public class Profile {
         this.savitzkyGolayAmount = profile.getSavitzkyGolayAmount();
         this.savitzkyGolayIterations = profile.getSavitzkyGolayIterations();
 
+        if (applyDenoiseToChannel == ChannelEnum.RGB) {
+            this.denoiseAlgorithm1Green = profile.getDenoiseAlgorithm1();
+            this.denoiseAlgorithm2Green = profile.getDenoiseAlgorithm2();
+            this.denoise1AmountGreen = profile.getDenoise1Amount();
+            this.denoise1RadiusGreen = profile.getDenoise1Radius();
+            this.denoise1IterationsGreen = profile.getDenoise1Iterations();
+            this.denoise2RadiusGreen = profile.getDenoise2Radius();
+            this.denoise2IterationsGreen = profile.getDenoise2Iterations();
+            this.iansAmountGreen = profile.getIansAmount();
+            this.iansRecoveryGreen = profile.getIansRecovery();
+            this.savitzkyGolaySizeGreen = profile.getSavitzkyGolaySize();
+            this.savitzkyGolayAmountGreen = profile.getSavitzkyGolayAmount();
+            this.savitzkyGolayIterationsGreen = profile.getSavitzkyGolayIterations();
+
+            this.denoiseAlgorithm1Blue = profile.getDenoiseAlgorithm1();
+            this.denoiseAlgorithm2Blue = profile.getDenoiseAlgorithm2();
+            this.denoise1AmountBlue = profile.getDenoise1Amount();
+            this.denoise1RadiusBlue = profile.getDenoise1Radius();
+            this.denoise1IterationsBlue = profile.getDenoise1Iterations();
+            this.denoise2RadiusBlue = profile.getDenoise2Radius();
+            this.denoise2IterationsBlue = profile.getDenoise2Iterations();
+            this.iansAmountBlue = profile.getIansAmount();
+            this.iansRecoveryBlue = profile.getIansRecovery();
+            this.savitzkyGolaySizeBlue = profile.getSavitzkyGolaySize();
+            this.savitzkyGolayAmountBlue = profile.getSavitzkyGolayAmount();
+            this.savitzkyGolayIterationsBlue = profile.getSavitzkyGolayIterations();
+        } else {
+            this.denoiseAlgorithm1Green = profile.getDenoiseAlgorithm1Green();
+            this.denoiseAlgorithm2Green = profile.getDenoiseAlgorithm2Green();
+            this.denoise1AmountGreen = profile.getDenoise1AmountGreen();
+            this.denoise1RadiusGreen = profile.getDenoise1RadiusGreen();
+            this.denoise1IterationsGreen = profile.getDenoise1IterationsGreen();
+            this.denoise2RadiusGreen = profile.getDenoise2RadiusGreen();
+            this.denoise2IterationsGreen = profile.getDenoise2IterationsGreen();
+            this.iansAmountGreen = profile.getIansAmountGreen();
+            this.iansRecoveryGreen = profile.getIansRecoveryGreen();
+            this.savitzkyGolaySizeGreen = profile.getSavitzkyGolaySizeGreen();
+            this.savitzkyGolayAmountGreen = profile.getSavitzkyGolayAmountGreen();
+            this.savitzkyGolayIterationsGreen = profile.getSavitzkyGolayIterationsGreen();
+
+            this.denoiseAlgorithm1Blue = profile.getDenoiseAlgorithm1Blue();
+            this.denoiseAlgorithm2Blue = profile.getDenoiseAlgorithm2Blue();
+            this.denoise1AmountBlue = profile.getDenoise1AmountBlue();
+            this.denoise1RadiusBlue = profile.getDenoise1RadiusBlue();
+            this.denoise1IterationsBlue = profile.getDenoise1IterationsBlue();
+            this.denoise2RadiusBlue = profile.getDenoise2RadiusBlue();
+            this.denoise2IterationsBlue = profile.getDenoise2IterationsBlue();
+            this.iansAmountBlue = profile.getIansAmountBlue();
+            this.iansRecoveryBlue = profile.getIansRecoveryBlue();
+            this.savitzkyGolaySizeBlue = profile.getSavitzkyGolaySizeBlue();
+            this.savitzkyGolayAmountBlue = profile.getSavitzkyGolayAmountBlue();
+            this.savitzkyGolayIterationsBlue = profile.getSavitzkyGolayIterationsBlue();
+        }
+
         // contrast & light
         this.gamma = profile.getGamma();
         this.contrast = profile.getContrast();

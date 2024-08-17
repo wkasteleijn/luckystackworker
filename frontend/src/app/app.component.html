@@ -1073,6 +1073,35 @@
           </div>
         </div>
       </div>
+
+      <div class="sliderRow">
+        <div
+          class="sliderRowCategoryTitle {{
+            nightModeEnabled()
+              ? 'sliderRowCategoryTitleColorNight'
+              : 'sliderRowCategoryTitleColor'
+          }}"
+        >
+          Apply to
+        </div>
+        <mat-radio-group
+          [color]="colorTheme()"
+          [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+          [(ngModel)]="applyDenoiseToChannel"
+          (change)="applyDenoiseToChannelChanged($event)"
+        >
+          <mat-radio-button value="RGB" class="radioSizeButtonDenoise2"
+            >All</mat-radio-button
+          >
+          <mat-radio-button value="R" class="denoiseMode">Red</mat-radio-button>
+          <mat-radio-button value="G" class="denoiseMode"
+            >Green</mat-radio-button
+          >
+          <mat-radio-button value="B" class="denoiseMode"
+            >Blue</mat-radio-button
+          >
+        </mat-radio-group>
+      </div>
     </mat-tab>
 
     <!-- Light panel -->

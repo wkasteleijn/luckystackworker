@@ -34,6 +34,8 @@ public class GmicService {
                 return;
             }
 
+            // TODO: for channel specific processing, loop over channels and apply cli commands per channel.
+
             String workFolder = LswFileUtil.getDataFolder(activeOSProfile);
             String inputFile = workFolder + "/temp_in.tif";
             LswFileUtil.saveImage(image, profileName, inputFile, image.getStack().size() > 1, false, false, false);
