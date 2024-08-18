@@ -198,7 +198,14 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         } else {
             isMaximized = true;
             originalBounds = getBounds();
-            this.setLocation(0, 0);
+            Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
+            int locationX = (int) ((screenDimension.getWidth() - image.getWidth()) / 2);
+            int locationY = (int) ((screenDimension.getHeight() - image.getHeight()) / 2) - 32; // 32 is for assuming that there is a taskbar on the bottom
+            if ((screenDimension.getWidth() * 0.9) < image.getWidth()) {
+                locationX = 0;
+                locationY = 0;
+            }
+            this.setLocation(locationX, locationY);
             getCanvas().zoom100Percent();
             return 1.0;
         }
