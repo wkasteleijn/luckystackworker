@@ -1,7 +1,10 @@
 package nl.wilcokas.luckystackworker.filter;
 
 import java.awt.Rectangle;
+import java.util.concurrent.Executor;
 
+import nl.wilcokas.luckystackworker.model.Profile;
+import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.stereotype.Component;
 
 import ij.ImagePlus;
@@ -54,12 +57,54 @@ public class SigmaFilterPlus {
     protected int kNPoints; // number of points in the kernel
     protected int[] lineRadius; // the length of each kernel line is 2*lineRadius+1
 
-    public void apply(ImagePlus image, double radius, double sigma, double minimum) {
-        makeKernel(radius);
+    public void applyDenoise1(ImagePlus image, Profile profile, double minimum) {
+        double sigma = 2D;
         ImageStack stack = image.getStack();
-        for (int slice = 1; slice <= stack.getSize(); slice++) {
-            ImageProcessor ip = stack.getProcessor(slice);
+        Executor executor = LswUtil.getParallelExecutor();
+        // red
+        executor.execute(() -> {
+            ImageProcessor ip = stack.getProcessor(1);
+            applySigmaToLayer(sigma, minimum, profile.getDenoise1Radius().doubleValue(), profile.getDenoise1Iterations() == 0 ? 1 : profile.getDenoise1Iterations(), ip, 1);
+        });
+        // green
+        executor.execute(() -> {
+            ImageProcessor ip = stack.getProcessor(2);
+            applySigmaToLayer(sigma, minimum, profile.getDenoise1RadiusGreen().doubleValue(), profile.getDenoise1IterationsGreen() == 0 ? 1 : profile.getDenoise1IterationsGreen(), ip, 2);
+        });
+        // blue
+        executor.execute(() -> {
+            ImageProcessor ip = stack.getProcessor(3);
+            applySigmaToLayer(sigma, minimum, profile.getDenoise1RadiusBlue().doubleValue(), profile.getDenoise1IterationsBlue() == 0 ? 1 : profile.getDenoise1IterationsBlue(), ip, 3);
+        });
+        LswUtil.stopAndAwaitParallelExecutor(executor);
+    }
 
+    public void applyDenoise2(ImagePlus image, Profile profile) {
+        double sigma = 5D;
+        double minimum = 1D;
+        ImageStack stack = image.getStack();
+        Executor executor = LswUtil.getParallelExecutor();
+        // red
+        executor.execute(() -> {
+            ImageProcessor ip = stack.getProcessor(1);
+            applySigmaToLayer(sigma, minimum, profile.getDenoise2Radius().doubleValue(), profile.getDenoise2Iterations() == 0 ? 1 : profile.getDenoise2Iterations(), ip, 1);
+        });
+        // green
+        executor.execute(() -> {
+            ImageProcessor ip = stack.getProcessor(2);
+            applySigmaToLayer(sigma, minimum, profile.getDenoise2RadiusGreen().doubleValue(), profile.getDenoise2IterationsGreen() == 0 ? 1 : profile.getDenoise2IterationsGreen(), ip, 2);
+        });
+        // blue
+        executor.execute(() -> {
+            ImageProcessor ip = stack.getProcessor(3);
+            applySigmaToLayer(sigma, minimum, profile.getDenoise2RadiusBlue().doubleValue(), profile.getDenoise2IterationsBlue() == 0 ? 1 : profile.getDenoise2IterationsBlue(), ip, 3);
+        });
+        LswUtil.stopAndAwaitParallelExecutor(executor);
+    }
+
+    private void applySigmaToLayer(double sigma, double minimum, double radius, int iterations, ImageProcessor ip, int layer) {
+        makeKernel(radius);
+        for (int i = 0; i < iterations; i++) {
             // copy class variables to local ones - this is necessary for preview
             int[] lineRadius;
             int kRadius, kNPoints, minPixNumber;
@@ -72,9 +117,9 @@ public class SigmaFilterPlus {
             if (Thread.currentThread().isInterrupted())
                 return;
 
-            FloatProcessor fp = ip.toFloat(slice, null);
+            FloatProcessor fp = ip.toFloat(layer, null);
             doFiltering(fp, kRadius, lineRadius, sigma, minPixNumber, true);
-            ip.setPixels(slice, fp);
+            ip.setPixels(layer, fp);
         }
     }
 

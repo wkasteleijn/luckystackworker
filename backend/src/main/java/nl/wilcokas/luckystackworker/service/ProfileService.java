@@ -85,10 +85,10 @@ public class ProfileService {
             json = defaultProfilesJson;
         }
         try {
-            List<Profile> list = objectMapper.readValue(json, new TypeReference<List<Profile>>() {
+            List<Profile> list = objectMapper.readValue(json, new TypeReference<>() {
             });
+            list.forEach(LswFileUtil::correctProfileForBackwardCompatability);
             profiles = list.stream().collect(Collectors.toMap(Profile::getName, Function.identity()));
-
         } catch (JsonProcessingException e) {
             log.error("Error reading profiles: ", e);
             throw new ProfileNotFoundException(e.getMessage());
