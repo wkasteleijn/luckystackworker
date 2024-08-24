@@ -75,8 +75,6 @@ public class ProfileDTO {
         this.denoise1AmountGreen = profile.getDenoise1AmountGreen();
         this.denoise1RadiusGreen = profile.getDenoise1RadiusGreen();
         this.denoise1IterationsGreen = profile.getDenoise1IterationsGreen();
-        this.iansAmountGreen = profile.getIansAmountGreen();
-        this.iansRecoveryGreen = profile.getIansRecoveryGreen();
         this.denoiseAlgorithm2Green = profile.getDenoiseAlgorithm2Green();
         this.denoise2RadiusGreen = profile.getDenoise2RadiusGreen();
         this.denoise2IterationsGreen = profile.getDenoise2IterationsGreen();
@@ -88,8 +86,6 @@ public class ProfileDTO {
         this.denoise1AmountBlue = profile.getDenoise1AmountBlue();
         this.denoise1RadiusBlue = profile.getDenoise1RadiusBlue();
         this.denoise1IterationsBlue = profile.getDenoise1IterationsBlue();
-        this.iansAmountBlue = profile.getIansAmountBlue();
-        this.iansRecoveryBlue = profile.getIansRecoveryBlue();
         this.denoiseAlgorithm2Blue = profile.getDenoiseAlgorithm2Blue();
         this.denoise2RadiusBlue = profile.getDenoise2RadiusBlue();
         this.denoise2IterationsBlue = profile.getDenoise2IterationsBlue();

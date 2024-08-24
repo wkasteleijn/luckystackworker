@@ -760,7 +760,7 @@
             disabled="{{ !this.settings?.gmicAvailable }}"
             matTooltip="{{
               this.settings?.gmicAvailable
-                ? 'Warning: slows down processing, but is very effective!'
+                ? 'Warning: slows down processing, but is very effective! It cannot be applied to individual channels.'
                 : gmicUnavailableMessage()
             }}"
             >Ian's NR</mat-radio-button
@@ -1074,7 +1074,7 @@
         </div>
       </div>
 
-      <div class="sliderRow">
+      <div class="sliderRow" *ngIf="denoiseAlgorithm1 !== 'IAN'">
         <div
           class="sliderRowCategoryTitle {{
             nightModeEnabled()

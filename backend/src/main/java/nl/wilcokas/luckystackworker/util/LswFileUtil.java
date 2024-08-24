@@ -233,8 +233,6 @@ public class LswFileUtil {
             profile.setDenoise1IterationsGreen(profile.getDenoise1Iterations());
             profile.setDenoise2RadiusGreen(profile.getDenoise2Radius());
             profile.setDenoise2IterationsGreen(profile.getDenoise2Iterations());
-            profile.setIansAmountGreen(profile.getIansAmount());
-            profile.setIansRecoveryGreen(profile.getIansRecovery());
             profile.setSavitzkyGolaySizeGreen(profile.getSavitzkyGolaySize());
             profile.setSavitzkyGolayAmountGreen(profile.getSavitzkyGolayAmount());
             profile.setSavitzkyGolayIterationsGreen(profile.getSavitzkyGolayIterations());
@@ -245,8 +243,6 @@ public class LswFileUtil {
             profile.setDenoise1IterationsBlue(profile.getDenoise1Iterations());
             profile.setDenoise2RadiusBlue(profile.getDenoise2Radius());
             profile.setDenoise2IterationsBlue(profile.getDenoise2Iterations());
-            profile.setIansAmountBlue(profile.getIansAmount());
-            profile.setIansRecoveryBlue(profile.getIansRecovery());
             profile.setSavitzkyGolaySizeBlue(profile.getSavitzkyGolaySize());
             profile.setSavitzkyGolayAmountBlue(profile.getSavitzkyGolayAmount());
             profile.setSavitzkyGolayIterationsBlue(profile.getSavitzkyGolayIterations());

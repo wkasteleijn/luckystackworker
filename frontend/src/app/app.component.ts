@@ -875,6 +875,12 @@ export class AppComponent implements OnInit {
     } else if (event.value === 'IAN') {
       this.settings.operation = 'iansAmount';
       this.profile.denoiseAlgorithm1 = 'IAN';
+      this.applyDenoiseToChannel = 'RGB';
+      this.profile.applyDenoiseToChannel = 'RGB';
+      this.visibleChannel = this.applyDenoiseToChannel;
+      this.luckyStackWorkerService
+        .channelChanged(this.visibleChannel)
+        .subscribe((error) => console.log(error));
     } else {
       this.settings.operation = 'DENOISEALGORITHM1';
       this.profile.denoiseAlgorithm1 = 'OFF';

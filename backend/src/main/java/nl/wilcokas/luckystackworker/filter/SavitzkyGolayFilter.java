@@ -2,6 +2,7 @@ package nl.wilcokas.luckystackworker.filter;
 
 import java.util.concurrent.Executor;
 
+import nl.wilcokas.luckystackworker.model.Profile;
 import org.springframework.stereotype.Component;
 
 import ij.ImagePlus;
@@ -26,11 +27,11 @@ public class SavitzkyGolayFilter {
     };
 
     private static final int[][] RADIUS_25_OFFSETS = { //
-            { -2, -2 }, { -1, -2 }, { 0, -2 }, { 1, -2 }, { 2, -2 }, //
-            { -2, -1 }, { -1, -1 }, { 0, -1 }, { 1, -1 }, { 2, -1 }, //
-            { -2, 0 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 2, 0 }, //
-            { -2, 1 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 2, 1 }, //
-            { -2, 2 }, { -1, 2 }, { 0, 2 }, { 1, 2 }, { 2, 2 }, //
+            {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {2, -2}, //
+            {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, //
+            {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}, //
+            {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1}, //
+            {-2, 2}, {-1, 2}, {0, 2}, {1, 2}, {2, 2}, //
     };
 
     private static final int[] RADIUS_49_FACTORS = { //
@@ -44,13 +45,13 @@ public class SavitzkyGolayFilter {
     };
 
     private static final int[][] RADIUS_49_OFFSETS = { //
-            { -3, -3 }, { -2, -3 }, { -1, -3 }, { 0, -3 }, { 1, -3 }, { 2, -3 }, { 3, -3 }, //
-            { -3, -2 }, { -2, -2 }, { -1, -2 }, { 0, -2 }, { 1, -2 }, { 2, -2 }, { 3, -2 }, //
-            { -3, -1 }, { -2, -1 }, { -1, -1 }, { 0, -1 }, { 1, -1 }, { 2, -1 }, { 3, -1 }, //
-            { -3, 0 }, { -2, 0 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 }, //
-            { -3, 1 }, { -2, 1 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 2, 1 }, { 3, 1 }, //
-            { -3, 2 }, { -2, 2 }, { -1, 2 }, { 0, 2 }, { 1, 2 }, { 2, 2 }, { 3, 2 }, //
-            { -3, 3 }, { -2, 3 }, { -1, 3 }, { 0, 3 }, { 1, 3 }, { 2, 3 }, { 3, 3 },//
+            {-3, -3}, {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {3, -3}, //
+            {-3, -2}, {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {2, -2}, {3, -2}, //
+            {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1}, //
+            {-3, 0}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}, {3, 0}, //
+            {-3, 1}, {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1}, {3, 1}, //
+            {-3, 2}, {-2, 2}, {-1, 2}, {0, 2}, {1, 2}, {2, 2}, {3, 2}, //
+            {-3, 3}, {-2, 3}, {-1, 3}, {0, 3}, {1, 3}, {2, 3}, {3, 3},//
     };
 
     private static final int[] RADIUS_81_FACTORS = { //
@@ -76,15 +77,15 @@ public class SavitzkyGolayFilter {
     };
 
     private static final int[][] RADIUS_81_OFFSETS = { //
-            { -4, -4 }, { -3, -4 }, { -2, -4 }, { -1, -4 }, { 0, -4 }, { 1, -4 }, { 2, -4 }, { 3, -4 }, { 4, -4 }, //
-            { -4, -3 }, { -3, -3 }, { -2, -3 }, { -1, -3 }, { 0, -3 }, { 1, -3 }, { 2, -3 }, { 3, -3 }, { 4, -3 }, //
-            { -4, -2 }, { -3, -2 }, { -2, -2 }, { -1, -2 }, { 0, -2 }, { 1, -2 }, { 2, -2 }, { 3, -2 }, { 4, -2 }, //
-            { -4, -1 }, { -3, -1 }, { -2, -1 }, { -1, -1 }, { 0, -1 }, { 1, -1 }, { 2, -1 }, { 3, -1 }, { 4, -1 }, //
-            { -4, 0 }, { -3, 0 }, { -2, 0 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, //
-            { -4, 1 }, { -3, 1 }, { -2, 1 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 2, 1 }, { 3, 1 }, { 4, 1 }, //
-            { -4, 2 }, { -3, 2 }, { -2, 2 }, { -1, 2 }, { 0, 2 }, { 1, 2 }, { 2, 2 }, { 3, 2 }, { 4, 2 }, //
-            { -4, 3 }, { -3, 3 }, { -2, 3 }, { -1, 3 }, { 0, 3 }, { 1, 3 }, { 2, 3 }, { 3, 3 }, { 4, 3 }, //
-            { -4, 4 }, { -3, 4 }, { -2, 4 }, { -1, 4 }, { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 }, { 4, 4 } //
+            {-4, -4}, {-3, -4}, {-2, -4}, {-1, -4}, {0, -4}, {1, -4}, {2, -4}, {3, -4}, {4, -4}, //
+            {-4, -3}, {-3, -3}, {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {3, -3}, {4, -3}, //
+            {-4, -2}, {-3, -2}, {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {2, -2}, {3, -2}, {4, -2}, //
+            {-4, -1}, {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1}, {4, -1}, //
+            {-4, 0}, {-3, 0}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, //
+            {-4, 1}, {-3, 1}, {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1}, {3, 1}, {4, 1}, //
+            {-4, 2}, {-3, 2}, {-2, 2}, {-1, 2}, {0, 2}, {1, 2}, {2, 2}, {3, 2}, {4, 2}, //
+            {-4, 3}, {-3, 3}, {-2, 3}, {-1, 3}, {0, 3}, {1, 3}, {2, 3}, {3, 3}, {4, 3}, //
+            {-4, 4}, {-3, 4}, {-2, 4}, {-1, 4}, {0, 4}, {1, 4}, {2, 4}, {3, 4}, {4, 4} //
     };
 
     private static final int[] RADIUS_121_FACTORS = { //
@@ -102,17 +103,17 @@ public class SavitzkyGolayFilter {
     };
 
     private static final int[][] RADIUS_121_OFFSETS = { //
-            { -5, -5 }, { -4, -5 }, { -3, -5 }, { -2, -5 }, { -1, -5 }, { 0, -5 }, { 1, -5 }, { 2, -5 }, { 3, -5 }, { 4, -5 }, { 5, -5 }, //
-            { -5, -4 }, { -4, -4 }, { -3, -4 }, { -2, -4 }, { -1, -4 }, { 0, -4 }, { 1, -4 }, { 2, -4 }, { 3, -4 }, { 4, -4 }, { 5, -4 }, //
-            { -5, -3 }, { -4, -3 }, { -3, -3 }, { -2, -3 }, { -1, -3 }, { 0, -3 }, { 1, -3 }, { 2, -3 }, { 3, -3 }, { 4, -3 }, { 5, -3 }, //
-            { -5, -2 }, { -4, -2 }, { -3, -2 }, { -2, -2 }, { -1, -2 }, { 0, -2 }, { 1, -2 }, { 2, -2 }, { 3, -2 }, { 4, -2 }, { 5, -2 }, //
-            { -5, -1 }, { -4, -1 }, { -3, -1 }, { -2, -1 }, { -1, -1 }, { 0, -1 }, { 1, -1 }, { 2, -1 }, { 3, -1 }, { 4, -1 }, { 5, -1 }, //
-            { -5, 0 }, { -4, 0 }, { -3, 0 }, { -2, 0 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 }, //
-            { -5, 1 }, { -4, 1 }, { -3, 1 }, { -2, 1 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 2, 1 }, { 3, 1 }, { 4, 1 }, { 5, 1 }, //
-            { -5, 2 }, { -4, 2 }, { -3, 2 }, { -2, 2 }, { -1, 2 }, { 0, 2 }, { 1, 2 }, { 2, 2 }, { 3, 2 }, { 4, 2 }, { 5, 2 }, //
-            { -5, 3 }, { -4, 3 }, { -3, 3 }, { -2, 3 }, { -1, 3 }, { 0, 3 }, { 1, 3 }, { 2, 3 }, { 3, 3 }, { 4, 3 }, { 5, 3 }, //
-            { -5, 4 }, { -4, 4 }, { -3, 4 }, { -2, 4 }, { -1, 4 }, { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 }, { 4, 4 }, { 5, 4 }, //
-            { -5, 5 }, { -4, 5 }, { -3, 5 }, { -2, 5 }, { -1, 5 }, { 0, 5 }, { 1, 5 }, { 2, 5 }, { 3, 5 }, { 4, 5 }, { 5, 5 }, //
+            {-5, -5}, {-4, -5}, {-3, -5}, {-2, -5}, {-1, -5}, {0, -5}, {1, -5}, {2, -5}, {3, -5}, {4, -5}, {5, -5}, //
+            {-5, -4}, {-4, -4}, {-3, -4}, {-2, -4}, {-1, -4}, {0, -4}, {1, -4}, {2, -4}, {3, -4}, {4, -4}, {5, -4}, //
+            {-5, -3}, {-4, -3}, {-3, -3}, {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {3, -3}, {4, -3}, {5, -3}, //
+            {-5, -2}, {-4, -2}, {-3, -2}, {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {2, -2}, {3, -2}, {4, -2}, {5, -2}, //
+            {-5, -1}, {-4, -1}, {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1}, {4, -1}, {5, -1}, //
+            {-5, 0}, {-4, 0}, {-3, 0}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, //
+            {-5, 1}, {-4, 1}, {-3, 1}, {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}, //
+            {-5, 2}, {-4, 2}, {-3, 2}, {-2, 2}, {-1, 2}, {0, 2}, {1, 2}, {2, 2}, {3, 2}, {4, 2}, {5, 2}, //
+            {-5, 3}, {-4, 3}, {-3, 3}, {-2, 3}, {-1, 3}, {0, 3}, {1, 3}, {2, 3}, {3, 3}, {4, 3}, {5, 3}, //
+            {-5, 4}, {-4, 4}, {-3, 4}, {-2, 4}, {-1, 4}, {0, 4}, {1, 4}, {2, 4}, {3, 4}, {4, 4}, {5, 4}, //
+            {-5, 5}, {-4, 5}, {-3, 5}, {-2, 5}, {-1, 5}, {0, 5}, {1, 5}, {2, 5}, {3, 5}, {4, 5}, {5, 5}, //
     };
 
     private static final int[] RADIUS_169_FACTORS = { //
@@ -133,19 +134,19 @@ public class SavitzkyGolayFilter {
     };
 
     private static final int[][] RADIUS_169_OFFSETS = { //
-            { -6, -6 }, { -5, -6 }, { -4, -6 }, { -3, -6 }, { -2, -6 }, { -1, -6 }, { 0, -6 }, { 1, -6 }, { 2, -6 }, { 3, -6 }, { 4, -6 }, { 5, -6 }, { 6, -6 },//
-            { -6, -5 }, { -5, -5 }, { -4, -5 }, { -3, -5 }, { -2, -5 }, { -1, -5 }, { 0, -5 }, { 1, -5 }, { 2, -5 }, { 3, -5 }, { 4, -5 }, { 5, -5 }, { 6, -5 },//
-            { -6, -4 }, { -5, -4 }, { -4, -4 }, { -3, -4 }, { -2, -4 }, { -1, -4 }, { 0, -4 }, { 1, -4 }, { 2, -4 }, { 3, -4 }, { 4, -4 }, { 5, -4 }, { 6, -4 },//
-            { -6, -3 }, { -5, -3 }, { -4, -3 }, { -3, -3 }, { -2, -3 }, { -1, -3 }, { 0, -3 }, { 1, -3 }, { 2, -3 }, { 3, -3 }, { 4, -3 }, { 5, -3 }, { 6, -3 },//
-            { -6, -2 }, { -5, -2 }, { -4, -2 }, { -3, -2 }, { -2, -2 }, { -1, -2 }, { 0, -2 }, { 1, -2 }, { 2, -2 }, { 3, -2 }, { 4, -2 }, { 5, -2 }, { 6, -2 },//
-            { -6, -1 }, { -5, -1 }, { -4, -1 }, { -3, -1 }, { -2, -1 }, { -1, -1 }, { 0, -1 }, { 1, -1 }, { 2, -1 }, { 3, -1 }, { 4, -1 }, { 5, -1 }, { 6, -1 },//
-            { -6, 0 }, { -5, 0 }, { -4, 0 }, { -3, 0 }, { -2, 0 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 }, { 6, 0 },//
-            { -6, 1 }, { -5, 1 }, { -4, 1 }, { -3, 1 }, { -2, 1 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 2, 1 }, { 3, 1 }, { 4, 1 }, { 5, 1 }, { 6, 1 },//
-            { -6, 2 }, { -5, 2 }, { -4, 2 }, { -3, 2 }, { -2, 2 }, { -1, 2 }, { 0, 2 }, { 1, 2 }, { 2, 2 }, { 3, 2 }, { 4, 2 }, { 5, 2 }, { 6, 2 },//
-            { -6, 3 }, { -5, 3 }, { -4, 3 }, { -3, 3 }, { -2, 3 }, { -1, 3 }, { 0, 3 }, { 1, 3 }, { 2, 3 }, { 3, 3 }, { 4, 3 }, { 5, 3 }, { 6, 3 },//
-            { -6, 4 }, { -5, 4 }, { -4, 4 }, { -3, 4 }, { -2, 4 }, { -1, 4 }, { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 }, { 4, 4 }, { 5, 4 }, { 6, 4 },//
-            { -6, 5 }, { -5, 5 }, { -4, 5 }, { -3, 5 }, { -2, 5 }, { -1, 5 }, { 0, 5 }, { 1, 5 }, { 2, 5 }, { 3, 5 }, { 4, 5 }, { 5, 5 }, { 6, 5 },//
-            { -6, 6 }, { -5, 6 }, { -4, 6 }, { -3, 6 }, { -2, 6 }, { -1, 6 }, { 0, 6 }, { 1, 6 }, { 2, 6 }, { 3, 6 }, { 4, 6 }, { 5, 6 }, { 6, 6 }//
+            {-6, -6}, {-5, -6}, {-4, -6}, {-3, -6}, {-2, -6}, {-1, -6}, {0, -6}, {1, -6}, {2, -6}, {3, -6}, {4, -6}, {5, -6}, {6, -6},//
+            {-6, -5}, {-5, -5}, {-4, -5}, {-3, -5}, {-2, -5}, {-1, -5}, {0, -5}, {1, -5}, {2, -5}, {3, -5}, {4, -5}, {5, -5}, {6, -5},//
+            {-6, -4}, {-5, -4}, {-4, -4}, {-3, -4}, {-2, -4}, {-1, -4}, {0, -4}, {1, -4}, {2, -4}, {3, -4}, {4, -4}, {5, -4}, {6, -4},//
+            {-6, -3}, {-5, -3}, {-4, -3}, {-3, -3}, {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {3, -3}, {4, -3}, {5, -3}, {6, -3},//
+            {-6, -2}, {-5, -2}, {-4, -2}, {-3, -2}, {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {2, -2}, {3, -2}, {4, -2}, {5, -2}, {6, -2},//
+            {-6, -1}, {-5, -1}, {-4, -1}, {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1}, {4, -1}, {5, -1}, {6, -1},//
+            {-6, 0}, {-5, 0}, {-4, 0}, {-3, 0}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0},//
+            {-6, 1}, {-5, 1}, {-4, 1}, {-3, 1}, {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}, {6, 1},//
+            {-6, 2}, {-5, 2}, {-4, 2}, {-3, 2}, {-2, 2}, {-1, 2}, {0, 2}, {1, 2}, {2, 2}, {3, 2}, {4, 2}, {5, 2}, {6, 2},//
+            {-6, 3}, {-5, 3}, {-4, 3}, {-3, 3}, {-2, 3}, {-1, 3}, {0, 3}, {1, 3}, {2, 3}, {3, 3}, {4, 3}, {5, 3}, {6, 3},//
+            {-6, 4}, {-5, 4}, {-4, 4}, {-3, 4}, {-2, 4}, {-1, 4}, {0, 4}, {1, 4}, {2, 4}, {3, 4}, {4, 4}, {5, 4}, {6, 4},//
+            {-6, 5}, {-5, 5}, {-4, 5}, {-3, 5}, {-2, 5}, {-1, 5}, {0, 5}, {1, 5}, {2, 5}, {3, 5}, {4, 5}, {5, 5}, {6, 5},//
+            {-6, 6}, {-5, 6}, {-4, 6}, {-3, 6}, {-2, 6}, {-1, 6}, {0, 6}, {1, 6}, {2, 6}, {3, 6}, {4, 6}, {5, 6}, {6, 6}//
     };
     private static final int RADIUS_25_CENTER = 12;
     private static final int RADIUS_25_DIVISOR = 3181;
@@ -167,93 +168,114 @@ public class SavitzkyGolayFilter {
     private static final int RADIUS_169_DIVISOR = 33721;
     private static final int RADIUS_169_ROWLENGTH = 13;
 
-    public void apply(ImagePlus image, final SavitzkyGolayRadius radius, int amount) {
-
-        int[] radiusFactors;
-        int[][] radiusOffsets;
-        int radiusDivisor;
-        int radiusCenter;
-        int radiusRowLength;
-        switch (radius) {
-        case OFF -> {
-            return;
-        }
-        case RADIUS_25 -> {
-            radiusFactors = RADIUS_25_FACTORS;
-            radiusOffsets = RADIUS_25_OFFSETS;
-            radiusDivisor = RADIUS_25_DIVISOR;
-            radiusCenter = RADIUS_25_CENTER;
-            radiusRowLength = RADIUS_25_ROWLENGTH;
-        }
-        case RADIUS_49 -> {
-            radiusFactors = RADIUS_49_FACTORS;
-            radiusOffsets = RADIUS_49_OFFSETS;
-            radiusDivisor = RADIUS_49_DIVISOR;
-            radiusCenter = RADIUS_49_CENTER;
-            radiusRowLength = RADIUS_49_ROWLENGTH;
-        }
-        case RADIUS_81 -> {
-            radiusFactors = RADIUS_81_FACTORS;
-            radiusOffsets = RADIUS_81_OFFSETS;
-            radiusDivisor = RADIUS_81_DIVISOR;
-            radiusCenter = RADIUS_81_CENTER;
-            radiusRowLength = RADIUS_81_ROWLENGTH;
-        }
-        case RADIUS_121 -> {
-            radiusFactors = RADIUS_121_FACTORS;
-            radiusOffsets = RADIUS_121_OFFSETS;
-            radiusDivisor = RADIUS_121_DIVISOR;
-            radiusCenter = RADIUS_121_CENTER;
-            radiusRowLength = RADIUS_121_ROWLENGTH;
-        }
-        case RADIUS_169 -> {
-            radiusFactors = RADIUS_169_FACTORS;
-            radiusOffsets = RADIUS_169_OFFSETS;
-            radiusDivisor = RADIUS_169_DIVISOR;
-            radiusCenter = RADIUS_169_CENTER;
-            radiusRowLength = RADIUS_169_ROWLENGTH;
-        }
-        default -> {
-            radiusFactors = RADIUS_25_FACTORS;
-            radiusOffsets = RADIUS_25_OFFSETS;
-            radiusDivisor = RADIUS_25_DIVISOR;
-            radiusCenter = RADIUS_25_CENTER;
-            radiusRowLength = RADIUS_25_ROWLENGTH;
-        }
-        }
-
+    public void apply(ImagePlus image, Profile profile) {
         ImageStack stack = image.getStack();
         // Run every stack in a seperate thread to increase performance.
         Executor executor = LswUtil.getParallelExecutor();
-        for (int layer = 1; layer <= stack.size(); layer++) {
-            int finalLayer = layer;
-            executor.execute(() -> {
-                ImageProcessor p = stack.getProcessor(finalLayer);
-                short[] pixels = (short[]) p.getPixels();
-
-                short[] pixelsResult = new short[pixels.length];
-                for (int i = 0; i < pixels.length; i++) {
-                    long newValueUnsignedInt = getPixelValueUnsignedInt(pixels, i, image.getWidth(), radiusFactors, radiusOffsets, radiusDivisor,
-                            radiusCenter, radiusRowLength, amount);
-                    pixelsResult[i] = LswImageProcessingUtil.convertToShort(newValueUnsignedInt > Constants.MAX_INT_VALUE ? Constants.MAX_INT_VALUE
-                            : (newValueUnsignedInt < 0 ? 0 : newValueUnsignedInt));
-                }
-                for (int i = 0; i < pixels.length; i++) {
-                    pixels[i] = pixelsResult[i];
-                }
-            });
-        }
+        // Red
+        executor.execute(() -> {
+            ImageProcessor layerProcessor = stack.getProcessor(1);
+            int iterations = profile.getSavitzkyGolayIterations() == 0 ? 1 : profile.getSavitzkyGolayIterations();
+            SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySize(),profile.getSavitzkyGolayAmount(), iterations);
+            if (parameters.radiusFactors != null) {
+                applySavitzkyGolayToLayer(image, layerProcessor, parameters);
+            }
+        });
+        // Green
+        executor.execute(() -> {
+            ImageProcessor layerProcessor = stack.getProcessor(2);
+            int iterations = profile.getSavitzkyGolayIterationsGreen() == 0 ? 1 : profile.getSavitzkyGolayIterationsGreen();
+            SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySizeGreen(),profile.getSavitzkyGolayAmountGreen(), iterations);
+            if (parameters.radiusFactors != null) {
+                applySavitzkyGolayToLayer(image, layerProcessor, parameters);
+            }
+        });
+        // Blue
+        executor.execute(() -> {
+            ImageProcessor layerProcessor = stack.getProcessor(3);
+            int iterations = profile.getSavitzkyGolayIterationsBlue() == 0 ? 1 : profile.getSavitzkyGolayIterationsBlue();
+            SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySizeBlue(),profile.getSavitzkyGolayAmountBlue(), iterations);
+            if (parameters.radiusFactors != null) {
+                applySavitzkyGolayToLayer(image, layerProcessor, parameters);
+            }
+        });
         LswUtil.stopAndAwaitParallelExecutor(executor);
     }
 
+    private SavitzkyGolayParameters getSavitzkyGolayParameters(int size, int amount, int iterations) {
+        SavitzkyGolayRadius radius = SavitzkyGolayRadius.valueOf(size);
+        int[] radiusFactors = null;
+        int[][] radiusOffsets = null;
+        int radiusDivisor = -1;
+        int radiusCenter = -1;
+        int radiusRowLength = -1;
+        switch (radius) {
+            case OFF -> {
+                // No filter should be applied
+            }
+            case RADIUS_49 -> {
+                radiusFactors = RADIUS_49_FACTORS;
+                radiusOffsets = RADIUS_49_OFFSETS;
+                radiusDivisor = RADIUS_49_DIVISOR;
+                radiusCenter = RADIUS_49_CENTER;
+                radiusRowLength = RADIUS_49_ROWLENGTH;
+            }
+            case RADIUS_81 -> {
+                radiusFactors = RADIUS_81_FACTORS;
+                radiusOffsets = RADIUS_81_OFFSETS;
+                radiusDivisor = RADIUS_81_DIVISOR;
+                radiusCenter = RADIUS_81_CENTER;
+                radiusRowLength = RADIUS_81_ROWLENGTH;
+            }
+            case RADIUS_121 -> {
+                radiusFactors = RADIUS_121_FACTORS;
+                radiusOffsets = RADIUS_121_OFFSETS;
+                radiusDivisor = RADIUS_121_DIVISOR;
+                radiusCenter = RADIUS_121_CENTER;
+                radiusRowLength = RADIUS_121_ROWLENGTH;
+            }
+            case RADIUS_169 -> {
+                radiusFactors = RADIUS_169_FACTORS;
+                radiusOffsets = RADIUS_169_OFFSETS;
+                radiusDivisor = RADIUS_169_DIVISOR;
+                radiusCenter = RADIUS_169_CENTER;
+                radiusRowLength = RADIUS_169_ROWLENGTH;
+            }
+            default -> { // Also RADIUS_25
+                radiusFactors = RADIUS_25_FACTORS;
+                radiusOffsets = RADIUS_25_OFFSETS;
+                radiusDivisor = RADIUS_25_DIVISOR;
+                radiusCenter = RADIUS_25_CENTER;
+                radiusRowLength = RADIUS_25_ROWLENGTH;
+            }
+        }
+        return new SavitzkyGolayParameters(iterations, amount, radiusFactors, radiusOffsets, radiusDivisor, radiusCenter, radiusRowLength);
+    }
+
+    private void applySavitzkyGolayToLayer(ImagePlus image, ImageProcessor p, SavitzkyGolayParameters parameters) {
+        for (int it = 0; it < parameters.iterations; it++) {
+            short[] pixels = (short[]) p.getPixels();
+            short[] pixelsResult = new short[pixels.length];
+            for (int i = 0; i < pixels.length; i++) {
+                long newValueUnsignedInt = getPixelValueUnsignedInt(pixels, i, image.getWidth(), parameters.radiusFactors, parameters.radiusOffsets, parameters.radiusDivisor,
+                        parameters.radiusCenter, parameters.radiusRowLength, parameters.amount);
+                pixelsResult[i] = LswImageProcessingUtil.convertToShort(newValueUnsignedInt > Constants.MAX_INT_VALUE ? Constants.MAX_INT_VALUE
+                        : (newValueUnsignedInt < 0 ? 0 : newValueUnsignedInt));
+            }
+            for (int i = 0; i < pixels.length; i++) {
+                pixels[i] = pixelsResult[i];
+            }
+        }
+    }
+
     private long getPixelValueUnsignedInt(short[] pixels, final int position, final int width, int[] radiusFactors, int[][] radiusOffsets,
-            double radiusDivisor, int radiusCenter, int radiusRowLength, double amount) {
+                                          double radiusDivisor, int radiusCenter, int radiusRowLength, double amount) {
         final int yPosition = position / width;
         final int xPosition = position % width;
         double multipliedTotal = 0;
         int pixelValueUnsignedInt = LswImageProcessingUtil.convertToUnsignedInt(pixels[position]);
         for (int i = 0; i < radiusOffsets.length; i++) {
-            int offsetValueUnsignedInt = getOffsetValueUnsignedInt(pixels,  xPosition + radiusOffsets[i][0],
+            int offsetValueUnsignedInt = getOffsetValueUnsignedInt(pixels, xPosition + radiusOffsets[i][0],
                     yPosition + radiusOffsets[i][1], width);
             int factor = radiusFactors[radiusCenter + (radiusOffsets[i][1] * radiusRowLength) + radiusOffsets[i][0]];
             multipliedTotal += offsetValueUnsignedInt * factor;
@@ -268,5 +290,7 @@ public class SavitzkyGolayFilter {
         }
         return LswImageProcessingUtil.convertToUnsignedInt(pixels[position]);
     }
+
+    private record SavitzkyGolayParameters(int iterations, int amount, int[] radiusFactors, int[][] radiusOffsets, int radiusDivisor, int radiusCenter, int radiusRowLength) {}
 
 }

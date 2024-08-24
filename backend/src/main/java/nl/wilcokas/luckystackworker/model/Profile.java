@@ -105,8 +105,6 @@ public class Profile {
             this.denoise1IterationsGreen = profile.getDenoise1Iterations();
             this.denoise2RadiusGreen = profile.getDenoise2Radius();
             this.denoise2IterationsGreen = profile.getDenoise2Iterations();
-            this.iansAmountGreen = profile.getIansAmount();
-            this.iansRecoveryGreen = profile.getIansRecovery();
             this.savitzkyGolaySizeGreen = profile.getSavitzkyGolaySize();
             this.savitzkyGolayAmountGreen = profile.getSavitzkyGolayAmount();
             this.savitzkyGolayIterationsGreen = profile.getSavitzkyGolayIterations();
@@ -118,8 +116,6 @@ public class Profile {
             this.denoise1IterationsBlue = profile.getDenoise1Iterations();
             this.denoise2RadiusBlue = profile.getDenoise2Radius();
             this.denoise2IterationsBlue = profile.getDenoise2Iterations();
-            this.iansAmountBlue = profile.getIansAmount();
-            this.iansRecoveryBlue = profile.getIansRecovery();
             this.savitzkyGolaySizeBlue = profile.getSavitzkyGolaySize();
             this.savitzkyGolayAmountBlue = profile.getSavitzkyGolayAmount();
             this.savitzkyGolayIterationsBlue = profile.getSavitzkyGolayIterations();
@@ -131,8 +127,6 @@ public class Profile {
             this.denoise1IterationsGreen = profile.getDenoise1IterationsGreen();
             this.denoise2RadiusGreen = profile.getDenoise2RadiusGreen();
             this.denoise2IterationsGreen = profile.getDenoise2IterationsGreen();
-            this.iansAmountGreen = profile.getIansAmountGreen();
-            this.iansRecoveryGreen = profile.getIansRecoveryGreen();
             this.savitzkyGolaySizeGreen = profile.getSavitzkyGolaySizeGreen();
             this.savitzkyGolayAmountGreen = profile.getSavitzkyGolayAmountGreen();
             this.savitzkyGolayIterationsGreen = profile.getSavitzkyGolayIterationsGreen();
@@ -144,8 +138,6 @@ public class Profile {
             this.denoise1IterationsBlue = profile.getDenoise1IterationsBlue();
             this.denoise2RadiusBlue = profile.getDenoise2RadiusBlue();
             this.denoise2IterationsBlue = profile.getDenoise2IterationsBlue();
-            this.iansAmountBlue = profile.getIansAmountBlue();
-            this.iansRecoveryBlue = profile.getIansRecoveryBlue();
             this.savitzkyGolaySizeBlue = profile.getSavitzkyGolaySizeBlue();
             this.savitzkyGolayAmountBlue = profile.getSavitzkyGolayAmountBlue();
             this.savitzkyGolayIterationsBlue = profile.getSavitzkyGolayIterationsBlue();
@@ -243,8 +235,6 @@ public class Profile {
     private BigDecimal denoise1AmountGreen;
     private BigDecimal denoise1RadiusGreen;
     private int denoise1IterationsGreen;
-    private BigDecimal iansAmountGreen;
-    private BigDecimal iansRecoveryGreen;
     private BigDecimal denoise2RadiusGreen;
     private int denoise2IterationsGreen;
     private int savitzkyGolaySizeGreen;
@@ -257,8 +247,6 @@ public class Profile {
     private BigDecimal denoise1AmountBlue;
     private BigDecimal denoise1RadiusBlue;
     private int denoise1IterationsBlue;
-    private BigDecimal iansAmountBlue;
-    private BigDecimal iansRecoveryBlue;
     private BigDecimal denoise2RadiusBlue;
     private int denoise2IterationsBlue;
     private int savitzkyGolaySizeBlue;

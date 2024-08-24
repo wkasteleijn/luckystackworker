@@ -339,10 +339,7 @@ public class OperationService {
     private void applySavitzkyGolayDenoise(ImagePlus image, final Profile profile) {
         if (Constants.DENOISE_ALGORITHM_SAVGOLAY.equals(profile.getDenoiseAlgorithm2())) {
             log.info("Starting SavitzkyGolayDenoise filter");
-            int iterations = profile.getSavitzkyGolayIterations() == 0 ? 1 : profile.getSavitzkyGolayIterations();
-            for (int i = 0; i < iterations; i++) {
-                savitzkyGolayFilter.apply(image, SavitzkyGolayRadius.valueOf(profile.getSavitzkyGolaySize()), profile.getSavitzkyGolayAmount());
-            }
+            savitzkyGolayFilter.apply(image, profile);
         }
     }
 
