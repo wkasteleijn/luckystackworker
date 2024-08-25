@@ -98,8 +98,6 @@ public class Profile {
         this.savitzkyGolayIterations = profile.getSavitzkyGolayIterations();
 
         if (applyDenoiseToChannel == ChannelEnum.RGB) {
-            this.denoiseAlgorithm1Green = profile.getDenoiseAlgorithm1();
-            this.denoiseAlgorithm2Green = profile.getDenoiseAlgorithm2();
             this.denoise1AmountGreen = profile.getDenoise1Amount();
             this.denoise1RadiusGreen = profile.getDenoise1Radius();
             this.denoise1IterationsGreen = profile.getDenoise1Iterations();
@@ -109,8 +107,6 @@ public class Profile {
             this.savitzkyGolayAmountGreen = profile.getSavitzkyGolayAmount();
             this.savitzkyGolayIterationsGreen = profile.getSavitzkyGolayIterations();
 
-            this.denoiseAlgorithm1Blue = profile.getDenoiseAlgorithm1();
-            this.denoiseAlgorithm2Blue = profile.getDenoiseAlgorithm2();
             this.denoise1AmountBlue = profile.getDenoise1Amount();
             this.denoise1RadiusBlue = profile.getDenoise1Radius();
             this.denoise1IterationsBlue = profile.getDenoise1Iterations();
@@ -120,8 +116,6 @@ public class Profile {
             this.savitzkyGolayAmountBlue = profile.getSavitzkyGolayAmount();
             this.savitzkyGolayIterationsBlue = profile.getSavitzkyGolayIterations();
         } else {
-            this.denoiseAlgorithm1Green = profile.getDenoiseAlgorithm1Green();
-            this.denoiseAlgorithm2Green = profile.getDenoiseAlgorithm2Green();
             this.denoise1AmountGreen = profile.getDenoise1AmountGreen();
             this.denoise1RadiusGreen = profile.getDenoise1RadiusGreen();
             this.denoise1IterationsGreen = profile.getDenoise1IterationsGreen();
@@ -131,8 +125,6 @@ public class Profile {
             this.savitzkyGolayAmountGreen = profile.getSavitzkyGolayAmountGreen();
             this.savitzkyGolayIterationsGreen = profile.getSavitzkyGolayIterationsGreen();
 
-            this.denoiseAlgorithm1Blue = profile.getDenoiseAlgorithm1Blue();
-            this.denoiseAlgorithm2Blue = profile.getDenoiseAlgorithm2Blue();
             this.denoise1AmountBlue = profile.getDenoise1AmountBlue();
             this.denoise1RadiusBlue = profile.getDenoise1RadiusBlue();
             this.denoise1IterationsBlue = profile.getDenoise1IterationsBlue();
@@ -230,8 +222,6 @@ public class Profile {
     private ChannelEnum applyDenoiseToChannel;
 
     // denoise green
-    private String denoiseAlgorithm1Green;
-    private String denoiseAlgorithm2Green;
     private BigDecimal denoise1AmountGreen;
     private BigDecimal denoise1RadiusGreen;
     private int denoise1IterationsGreen;
@@ -242,8 +232,6 @@ public class Profile {
     private int savitzkyGolayIterationsGreen;
 
     // denoise blue
-    private String denoiseAlgorithm1Blue;
-    private String denoiseAlgorithm2Blue;
     private BigDecimal denoise1AmountBlue;
     private BigDecimal denoise1RadiusBlue;
     private int denoise1IterationsBlue;

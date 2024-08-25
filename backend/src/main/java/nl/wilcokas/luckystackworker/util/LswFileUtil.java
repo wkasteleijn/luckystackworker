@@ -226,8 +226,6 @@ public class LswFileUtil {
     public static void correctProfileForBackwardCompatability(Profile profile) {
         if (profile.getApplyDenoiseToChannel() == null) {
             profile.setApplyDenoiseToChannel(ChannelEnum.RGB);
-            profile.setDenoiseAlgorithm1Green(profile.getDenoiseAlgorithm1());
-            profile.setDenoiseAlgorithm2Green(profile.getDenoiseAlgorithm2());
             profile.setDenoise1AmountGreen(profile.getDenoise1Amount());
             profile.setDenoise1RadiusGreen(profile.getDenoise1Radius());
             profile.setDenoise1IterationsGreen(profile.getDenoise1Iterations());
@@ -236,8 +234,6 @@ public class LswFileUtil {
             profile.setSavitzkyGolaySizeGreen(profile.getSavitzkyGolaySize());
             profile.setSavitzkyGolayAmountGreen(profile.getSavitzkyGolayAmount());
             profile.setSavitzkyGolayIterationsGreen(profile.getSavitzkyGolayIterations());
-            profile.setDenoiseAlgorithm1Blue(profile.getDenoiseAlgorithm1());
-            profile.setDenoiseAlgorithm2Blue(profile.getDenoiseAlgorithm2());
             profile.setDenoise1AmountBlue(profile.getDenoise1Amount());
             profile.setDenoise1RadiusBlue(profile.getDenoise1Radius());
             profile.setDenoise1IterationsBlue(profile.getDenoise1Iterations());

@@ -71,22 +71,18 @@ public class ProfileDTO {
         this.savitzkyGolayAmount = profile.getSavitzkyGolayAmount();
         this.savitzkyGolayIterations = profile.getSavitzkyGolayIterations();
 
-        this.denoiseAlgorithm1Green = profile.getDenoiseAlgorithm1Green();
         this.denoise1AmountGreen = profile.getDenoise1AmountGreen();
         this.denoise1RadiusGreen = profile.getDenoise1RadiusGreen();
         this.denoise1IterationsGreen = profile.getDenoise1IterationsGreen();
-        this.denoiseAlgorithm2Green = profile.getDenoiseAlgorithm2Green();
         this.denoise2RadiusGreen = profile.getDenoise2RadiusGreen();
         this.denoise2IterationsGreen = profile.getDenoise2IterationsGreen();
         this.savitzkyGolaySizeGreen = profile.getSavitzkyGolaySizeGreen();
         this.savitzkyGolayAmountGreen = profile.getSavitzkyGolayAmountGreen();
         this.savitzkyGolayIterationsGreen = profile.getSavitzkyGolayIterationsGreen();
 
-        this.denoiseAlgorithm1Blue = profile.getDenoiseAlgorithm1Blue();
         this.denoise1AmountBlue = profile.getDenoise1AmountBlue();
         this.denoise1RadiusBlue = profile.getDenoise1RadiusBlue();
         this.denoise1IterationsBlue = profile.getDenoise1IterationsBlue();
-        this.denoiseAlgorithm2Blue = profile.getDenoiseAlgorithm2Blue();
         this.denoise2RadiusBlue = profile.getDenoise2RadiusBlue();
         this.denoise2IterationsBlue = profile.getDenoise2IterationsBlue();
         this.savitzkyGolaySizeBlue = profile.getSavitzkyGolaySizeBlue();
@@ -171,13 +167,11 @@ public class ProfileDTO {
     private int denoise2Iterations;
     private ChannelEnum applyDenoiseToChannel;
 
-    private String denoiseAlgorithm1Green;
     private BigDecimal denoise1AmountGreen;
     private BigDecimal denoise1RadiusGreen;
     private int denoise1IterationsGreen;
     private BigDecimal iansAmountGreen;
     private BigDecimal iansRecoveryGreen;
-    private String denoiseAlgorithm2Green;
     private int savitzkyGolaySizeGreen;
     private int savitzkyGolayAmountGreen;
     private int savitzkyGolayIterationsGreen;
@@ -185,13 +179,11 @@ public class ProfileDTO {
     private int denoise2IterationsGreen;
     private ChannelEnum applyDenoiseToChannelGreen;
 
-    private String denoiseAlgorithm1Blue;
     private BigDecimal denoise1AmountBlue;
     private BigDecimal denoise1RadiusBlue;
     private int denoise1IterationsBlue;
     private BigDecimal iansAmountBlue;
     private BigDecimal iansRecoveryBlue;
-    private String denoiseAlgorithm2Blue;
     private int savitzkyGolaySizeBlue;
     private int savitzkyGolayAmountBlue;
     private int savitzkyGolayIterationsBlue;

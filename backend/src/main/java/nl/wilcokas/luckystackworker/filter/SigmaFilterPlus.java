@@ -1,6 +1,8 @@
 package nl.wilcokas.luckystackworker.filter;
 
 import java.awt.Rectangle;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.concurrent.Executor;
 
 import nl.wilcokas.luckystackworker.model.Profile;
@@ -20,7 +22,7 @@ import ij.process.ImageProcessor;
  * Computer Vision, Graphics and Image Processing, vol. 24, 255-269 (1983). The
  * "Outlier Aware" option is a modification of Lee's algorithm introduced by
  * Tony Collins.
- *
+ * <p>
  * The filter smoothens an image by taking an average over the neighboring
  * pixels, but only includes those pixels that have a value not deviating from
  * the current pixel by more than a given range. The range is defined by the
@@ -31,24 +33,23 @@ import ij.process.ImageProcessor;
  * pixels excludes the center pixel. Thus, outliers having a value very
  * different from the surrounding are not included in the average, i.e.,
  * completely eliminated.
- *
+ * <p>
  * For preserving the edges, values of "Use pixels within" between 1 and 2
  * sigmas are recommended. With high values, the filter will behave more like a
  * traditional averaging filter, i.e. smoothen the edges. Typical values of the
  * minimum pixel fraction are around 0.2, with higher values resulting in more
  * noise supression, but smoother edges.
- *
+ * <p>
  * If preserving the edges is not desired, "Use pixels within" 2-3 sigmas and a
  * minimum pixel fraction around 0.8-0.9, together with the "Outlier Aware"
  * option will smoothen the image, similar to a traditional filter, but without
  * being influenced by outliers strongly deviating from the surrounding pixels
  * (hot pixels, dead pixels etc.).
- *
- *
+ * <p>
+ * <p>
  * Code by Michael Schmid, 2007-10-25
- *
+ * <p>
  * Note: this class is based on the original filter from Michael Schmid, but rewritten as an LSW filter.
- *
  */
 @Component
 public class SigmaFilterPlus {
@@ -57,49 +58,39 @@ public class SigmaFilterPlus {
     protected int kNPoints; // number of points in the kernel
     protected int[] lineRadius; // the length of each kernel line is 2*lineRadius+1
 
-    public void applyDenoise1(ImagePlus image, Profile profile, double minimum) {
+    public void applyDenoise1(ImagePlus image, Profile profile) {
         double sigma = 2D;
         ImageStack stack = image.getStack();
-        Executor executor = LswUtil.getParallelExecutor();
         // red
-        executor.execute(() -> {
-            ImageProcessor ip = stack.getProcessor(1);
-            applySigmaToLayer(sigma, minimum, profile.getDenoise1Radius().doubleValue(), profile.getDenoise1Iterations() == 0 ? 1 : profile.getDenoise1Iterations(), ip, 1);
-        });
+        ImageProcessor ip = stack.getProcessor(1);
+        BigDecimal factor = profile.getDenoise1Amount().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100) : profile.getDenoise1Amount();
+        BigDecimal minimum = factor.divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
+        applySigmaToLayer(sigma, minimum.doubleValue(), profile.getDenoise1Radius().doubleValue(), profile.getDenoise1Iterations() == 0 ? 1 : profile.getDenoise1Iterations(), ip, 1);
         // green
-        executor.execute(() -> {
-            ImageProcessor ip = stack.getProcessor(2);
-            applySigmaToLayer(sigma, minimum, profile.getDenoise1RadiusGreen().doubleValue(), profile.getDenoise1IterationsGreen() == 0 ? 1 : profile.getDenoise1IterationsGreen(), ip, 2);
-        });
+        ip = stack.getProcessor(2);
+        factor = profile.getDenoise1AmountGreen().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100) : profile.getDenoise1AmountGreen();
+        minimum = factor.divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
+        applySigmaToLayer(sigma, minimum.doubleValue(), profile.getDenoise1RadiusGreen().doubleValue(), profile.getDenoise1IterationsGreen() == 0 ? 1 : profile.getDenoise1IterationsGreen(), ip, 2);
         // blue
-        executor.execute(() -> {
-            ImageProcessor ip = stack.getProcessor(3);
-            applySigmaToLayer(sigma, minimum, profile.getDenoise1RadiusBlue().doubleValue(), profile.getDenoise1IterationsBlue() == 0 ? 1 : profile.getDenoise1IterationsBlue(), ip, 3);
-        });
-        LswUtil.stopAndAwaitParallelExecutor(executor);
+        ip = stack.getProcessor(3);
+        factor = profile.getDenoise1AmountBlue().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100) : profile.getDenoise1AmountBlue();
+        minimum = factor.divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
+        applySigmaToLayer(sigma, minimum.doubleValue(), profile.getDenoise1RadiusBlue().doubleValue(), profile.getDenoise1IterationsBlue() == 0 ? 1 : profile.getDenoise1IterationsBlue(), ip, 3);
     }
 
     public void applyDenoise2(ImagePlus image, Profile profile) {
         double sigma = 5D;
         double minimum = 1D;
         ImageStack stack = image.getStack();
-        Executor executor = LswUtil.getParallelExecutor();
         // red
-        executor.execute(() -> {
-            ImageProcessor ip = stack.getProcessor(1);
-            applySigmaToLayer(sigma, minimum, profile.getDenoise2Radius().doubleValue(), profile.getDenoise2Iterations() == 0 ? 1 : profile.getDenoise2Iterations(), ip, 1);
-        });
+        ImageProcessor ip = stack.getProcessor(1);
+        applySigmaToLayer(sigma, minimum, profile.getDenoise2Radius().doubleValue(), profile.getDenoise2Iterations() == 0 ? 1 : profile.getDenoise2Iterations(), ip, 1);
         // green
-        executor.execute(() -> {
-            ImageProcessor ip = stack.getProcessor(2);
-            applySigmaToLayer(sigma, minimum, profile.getDenoise2RadiusGreen().doubleValue(), profile.getDenoise2IterationsGreen() == 0 ? 1 : profile.getDenoise2IterationsGreen(), ip, 2);
-        });
+        ip = stack.getProcessor(2);
+        applySigmaToLayer(sigma, minimum, profile.getDenoise2RadiusGreen().doubleValue(), profile.getDenoise2IterationsGreen() == 0 ? 1 : profile.getDenoise2IterationsGreen(), ip, 2);
         // blue
-        executor.execute(() -> {
-            ImageProcessor ip = stack.getProcessor(3);
-            applySigmaToLayer(sigma, minimum, profile.getDenoise2RadiusBlue().doubleValue(), profile.getDenoise2IterationsBlue() == 0 ? 1 : profile.getDenoise2IterationsBlue(), ip, 3);
-        });
-        LswUtil.stopAndAwaitParallelExecutor(executor);
+        ip = stack.getProcessor(3);
+        applySigmaToLayer(sigma, minimum, profile.getDenoise2RadiusBlue().doubleValue(), profile.getDenoise2IterationsBlue() == 0 ? 1 : profile.getDenoise2IterationsBlue(), ip, 3);
     }
 
     private void applySigmaToLayer(double sigma, double minimum, double radius, int iterations, ImageProcessor ip, int layer) {
@@ -149,7 +140,7 @@ public class SigmaFilterPlus {
     // shifted.
     //
     private void doFiltering(FloatProcessor ip, int kRadius, int[] lineRadius, double sigmaWidth, int minPixNumber,
-            boolean outlierAware) {
+                             boolean outlierAware) {
         float[] pixels = (float[]) ip.getPixels(); // array of the pixel values of the input image
         int width = ip.getWidth();
         int height = ip.getHeight();
@@ -167,7 +158,7 @@ public class SigmaFilterPlus {
         for (int y = roi.y - kRadius, iCache = 0; y < roi.y + kRadius; y++)
             for (int x = xmin; x < xmax; x++, iCache++) // fill the cache for filtering the first line
                 cache[iCache] = pixels[(x < 0 ? 0 : x >= width ? width - 1 : x)
-                                       + width * (y < 0 ? 0 : y >= height ? height - 1 : y)];
+                        + width * (y < 0 ? 0 : y >= height ? height - 1 : y)];
         int nextLineInCache = 2 * kRadius; // where the next line should be written to
         double[] sums = new double[2];
         Thread thread = Thread.currentThread(); // needed to check for interrupted state
@@ -211,7 +202,7 @@ public class SigmaFilterPlus {
                 int count = 0;
                 for (int y1 = 0; y1 < kSize; y1++) { // for y1 within the cache stripe
                     for (int x1 = xCache0 - lineRadius[y1],
-                            iCache1 = y1 * cacheWidth + x1; x1 <= xCache0 + lineRadius[y1]; x1++, iCache1++) {
+                         iCache1 = y1 * cacheWidth + x1; x1 <= xCache0 + lineRadius[y1]; x1++, iCache1++) {
                         float v = cache[iCache1]; // a point within the kernel
                         if ((v >= sigmaBottom) && (v <= sigmaTop)) {
                             sum += v;
@@ -226,7 +217,7 @@ public class SigmaFilterPlus {
                 else {
                     if (outlierAware)
                         pixels[p] = (float) ((sums[0] - value) / (kNPoints - 1)); // assumes that the current pixel is
-                    // an outlier
+                        // an outlier
                     else
                         pixels[p] = (float) mean;
                 }
@@ -246,7 +237,7 @@ public class SigmaFilterPlus {
         double sum = 0, sum2 = 0;
         for (int y = 0; y < kSize; y++) { // y within the cache stripe
             for (int x = xCache0 - lineRadius[y],
-                    iCache = y * cacheWidth + x; x <= xCache0 + lineRadius[y]; x++, iCache++) {
+                 iCache = y * cacheWidth + x; x <= xCache0 + lineRadius[y]; x++, iCache++) {
                 float v = cache[iCache];
                 sum += v;
                 sum2 += v * v;

@@ -245,9 +245,7 @@ public class OperationService {
     private void applySigmaDenoise1(final ImagePlus image, final Profile profile) {
         if (Constants.DENOISE_ALGORITHM_SIGMA1.equals(profile.getDenoiseAlgorithm1())) {
             log.info("Applying Sigma denoise mode 1 with value {} to image {}", profile.getDenoise1Amount(), image.getID());
-            BigDecimal factor = profile.getDenoise1Amount().compareTo(new BigDecimal("100")) > 0 ? new BigDecimal(100) : profile.getDenoise1Amount();
-            BigDecimal minimum = factor.divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
-            sigmaFilterPlusFilter.applyDenoise1(image,profile, minimum.doubleValue());
+            sigmaFilterPlusFilter.applyDenoise1(image,profile);
         }
     }
 

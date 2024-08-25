@@ -54,15 +54,11 @@ export class Profile {
   denoise2Iterations: number;
 
   // denoise 1 green
-  denoiseAlgorithm1Green: string;
   denoise1AmountGreen: number;
   denoise1RadiusGreen: number;
   denoise1IterationsGreen: number;
-  iansAmountGreen: number;
-  iansRecoveryGreen: number;
 
   // denoise 2 green
-  denoiseAlgorithm2Green: string;
   savitzkyGolaySizeGreen: number;
   savitzkyGolayAmountGreen: number;
   savitzkyGolayIterationsGreen: number;
@@ -70,15 +66,11 @@ export class Profile {
   denoise2IterationsGreen: number;
 
   // denoise 1 blue
-  denoiseAlgorithm1Blue: string;
   denoise1AmountBlue: number;
   denoise1RadiusBlue: number;
   denoise1IterationsBlue: number;
-  iansAmountBlue: number;
-  iansRecoveryBlue: number;
 
   // denoise 2 blue
-  denoiseAlgorithm2Blue: string;
   savitzkyGolaySizeBlue: number;
   savitzkyGolayAmountBlue: number;
   savitzkyGolayIterationsBlue: number;
