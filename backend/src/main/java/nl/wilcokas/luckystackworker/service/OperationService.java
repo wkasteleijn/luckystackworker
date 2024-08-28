@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import nl.wilcokas.luckystackworker.filter.*;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import org.apache.commons.text.StringSubstitutor;
 import org.springframework.core.io.ClassPathResource;
@@ -20,14 +21,6 @@ import ij.process.ImageProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.filter.DispersionCorrectionFilter;
-import nl.wilcokas.luckystackworker.filter.EqualizeLocalHistogramsFilter;
-import nl.wilcokas.luckystackworker.filter.IansNoiseReductionFilter;
-import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
-import nl.wilcokas.luckystackworker.filter.RGBBalanceFilter;
-import nl.wilcokas.luckystackworker.filter.SaturationFilter;
-import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter;
-import nl.wilcokas.luckystackworker.filter.SigmaFilterPlus;
 import nl.wilcokas.luckystackworker.filter.settings.IansNoiseReductionParameters;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenParameters;
@@ -61,6 +54,7 @@ public class OperationService {
     private final DispersionCorrectionFilter dispersionCorrectionFilter;
     private final IansNoiseReductionFilter iansNoiseReductionFilter;
     private final EqualizeLocalHistogramsFilter equalizeLocalHistogramsFilter;
+    private final ColorNormalisationFilter colorNormalisationFilter;
 
     private int displayedProgress = 0;
     private Timer timer = new Timer();
@@ -90,6 +84,7 @@ public class OperationService {
         updateProgress(viewer, 64);
         applyBrightnessAndContrast(image, profile, true);
         updateProgress(viewer, 72);
+        applyColorNormalisation(image, profile);
         applyRGBBalance(image, profile);
         updateProgress(viewer, 80);
         applyGamma(image, profile);
@@ -289,6 +284,10 @@ public class OperationService {
                         profile.getPurple().intValue() / 255D);
             }
         }
+    }
+
+    private void applyColorNormalisation(final ImagePlus image, final Profile profile) {
+        colorNormalisationFilter.apply(image);
     }
 
     private void applySaturation(final ImagePlus image, final Profile profile) {
