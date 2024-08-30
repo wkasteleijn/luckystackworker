@@ -11,6 +11,10 @@ export class Profile {
   deringRadius: number;
   deringStrength: number;
   deringThreshold: number;
+  luminanceIncludeRed: boolean;
+  luminanceIncludeGreen: boolean;
+  luminanceIncludeBlue: boolean;
+  luminanceIncludeColor: boolean;
 
   // sharpen green
   radiusGreen: number;
@@ -79,11 +83,7 @@ export class Profile {
 
   applyDenoiseToChannel: string;
 
-  luminanceIncludeRed: boolean;
-  luminanceIncludeGreen: boolean;
-  luminanceIncludeBlue: boolean;
-  luminanceIncludeColor: boolean;
-
+  // light & contrast
   gamma: number;
   contrast: number;
   brightness: number;
@@ -93,6 +93,8 @@ export class Profile {
   localContrastMedium: number;
   localContrastLarge: number;
   equalizeLocalHistogramsStrength: number;
+
+  // color
   red: number;
   green: number;
   blue: number;
@@ -103,6 +105,8 @@ export class Profile {
   dispersionCorrectionBlueX: number;
   dispersionCorrectionRedY: number;
   dispersionCorrectionBlueY: number;
+  normalizeColorBalance: boolean;
+
   scale: number;
   openImageMode: string;
 }

@@ -338,3 +338,21 @@
 .zoomIcon {
   transform: scale(1.6);
 }
+.normalizeCheckBox {
+  margin-left: 78px;
+}
+.dispersion {
+  transform: scale(1.8);
+}
+.infoButton {
+  width: 12px;
+  transform: scale(2.7);
+}
+.openButton {
+  width: 12px;
+  transform: scale(2.4);
+}
+.saveButton {
+  width: 12px;
+  transform: scale(2.4);
+}

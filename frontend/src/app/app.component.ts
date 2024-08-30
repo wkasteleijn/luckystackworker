@@ -97,6 +97,7 @@ export class AppComponent implements OnInit {
   blue: number;
   purple: number;
   dispersionCorrectionEnabled: boolean = false;
+  normalizeColorBalance: boolean = false;
 
   profile: Profile;
   settings: Settings;
@@ -1013,6 +1014,15 @@ export class AppComponent implements OnInit {
       this.profile.denoiseAlgorithm2 = 'OFF';
     }
     console.log('denoiseAlgorithm1Changed called: ' + event.value);
+    this.updateProfile();
+  }
+
+  colorNormalizationChanged() {
+    this.settings.operation = 'normalizeColorBalance';
+    this.profile.normalizeColorBalance = this.normalizeColorBalance;
+    console.log(
+      'colorNormalizationChanged called: ' + this.normalizeColorBalance
+    );
     this.updateProfile();
   }
 

@@ -95,6 +95,7 @@ public class ProfileDTO {
         this.blue = profile.getBlue();
         this.purple = profile.getPurple();
         this.saturation = profile.getSaturation();
+        this.normalizeColorBalance = profile.isNormalizeColorBalance();
 
         // constrast & light
         this.gamma = profile.getGamma();
@@ -216,6 +217,7 @@ public class ProfileDTO {
     private boolean luminanceIncludeGreen;
     private boolean luminanceIncludeBlue;
     private boolean luminanceIncludeColor;
+    private boolean normalizeColorBalance;
 
     private double scale;
     private int equalizeLocalHistogramsStrength;

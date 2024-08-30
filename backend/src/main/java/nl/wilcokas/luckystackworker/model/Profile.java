@@ -157,6 +157,7 @@ public class Profile {
         this.dispersionCorrectionBlueX = profile.getDispersionCorrectionBlueX();
         this.dispersionCorrectionRedY = profile.getDispersionCorrectionRedY();
         this.dispersionCorrectionBlueY = profile.getDispersionCorrectionBlueY();
+        this.normalizeColorBalance = profile.isNormalizeColorBalance();
 
         this.scale = profile.getScale();
         this.openImageMode = profile.getOpenImageMode();
@@ -263,6 +264,7 @@ public class Profile {
     private int dispersionCorrectionBlueX;
     private int dispersionCorrectionRedY;
     private int dispersionCorrectionBlueY;
+    private boolean normalizeColorBalance;
 
     private double scale;
     private OpenImageModeEnum openImageMode;

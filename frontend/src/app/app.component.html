@@ -25,11 +25,7 @@
       }}"
       matTooltip="Open a 16-bit image stack for processing."
     >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon"
-        fontIcon="upload_file"
-      ></mat-icon>
+      <img src="assets/images/open.png" class="openButton zoomIcon" />
     </button>
     <button
       *ngIf="!openRefImageEnabled()"
@@ -38,11 +34,7 @@
       disabled
       class="button_disabled"
     >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon"
-        fontIcon="upload_file"
-      ></mat-icon>
+      <img src="assets/images/open.png" class="openButton zoomIcon" />
     </button>
 
     <mat-form-field appearance="fill">
@@ -173,11 +165,10 @@
         getLatestKnownVersion()
       }}."
     >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon buttonBottom"
-        fontIcon="info_i"
-      ></mat-icon>
+      <img
+        src="assets/images/info.png"
+        class="infoButton zoomIcon buttonBottom"
+      />
     </button>
 
     <button
@@ -189,7 +180,7 @@
         'buttonChannelSwitcher buttonMargin ' +
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
       }}"
-      matTooltip="Switch channel"
+      matTooltip="Switch visible channel"
     >
       <img
         *ngIf="visibleChannel === 'RGB'"
@@ -252,11 +243,10 @@
       (click)="openAbout()"
       matTooltip="About"
     >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon buttonBottom"
-        fontIcon="info_i"
-      ></mat-icon>
+      <img
+        src="assets/images/info.png"
+        class="infoButton zoomIcon buttonBottom"
+      />
     </button>
     <button
       *ngIf="!openRefImageEnabled() && !showVersionButton()"
@@ -266,11 +256,10 @@
       class="button_disabled buttonMargin"
       matTooltip="About"
     >
-      <mat-icon
-        aria-hidden="false"
-        fontIcon="info_i"
-        class="zoomIcon buttonBottom"
-      ></mat-icon>
+      <img
+        src="assets/images/info.png"
+        class="infoButton zoomIcon buttonBottom"
+      />
     </button>
 
     <button
@@ -375,11 +364,7 @@
       }}"
       matTooltip="This will save the currently open stack with all applied the post-processing. You can save it as a 16-bit TIFF or a 100% quality JPG. To do so add the applicable extension to the filename (filename.tif, filename.jpg)."
     >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon buttonBottom"
-        fontIcon="save"
-      ></mat-icon>
+      <img src="assets/images/save.png" class="saveButton zoomIcon" />
     </button>
     <button
       *ngIf="!refImageSelected || !openRefImageEnabled()"
@@ -388,11 +373,7 @@
       disabled
       class="button_disabled"
     >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon buttonBottom"
-        fontIcon="save"
-      ></mat-icon>
+      <img src="assets/images/save.png" class="saveButton zoomIcon" />
     </button>
 
     <mat-form-field appearance="fill">
@@ -1365,14 +1346,25 @@
         </div>
       </div>
 
-      <div
-        class="sliderRowCategoryTitle {{
-          nightModeEnabled()
-            ? 'sliderRowCategoryTitleColorNight'
-            : 'sliderRowCategoryTitleColor'
-        }}"
-      >
-        Balance
+      <div class="sliderRow">
+        <div
+          class="sliderRowCategoryTitle {{
+            nightModeEnabled()
+              ? 'sliderRowCategoryTitleColorNight'
+              : 'sliderRowCategoryTitleColor'
+          }}"
+        >
+          Balance
+        </div>
+        <div class="normalizeCheckBox">
+          <mat-checkbox
+            [(ngModel)]="normalizeColorBalance"
+            (change)="colorNormalizationChanged()"
+            [color]="colorTheme()"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            >Normalize</mat-checkbox
+          >
+        </div>
       </div>
       <div class="sliderRow">
         <div class="sliderLabel">Red</div>
@@ -1463,7 +1455,10 @@
               }}"
               matTooltip="Dipersion Correction"
             >
-              <img src="assets/images/dispersion.png" class="dispersionArrow" />
+              <img
+                src="assets/images/dispersion.png"
+                class="dispersion dispersionArrow"
+              />
             </button>
             <button
               *ngIf="!openRefImageEnabled() || !refImageSelected"

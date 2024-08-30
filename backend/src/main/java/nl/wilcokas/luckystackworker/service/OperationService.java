@@ -240,7 +240,7 @@ public class OperationService {
     private void applySigmaDenoise1(final ImagePlus image, final Profile profile) {
         if (Constants.DENOISE_ALGORITHM_SIGMA1.equals(profile.getDenoiseAlgorithm1())) {
             log.info("Applying Sigma denoise mode 1 with value {} to image {}", profile.getDenoise1Amount(), image.getID());
-            sigmaFilterPlusFilter.applyDenoise1(image,profile);
+            sigmaFilterPlusFilter.applyDenoise1(image, profile);
         }
     }
 
@@ -287,7 +287,9 @@ public class OperationService {
     }
 
     private void applyColorNormalisation(final ImagePlus image, final Profile profile) {
-        colorNormalisationFilter.apply(image);
+        if (profile.isNormalizeColorBalance()) {
+            colorNormalisationFilter.apply(image);
+        }
     }
 
     private void applySaturation(final ImagePlus image, final Profile profile) {
