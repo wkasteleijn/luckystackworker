@@ -20,7 +20,7 @@ public class ProfileDTO {
         this.name = profile.getName();
 
         // sharpen
-        this.applySharpenToChannel = profile.getApplySharpenToChannel();
+        this.applySharpenToChannel = ChannelEnum.RGB;
         this.radius = profile.getRadius();
         this.amount = profile.getAmount();
         this.iterations = profile.getIterations();
@@ -178,7 +178,6 @@ public class ProfileDTO {
     private int savitzkyGolayIterationsGreen;
     private BigDecimal denoise2RadiusGreen;
     private int denoise2IterationsGreen;
-    private ChannelEnum applyDenoiseToChannelGreen;
 
     private BigDecimal denoise1AmountBlue;
     private BigDecimal denoise1RadiusBlue;
@@ -190,7 +189,6 @@ public class ProfileDTO {
     private int savitzkyGolayIterationsBlue;
     private BigDecimal denoise2RadiusBlue;
     private int denoise2IterationsBlue;
-    private ChannelEnum applyDenoiseToChannelBlue;
 
     // light & contrast
     private BigDecimal gamma;

@@ -319,8 +319,7 @@ public class LswFileUtil {
         }
 
         // Added since v6.0.0, so older version written yaml needs to stay compatible.
-        if (profile.getApplyDenoiseToChannel() == null) {
-            profile.setApplyDenoiseToChannel(ChannelEnum.RGB);
+        if (profile.getDenoise1AmountGreen() == null) {
             profile.setDenoise1AmountGreen(profile.getDenoise1Amount());
             profile.setDenoise1RadiusGreen(profile.getDenoise1Radius());
             profile.setDenoise1IterationsGreen(profile.getDenoise1Iterations());
@@ -338,8 +337,7 @@ public class LswFileUtil {
             profile.setSavitzkyGolayAmountBlue(profile.getSavitzkyGolayAmount());
             profile.setSavitzkyGolayIterationsBlue(profile.getSavitzkyGolayIterations());
         }
-        if (profile.getApplySharpenToChannel() == null) {
-            profile.setApplySharpenToChannel(ChannelEnum.RGB);
+        if (profile.getRadiusGreen() == null) {
             profile.setRadiusGreen(profile.getRadius());
             profile.setAmountGreen(profile.getAmount());
             profile.setIterationsGreen(profile.getIterations());

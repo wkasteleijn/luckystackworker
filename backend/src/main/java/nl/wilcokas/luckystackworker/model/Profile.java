@@ -23,7 +23,6 @@ public class Profile {
         this.name = profile.getName();
 
         // sharpen
-        this.applySharpenToChannel = profile.getApplySharpenToChannel();
         this.radius = profile.getRadius();
         this.amount = profile.getAmount();
         this.iterations = profile.getIterations();
@@ -34,7 +33,7 @@ public class Profile {
         this.deringStrength = profile.getDeringStrength();
         this.deringThreshold = profile.getDeringThreshold();
 
-        if (applySharpenToChannel == ChannelEnum.RGB) {
+        if ( profile.getApplySharpenToChannel() == ChannelEnum.RGB) {
             this.radiusGreen = profile.getRadius();
             this.amountGreen = profile.getAmount();
             this.iterationsGreen = profile.getIterations();
@@ -97,7 +96,7 @@ public class Profile {
         this.savitzkyGolayAmount = profile.getSavitzkyGolayAmount();
         this.savitzkyGolayIterations = profile.getSavitzkyGolayIterations();
 
-        if (applyDenoiseToChannel == ChannelEnum.RGB) {
+        if (profile.getApplyDenoiseToChannel() == ChannelEnum.RGB) {
             this.denoise1AmountGreen = profile.getDenoise1Amount();
             this.denoise1RadiusGreen = profile.getDenoise1Radius();
             this.denoise1IterationsGreen = profile.getDenoise1Iterations();
@@ -205,7 +204,6 @@ public class Profile {
     private boolean luminanceIncludeGreen;
     private boolean luminanceIncludeBlue;
     private boolean luminanceIncludeColor;
-    private ChannelEnum applySharpenToChannel;
 
     // denoise (red and all channels)
     private String denoiseAlgorithm1;
@@ -220,7 +218,6 @@ public class Profile {
     private int savitzkyGolaySize;
     private int savitzkyGolayAmount;
     private int savitzkyGolayIterations;
-    private ChannelEnum applyDenoiseToChannel;
 
     // denoise green
     private BigDecimal denoise1AmountGreen;
