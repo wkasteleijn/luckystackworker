@@ -1289,6 +1289,7 @@ export class AppComponent implements OnInit {
       this.settings.largeImage
     );
     this.equalizeLocalHistograms = this.profile.equalizeLocalHistogramsStrength;
+    this.normalizeColorBalance = this.profile.normalizeColorBalance;
     this.setNonPersistentSettings();
   }
 
