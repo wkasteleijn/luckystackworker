@@ -1,5 +1,18 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+08/09/2024 major release 6.0.0
+- Replaced histogram window with a new metadata panel integrated in the image window containing the histogram graphic plus seperate indicators per channel
+- New object metadata indicators added to the image window
+- New image metatada indictors also added to the image window
+- Added ability to sharpen & denoise the red, green & blue channels seperately
+- Added new button to switch the visible channel between color, red, green and blue
+- Added new color balance normalization switch to automatically equalize the color balance
+- New and more compact look and feel, replaced textual buttons with icons
+- New revised image window with better control panel integration
+- New buttton to force showing the image windows at 100% scale
+- Many other noticeable and less noticeable changes to the user interface
+- Upgraded frontend & backend dependencies to the latest versions.
+
 30/04/2024 minor release 5.2.0:
 - Added ability to open stacks cumulatively for specific channels (RGB, gray, red, green, blue)
 - Profiles will persist with the installation of a new version from now on
