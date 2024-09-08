@@ -85,7 +85,10 @@ app.on("ready", function () {
   const pathParts = app.getAppPath().split("/");
   switch (process.platform) {
     case "win32":
-      spawn(`${app.getAppPath()}\\lsworker.bat`, { shell: true });
+      const lsworkerPath = `${app.getPath(
+        "home"
+      )}\\AppData\\Local\\LuckyStackWorker\\lsworker.bat`;
+      spawn(lsworkerPath, { shell: true });
       break;
     case "darwin":
       spawn(
