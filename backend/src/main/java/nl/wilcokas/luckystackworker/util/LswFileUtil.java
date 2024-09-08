@@ -229,6 +229,7 @@ public class LswFileUtil {
         if (profile.getDenoise1Radius() == null) {
             profile.setDenoise1Radius(Constants.DEFAULT_DENOISE_RADIUS);
             profile.setDenoiseSigma(Constants.DEFAULT_DENOISE_SIGMA);
+            profile.setDenoise1Amount(new BigDecimal(50));
         }
         if (profile.getDenoise1Iterations() == 0) {
             profile.setDenoise1Iterations(Constants.DEFAULT_DENOISE_ITERATIONS);
