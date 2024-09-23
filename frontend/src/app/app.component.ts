@@ -1,8 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
+import { MatLegacyDialog } from '@angular/material/legacy-dialog';
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar';
 import version from '../../package.json';
 import { AboutComponent } from './about/about.component';
+import {
+  ConfirmationComponent,
+  ConfirmationModel,
+} from './confirmation/confirmation.component';
 import { LuckyStackWorkerService } from './luckystackworker.service';
 import { Profile } from './model/profile';
 import { Settings } from './model/settings';
@@ -100,6 +105,7 @@ export class AppComponent implements OnInit {
   normalizeColorBalance: boolean = false;
 
   profile: Profile;
+  profileWhenOpening: Profile;
   settings: Settings;
   selectedProfile: string;
   rootFolder: string = 'C:\\';
@@ -124,11 +130,13 @@ export class AppComponent implements OnInit {
   visibleChannel: string = 'RGB';
   applySharpenToChannel: string = 'RGB';
   applyDenoiseToChannel: string = 'RGB';
+  confirmationResult: string = '';
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
     private aboutSnackbar: MatLegacySnackBar,
-    private newVersionSnackbar: MatLegacySnackBar
+    private newVersionSnackbar: MatLegacySnackBar,
+    private confirmationDialog: MatLegacyDialog
   ) {}
 
   ngOnInit(): void {
@@ -155,6 +163,7 @@ export class AppComponent implements OnInit {
           this.crop = false;
           if (data && data.profile.amount > 0) {
             this.profile = data.profile;
+            this.profileWhenOpening = { ...this.profile };
             this.settings = data.settings;
             this.selectedProfile = this.profile.name;
             this.rootFolder = data.settings.rootFolder;
@@ -1581,6 +1590,20 @@ export class AppComponent implements OnInit {
       'https://github.com/wkasteleijn/luckystackworker/releases/latest',
       '_blank'
     );
+  }
+
+  openConfirmation(confirmationText: string) {
+    const dialogData = new ConfirmationModel(confirmationText);
+
+    const dialogRef = this.confirmationDialog.open(ConfirmationComponent, {
+      maxWidth: '400px',
+      data: dialogData,
+    });
+
+    dialogRef.afterClosed().subscribe((dialogResult) => {
+      this.confirmationResult = dialogResult;
+      console.log(dialogResult);
+    });
   }
 
   private showSpinner() {

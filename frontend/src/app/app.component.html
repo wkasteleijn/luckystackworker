@@ -425,6 +425,31 @@
         fontIcon="nightlight"
       ></mat-icon>
     </button>
+
+    <button
+      *ngIf="openRefImageEnabled() && refImageSelected"
+      type="button"
+      mat-button
+      (click)="
+        openConfirmation('Are you sure you want to revert your changes?')
+      "
+      class="{{
+        'buttonZoom buttonMargin ' +
+          (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
+      }}"
+      matTooltip="Revert changes"
+    >
+      <img src="assets/images/reset.png" class="dispersion dispersionArrow" />
+    </button>
+    <button
+      *ngIf="!refImageSelected || !openRefImageEnabled()"
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled buttonMargin"
+    >
+      <img src="assets/images/reset.png" class="dispersion dispersionArrow" />
+    </button>
   </div>
   <mat-tab-group class="sliderTabs" selectedIndex="0">
     <mat-tab label="Sharpen">

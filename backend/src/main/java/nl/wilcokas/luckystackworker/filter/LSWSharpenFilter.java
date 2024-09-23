@@ -30,29 +30,29 @@ public class LSWSharpenFilter {
         // Run every stack in a seperate thread to increase performance.
         Executor executor = LswUtil.getParallelExecutor();
         executor.execute(() -> applyRGBModeToChannel(stack,
-                                                     unsharpMaskParameters.getRadiusRed(),
-                                                     unsharpMaskParameters.getAmountRed(),
-                                                     unsharpMaskParameters.getIterationsRed(),
-                                                     unsharpMaskParameters.getDeringRadiusRed(),
-                                                     unsharpMaskParameters.getDeringStrengthRed(),
-                                                     unsharpMaskParameters.getDeringThresholdRed(),
-                                                     1));
+                unsharpMaskParameters.getRadiusRed(),
+                unsharpMaskParameters.getAmountRed(),
+                unsharpMaskParameters.getIterationsRed(),
+                unsharpMaskParameters.getDeringRadiusRed(),
+                unsharpMaskParameters.getDeringStrengthRed(),
+                unsharpMaskParameters.getDeringThresholdRed(),
+                1));
         executor.execute(() -> applyRGBModeToChannel(stack,
-                                                     unsharpMaskParameters.getRadiusGreen(),
-                                                     unsharpMaskParameters.getAmountGreen(),
-                                                     unsharpMaskParameters.getIterationsGreen(),
-                                                     unsharpMaskParameters.getDeringRadiusGreen(),
-                                                     unsharpMaskParameters.getDeringStrengthGreen(),
-                                                     unsharpMaskParameters.getDeringThresholdGreen(),
-                                                     2));
+                unsharpMaskParameters.getRadiusGreen(),
+                unsharpMaskParameters.getAmountGreen(),
+                unsharpMaskParameters.getIterationsGreen(),
+                unsharpMaskParameters.getDeringRadiusGreen(),
+                unsharpMaskParameters.getDeringStrengthGreen(),
+                unsharpMaskParameters.getDeringThresholdGreen(),
+                2));
         executor.execute(() -> applyRGBModeToChannel(stack,
-                                                     unsharpMaskParameters.getRadiusBlue(),
-                                                     unsharpMaskParameters.getAmountBlue(),
-                                                     unsharpMaskParameters.getIterationsBlue(),
-                                                     unsharpMaskParameters.getDeringRadiusBlue(),
-                                                     unsharpMaskParameters.getDeringStrengthBlue(),
-                                                     unsharpMaskParameters.getDeringThresholdBlue(),
-                                                     3));
+                unsharpMaskParameters.getRadiusBlue(),
+                unsharpMaskParameters.getAmountBlue(),
+                unsharpMaskParameters.getIterationsBlue(),
+                unsharpMaskParameters.getDeringRadiusBlue(),
+                unsharpMaskParameters.getDeringStrengthBlue(),
+                unsharpMaskParameters.getDeringThresholdBlue(),
+                3));
         LswUtil.stopAndAwaitParallelExecutor(executor);
     }
 
@@ -64,20 +64,20 @@ public class LSWSharpenFilter {
         // Run every stack in a seperate thread to increase performance.
         Executor executor = LswUtil.getParallelExecutor();
         executor.execute(() -> applyRGBModeClippingPreventionToChannelPass1(intialStack,
-                                                                            unsharpMaskParameters.getRadiusRed(),
-                                                                            unsharpMaskParameters.getAmountRed(),
-                                                                            unsharpMaskParameters.getIterationsRed(),
-                                                                            1));
+                unsharpMaskParameters.getRadiusRed(),
+                unsharpMaskParameters.getAmountRed(),
+                unsharpMaskParameters.getIterationsRed(),
+                1));
         executor.execute(() -> applyRGBModeClippingPreventionToChannelPass1(intialStack,
-                                                                            unsharpMaskParameters.getRadiusGreen(),
-                                                                            unsharpMaskParameters.getAmountGreen(),
-                                                                            unsharpMaskParameters.getIterationsGreen(),
-                                                                            2));
+                unsharpMaskParameters.getRadiusGreen(),
+                unsharpMaskParameters.getAmountGreen(),
+                unsharpMaskParameters.getIterationsGreen(),
+                2));
         executor.execute(() -> applyRGBModeClippingPreventionToChannelPass1(intialStack,
-                                                                            unsharpMaskParameters.getRadiusBlue(),
-                                                                            unsharpMaskParameters.getAmountBlue(),
-                                                                            unsharpMaskParameters.getIterationsBlue(),
-                                                                            3));
+                unsharpMaskParameters.getRadiusBlue(),
+                unsharpMaskParameters.getAmountBlue(),
+                unsharpMaskParameters.getIterationsBlue(),
+                3));
         LswUtil.stopAndAwaitParallelExecutor(executor);
 
         // Pass 2, apply the adaptive filter based on the result of pass 1.
@@ -85,48 +85,29 @@ public class LSWSharpenFilter {
         executor = LswUtil.getParallelExecutor();
 
         executor.execute(() -> doUnsharpMarkClippingPrevention(unsharpMaskParameters.getIterationsRed(),
-                                                               unsharpMaskParameters.getRadiusRed(),
-                                                               unsharpMaskParameters.getAmountRed(),
-                                                               unsharpMaskParameters.getClippingStrengthRed(),
-                                                               unsharpMaskParameters.getClippingRangeRed(),
-                                                               intialStack,
-                                                               finalStack));
+                unsharpMaskParameters.getRadiusRed(),
+                unsharpMaskParameters.getAmountRed(),
+                unsharpMaskParameters.getClippingStrengthRed(),
+                unsharpMaskParameters.getClippingRangeRed(),
+                intialStack,
+                finalStack, 1));
 
         executor.execute(() -> doUnsharpMarkClippingPrevention(unsharpMaskParameters.getIterationsGreen(),
-                                                               unsharpMaskParameters.getRadiusGreen(),
-                                                               unsharpMaskParameters.getAmountGreen(),
-                                                               unsharpMaskParameters.getClippingStrengthGreen(),
-                                                               unsharpMaskParameters.getClippingRangeGreen(),
-                                                               intialStack,
-                                                               finalStack));
+                unsharpMaskParameters.getRadiusGreen(),
+                unsharpMaskParameters.getAmountGreen(),
+                unsharpMaskParameters.getClippingStrengthGreen(),
+                unsharpMaskParameters.getClippingRangeGreen(),
+                intialStack,
+                finalStack, 2));
 
         executor.execute(() -> doUnsharpMarkClippingPrevention(unsharpMaskParameters.getIterationsBlue(),
-                                                               unsharpMaskParameters.getRadiusBlue(),
-                                                               unsharpMaskParameters.getAmountBlue(),
-                                                               unsharpMaskParameters.getClippingStrengthBlue(),
-                                                               unsharpMaskParameters.getClippingRangeBlue(),
-                                                               intialStack,
-                                                               finalStack));
-
-        executor.execute(() -> {
-            for (int i = 0; i < unsharpMaskParameters.getIterationsBlue(); i++) {
-                ImageProcessor ipInitial = intialStack.getProcessor(3);
-                FloatProcessor fpInitial = ipInitial.toFloat(3, null);
-                ImageProcessor ipFinal = finalStack.getProcessor(3);
-                FloatProcessor fpFinal = ipFinal.toFloat(3, null);
-                fpFinal.snapshot();
-                doUnsharpMaskClippingPrevention(unsharpMaskParameters.getRadiusBlue(),
-                                                unsharpMaskParameters.getAmountBlue(),
-                                                unsharpMaskParameters.getClippingStrengthBlue(),
-                                                unsharpMaskParameters.getClippingRangeBlue(),
-                                                fpInitial,
-                                                fpFinal);
-                ipFinal.setPixels(3, fpFinal);
-            }
-        });
-
+                unsharpMaskParameters.getRadiusBlue(),
+                unsharpMaskParameters.getAmountBlue(),
+                unsharpMaskParameters.getClippingStrengthBlue(),
+                unsharpMaskParameters.getClippingRangeBlue(),
+                intialStack,
+                finalStack, 3));
         LswUtil.stopAndAwaitParallelExecutor(executor);
-
     }
 
     public void applyLuminanceMode(ImagePlus image, final LSWSharpenParameters parameters) {
@@ -158,13 +139,13 @@ public class LSWSharpenFilter {
             float[] pixelsLum = new float[pixelsRed.length];
             for (int i = 0; i < pixelsRed.length; i++) {
                 float[] hsl = LswImageProcessingUtil.rgbToHsl(pixelsRed[i],
-                                                              pixelsGreen[i],
-                                                              pixelsBlue[i],
-                                                              parameters.isIncludeRed(),
-                                                              parameters.isIncludeGreen(),
-                                                              parameters.isIncludeBlue(),
-                                                              parameters.isIncludeColor(),
-                                                              parameters.getMode());
+                        pixelsGreen[i],
+                        pixelsBlue[i],
+                        parameters.isIncludeRed(),
+                        parameters.isIncludeGreen(),
+                        parameters.isIncludeBlue(),
+                        parameters.isIncludeColor(),
+                        parameters.getMode());
                 pixelsHue[i] = hsl[0];
                 pixelsSat[i] = hsl[1];
                 pixelsLum[i] = hsl[2];
@@ -176,19 +157,19 @@ public class LSWSharpenFilter {
                 ImageProcessor ipLum = new ShortProcessor(image.getWidth(), image.getHeight());
                 ipLum.setPixels(1, fpLum);
                 final FloatProcessor fpMask = createDeringMaskFloatProcessor(unsharpMaskParameters.getDeringRadiusLuminance(),
-                                                                             unsharpMaskParameters.getDeringThresholdLuminance(),
-                                                                             ipLum);
+                        unsharpMaskParameters.getDeringThresholdLuminance(),
+                        ipLum);
                 ImageProcessor ipLumMask = new ShortProcessor(image.getWidth(), image.getHeight());
                 ipLumMask.setPixels(1, fpMask);
                 doUnsharpMaskDeringing(unsharpMaskParameters.getRadiusLuminance(),
-                                       unsharpMaskParameters.getAmountLuminance(),
-                                       unsharpMaskParameters.getDeringStrengthLuminance(),
-                                       fpLum,
-                                       ipLumMask);
+                        unsharpMaskParameters.getAmountLuminance(),
+                        unsharpMaskParameters.getDeringStrengthLuminance(),
+                        fpLum,
+                        ipLumMask);
             } else {
                 doUnsharpMask(unsharpMaskParameters.getRadiusLuminance(),
-                              unsharpMaskParameters.getAmountLuminance(),
-                              fpLum);
+                        unsharpMaskParameters.getAmountLuminance(),
+                        fpLum);
             }
 
             for (int i = 0; i < pixelsRed.length; i++) {
@@ -236,13 +217,13 @@ public class LSWSharpenFilter {
             float[] pixelsLum = new float[pixelsRed.length];
             for (int i = 0; i < pixelsRed.length; i++) {
                 float[] hsl = LswImageProcessingUtil.rgbToHsl(pixelsRed[i],
-                                                              pixelsGreen[i],
-                                                              pixelsBlue[i],
-                                                              parameters.isIncludeRed(),
-                                                              parameters.isIncludeGreen(),
-                                                              parameters.isIncludeBlue(),
-                                                              parameters.isIncludeColor(),
-                                                              parameters.getMode());
+                        pixelsGreen[i],
+                        pixelsBlue[i],
+                        parameters.isIncludeRed(),
+                        parameters.isIncludeGreen(),
+                        parameters.isIncludeBlue(),
+                        parameters.isIncludeColor(),
+                        parameters.getMode());
                 pixelsHue[i] = hsl[0];
                 pixelsSat[i] = hsl[1];
                 pixelsLum[i] = hsl[2];
@@ -250,8 +231,8 @@ public class LSWSharpenFilter {
             fpLumInitial = new FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum);
             fpLumInitial.snapshot();
             doUnsharpMask(unsharpMaskParameters.getRadiusLuminance(),
-                          unsharpMaskParameters.getAmountLuminance(),
-                          fpLumInitial);
+                    unsharpMaskParameters.getAmountLuminance(),
+                    fpLumInitial);
 
             for (int i = 0; i < pixelsRed.length; i++) {
                 float[] rgb = LswImageProcessingUtil.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
@@ -286,13 +267,13 @@ public class LSWSharpenFilter {
             float[] pixelsLum = new float[pixelsRed.length];
             for (int i = 0; i < pixelsRed.length; i++) {
                 float[] hsl = LswImageProcessingUtil.rgbToHsl(pixelsRed[i],
-                                                              pixelsGreen[i],
-                                                              pixelsBlue[i],
-                                                              parameters.isIncludeRed(),
-                                                              parameters.isIncludeGreen(),
-                                                              parameters.isIncludeBlue(),
-                                                              parameters.isIncludeColor(),
-                                                              parameters.getMode());
+                        pixelsGreen[i],
+                        pixelsBlue[i],
+                        parameters.isIncludeRed(),
+                        parameters.isIncludeGreen(),
+                        parameters.isIncludeBlue(),
+                        parameters.isIncludeColor(),
+                        parameters.getMode());
                 pixelsHue[i] = hsl[0];
                 pixelsSat[i] = hsl[1];
                 pixelsLum[i] = hsl[2];
@@ -300,11 +281,11 @@ public class LSWSharpenFilter {
             FloatProcessor fpLum = new FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum);
             fpLum.snapshot();
             doUnsharpMaskClippingPrevention(unsharpMaskParameters.getRadiusLuminance(),
-                                            unsharpMaskParameters.getAmountLuminance(),
-                                            unsharpMaskParameters.getClippingStrengthLuminance(),
-                                            unsharpMaskParameters.getClippingRangeLuminance(),
-                                            fpLumInitial,
-                                            fpLum);
+                    unsharpMaskParameters.getAmountLuminance(),
+                    unsharpMaskParameters.getClippingStrengthLuminance(),
+                    unsharpMaskParameters.getClippingRangeLuminance(),
+                    fpLumInitial,
+                    fpLum);
 
             for (int i = 0; i < pixelsRed.length; i++) {
                 float[] rgb = LswImageProcessingUtil.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
@@ -329,9 +310,9 @@ public class LSWSharpenFilter {
             int deringThreshold,
             int channel) {
         final ImageProcessor ipMask = createDeringMaskProcessor(deringStrength,
-                                                                deringRadius,
-                                                                deringThreshold,
-                                                                stack.getProcessor(channel));
+                deringRadius,
+                deringThreshold,
+                stack.getProcessor(channel));
         for (int i = 0; i < iterations; i++) {
             ImageProcessor ip = stack.getProcessor(channel);
             FloatProcessor fp = ip.toFloat(channel, null);
@@ -424,15 +405,16 @@ public class LSWSharpenFilter {
             float clippingStrength,
             float clippingRange,
             ImageStack intialStack,
-            ImageStack finalStack) {
+            ImageStack finalStack,
+            int channel) {
         for (int i = 0; i < iterations; i++) {
-            ImageProcessor ipInitial = intialStack.getProcessor(1);
-            FloatProcessor fpInitial = ipInitial.toFloat(1, null);
-            ImageProcessor ipFinal = finalStack.getProcessor(1);
-            FloatProcessor fpFinal = ipFinal.toFloat(1, null);
+            ImageProcessor ipInitial = intialStack.getProcessor(channel);
+            FloatProcessor fpInitial = ipInitial.toFloat(channel, null);
+            ImageProcessor ipFinal = finalStack.getProcessor(channel);
+            FloatProcessor fpFinal = ipFinal.toFloat(channel, null);
             fpFinal.snapshot();
             doUnsharpMaskClippingPrevention(radius, amount, clippingStrength, clippingRange, fpInitial, fpFinal);
-            ipFinal.setPixels(1, fpFinal);
+            ipFinal.setPixels(channel, fpFinal);
         }
     }
 

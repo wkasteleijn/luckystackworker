@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatLegacyCardModule } from '@angular/material/legacy-card';
 import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox';
+import { MatLegacyDialogModule } from '@angular/material/legacy-dialog';
 import { MatLegacyProgressBarModule } from '@angular/material/legacy-progress-bar';
 import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
 import { MatLegacyRadioModule } from '@angular/material/legacy-radio';
@@ -14,6 +15,7 @@ import { MatLegacySliderModule } from '@angular/material/legacy-slider';
 import { MatLegacySnackBarModule } from '@angular/material/legacy-snack-bar';
 import { MatLegacyTabsModule } from '@angular/material/legacy-tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
+
 import {
   BrowserAnimationsModule,
   NoopAnimationsModule,
@@ -21,9 +23,10 @@ import {
 import { AboutComponent } from './about/about.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { ConfirmationComponent } from './confirmation/confirmation.component';
 
 @NgModule({
-  declarations: [AppComponent, AboutComponent],
+  declarations: [AppComponent, AboutComponent, ConfirmationComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -42,6 +45,7 @@ import { AppComponent } from './app.component';
     MatLegacyCheckboxModule,
     MatIconModule,
     MatTooltipModule,
+    MatLegacyDialogModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
