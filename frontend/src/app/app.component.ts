@@ -130,7 +130,6 @@ export class AppComponent implements OnInit {
   visibleChannel: string = 'RGB';
   applySharpenToChannel: string = 'RGB';
   applyDenoiseToChannel: string = 'RGB';
-  confirmationResult: string = '';
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
@@ -1601,9 +1600,17 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((dialogResult) => {
-      this.confirmationResult = dialogResult;
-      console.log(dialogResult);
+      if (dialogResult) {
+        this.restoreToInitialSettings();
+      }
     });
+  }
+
+  private restoreToInitialSettings() {
+    this.profile = { ...this.profileWhenOpening };
+    this.selectedProfile = this.profile.name;
+    this.updateProfileSettings();
+    this.updateProfile();
   }
 
   private showSpinner() {

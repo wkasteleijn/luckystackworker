@@ -434,7 +434,7 @@
         openConfirmation('Are you sure you want to revert your changes?')
       "
       class="{{
-        'buttonZoom buttonMargin ' +
+        'buttonRevert buttonMargin ' +
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
       }}"
       matTooltip="Revert changes"
@@ -446,7 +446,7 @@
       type="button"
       mat-button
       disabled
-      class="button_disabled buttonMargin"
+      class="buttonRevertDisabled buttonMargin"
     >
       <img src="assets/images/reset.png" class="dispersion dispersionArrow" />
     </button>
