@@ -1,5 +1,11 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+05/10/2024 minor release 6.1.0
+- Added "Revert changes" button to go back to the setting when the image stack was opened
+- Fixed broken Edge artefact suppression - clipping option
+- Fixed issue with saving as JPG with RGB channels out of balance and being over-exposed.
+- Fixed small UI layout issue with button misalignment.
+
 08/09/2024 major release 6.0.0
 - Replaced histogram window with a new metadata panel integrated in the image window containing the histogram graphic plus seperate indicators per channel
 - New object metadata indicators added to the image window

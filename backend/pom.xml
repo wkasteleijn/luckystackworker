@@ -12,7 +12,7 @@
 
 	<groupId>nl.wilcokas</groupId>
 	<artifactId>luckystackworker</artifactId>
-	<version>6.0.0</version>
+	<version>6.1.0</version>
 	<name>LuckyStackWorker</name>
 	<description>LuckyStackWorker Application</description>
 
