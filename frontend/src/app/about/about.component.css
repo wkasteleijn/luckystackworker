@@ -1,11 +1,14 @@
 .title {
   text-align: center;
   font-weight: bold;
+  max-height: 16px;
 }
 
 .subtitle {
   text-align: center;
   font-weight: bold;
+  max-height: 8px;
+  margin-bottom: 32px;
 }
 .icon {
   width: 128px;
