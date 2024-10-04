@@ -14,7 +14,7 @@ if [ "$1" = "arm64" ]; then
 fi
 
 rm -rf LuckyStackWorker-darwin-$1
-npx electron-packager . LuckyStackWorker --platform darwin --arch $1 --icon ../luckystackworker_icon.icns --overwrite
+npx electron-packager . LuckyStackWorker --platform darwin --arch $1 --icon luckystackworker_icon.icns --overwrite
 mkdir ./LuckyStackWorker-darwin-$1/LuckyStackWorker.app/Contents/Java
 cp ../backend/target/luckystackworker.jar ./LuckyStackWorker-darwin-$1/LuckyStackWorker.app/Contents/Java
 cd ./LuckyStackWorker-darwin-$1/LuckyStackWorker.app/Contents
