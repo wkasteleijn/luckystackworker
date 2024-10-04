@@ -23,9 +23,11 @@ import javax.swing.JOptionPane;
 import ij.ImageStack;
 import ij.gui.NewImage;
 import ij.io.Opener;
+import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -142,15 +144,6 @@ public class LswFileUtil {
         if (crop) {
             image = image.crop();
         }
-        if (fixRgbStack) {
-            image.setActiveChannels("111");
-            image.setC(1);
-            image.setZ(1);
-        }
-        LSWFileSaver saver = new LSWFileSaver(image);
-        if (fixRgbStack) {
-            hackIncorrectPngFileInfo(saver);
-        }
         if (fromWorker) {
             String folder = getFileDirectory(path);
             if (!folder.endsWith(profileName + Constants.WORKER_FOLDER_POSTFIX)) {
@@ -160,9 +153,23 @@ public class LswFileUtil {
             }
         }
         if (asJpg) {
+            LswImageViewer singleLayerColorImage = new LswImageViewer(StringUtils.EMPTY,
+                    new ColorProcessor(image.getWidth(),
+                            image.getHeight()));
+            LswImageProcessingUtil.convertLayersToColorImage(LswImageProcessingUtil.getImageLayers(image).getLayers(), singleLayerColorImage);
+            LSWFileSaver saver = new LSWFileSaver(singleLayerColorImage);
             saver.setJpegQuality(100);
             saver.saveAsJpeg(path);
         } else {
+            if (fixRgbStack) {
+                image.setActiveChannels("111");
+                image.setC(1);
+                image.setZ(1);
+            }
+            LSWFileSaver saver = new LSWFileSaver(image);
+            if (fixRgbStack) {
+                hackIncorrectPngFileInfo(saver);
+            }
             saver.saveAsTiff(path);
         }
     }
