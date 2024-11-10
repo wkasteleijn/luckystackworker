@@ -35,17 +35,6 @@ import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 @Service
 public class OperationService {
 
-    private static String histogramStretchMacro;
-
-    static {
-        try {
-            histogramStretchMacro = LswFileUtil
-                    .readFromInputStream(new ClassPathResource("histogramstretch.ijm").getInputStream());
-        } catch (IOException e) {
-            log.error("Error loading histogram stretch script", e);
-        }
-    }
-
     private final LSWSharpenFilter lswSharpenFilter;
     private final RGBBalanceFilter rgbBalanceFilter;
     private final SaturationFilter saturationFilter;
@@ -55,6 +44,7 @@ public class OperationService {
     private final IansNoiseReductionFilter iansNoiseReductionFilter;
     private final EqualizeLocalHistogramsFilter equalizeLocalHistogramsFilter;
     private final ColorNormalisationFilter colorNormalisationFilter;
+    private final HistogramStretchFilter histogramStretchFilter;
 
     private int displayedProgress = 0;
     private Timer timer = new Timer();
@@ -82,7 +72,7 @@ public class OperationService {
         updateProgress(viewer, 56);
         applyDispersionCorrection(image, profile);
         updateProgress(viewer, 64);
-        applyBrightnessAndContrast(image, profile, true);
+        applyBrightnessAndContrast(image, profile);
         updateProgress(viewer, 72);
         applyColorNormalisation(image, profile);
         applyRGBBalance(image, profile);
@@ -309,11 +299,8 @@ public class OperationService {
         equalizeLocalHistogramsFilter.apply(image, profile.getName(), profile.getEqualizeLocalHistogramsStrength(), profile.getScale());
     }
 
-    private void applyBrightnessAndContrast(ImagePlus image, final Profile profile, boolean copyMinMax) {
+    private void applyBrightnessAndContrast(ImagePlus image, final Profile profile) {
         if (profile.getContrast() != 0 || profile.getBrightness() != 0 || profile.getBackground() != 0) {
-            if (copyMinMax) {
-                LswImageProcessingUtil.copyMinMax(image, image);
-            }
             log.info("Applying contrast increase with factor {} to image {}", profile.getContrast(),
                     image.getID());
 
@@ -327,11 +314,8 @@ public class OperationService {
             // Darken background
             newMin = Math.round(newMin + (profile.getBackground()) * (16384.0 / 100.0));
 
-            StringSubstitutor stringSubstitutor = new StringSubstitutor(
-                    Map.of("isStack", validateRGBStack(image), "newMin", newMin, "newMax", newMax));
-            String result = stringSubstitutor.replace(histogramStretchMacro);
-            WindowManager.setTempCurrentImage(image);
-            new Interpreter().run(result);
+            histogramStretchFilter.apply(image, newMin, newMax);
+
         }
     }
 
