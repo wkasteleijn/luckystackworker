@@ -302,6 +302,19 @@
   margin-top: 8px;
   margin-left: 16px;
 }
+.balanceButton {
+  margin-left: 14px;
+}
+.buttonColorBalance {
+  margin-top: 6px;
+}
+.balanceButtonImg {
+  width: 13px;
+  height: 11px;
+  transform: scaleX(2.6) scaleY(2.9);
+  margin-top: 3px;
+  margin-left: -2px;
+}
 .dispersionInnerButton {
   max-width: 44px;
   max-height: 40px;
@@ -339,10 +352,21 @@
   transform: scale(1.6);
 }
 .normalizeCheckBox {
-  margin-left: 78px;
+  margin-left: 24px;
 }
-.dispersion {
-  transform: scale(1.8);
+.dispersionImg {
+  width: 16px;
+  height: 15px;
+  transform: scaleX(2) scaleY(2);
+  margin-top: 3px;
+  margin-left: -1px;
+}
+.revertImg {
+  width: 20px;
+  height: 14px;
+  transform: scaleX(1.7) scaleY(2.3);
+  margin-top: 2px;
+  margin-left: -1px;
 }
 .infoButton {
   width: 12px;

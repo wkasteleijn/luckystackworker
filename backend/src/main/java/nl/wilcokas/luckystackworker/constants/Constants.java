@@ -49,4 +49,5 @@ public class Constants {
     public static final int MINIMUM_WINDOW_WIDTH = 528;
     public static final int ARTIFICIAL_PROGRESS_DELAY = 500;
     public static final int CONTROL_PANEL_WIDTH = 568;
+    public static final int MINIMUK_DARK_TRESHOLD = 6144;
 }

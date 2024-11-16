@@ -7,10 +7,12 @@ import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import org.springframework.stereotype.Component;
 
+import static nl.wilcokas.luckystackworker.constants.Constants.MINIMUK_DARK_TRESHOLD;
+
 @Slf4j
 @Component
 public class HistogramStretchFilter {
-    public void apply(ImagePlus image, double minValue, double maxValue) {
+    public void apply(ImagePlus image, double minValue, double maxValue, double lightnessIncreaseValue, double backgroundCutoffFactor) {
         int width = image.getWidth();
         int height = image.getHeight();
 
@@ -23,7 +25,9 @@ public class HistogramStretchFilter {
         int[] blueResult = new int[bluePixels.length];
 
         double factor = 65535 / (maxValue - minValue);
-        long minLong = (long)minValue;
+        long minLong = (long) minValue;
+
+        double lowestValue = 16384 * (backgroundCutoffFactor/100D);
 
         // Apply scaling to each channel
         for (int y = 0; y < height; y++) {
@@ -32,9 +36,9 @@ public class HistogramStretchFilter {
                 redResult[index] = LswImageProcessingUtil.convertToUnsignedInt(redPixels[index]);
                 greenResult[index] = LswImageProcessingUtil.convertToUnsignedInt(greenPixels[index]);
                 blueResult[index] = LswImageProcessingUtil.convertToUnsignedInt(bluePixels[index]);
-                long scaledRed = (long) (redResult[index] * factor) - minLong;
-                long scaledGreen = (long) (greenResult[index] * factor) - minLong;
-                long scaledBlue = (long) (blueResult[index] * factor) - minLong;
+                int scaledRed = LswImageProcessingUtil.preventBackgroundFromLightingUp(redResult[index], (lightnessIncreaseValue * 256) + (redResult[index] * factor) - minLong, lowestValue);
+                int scaledGreen = LswImageProcessingUtil.preventBackgroundFromLightingUp(greenResult[index], (lightnessIncreaseValue * 256) + (greenResult[index] * factor) - minLong, lowestValue);
+                int scaledBlue = LswImageProcessingUtil.preventBackgroundFromLightingUp(blueResult[index], (lightnessIncreaseValue * 256) + (blueResult[index] * factor) - minLong, lowestValue);
                 redPixels[index] = LswImageProcessingUtil.convertToShort(scaledRed > 65535 ? 65535 : scaledRed < 0 ? 0 : scaledRed);
                 greenPixels[index] = LswImageProcessingUtil.convertToShort(scaledGreen > 65535 ? 65535 : scaledGreen < 0 ? 0 : scaledGreen);
                 bluePixels[index] = LswImageProcessingUtil.convertToShort(scaledBlue > 65535 ? 65535 : scaledBlue < 0 ? 0 : scaledBlue);

@@ -25,38 +25,21 @@ public class RGBBalanceFilter {
         short[] redPixelsResult = new short[redPixels.length];
         short[] greenPixelsResult = new short[greenPixels.length];
         short[] bluePixelsResult = new short[bluePixels.length];
-        double greenCompensationAmount = 0.99;
 
         for (int i = 0; i < redPixels.length; i++) {
             int currentRedValue = LswImageProcessingUtil.convertToUnsignedInt(redPixels[i]);
             int currentGreenValue = LswImageProcessingUtil.convertToUnsignedInt(greenPixels[i]);
             int currentBlueValue = LswImageProcessingUtil.convertToUnsignedInt(bluePixels[i]);
 
-            /*
-            int desaturatedInt = (currentRedValue + currentGreenValue + currentBlueValue) / 3;
-            int redDifference = Math.abs(currentRedValue - desaturatedInt);
-            int greenDifference = Math.abs(currentGreenValue - desaturatedInt);
-            int blueDifference = Math.abs(currentBlueValue - desaturatedInt);
-            int redBlueDifference = (redDifference + blueDifference) / 2;
-            if (greenDifference > redBlueDifference) {
-                currentGreenValue = (int)(currentGreenValue * (1 - greenCompensationAmount) + desaturatedInt * greenCompensationAmount);
-            }
-            */
-            // Normalize each channel as follows:
-            // - Determine the min/max of the difference to luminance per channel
-            // - Average out those min/max over the 3 channels
-            // - Difference to luminance should not exceed the average max or min
-            // By mapping the range per channel to the range of the average
+            int newRedValue = LswImageProcessingUtil.preventBackgroundFromLightingUp(currentRedValue, currentRedValue - (amountRed * STEP_SIZE), 0);
+            int newGreenValue = LswImageProcessingUtil.preventBackgroundFromLightingUp(currentGreenValue, currentGreenValue - (amountGreen * STEP_SIZE), 0);
+            int newBlueValue = LswImageProcessingUtil.preventBackgroundFromLightingUp(currentBlueValue, currentBlueValue - (amountBlue * STEP_SIZE), 0);
 
-
-            int newRedValue = currentRedValue - (amountRed * STEP_SIZE);
-            int newGreenValue = currentGreenValue - (amountGreen * STEP_SIZE);
-            int newBlueValue = currentBlueValue - (amountBlue * STEP_SIZE);
             int desaturatedValue = (newRedValue + newGreenValue + newBlueValue) / 3;
             double purpleCorrectionFactor = purpleReductionAmount > 0D ? getPurpleCorrectionFactor(newRedValue, newGreenValue, newBlueValue) : 0D;
-            redPixelsResult[i] = getPixelResult(newRedValue, desaturatedValue, amountRed, purpleCorrectionFactor, purpleReductionAmount);
-            greenPixelsResult[i] = getPixelResult(newGreenValue, desaturatedValue, amountGreen, purpleCorrectionFactor, purpleReductionAmount);
-            bluePixelsResult[i] = getPixelResult(newBlueValue, desaturatedValue, amountBlue, purpleCorrectionFactor, purpleReductionAmount);
+            redPixelsResult[i] = getPixelResult(newRedValue, desaturatedValue, purpleCorrectionFactor, purpleReductionAmount);
+            greenPixelsResult[i] = getPixelResult(newGreenValue, desaturatedValue, purpleCorrectionFactor, purpleReductionAmount);
+            bluePixelsResult[i] = getPixelResult(newBlueValue, desaturatedValue, purpleCorrectionFactor, purpleReductionAmount);
         }
         Executor executor = LswUtil.getParallelExecutor();
         executor.execute(() -> {
@@ -77,7 +60,7 @@ public class RGBBalanceFilter {
         LswUtil.stopAndAwaitParallelExecutor(executor);
     }
 
-    private short getPixelResult(int newValueUnsignedInt, int desaturatedValue, int correctionAmount, double purpleCorrectionFactor,
+    private short getPixelResult(int newValueUnsignedInt, int desaturatedValue, double purpleCorrectionFactor,
                                  double purpleReductionAmount) {
         int purpleCorrectedValue = (int) ((desaturatedValue * purpleCorrectionFactor) + (newValueUnsignedInt * (1 - purpleCorrectionFactor)));
         int finalNewValue = (int) ((purpleCorrectedValue * purpleReductionAmount) + (newValueUnsignedInt * (1 - purpleReductionAmount)));

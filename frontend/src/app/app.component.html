@@ -439,7 +439,7 @@
       }}"
       matTooltip="Revert changes"
     >
-      <img src="assets/images/reset.png" class="dispersion dispersionArrow" />
+      <img src="assets/images/reset.png" class="revertImg" />
     </button>
     <button
       *ngIf="!refImageSelected || !openRefImageEnabled()"
@@ -448,7 +448,7 @@
       disabled
       class="buttonRevertDisabled buttonMargin"
     >
-      <img src="assets/images/reset.png" class="dispersion dispersionArrow" />
+      <img src="assets/images/reset.png" class="revertImg" />
     </button>
   </div>
   <mat-tab-group class="sliderTabs" selectedIndex="0">
@@ -1381,6 +1381,33 @@
         >
           Balance
         </div>
+
+        <div class="balanceButton">
+          <button
+            *ngIf="openRefImageEnabled() && refImageSelected"
+            type="button"
+            mat-button
+            (click)="resetBalanceClicked()"
+            class="{{
+              'buttonColorBalance buttonZoom ' +
+                (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
+            }}"
+            matTooltip="Reset color balance"
+          >
+            <img src="assets/images/reset.png" class="balanceButtonImg" />
+          </button>
+          <button
+            *ngIf="!openRefImageEnabled() || !refImageSelected"
+            type="button"
+            mat-button
+            disabled
+            class="buttonColorBalance buttonDisabledZoom"
+            matTooltip="Reset color balance"
+          >
+            <img src="assets/images/reset.png" class="balanceButtonImg" />
+          </button>
+        </div>
+
         <div class="normalizeCheckBox">
           <mat-checkbox
             [(ngModel)]="normalizeColorBalance"
@@ -1478,12 +1505,9 @@
                   (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
                   (dispersionCorrectionEnabled ? 'Pressed' : '')
               }}"
-              matTooltip="Dipersion Correction"
+              matTooltip="Dispersion Correction"
             >
-              <img
-                src="assets/images/dispersion.png"
-                class="dispersion dispersionArrow"
-              />
+              <img src="assets/images/dispersion.png" class="dispersionImg" />
             </button>
             <button
               *ngIf="!openRefImageEnabled() || !refImageSelected"
@@ -1491,9 +1515,9 @@
               mat-button
               disabled
               class="buttonDisabledZoom"
-              matTooltip="Dipersion Correction"
+              matTooltip="Dispersion Correction"
             >
-              <img src="assets/images/dispersion.png" class="dispersionArrow" />
+              <img src="assets/images/dispersion.png" class="dispersionImg" />
             </button>
           </div>
         </div>

@@ -72,10 +72,10 @@ public class OperationService {
         updateProgress(viewer, 56);
         applyDispersionCorrection(image, profile);
         updateProgress(viewer, 64);
-        applyBrightnessAndContrast(image, profile);
-        updateProgress(viewer, 72);
         applyColorNormalisation(image, profile);
         applyRGBBalance(image, profile);
+        updateProgress(viewer, 72);
+        applyBrightnessAndContrast(image, profile);
         updateProgress(viewer, 80);
         applyGamma(image, profile);
         updateProgress(viewer, 92);
@@ -311,10 +311,8 @@ public class OperationService {
             // Brightness
             newMax = Math.round(newMax - (profile.getBrightness()) * (49152.0 / 100.0));
 
-            // Darken background
-            newMin = Math.round(newMin + (profile.getBackground()) * (16384.0 / 100.0));
-
-            histogramStretchFilter.apply(image, newMin, newMax);
+            // TODO: add control for lightness correction (now 0).
+            histogramStretchFilter.apply(image, newMin, newMax, 0, profile.getBackground());
 
         }
     }

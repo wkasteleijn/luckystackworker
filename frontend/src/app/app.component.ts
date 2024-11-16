@@ -1606,6 +1606,17 @@ export class AppComponent implements OnInit {
     });
   }
 
+  resetBalanceClicked() {
+    console.log('Reset color balance called');
+    this.red = 0;
+    this.green = 0;
+    this.blue = 0;
+    this.profile.red = 0;
+    this.profile.green = 0;
+    this.profile.blue = 0;
+    this.updateProfile();
+  }
+
   private restoreToInitialSettings() {
     this.profile = { ...this.profileWhenOpening };
     this.selectedProfile = this.profile.name;
