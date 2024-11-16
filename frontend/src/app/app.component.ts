@@ -88,6 +88,7 @@ export class AppComponent implements OnInit {
   gamma: number;
   contrast: number;
   brightness: number;
+  lightness: number;
   background: number;
   saturation: number;
   localContrastMode: string;
@@ -835,6 +836,16 @@ export class AppComponent implements OnInit {
     }
   }
 
+  lightnessChanged(event: any, update: boolean) {
+    this.profile.lightness = event.value;
+    this.lightness = event.value;
+    this.settings.operation = 'lightness';
+    console.log('lightnessChanged called: ' + this.profile.lightness);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
   backgroundChanged(event: any, update: boolean) {
     this.profile.background = event.value;
     this.background = event.value;
@@ -1283,6 +1294,7 @@ export class AppComponent implements OnInit {
     this.gamma = this.profile.gamma;
     this.contrast = this.profile.contrast;
     this.brightness = this.profile.brightness;
+    this.lightness = this.profile.lightness;
     this.background = this.profile.background;
     this.localContrastMode = this.profile.localContrastMode;
     this.localContrastFine = this.profile.localContrastFine;

@@ -138,6 +138,7 @@ public class Profile {
         this.gamma = profile.getGamma();
         this.contrast = profile.getContrast();
         this.brightness = profile.getBrightness();
+        this.lightness = profile.getLightness();
         this.background = profile.getBackground();
         this.localContrastMode = profile.getLocalContrastMode();
         this.localContrastFine = profile.getLocalContrastFine();
@@ -243,6 +244,7 @@ public class Profile {
     private BigDecimal gamma;
     private int contrast;
     private int brightness;
+    private int lightness;
     private int background;
     private String localContrastMode;
     private int localContrastFine;

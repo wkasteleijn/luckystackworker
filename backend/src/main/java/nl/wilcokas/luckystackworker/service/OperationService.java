@@ -300,7 +300,7 @@ public class OperationService {
     }
 
     private void applyBrightnessAndContrast(ImagePlus image, final Profile profile) {
-        if (profile.getContrast() != 0 || profile.getBrightness() != 0 || profile.getBackground() != 0) {
+        if (profile.getContrast() != 0 || profile.getBrightness() != 0 || profile.getLightness() != 0 || profile.getBackground() != 0) {
             log.info("Applying contrast increase with factor {} to image {}", profile.getContrast(),
                     image.getID());
 
@@ -311,8 +311,7 @@ public class OperationService {
             // Brightness
             newMax = Math.round(newMax - (profile.getBrightness()) * (49152.0 / 100.0));
 
-            // TODO: add control for lightness correction (now 0).
-            histogramStretchFilter.apply(image, newMin, newMax, 0, profile.getBackground());
+            histogramStretchFilter.apply(image, newMin, newMax, profile.getLightness(), profile.getBackground());
 
         }
     }

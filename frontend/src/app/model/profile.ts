@@ -87,6 +87,7 @@ export class Profile {
   gamma: number;
   contrast: number;
   brightness: number;
+  lightness: number;
   background: number;
   localContrastMode: string;
   localContrastFine: number;
