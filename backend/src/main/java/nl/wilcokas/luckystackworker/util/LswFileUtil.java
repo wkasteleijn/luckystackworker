@@ -298,10 +298,21 @@ public class LswFileUtil {
             profile.setIansRecovery(BigDecimal.ZERO);
         }
         if (profile.getDenoiseAlgorithm1() == null) {
-            profile.setDenoiseAlgorithm1(Constants.DEFAULT_DENOISEALGORITHM);
+            if (BigDecimal.valueOf(2).compareTo(oldDenoiseSigma) >= 0) {
+                profile.setDenoiseAlgorithm1(Constants.DENOISE_ALGORITHM_SIGMA1);
+                profile.setDenoise1Amount(profile.getDenoise() == null ? BigDecimal.ZERO : profile.getDenoise());
+                profile.setDenoise1Radius(profile.getDenoiseRadius() == null ? BigDecimal.ONE : profile.getDenoiseRadius());
+                profile.setDenoise1Iterations(profile.getDenoiseIterations());
+            } else {
+                profile.setDenoiseAlgorithm1(Constants.DEFAULT_DENOISEALGORITHM);
+            }
         }
         if (profile.getDenoiseAlgorithm2() == null) {
-            profile.setDenoiseAlgorithm2(Constants.DEFAULT_DENOISEALGORITHM);
+            if (profile.getSavitzkyGolaySize() > 0) {
+                profile.setDenoiseAlgorithm2(Constants.DENOISE_ALGORITHM_SAVGOLAY);
+            } else {
+                profile.setDenoiseAlgorithm2(Constants.DEFAULT_DENOISEALGORITHM);
+            }
         }
         if (profile.getDenoise2Radius() == null) {
             profile.setDenoise2Radius(BigDecimal.ONE);
@@ -312,13 +323,6 @@ public class LswFileUtil {
             profile.setDenoiseAlgorithm2(Constants.DENOISE_ALGORITHM_SIGMA2);
             profile.setDenoise2Radius(profile.getDenoiseRadius());
             profile.setDenoise2Iterations(profile.getDenoiseIterations());
-        } else if (profile.getSavitzkyGolaySize() > 0) {
-            profile.setDenoiseAlgorithm2(Constants.DENOISE_ALGORITHM_SAVGOLAY);
-        } else {
-            profile.setDenoiseAlgorithm1(Constants.DENOISE_ALGORITHM_SIGMA1);
-            profile.setDenoise1Amount(profile.getDenoise() == null ? BigDecimal.ZERO : profile.getDenoise());
-            profile.setDenoise1Radius(profile.getDenoiseRadius() == null ? BigDecimal.ONE : profile.getDenoiseRadius());
-            profile.setDenoise1Iterations(profile.getDenoiseIterations());
         }
 
         // Added since v5.2.0, so older version written yaml needs to stay compatible.
