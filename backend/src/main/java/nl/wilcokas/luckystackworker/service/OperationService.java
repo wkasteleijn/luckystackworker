@@ -246,8 +246,8 @@ public class OperationService {
     private void applyIansNoiseReduction(final ImagePlus image, final Profile profile) throws IOException, InterruptedException {
         if (Constants.DENOISE_ALGORITHM_IANS.equals(profile.getDenoiseAlgorithm1())) {
             log.info("Applying Ian's noise reduction to image {}", image.getID());
-            IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(profile.getIansAmount()).medium(BigDecimal.ZERO)
-                    .large(BigDecimal.ZERO).recovery(profile.getIansRecovery()).build();
+            IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(profile.getIansAmount()).medium(profile.getIansAmountMid())
+                    .large(BigDecimal.ZERO).recovery(profile.getIansRecovery()).iterations(profile.getIansIterations()).build();
             iansNoiseReductionFilter.apply(image, profile.getName(), parameters, profile.getScale());
         }
     }

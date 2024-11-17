@@ -47,7 +47,9 @@ export class Profile {
   denoise1Radius: number;
   denoise1Iterations: number;
   iansAmount: number;
+  iansAmountMid: number;
   iansRecovery: number;
+  iansIterations: number;
 
   // denoise 2 red or all channels
   denoiseAlgorithm2: string;

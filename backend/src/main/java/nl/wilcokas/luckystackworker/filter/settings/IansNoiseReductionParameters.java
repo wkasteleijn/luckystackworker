@@ -14,4 +14,5 @@ public class IansNoiseReductionParameters {
     private BigDecimal medium;
     private BigDecimal large;
     private BigDecimal recovery;
+    private int iterations;
 }

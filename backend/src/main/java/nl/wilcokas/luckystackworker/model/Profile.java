@@ -19,6 +19,130 @@ public class Profile {
         mapFromDTO(profile);
     }
 
+    private int id;
+    private String name;
+
+    // sharpen (red or all channels)
+    private BigDecimal radius;
+    private BigDecimal amount;
+    private int iterations;
+    private int level;
+    private int clippingStrength;
+    private int clippingRange;
+    private BigDecimal deringRadius;
+    private int deringStrength;
+    private int deringThreshold;
+
+    // sharpen green
+    private BigDecimal radiusGreen;
+    private BigDecimal amountGreen;
+    private int iterationsGreen;
+    private int levelGreen;
+    private int clippingStrengthGreen;
+    private int clippingRangeGreen;
+    private BigDecimal deringRadiusGreen;
+    private int deringStrengthGreen;
+    private int deringThresholdGreen;
+
+    // sharpen blue
+    private BigDecimal radiusBlue;
+    private BigDecimal amountBlue;
+    private int iterationsBlue;
+    private int levelBlue;
+    private int clippingStrengthBlue;
+    private int clippingRangeBlue;
+    private BigDecimal deringRadiusBlue;
+    private int deringStrengthBlue;
+    private int deringThresholdBlue;
+
+    // general sharpen settings
+    private String sharpenMode;
+    private boolean luminanceIncludeRed;
+    private boolean luminanceIncludeGreen;
+    private boolean luminanceIncludeBlue;
+    private boolean luminanceIncludeColor;
+
+    // denoise (red and all channels)
+    private String denoiseAlgorithm1;
+    private String denoiseAlgorithm2;
+    private BigDecimal denoise1Amount;
+    private BigDecimal denoise1Radius;
+    private int denoise1Iterations;
+    private BigDecimal iansAmount;
+    private BigDecimal iansAmountMid;
+    private BigDecimal iansRecovery;
+    private int iansIterations;
+    private BigDecimal denoise2Radius;
+    private int denoise2Iterations;
+    private int savitzkyGolaySize;
+    private int savitzkyGolayAmount;
+    private int savitzkyGolayIterations;
+
+    // denoise green
+    private BigDecimal denoise1AmountGreen;
+    private BigDecimal denoise1RadiusGreen;
+    private int denoise1IterationsGreen;
+    private BigDecimal denoise2RadiusGreen;
+    private int denoise2IterationsGreen;
+    private int savitzkyGolaySizeGreen;
+    private int savitzkyGolayAmountGreen;
+    private int savitzkyGolayIterationsGreen;
+
+    // denoise blue
+    private BigDecimal denoise1AmountBlue;
+    private BigDecimal denoise1RadiusBlue;
+    private int denoise1IterationsBlue;
+    private BigDecimal denoise2RadiusBlue;
+    private int denoise2IterationsBlue;
+    private int savitzkyGolaySizeBlue;
+    private int savitzkyGolayAmountBlue;
+    private int savitzkyGolayIterationsBlue;
+
+    // constrast & light
+    private BigDecimal gamma;
+    private int contrast;
+    private int brightness;
+    private int lightness;
+    private int background;
+    private String localContrastMode;
+    private int localContrastFine;
+    private int localContrastMedium;
+    private int localContrastLarge;
+    private int equalizeLocalHistogramsStrength;
+
+    // color & dispersion
+    private BigDecimal red;
+    private BigDecimal green;
+    private BigDecimal blue;
+    private BigDecimal purple;
+    private BigDecimal saturation;
+    private boolean dispersionCorrectionEnabled;
+    private int dispersionCorrectionRedX;
+    private int dispersionCorrectionBlueX;
+    private int dispersionCorrectionRedY;
+    private int dispersionCorrectionBlueY;
+    private boolean normalizeColorBalance;
+
+    private double scale;
+    private OpenImageModeEnum openImageMode;
+
+    // Not used any longer, needed for historical reasons. Removing this would now
+    // break the profile loading of old yaml files created prior to 4.1.0.
+
+    // Unused as of 5.2.0
+    private int threshold;
+
+    // Unused as of 5.0.0
+    private BigDecimal denoiseSigma;
+
+    // Unused as of 4.1.0
+    private String operation;
+    private String rootFolder;
+    private boolean isLargeImage;
+    private BigDecimal denoise;
+    private BigDecimal denoiseRadius;
+    private int denoiseIterations;
+
     private void mapFromDTO(final ProfileDTO profile) {
         this.name = profile.getName();
 
@@ -91,6 +215,8 @@ public class Profile {
         this.denoise2Radius = profile.getDenoise2Radius();
         this.denoise2Iterations = profile.getDenoise2Iterations();
         this.iansAmount = profile.getIansAmount();
+        this.iansAmountMid = profile.getIansAmountMid();
+        this.iansIterations = profile.getIansIterations();
         this.iansRecovery = profile.getIansRecovery();
         this.savitzkyGolaySize = profile.getSavitzkyGolaySize();
         this.savitzkyGolayAmount = profile.getSavitzkyGolayAmount();
@@ -163,125 +289,4 @@ public class Profile {
         this.openImageMode = profile.getOpenImageMode();
     }
 
-    private int id;
-    private String name;
-
-    // sharpen (red or all channels)
-    private BigDecimal radius;
-    private BigDecimal amount;
-    private int iterations;
-    private int level;
-    private int clippingStrength;
-    private int clippingRange;
-    private BigDecimal deringRadius;
-    private int deringStrength;
-    private int deringThreshold;
-
-    // sharpen green
-    private BigDecimal radiusGreen;
-    private BigDecimal amountGreen;
-    private int iterationsGreen;
-    private int levelGreen;
-    private int clippingStrengthGreen;
-    private int clippingRangeGreen;
-    private BigDecimal deringRadiusGreen;
-    private int deringStrengthGreen;
-    private int deringThresholdGreen;
-
-    // sharpen blue
-    private BigDecimal radiusBlue;
-    private BigDecimal amountBlue;
-    private int iterationsBlue;
-    private int levelBlue;
-    private int clippingStrengthBlue;
-    private int clippingRangeBlue;
-    private BigDecimal deringRadiusBlue;
-    private int deringStrengthBlue;
-    private int deringThresholdBlue;
-
-    // general sharpen settings
-    private String sharpenMode;
-    private boolean luminanceIncludeRed;
-    private boolean luminanceIncludeGreen;
-    private boolean luminanceIncludeBlue;
-    private boolean luminanceIncludeColor;
-
-    // denoise (red and all channels)
-    private String denoiseAlgorithm1;
-    private String denoiseAlgorithm2;
-    private BigDecimal denoise1Amount;
-    private BigDecimal denoise1Radius;
-    private int denoise1Iterations;
-    private BigDecimal iansAmount;
-    private BigDecimal iansRecovery;
-    private BigDecimal denoise2Radius;
-    private int denoise2Iterations;
-    private int savitzkyGolaySize;
-    private int savitzkyGolayAmount;
-    private int savitzkyGolayIterations;
-
-    // denoise green
-    private BigDecimal denoise1AmountGreen;
-    private BigDecimal denoise1RadiusGreen;
-    private int denoise1IterationsGreen;
-    private BigDecimal denoise2RadiusGreen;
-    private int denoise2IterationsGreen;
-    private int savitzkyGolaySizeGreen;
-    private int savitzkyGolayAmountGreen;
-    private int savitzkyGolayIterationsGreen;
-
-    // denoise blue
-    private BigDecimal denoise1AmountBlue;
-    private BigDecimal denoise1RadiusBlue;
-    private int denoise1IterationsBlue;
-    private BigDecimal denoise2RadiusBlue;
-    private int denoise2IterationsBlue;
-    private int savitzkyGolaySizeBlue;
-    private int savitzkyGolayAmountBlue;
-    private int savitzkyGolayIterationsBlue;
-
-    // constrast & light
-    private BigDecimal gamma;
-    private int contrast;
-    private int brightness;
-    private int lightness;
-    private int background;
-    private String localContrastMode;
-    private int localContrastFine;
-    private int localContrastMedium;
-    private int localContrastLarge;
-    private int equalizeLocalHistogramsStrength;
-
-    // color & dispersion
-    private BigDecimal red;
-    private BigDecimal green;
-    private BigDecimal blue;
-    private BigDecimal purple;
-    private BigDecimal saturation;
-    private boolean dispersionCorrectionEnabled;
-    private int dispersionCorrectionRedX;
-    private int dispersionCorrectionBlueX;
-    private int dispersionCorrectionRedY;
-    private int dispersionCorrectionBlueY;
-    private boolean normalizeColorBalance;
-
-    private double scale;
-    private OpenImageModeEnum openImageMode;
-
-    // Not used any longer, needed for historical reasons. Removing this would now
-    // break the profile loading of old yaml files created prior to 4.1.0.
-
-    // Unused as of 5.2.0
-    private int threshold;
-
-    // Unused as of 5.0.0
-    private BigDecimal denoiseSigma;
-
-    // Unused as of 4.1.0
-    private String operation;
-    private String rootFolder;
-    private boolean isLargeImage;
-    private BigDecimal denoise;
-    private BigDecimal denoiseRadius;
-    private int denoiseIterations;
 }

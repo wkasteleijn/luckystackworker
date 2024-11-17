@@ -369,6 +369,14 @@ public class LswFileUtil {
             profile.setDeringStrengthBlue(profile.getDeringStrength());
             profile.setDeringThresholdBlue(profile.getDeringThreshold());
         }
+
+        // Added since 6.6.0, so older version written yaml needs to stay compatible.
+        if (profile.getIansAmountMid() == null) {
+            profile.setIansAmountMid(BigDecimal.ZERO);
+        }
+        if (profile.getIansIterations() == 0) {
+            profile.setIansIterations(1);
+        }
     }
 
 

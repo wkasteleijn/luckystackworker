@@ -778,7 +778,7 @@
       </div>
       <div *ngIf="denoiseAlgorithm1 === 'IAN'">
         <div class="sliderRow">
-          <div class="sliderLabel">Amount</div>
+          <div class="sliderLabel">Fine details</div>
           <div class="slider">
             <mat-slider
               [disabled]="
@@ -805,6 +805,38 @@
               *ngIf="refImageSelected"
               class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
               >{{ iansAmount == 0 ? "Off" : "" }}</span
+            >
+          </div>
+        </div>
+
+        <div class="sliderRow">
+          <div class="sliderLabel">Medium details</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="
+                shouldShowSpinner() ||
+                !refImageSelected ||
+                crop ||
+                !this.settings?.gmicAvailable
+              "
+              step="0.1"
+              min="0"
+              max="15"
+              (input)="iansAmountMidChanged($event, false)"
+              (change)="iansAmountMidChanged($event, true)"
+              [(ngModel)]="iansAmountMid"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span
+              class="{{
+                iansAmountMid === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+              }}"
+              >{{ iansAmountMid }}</span
+            >
+            <span
+              *ngIf="refImageSelected"
+              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+              >{{ iansAmountMid == 0 ? "Off" : "" }}</span
             >
           </div>
         </div>
@@ -837,6 +869,38 @@
               *ngIf="refImageSelected"
               class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
               >{{ iansRecovery == 0 ? "Off" : "" }}</span
+            >
+          </div>
+        </div>
+
+        <div class="sliderRow">
+          <div class="sliderLabel">Iterations</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="
+                shouldShowSpinner() ||
+                !refImageSelected ||
+                crop ||
+                !this.settings?.gmicAvailable
+              "
+              step="1"
+              min="1"
+              max="5"
+              (input)="iansIterationsChanged($event, false)"
+              (change)="iansIterationsChanged($event, true)"
+              [(ngModel)]="iansIterations"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span
+              class="{{
+                iansIterations === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+              }}"
+              >{{ iansIterations }}</span
+            >
+            <span
+              *ngIf="refImageSelected"
+              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+              >{{ iansIterations == 0 ? "Off" : "" }}</span
             >
           </div>
         </div>

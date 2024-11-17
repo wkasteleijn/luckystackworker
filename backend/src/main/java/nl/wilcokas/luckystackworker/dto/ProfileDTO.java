@@ -63,7 +63,9 @@ public class ProfileDTO {
         this.denoise1Radius = profile.getDenoise1Radius();
         this.denoise1Iterations = profile.getDenoise1Iterations();
         this.iansAmount = profile.getIansAmount();
+        this.iansAmountMid = profile.getIansAmountMid();
         this.iansRecovery = profile.getIansRecovery();
+        this.iansIterations = profile.getIansIterations();
         this.denoiseAlgorithm2 = profile.getDenoiseAlgorithm2();
         this.denoise2Radius = profile.getDenoise2Radius();
         this.denoise2Iterations = profile.getDenoise2Iterations();
@@ -160,7 +162,9 @@ public class ProfileDTO {
     private BigDecimal denoise1Radius;
     private int denoise1Iterations;
     private BigDecimal iansAmount;
+    private BigDecimal iansAmountMid;
     private BigDecimal iansRecovery;
+    private int iansIterations;
     private String denoiseAlgorithm2;
     private int savitzkyGolaySize;
     private int savitzkyGolayAmount;

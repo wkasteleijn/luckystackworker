@@ -72,7 +72,9 @@ export class AppComponent implements OnInit {
   denoise1Iterations: number;
 
   iansAmount: number;
+  iansAmountMid: number;
   iansRecovery: number;
+  iansIterations: number;
 
   // denoise 2
   denoiseAlgorithm2: string;
@@ -697,11 +699,31 @@ export class AppComponent implements OnInit {
     }
   }
 
+  iansAmountMidChanged(event: any, update: boolean) {
+    this.profile.iansAmountMid = event.value;
+    this.iansAmountMid = event.value;
+    this.settings.operation = 'iansAmountMid';
+    console.log('iansAmountMid called: ' + this.profile.iansAmountMid);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
   iansRecoveryChanged(event: any, update: boolean) {
     this.profile.iansRecovery = event.value;
     this.iansRecovery = event.value;
     this.settings.operation = 'iansRecovery';
     console.log('iansRecovery called: ' + this.profile.iansRecovery);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  iansIterationsChanged(event: any, update: boolean) {
+    this.profile.iansIterations = event.value;
+    this.iansIterations = event.value;
+    this.settings.operation = 'iansIterations';
+    console.log('iansIterations called: ' + this.profile.iansIterations);
     if (update) {
       this.updateProfile();
     }
@@ -1261,7 +1283,9 @@ export class AppComponent implements OnInit {
     this.denoise1Radius = this.profile.denoise1Radius;
     this.denoise1Iterations = this.profile.denoise1Iterations;
     this.iansAmount = this.profile.iansAmount;
+    this.iansAmountMid = this.profile.iansAmountMid;
     this.iansRecovery = this.profile.iansRecovery;
+    this.iansIterations = this.profile.iansIterations;
 
     this.denoiseAlgorithm2 = this.profile.denoiseAlgorithm2;
     this.denoise2Radius = this.profile.denoise2Radius;
