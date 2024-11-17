@@ -504,6 +504,6 @@ public class LSWSharpenFilter {
     }
 
     private float getUnsharpMaskValue(float pixelValue, float pixelValueAfterBlur, float amount, float blendRawFactor) {
-        return ((pixelValue - amount * pixelValueAfterBlur) / (1f - amount) * (1 - blendRawFactor)) + (pixelValue * blendRawFactor);
+        return ((pixelValue - amount * pixelValueAfterBlur) / (1f - amount) * (1f - blendRawFactor)) + (pixelValue * blendRawFactor);
     }
 }

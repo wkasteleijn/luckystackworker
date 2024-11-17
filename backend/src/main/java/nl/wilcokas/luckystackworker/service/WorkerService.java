@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
+import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import org.apache.commons.io.FileUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -149,7 +150,7 @@ public class WorkerService {
                         imp = LswFileUtil.fixNonTiffOpeningSettings(imp);
                     }
                     operationService.correctExposure(imp);
-                    operationService.applyAllOperations(imp, null, profile);
+                    operationService.applyAllOperations(imp, LswImageProcessingUtil.getImageLayers(imp), null, profile);
                     imp.updateAndDraw();
                     if (LuckyStackWorkerContext.getSelectedRoi() != null) {
                         imp.setRoi(LuckyStackWorkerContext.getSelectedRoi());

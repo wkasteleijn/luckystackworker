@@ -159,7 +159,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     boolean includeGreen = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G;
     boolean includeBlue = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B;
     LswImageProcessingUtil.copyLayers(unprocessedImageLayers, finalResultImage, true, true, true);
-    operationService.applyAllOperations(finalResultImage, displayedImage, profile);
+    operationService.applyAllOperations(finalResultImage, unprocessedImageLayers, displayedImage, profile);
     finalResultImage.updateAndDraw();
     LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
       displayedImage,

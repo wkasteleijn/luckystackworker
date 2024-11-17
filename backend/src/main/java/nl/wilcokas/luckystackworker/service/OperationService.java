@@ -9,6 +9,7 @@ import java.util.TimerTask;
 
 import nl.wilcokas.luckystackworker.filter.*;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
+import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import org.apache.commons.text.StringSubstitutor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,7 @@ public class OperationService {
     private final EqualizeLocalHistogramsFilter equalizeLocalHistogramsFilter;
     private final ColorNormalisationFilter colorNormalisationFilter;
     private final HistogramStretchFilter histogramStretchFilter;
+    private final BlendRawFilter blendRawFilter;
 
     private int displayedProgress = 0;
     private Timer timer = new Timer();
@@ -54,10 +56,14 @@ public class OperationService {
         image.resetDisplayRange();
     }
 
-    public void applyAllOperations(ImagePlus image, LswImageViewer viewer, Profile profile) throws IOException, InterruptedException {
+    public void applyAllOperations(ImagePlus image, LswImageLayersDto unprocessedImageLayers, LswImageViewer viewer, Profile profile) throws IOException, InterruptedException {
         updateProgress(viewer, 0, true);
+
+        // Sharpening filters
         applySharpen(image, profile);
         updateProgress(viewer, 8);
+
+        // Denoise filters
         applySigmaDenoise1(image, profile);
         updateProgress(viewer, 16, true);
         applyIansNoiseReduction(image, profile);
@@ -66,21 +72,29 @@ public class OperationService {
         updateProgress(viewer, 32);
         applySavitzkyGolayDenoise(image, profile);
         updateProgress(viewer, 40, true);
+
+        // Light and contrast filters
         applyEqualizeLocalHistorgrams(image, profile);
         updateProgress(viewer, 48);
         applyLocalContrast(image, profile);
         updateProgress(viewer, 56);
-        applyDispersionCorrection(image, profile);
-        updateProgress(viewer, 64);
-        applyColorNormalisation(image, profile);
-        applyRGBBalance(image, profile);
-        updateProgress(viewer, 72);
-        applyBrightnessAndContrast(image, profile);
-        updateProgress(viewer, 80);
         applyGamma(image, profile);
-        updateProgress(viewer, 92);
+        updateProgress(viewer, 64);
+
+        // Color filters
+        applyColorNormalisation(image, profile);
+        updateProgress(viewer, 72);
+        applyRGBBalance(image, profile);
+        updateProgress(viewer, 80);
         applySaturation(image, profile);
+        updateProgress(viewer, 88);
+        applyDispersionCorrection(image, profile);
+        updateProgress(viewer, 96);
+
+        // Always apply last
+        applyBrightnessAndContrast(image, profile);
         updateProgress(viewer, 100);
+
         Timer resetProgressTimer = new Timer();
         resetProgressTimer.schedule(new TimerTask() {
             @Override
@@ -360,6 +374,15 @@ public class OperationService {
 
     private boolean validateRGBStack(ImagePlus image) {
         return image.getStack().size() == 3;
+    }
+
+    private void blendRaw(ImagePlus image, final LswImageLayersDto unprocessedImageLayers, final Profile profile) {
+        if (profile.getBlendRaw() > 0 || profile.getBlendRawGreen() > 0 || profile.getBlendRawBlue() > 0) {
+            double blendRawRedFactor = profile.getBlendRaw() / 100.0;
+            double blendRawGreenFactor = profile.getBlendRawGreen() / 100.0;
+            double blendRawBlueFactor = profile.getBlendRawBlue() / 100.0;
+            blendRawFilter.apply(image, unprocessedImageLayers, blendRawRedFactor, blendRawGreenFactor, blendRawBlueFactor);
+        }
     }
 
 }
