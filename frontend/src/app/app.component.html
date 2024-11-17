@@ -581,6 +581,24 @@
       </div>
 
       <div class="sliderRow">
+        <div class="sliderLabel">Blend raw</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            tickInterval="1"
+            step="1"
+            min="0"
+            max="100"
+            (input)="blendRawChanged($event, false)"
+            (change)="blendRawChanged($event, true)"
+            [(ngModel)]="blendRaw"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ blendRaw }}</span>
+        </div>
+      </div>
+
+      <div class="sliderRow">
         <div
           class="edgeArtifactLabel sliderRowCategoryTitle {{
             nightModeEnabled()

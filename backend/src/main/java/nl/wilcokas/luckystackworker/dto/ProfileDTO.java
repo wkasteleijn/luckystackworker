@@ -30,6 +30,7 @@ public class ProfileDTO {
         this.deringRadius = profile.getDeringRadius();
         this.deringStrength = profile.getDeringStrength();
         this.deringThreshold = profile.getDeringThreshold();
+        this.blendRaw = profile.getBlendRaw();
 
         this.radiusGreen = profile.getRadiusGreen();
         this.amountGreen = profile.getAmountGreen();
@@ -40,6 +41,7 @@ public class ProfileDTO {
         this.deringRadiusGreen = profile.getDeringRadiusGreen();
         this.deringStrengthGreen = profile.getDeringStrengthGreen();
         this.deringThresholdGreen = profile.getDeringThresholdGreen();
+        this.blendRawGreen = profile.getBlendRawGreen();
 
         this.radiusBlue = profile.getRadiusBlue();
         this.amountBlue = profile.getAmountBlue();
@@ -50,6 +52,7 @@ public class ProfileDTO {
         this.deringRadiusBlue = profile.getDeringRadiusBlue();
         this.deringStrengthBlue = profile.getDeringStrengthBlue();
         this.deringThresholdBlue = profile.getDeringThresholdBlue();
+        this.blendRawBlue = profile.getBlendRawBlue();
 
         this.sharpenMode = profile.getSharpenMode();
         this.luminanceIncludeRed = profile.isLuminanceIncludeRed();
@@ -132,6 +135,7 @@ public class ProfileDTO {
     private BigDecimal deringRadius;
     private int deringStrength;
     private int deringThreshold;
+    private int blendRaw;
 
     private BigDecimal radiusGreen;
     private BigDecimal amountGreen;
@@ -142,6 +146,7 @@ public class ProfileDTO {
     private BigDecimal deringRadiusGreen;
     private int deringStrengthGreen;
     private int deringThresholdGreen;
+    private int blendRawGreen;
 
     private BigDecimal radiusBlue;
     private BigDecimal amountBlue;
@@ -152,6 +157,7 @@ public class ProfileDTO {
     private BigDecimal deringRadiusBlue;
     private int deringStrengthBlue;
     private int deringThresholdBlue;
+    private int blendRawBlue;
 
     private String sharpenMode;
     private ChannelEnum applySharpenToChannel;

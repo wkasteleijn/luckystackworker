@@ -52,6 +52,7 @@ export class AppComponent implements OnInit {
   radius: number;
   amount: number;
   iterations: number;
+  blendRaw: number;
   sharpenMode: string;
   edgeArtefactSupressionMode: string;
   clippingStrength: number;
@@ -328,6 +329,31 @@ export class AppComponent implements OnInit {
     }
   }
 
+  blendRawChanged(event: any, update: boolean) {
+    switch (this.applySharpenToChannel) {
+      case 'G':
+        this.profile.blendRawGreen = event.value;
+        break;
+      case 'B':
+        this.profile.blendRawBlue = event.value;
+        break;
+      case 'R':
+        this.profile.blendRaw = event.value;
+        break;
+      default:
+        this.equalizeChannelsForSharpening();
+        this.profile.blendRaw = event.value;
+        this.profile.blendRawGreen = event.value;
+        this.profile.blendRawBlue = event.value;
+    }
+    this.blendRaw = event.value;
+    this.settings.operation = 'blendRaw';
+    console.log('blendRawChanged called: ' + this.profile.blendRaw);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
   clippingStrengthChanged(event: any, update: boolean) {
     switch (this.applySharpenToChannel) {
       case 'G':
@@ -525,6 +551,7 @@ export class AppComponent implements OnInit {
         this.radius = this.profile.radiusGreen;
         this.amount = this.profile.amountGreen;
         this.iterations = this.profile.iterationsGreen;
+        this.blendRaw = this.profile.blendRawGreen;
         this.clippingStrength = this.profile.clippingStrengthGreen;
         this.clippingRange = this.profile.clippingRangeGreen;
         this.deringRadius = this.profile.deringRadiusGreen;
@@ -534,6 +561,7 @@ export class AppComponent implements OnInit {
         this.radius = this.profile.radiusBlue;
         this.amount = this.profile.amountBlue;
         this.iterations = this.profile.iterationsBlue;
+        this.blendRaw = this.profile.blendRawBlue;
         this.clippingStrength = this.profile.clippingStrengthBlue;
         this.clippingRange = this.profile.clippingRangeBlue;
         this.deringRadius = this.profile.deringRadiusBlue;
@@ -543,6 +571,7 @@ export class AppComponent implements OnInit {
         this.radius = this.profile.radius;
         this.amount = this.profile.amount;
         this.iterations = this.profile.iterations;
+        this.blendRaw = this.profile.blendRaw;
         this.clippingStrength = this.profile.clippingStrength;
         this.clippingRange = this.profile.clippingRange;
         this.deringRadius = this.profile.deringRadius;
@@ -1277,6 +1306,7 @@ export class AppComponent implements OnInit {
     this.radius = this.profile.radius;
     this.amount = this.profile.amount;
     this.iterations = this.profile.iterations;
+    this.blendRaw = this.profile.blendRaw;
 
     this.denoiseAlgorithm1 = this.profile.denoiseAlgorithm1;
     this.denoise1Amount = this.profile.denoise1Amount;
@@ -1687,6 +1717,7 @@ export class AppComponent implements OnInit {
     this.profile.radiusGreen = this.radius;
     this.profile.amountGreen = this.amount;
     this.profile.iterationsGreen = this.iterations;
+    this.profile.blendRawGreen = this.blendRaw;
     this.profile.clippingStrengthGreen = this.clippingStrength;
     this.profile.clippingRangeGreen = this.clippingRange;
     this.profile.deringRadiusGreen = this.deringRadius;
@@ -1695,6 +1726,7 @@ export class AppComponent implements OnInit {
     this.profile.radiusBlue = this.radius;
     this.profile.amountBlue = this.amount;
     this.profile.iterationsBlue = this.iterations;
+    this.profile.blendRawBlue = this.blendRaw;
     this.profile.clippingStrengthBlue = this.clippingStrength;
     this.profile.clippingRangeBlue = this.clippingRange;
     this.profile.deringRadiusBlue = this.deringRadius;

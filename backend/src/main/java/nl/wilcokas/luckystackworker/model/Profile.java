@@ -32,6 +32,7 @@ public class Profile {
     private BigDecimal deringRadius;
     private int deringStrength;
     private int deringThreshold;
+    private int blendRaw;
 
     // sharpen green
     private BigDecimal radiusGreen;
@@ -43,6 +44,7 @@ public class Profile {
     private BigDecimal deringRadiusGreen;
     private int deringStrengthGreen;
     private int deringThresholdGreen;
+    private int blendRawGreen;
 
     // sharpen blue
     private BigDecimal radiusBlue;
@@ -54,6 +56,7 @@ public class Profile {
     private BigDecimal deringRadiusBlue;
     private int deringStrengthBlue;
     private int deringThresholdBlue;
+    private int blendRawBlue;
 
     // general sharpen settings
     private String sharpenMode;
@@ -156,6 +159,7 @@ public class Profile {
         this.deringRadius = profile.getDeringRadius();
         this.deringStrength = profile.getDeringStrength();
         this.deringThreshold = profile.getDeringThreshold();
+        this.blendRaw = profile.getBlendRaw();
 
         if ( profile.getApplySharpenToChannel() == ChannelEnum.RGB) {
             this.radiusGreen = profile.getRadius();
@@ -167,6 +171,7 @@ public class Profile {
             this.deringRadiusGreen = profile.getDeringRadius();
             this.deringStrengthGreen = profile.getDeringStrength();
             this.deringThresholdGreen = profile.getDeringThreshold();
+            this.blendRawGreen = profile.getBlendRaw();
 
             this.radiusBlue = profile.getRadius();
             this.amountBlue = profile.getAmount();
@@ -177,6 +182,7 @@ public class Profile {
             this.deringRadiusBlue = profile.getDeringRadius();
             this.deringStrengthBlue = profile.getDeringStrength();
             this.deringThresholdBlue = profile.getDeringThreshold();
+            this.blendRawBlue = profile.getBlendRaw();
 
         } else {
             this.radiusGreen = profile.getRadiusGreen();
@@ -188,6 +194,7 @@ public class Profile {
             this.deringRadiusGreen = profile.getDeringRadiusGreen();
             this.deringStrengthGreen = profile.getDeringStrengthGreen();
             this.deringThresholdGreen = profile.getDeringThresholdGreen();
+            this.blendRawGreen = profile.getBlendRawGreen();
 
             this.radiusBlue = profile.getRadiusBlue();
             this.amountBlue = profile.getAmountBlue();
@@ -198,6 +205,7 @@ public class Profile {
             this.deringRadiusBlue = profile.getDeringRadiusBlue();
             this.deringStrengthBlue = profile.getDeringStrengthBlue();
             this.deringThresholdBlue = profile.getDeringThresholdBlue();
+            this.blendRawBlue = profile.getBlendRawBlue();
         }
 
         this.sharpenMode = profile.getSharpenMode();

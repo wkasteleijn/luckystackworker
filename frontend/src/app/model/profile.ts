@@ -6,6 +6,7 @@ export class Profile {
   amount: number;
   level: number;
   iterations: number;
+  blendRaw: number;
   clippingStrength: number;
   clippingRange: number;
   deringRadius: number;
@@ -21,6 +22,7 @@ export class Profile {
   amountGreen: number;
   levelGreen: number;
   iterationsGreen: number;
+  blendRawGreen: number;
   clippingStrengthGreen: number;
   clippingRangeGreen: number;
   deringRadiusGreen: number;
@@ -32,6 +34,7 @@ export class Profile {
   amountBlue: number;
   levelBlue: number;
   iterationsBlue: number;
+  blendRawBlue: number;
   clippingStrengthBlue: number;
   clippingRangeBlue: number;
   deringRadiusBlue: number;

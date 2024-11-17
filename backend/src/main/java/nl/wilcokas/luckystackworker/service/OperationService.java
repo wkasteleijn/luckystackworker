@@ -137,6 +137,7 @@ public class OperationService {
             float amount = profile.getAmount().divide(new BigDecimal("10000")).floatValue();
             float clippingStrength = (profile.getClippingStrength()) / 500f;
             float deringStrength = profile.getDeringStrength() / 100f;
+            float blendRaw = profile.getBlendRaw() / 100f;
             UnsharpMaskParameters usParams;
             LSWSharpenMode mode = (profile.getSharpenMode() == null) ? LSWSharpenMode.LUMINANCE : LSWSharpenMode.valueOf(profile.getSharpenMode());
             if (mode == LSWSharpenMode.LUMINANCE) {
@@ -149,6 +150,7 @@ public class OperationService {
                         .deringRadiusLuminance(profile.getDeringRadius().doubleValue())
                         .deringStrengthLuminance(deringStrength)
                         .deringThresholdLuminance(profile.getDeringThreshold())
+                        .blendRawLuminance(blendRaw)
                         .build();
             } else {
                 int iterationsGreen = profile.getIterationsGreen() == 0 ? 1 : profile.getIterationsGreen();
@@ -159,6 +161,8 @@ public class OperationService {
                 float amountBlue = profile.getAmountBlue().divide(new BigDecimal("10000")).floatValue();
                 float clippingStrengthBlue = (profile.getClippingStrengthBlue()) / 500f;
                 float deringStrengthBlue = profile.getDeringStrengthBlue() / 100f;
+                float blendRawGreen = profile.getBlendRawGreen() / 100f;
+                float blendRawBlue = profile.getBlendRawBlue() / 100f;
                 usParams = UnsharpMaskParameters.builder()
                         .radiusRed(profile.getRadius().doubleValue())
                         .amountRed(amount)
@@ -184,6 +188,9 @@ public class OperationService {
                         .deringRadiusBlue(profile.getDeringRadiusBlue().doubleValue())
                         .deringStrengthBlue(deringStrengthBlue)
                         .deringThresholdBlue(profile.getDeringThresholdBlue())
+                        .blendRawRed(blendRaw)
+                        .blendRawGreen(blendRawGreen)
+                        .blendRawBlue(blendRawBlue)
                         .build();
             }
 
