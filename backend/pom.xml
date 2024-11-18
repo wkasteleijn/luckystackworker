@@ -6,20 +6,20 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.2</version>
+		<version>3.3.5</version>
 		<relativePath />
 	</parent>
 
 	<groupId>nl.wilcokas</groupId>
 	<artifactId>luckystackworker</artifactId>
-	<version>6.6.0</version>
+	<version>6.6.0-beta</version>
 	<name>LuckyStackWorker</name>
 	<description>LuckyStackWorker Application</description>
 
 	<properties>
 		<java.version>21</java.version>
-		<commons-io.version>2.16.1</commons-io.version>
-		<velocity.version>2.3</velocity.version>
+		<commons-io.version>2.17.0</commons-io.version>
+		<velocity.version>2.4.1</velocity.version>
 		<commons-text.version>1.12.0</commons-text.version>
 		<imagej.version>1.54k</imagej.version>
 	</properties>

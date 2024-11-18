@@ -62,6 +62,9 @@
   color: rgb(168, 168, 168);
   margin-top: 2px;
 }
+.sliderRowLight {
+  height: 26px;
+}
 
 .sliderRowCategoryTitle {
   display: flex;
@@ -301,10 +304,10 @@
 }
 .dispersionButton {
   margin-top: 8px;
-  margin-left: 16px;
+  margin-left: 8px;
 }
 .balanceButton {
-  margin-left: 14px;
+  margin-left: 22px;
 }
 .buttonColorBalance {
   margin-top: 6px;
@@ -353,7 +356,10 @@
   transform: scale(1.6);
 }
 .normalizeCheckBox {
-  margin-left: 24px;
+  margin-left: 16px;
+}
+.preserveDarkBGCheckBox {
+  margin-left: 90px;
 }
 .dispersionImg {
   width: 16px;

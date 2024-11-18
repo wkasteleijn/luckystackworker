@@ -374,9 +374,9 @@ public class LswImageProcessingUtil {
     /*
     Excludes the background from RGB balance correction. Works with a gradual decrease in brightness when the background value is reached for the new Value
      */
-    public static int preventBackgroundFromLightingUp(double oldValue, double newValue, double lowestValue) {
+    public static int preventBackgroundFromLightingUp(double oldValue, double newValue, double lowestValue, boolean preserveDarkBackground) {
         double correctedValue = newValue;
-        if (oldValue < (MINIMUK_DARK_TRESHOLD + lowestValue)) {
+        if (preserveDarkBackground && oldValue < (MINIMUK_DARK_TRESHOLD + lowestValue)) {
             correctedValue = correctedValue * ((oldValue - lowestValue) / MINIMUK_DARK_TRESHOLD);
         }
         return (int) correctedValue;

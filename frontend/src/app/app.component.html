@@ -1301,14 +1301,25 @@
           >
         </div>
       </div>
-      <div
-        class="sliderRowCategoryTitle {{
-          nightModeEnabled()
-            ? 'sliderRowCategoryTitleColorNight'
-            : 'sliderRowCategoryTitleColor'
-        }}"
-      >
-        Light
+      <div class="sliderRow sliderRowLight">
+        <div
+          class="sliderRowCategoryTitle {{
+            nightModeEnabled()
+              ? 'sliderRowCategoryTitleColorNight'
+              : 'sliderRowCategoryTitleColor'
+          }}"
+        >
+          Light
+        </div>
+        <div class="preserveDarkBGCheckBox">
+          <mat-checkbox
+            [(ngModel)]="preserveDarkBackground"
+            (change)="preserveDarkBackgroundChanged()"
+            [color]="colorTheme()"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            >Preserve dark background</mat-checkbox
+          >
+        </div>
       </div>
       <div class="sliderRow">
         <div class="sliderLabel">Gamma</div>

@@ -292,7 +292,7 @@ public class OperationService {
                 log.info("Applying RGB balance correction to image {} with values R {}, G {}, B {}", image.getID(), profile.getRed(), profile.getGreen(),
                         profile.getBlue());
                 rgbBalanceFilter.apply(image, profile.getRed().intValue(), profile.getGreen().intValue(), profile.getBlue().intValue(),
-                        profile.getPurple().intValue() / 255D);
+                        profile.getPurple().intValue() / 255D, profile.isPreserveDarkBackground());
             }
         }
     }
@@ -332,7 +332,7 @@ public class OperationService {
             // Brightness
             newMax = Math.round(newMax - (profile.getBrightness()) * (49152.0 / 100.0));
 
-            histogramStretchFilter.apply(image, newMin, newMax, profile.getLightness(), profile.getBackground());
+            histogramStretchFilter.apply(image, newMin, newMax, profile.getLightness(), profile.getBackground(), profile.isPreserveDarkBackground());
 
         }
     }

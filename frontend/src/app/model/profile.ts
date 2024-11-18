@@ -99,6 +99,7 @@ export class Profile {
   localContrastMedium: number;
   localContrastLarge: number;
   equalizeLocalHistogramsStrength: number;
+  preserveDarkBackground: boolean;
 
   // color
   red: number;

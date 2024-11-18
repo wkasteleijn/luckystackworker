@@ -1,5 +1,16 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+22/11/2024 minor release 6.6.0
+- Added reset button to color balance, to easily set the sliders back to 0
+- Improved color balance, adjusting to higher Red, Green or Blue values will not increase the background brightness
+- Added 2 new sliders to Ian's noise reduction for medium sized details and iterations
+- Added new blend raw slider to the sharpening control.
+- Added new lightness slider to the light control
+- Added switch to preserve/not preserve the dark background to the light control
+- Fixed bug when opening png files, image no longer initially shown over-exposed
+- Fixed bug when loading an earlier saved profile yaml file with the pass 2 denoise switched off would always open with pass 2 denoise on
+- Upgraded all dependencies to the latest versions.
+
 05/10/2024 minor release 6.1.0
 - Added "Revert changes" button to go back to the setting when the image stack was opened
 - Fixed broken Edge artefact suppression - clipping option

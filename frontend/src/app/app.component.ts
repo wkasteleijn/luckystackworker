@@ -99,6 +99,7 @@ export class AppComponent implements OnInit {
   localContrastMedium: number;
   localContrastLarge: number;
   equalizeLocalHistograms: number;
+  preserveDarkBackground: boolean = true;
 
   // color
   red: number;
@@ -1096,6 +1097,15 @@ export class AppComponent implements OnInit {
     this.updateProfile();
   }
 
+  preserveDarkBackgroundChanged() {
+    this.settings.operation = 'preserveDarkBackground';
+    this.profile.preserveDarkBackground = this.preserveDarkBackground;
+    console.log(
+      'preserveDarkBackgroundChanged called: ' + this.preserveDarkBackground
+    );
+    this.updateProfile();
+  }
+
   realtimeEnabledChanged() {
     console.log('realtimeEnabledChanged called: ' + this.realtimeEnabled);
     this.realtimeEnabled = !this.realtimeEnabled;
@@ -1364,6 +1374,7 @@ export class AppComponent implements OnInit {
     );
     this.equalizeLocalHistograms = this.profile.equalizeLocalHistogramsStrength;
     this.normalizeColorBalance = this.profile.normalizeColorBalance;
+    this.preserveDarkBackground = this.profile.preserveDarkBackground;
     this.setNonPersistentSettings();
   }
 

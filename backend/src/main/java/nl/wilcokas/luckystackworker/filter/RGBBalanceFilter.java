@@ -17,7 +17,7 @@ public class RGBBalanceFilter {
 
     private static final int STEP_SIZE = 64;
 
-    public void apply(ImagePlus image, int amountRed, int amountGreen, int amountBlue, double purpleReductionAmount) {
+    public void apply(ImagePlus image, int amountRed, int amountGreen, int amountBlue, double purpleReductionAmount, boolean preserveDarkBackground) {
         ImageStack stack = image.getStack();
         short[] redPixels = (short[]) stack.getProcessor(Constants.RED_LAYER_INDEX).getPixels();
         short[] greenPixels = (short[]) stack.getProcessor(Constants.GREEN_LAYER_INDEX).getPixels();
@@ -31,9 +31,9 @@ public class RGBBalanceFilter {
             int currentGreenValue = LswImageProcessingUtil.convertToUnsignedInt(greenPixels[i]);
             int currentBlueValue = LswImageProcessingUtil.convertToUnsignedInt(bluePixels[i]);
 
-            int newRedValue = LswImageProcessingUtil.preventBackgroundFromLightingUp(currentRedValue, currentRedValue - (amountRed * STEP_SIZE), 0);
-            int newGreenValue = LswImageProcessingUtil.preventBackgroundFromLightingUp(currentGreenValue, currentGreenValue - (amountGreen * STEP_SIZE), 0);
-            int newBlueValue = LswImageProcessingUtil.preventBackgroundFromLightingUp(currentBlueValue, currentBlueValue - (amountBlue * STEP_SIZE), 0);
+            int newRedValue = LswImageProcessingUtil.preventBackgroundFromLightingUp(currentRedValue, currentRedValue - (amountRed * STEP_SIZE), 0, preserveDarkBackground);
+            int newGreenValue = LswImageProcessingUtil.preventBackgroundFromLightingUp(currentGreenValue, currentGreenValue - (amountGreen * STEP_SIZE), 0, preserveDarkBackground);
+            int newBlueValue = LswImageProcessingUtil.preventBackgroundFromLightingUp(currentBlueValue, currentBlueValue - (amountBlue * STEP_SIZE), 0, preserveDarkBackground);
 
             int desaturatedValue = (newRedValue + newGreenValue + newBlueValue) / 3;
             double purpleCorrectionFactor = purpleReductionAmount > 0D ? getPurpleCorrectionFactor(newRedValue, newGreenValue, newBlueValue) : 0D;

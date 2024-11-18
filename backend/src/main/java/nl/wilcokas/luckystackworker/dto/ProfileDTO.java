@@ -117,6 +117,7 @@ public class ProfileDTO {
         this.dispersionCorrectionBlueX = profile.getDispersionCorrectionBlueX();
         this.dispersionCorrectionRedY = profile.getDispersionCorrectionRedY();
         this.dispersionCorrectionBlueY = profile.getDispersionCorrectionBlueY();
+        this.preserveDarkBackground = profile.isPreserveDarkBackground();
 
         this.scale = profile.getScale();
         this.equalizeLocalHistogramsStrength = profile.getEqualizeLocalHistogramsStrength();
@@ -211,6 +212,7 @@ public class ProfileDTO {
     private int localContrastFine;
     private int localContrastMedium;
     private int localContrastLarge;
+    private boolean preserveDarkBackground;
 
     // color & dispersion
     private BigDecimal red;
