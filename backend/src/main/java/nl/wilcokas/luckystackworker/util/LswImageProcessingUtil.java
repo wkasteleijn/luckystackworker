@@ -258,10 +258,10 @@ public class LswImageProcessingUtil {
         ImageStack stack = image.getStack();
         short[][] newPixels = new short[3][stack.getProcessor(1).getPixelCount()];
         Executor executor = LswUtil.getParallelExecutor();
-        for (int layer = 1; layer <= stack.size(); layer++) {
+        for (int layer = 1; layer <= 3; layer++) {
             int finalLayer = layer;
             executor.execute(() -> {
-                ImageProcessor p = stack.getProcessor(finalLayer);
+                ImageProcessor p = stack.getProcessor(Math.min(stack.size(),finalLayer));
                 short[] pixels = (short[]) p.getPixels();
                 for (int i = 0; i < pixels.length; i++) {
                     newPixels[finalLayer - 1][i] = pixels[i];
@@ -269,7 +269,7 @@ public class LswImageProcessingUtil {
             });
         }
         LswUtil.stopAndAwaitParallelExecutor(executor);
-        return LswImageLayersDto.builder().layers(newPixels).count(stack.size()).build();
+        return LswImageLayersDto.builder().layers(newPixels).count(3).build();
     }
 
     public static void copyLayers(LswImageLayersDto layersDto, ImagePlus image, boolean includeRed, boolean includeGreen, boolean includeBlue) {

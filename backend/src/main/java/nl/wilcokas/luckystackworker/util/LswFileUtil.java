@@ -430,7 +430,7 @@ public class LswFileUtil {
         boolean includeRed = openImageMode == OpenImageModeEnum.RED || openImageMode == OpenImageModeEnum.RGB;
         boolean includeGreen = openImageMode == OpenImageModeEnum.GREEN || openImageMode == OpenImageModeEnum.RGB;
         boolean includeBlue = openImageMode == OpenImageModeEnum.BLUE || openImageMode == OpenImageModeEnum.RGB;
-        if (unprocessedNewImageLayers.getCount() == 3 && includeRed && includeGreen && includeBlue) {
+        if (newImage.getStackSize() == 3 && includeRed && includeGreen && includeBlue) {
             return newImage;
         }
 
