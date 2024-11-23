@@ -269,7 +269,7 @@ public class LswImageProcessingUtil {
             });
         }
         LswUtil.stopAndAwaitParallelExecutor(executor);
-        return LswImageLayersDto.builder().layers(newPixels).count(3).build();
+        return LswImageLayersDto.builder().layers(newPixels).build();
     }
 
     public static void copyLayers(LswImageLayersDto layersDto, ImagePlus image, boolean includeRed, boolean includeGreen, boolean includeBlue) {
@@ -319,7 +319,7 @@ public class LswImageProcessingUtil {
         ImageStack stack = image.getStack();
         Executor executor = LswUtil.getParallelExecutor();
         short[][] layers = layersDto.getLayers();
-        int sourceLayer = layersDto.getCount() == 1 ? 0 : layer - 1;
+        int sourceLayer = layer - 1;
         // Red
         executor.execute(() -> {
             ImageProcessor p = stack.getProcessor(layer);
@@ -342,13 +342,13 @@ public class LswImageProcessingUtil {
         }
         short[] greenPixels;
         if (includeGreen) {
-            greenPixels = unprocessedImageLayers.getLayers()[unprocessedImageLayers.getCount() == 1 ? 0 : 1];
+            greenPixels = unprocessedImageLayers.getLayers()[1];
         } else {
             greenPixels = Arrays.copyOf(emptyPixels, emptyPixels.length);
         }
         short[] bluePixels;
         if (includeBlue) {
-            bluePixels = unprocessedImageLayers.getLayers()[unprocessedImageLayers.getCount() == 1 ? 0 : 2];
+            bluePixels = unprocessedImageLayers.getLayers()[2];
         } else {
             bluePixels = Arrays.copyOf(emptyPixels, emptyPixels.length);
         }

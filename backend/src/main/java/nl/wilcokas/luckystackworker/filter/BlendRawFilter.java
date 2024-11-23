@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.Executor;
 
 /**
- *   Note: experimental feature. Does not seem to work any better than applying it directly from the LSWSharpenFilter.
+ * Note: experimental feature. Does not seem to work any better than applying it directly from the LSWSharpenFilter.
  */
 @Slf4j
 @Component
@@ -32,24 +32,20 @@ public class BlendRawFilter {
                 redPixels[i] = LswImageProcessingUtil.convertToShort((long) (value * (1 - blendRawRedFactor) + (rawValue * blendRawRedFactor)));
             }
         });
-        if (unprocessedImageLayers.getCount()>1) {
-            executor.execute(() -> {
-                for (int i = 0; i < greenPixels.length; i++) {
-                    double value = LswImageProcessingUtil.convertToUnsignedInt(greenPixels[i]);
-                    double rawValue = LswImageProcessingUtil.convertToUnsignedInt(unprocessedImageLayers.getLayers()[2][i]);
-                    greenPixels[i] = LswImageProcessingUtil.convertToShort((long) (value * (1 - blendRawGreenFactor) + (rawValue * blendRawGreenFactor)));
-                }
-            });
-        }
-        if (unprocessedImageLayers.getCount()>2) {
-            executor.execute(() -> {
-                for (int i = 0; i < bluePixels.length; i++) {
-                    double value = LswImageProcessingUtil.convertToUnsignedInt(bluePixels[i]);
-                    double rawValue = LswImageProcessingUtil.convertToUnsignedInt(unprocessedImageLayers.getLayers()[2][i]);
-                    bluePixels[i] = LswImageProcessingUtil.convertToShort((long) (value * (1 - blendRawBlueFactor) + (rawValue * blendRawBlueFactor)));
-                }
-            });
-        }
+        executor.execute(() -> {
+            for (int i = 0; i < greenPixels.length; i++) {
+                double value = LswImageProcessingUtil.convertToUnsignedInt(greenPixels[i]);
+                double rawValue = LswImageProcessingUtil.convertToUnsignedInt(unprocessedImageLayers.getLayers()[2][i]);
+                greenPixels[i] = LswImageProcessingUtil.convertToShort((long) (value * (1 - blendRawGreenFactor) + (rawValue * blendRawGreenFactor)));
+            }
+        });
+        executor.execute(() -> {
+            for (int i = 0; i < bluePixels.length; i++) {
+                double value = LswImageProcessingUtil.convertToUnsignedInt(bluePixels[i]);
+                double rawValue = LswImageProcessingUtil.convertToUnsignedInt(unprocessedImageLayers.getLayers()[2][i]);
+                bluePixels[i] = LswImageProcessingUtil.convertToShort((long) (value * (1 - blendRawBlueFactor) + (rawValue * blendRawBlueFactor)));
+            }
+        });
         LswUtil.stopAndAwaitParallelExecutor(executor);
     }
 

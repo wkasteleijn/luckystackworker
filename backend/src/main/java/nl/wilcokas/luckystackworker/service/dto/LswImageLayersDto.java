@@ -7,5 +7,4 @@ import lombok.Data;
 @Builder
 public class LswImageLayersDto {
     private short[][] layers;
-    private int count;
 }
