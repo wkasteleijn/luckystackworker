@@ -9,6 +9,7 @@ LuckyStackWorker - RELEASE NOTES
 - Added switch to preserve/not preserve the dark background to the light control
 - Fixed bug when opening png files, image no longer initially shown over-exposed
 - Fixed bug when loading an earlier saved profile yaml file with the pass 2 denoise switched off would always open with pass 2 denoise on
+- Fixed bug when opening mono image stack show over-exposed
 - Upgraded all dependencies to the latest versions.
 
 05/10/2024 minor release 6.1.0
