@@ -77,6 +77,9 @@ export class AppComponent implements OnInit {
   iansRecovery: number;
   iansIterations: number;
 
+  rofTheta: number = 1;
+  rofIterations: number = 2;
+
   // denoise 2
   denoiseAlgorithm2: string;
 
@@ -604,6 +607,8 @@ export class AppComponent implements OnInit {
           this.profile.savitzkyGolayIterationsGreen;
         this.denoise2Radius = this.profile.denoise2RadiusGreen;
         this.denoise2Iterations = this.profile.denoise2IterationsGreen;
+        this.rofTheta = this.profile.rofThetaGreen;
+        this.rofIterations = this.profile.rofIterationsGreen;
         break;
       case 'B':
         this.denoise1Amount = this.profile.denoise1AmountBlue;
@@ -616,6 +621,8 @@ export class AppComponent implements OnInit {
         this.savitzkyGolayIterations = this.profile.savitzkyGolayIterationsBlue;
         this.denoise2Radius = this.profile.denoise2RadiusBlue;
         this.denoise2Iterations = this.profile.denoise2IterationsBlue;
+        this.rofTheta = this.profile.rofThetaBlue;
+        this.rofIterations = this.profile.rofIterationsBlue;
         break;
       default:
         this.denoiseAlgorithm1 = this.profile.denoiseAlgorithm1;
@@ -632,6 +639,8 @@ export class AppComponent implements OnInit {
         this.savitzkyGolayIterations = this.profile.savitzkyGolayIterations;
         this.denoise2Radius = this.profile.denoise2Radius;
         this.denoise2Iterations = this.profile.denoise2Iterations;
+        this.rofTheta = this.profile.rofTheta;
+        this.rofIterations = this.profile.rofIterations;
     }
     this.visibleChannel = this.applyDenoiseToChannel;
     this.luckyStackWorkerService.channelChanged(this.visibleChannel).subscribe(
@@ -714,6 +723,56 @@ export class AppComponent implements OnInit {
     console.log(
       'denoise1IterationsChanged called: ' + this.profile.denoise1Iterations
     );
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  rofIterationsChanged(event: any, update: boolean) {
+    this.rofIterations = event.value;
+    this.settings.operation = 'rofIterations';
+    switch (this.applyDenoiseToChannel) {
+      case 'G':
+        this.profile.rofIterationsGreen = event.value;
+        break;
+      case 'B':
+        this.profile.rofIterationsBlue = event.value;
+        break;
+      case 'R':
+        this.profile.rofIterations = event.value;
+        break;
+      default:
+        this.equalizeChannelsForDenoising();
+        this.profile.rofIterations = event.value;
+        this.profile.rofIterationsGreen = event.value;
+        this.profile.rofIterationsBlue = event.value;
+    }
+    console.log('rofIterationsChanged called: ' + this.profile.rofIterations);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  rofThetaChanged(event: any, update: boolean) {
+    this.rofTheta = event.value;
+    this.settings.operation = 'rofTheta';
+    switch (this.applyDenoiseToChannel) {
+      case 'G':
+        this.profile.rofThetaGreen = event.value;
+        break;
+      case 'B':
+        this.profile.rofThetaBlue = event.value;
+        break;
+      case 'R':
+        this.profile.rofTheta = event.value;
+        break;
+      default:
+        this.equalizeChannelsForDenoising();
+        this.profile.rofTheta = event.value;
+        this.profile.rofThetaGreen = event.value;
+        this.profile.rofThetaBlue = event.value;
+    }
+    console.log('rofThetaChanged called: ' + this.profile.rofTheta);
     if (update) {
       this.updateProfile();
     }
@@ -1056,6 +1115,9 @@ export class AppComponent implements OnInit {
     if (event.value === 'SIGMA1') {
       this.settings.operation = 'denoise1Amount';
       this.profile.denoiseAlgorithm1 = 'SIGMA1';
+    } else if (event.value === 'ROF') {
+      this.settings.operation = 'rofDenoise';
+      this.profile.denoiseAlgorithm1 = 'ROF';
     } else if (event.value === 'IAN') {
       this.settings.operation = 'iansAmount';
       this.profile.denoiseAlgorithm1 = 'IAN';
@@ -1326,6 +1388,8 @@ export class AppComponent implements OnInit {
     this.iansAmountMid = this.profile.iansAmountMid;
     this.iansRecovery = this.profile.iansRecovery;
     this.iansIterations = this.profile.iansIterations;
+    this.rofTheta = this.profile.rofTheta;
+    this.rofIterations = this.profile.rofIterations;
 
     this.denoiseAlgorithm2 = this.profile.denoiseAlgorithm2;
     this.denoise2Radius = this.profile.denoise2Radius;
@@ -1752,6 +1816,7 @@ export class AppComponent implements OnInit {
     this.profile.savitzkyGolaySizeGreen = Number(this.savitzkyGolaySize);
     this.profile.savitzkyGolayAmountGreen = this.savitzkyGolayAmount;
     this.profile.savitzkyGolayIterationsGreen = this.savitzkyGolayIterations;
+    this.profile.rofThetaGreen = this.rofTheta;
     this.profile.denoise2RadiusGreen = this.denoise2Radius;
     this.profile.denoise2IterationsGreen = this.denoise2Iterations;
     this.profile.denoise1AmountBlue = this.denoise1Amount;
@@ -1762,5 +1827,6 @@ export class AppComponent implements OnInit {
     this.profile.savitzkyGolayIterationsBlue = this.savitzkyGolayIterations;
     this.profile.denoise2RadiusBlue = this.denoise2Radius;
     this.profile.denoise2IterationsBlue = this.denoise2Iterations;
+    this.profile.rofThetaBlue = this.rofTheta;
   }
 }

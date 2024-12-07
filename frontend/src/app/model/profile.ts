@@ -53,6 +53,8 @@ export class Profile {
   iansAmountMid: number;
   iansRecovery: number;
   iansIterations: number;
+  rofTheta: number;
+  rofIterations: number;
 
   // denoise 2 red or all channels
   denoiseAlgorithm2: string;
@@ -66,6 +68,8 @@ export class Profile {
   denoise1AmountGreen: number;
   denoise1RadiusGreen: number;
   denoise1IterationsGreen: number;
+  rofThetaGreen: number;
+  rofIterationsGreen: number;
 
   // denoise 2 green
   savitzkyGolaySizeGreen: number;
@@ -78,6 +82,8 @@ export class Profile {
   denoise1AmountBlue: number;
   denoise1RadiusBlue: number;
   denoise1IterationsBlue: number;
+  rofThetaBlue: number;
+  rofIterationsBlue: number;
 
   // denoise 2 blue
   savitzkyGolaySizeBlue: number;

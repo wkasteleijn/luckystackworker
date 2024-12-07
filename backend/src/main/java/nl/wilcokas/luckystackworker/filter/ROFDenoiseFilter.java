@@ -4,7 +4,7 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
-import nl.wilcokas.luckystackworker.filter.settings.ROFParameters;
+import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.stereotype.Component;
 
@@ -32,14 +32,16 @@ import java.util.concurrent.Executor;
 @Component
 public class ROFDenoiseFilter {
 
-    public void apply(ImagePlus image, ROFParameters parameters) {
+    public void apply(ImagePlus image, Profile profile) {
         ImageStack stack = image.getStack();
+        final float g = 1;
+        final float dt = 0.25f;
 
         // Run every stack in a seperate thread to increase performance.
         Executor executor = LswUtil.getParallelExecutor();
-        executor.execute(() -> applyToChannel(stack, parameters.getTethaRed(), parameters.getGRed(), parameters.getDtRed(), parameters.getIterationsRed(), 1));
-        executor.execute(() -> applyToChannel(stack, parameters.getTethaGreen(), parameters.getGGreen(), parameters.getDtGreen(), parameters.getIterationsGreen(), 2));
-        executor.execute(() -> applyToChannel(stack, parameters.getTethaBlue(), parameters.getGBlue(), parameters.getDtBlue(), parameters.getIterationsBlue(), 3));
+        executor.execute(() -> applyToChannel(stack, profile.getRofTheta() * 10, g, dt, profile.getRofIterations(), 1));
+        executor.execute(() -> applyToChannel(stack, profile.getRofThetaGreen() * 10, g, dt, profile.getRofIterationsGreen(), 2));
+        executor.execute(() -> applyToChannel(stack, profile.getRofThetaBlue() * 10, g, dt, profile.getRofIterationsBlue(), 3));
         LswUtil.stopAndAwaitParallelExecutor(executor);
     }
 

@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import nl.wilcokas.luckystackworker.filter.*;
+import nl.wilcokas.luckystackworker.filter.settings.*;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import org.apache.commons.text.StringSubstitutor;
@@ -22,11 +23,6 @@ import ij.process.ImageProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.filter.settings.IansNoiseReductionParameters;
-import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
-import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenParameters;
-import nl.wilcokas.luckystackworker.filter.settings.SavitzkyGolayRadius;
-import nl.wilcokas.luckystackworker.filter.settings.UnsharpMaskParameters;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
@@ -47,6 +43,7 @@ public class OperationService {
     private final ColorNormalisationFilter colorNormalisationFilter;
     private final HistogramStretchFilter histogramStretchFilter;
     private final BlendRawFilter blendRawFilter;
+    private final ROFDenoiseFilter rofDenoiseFilter;
 
     private int displayedProgress = 0;
     private Timer timer = new Timer();
@@ -61,35 +58,36 @@ public class OperationService {
 
         // Sharpening filters
         applySharpen(image, profile);
-        updateProgress(viewer, 8);
+        updateProgress(viewer, 9);
 
-        // Denoise filters
+        // Denoise filters -- pass 1
         applySigmaDenoise1(image, profile);
-        updateProgress(viewer, 16, true);
         applyIansNoiseReduction(image, profile);
-        updateProgress(viewer, 24);
+        applyROFDenoise(image,profile);
+        updateProgress(viewer, 18);
+
+        // Denoise filters -- pass 2
         applySigmaDenoise2(image, profile);
-        updateProgress(viewer, 32);
         applySavitzkyGolayDenoise(image, profile);
-        updateProgress(viewer, 40, true);
+        updateProgress(viewer, 27, true);
 
         // Light and contrast filters
         applyEqualizeLocalHistorgrams(image, profile);
-        updateProgress(viewer, 48);
+        updateProgress(viewer, 36);
         applyLocalContrast(image, profile);
-        updateProgress(viewer, 56);
+        updateProgress(viewer, 45);
         applyGamma(image, profile);
-        updateProgress(viewer, 64);
+        updateProgress(viewer, 54);
 
         // Color filters
         applyColorNormalisation(image, profile);
-        updateProgress(viewer, 72);
+        updateProgress(viewer, 63   );
         applyRGBBalance(image, profile);
-        updateProgress(viewer, 80);
+        updateProgress(viewer, 72);
         applySaturation(image, profile);
-        updateProgress(viewer, 88);
+        updateProgress(viewer, 81);
         applyDispersionCorrection(image, profile);
-        updateProgress(viewer, 96);
+        updateProgress(viewer, 90);
 
         // Always apply last
         applyBrightnessAndContrast(image, profile);
@@ -270,6 +268,13 @@ public class OperationService {
             IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(profile.getIansAmount()).medium(profile.getIansAmountMid())
                     .large(BigDecimal.ZERO).recovery(profile.getIansRecovery()).iterations(profile.getIansIterations()).build();
             iansNoiseReductionFilter.apply(image, profile.getName(), parameters, profile.getScale());
+        }
+    }
+
+    private void applyROFDenoise(final ImagePlus image, final Profile profile) {
+        if (Constants.DENOISE_ALGORITHM_ROF.equals(profile.getDenoiseAlgorithm1())) {
+            log.info("Applying ROF denoising to image {}", image.getID());
+            rofDenoiseFilter.apply(image, profile);
         }
     }
 

@@ -377,6 +377,15 @@ public class LswFileUtil {
         if (profile.getIansIterations() == 0) {
             profile.setIansIterations(1);
         }
+
+        // Added since 7.0.0, so older version written yaml needs to stay compatible.
+        if (profile.getRofIterations() == 0) {
+            profile.setRofIterations(5);
+        }
+        if (profile.getRofTheta() == 0) {
+            profile.setRofTheta(50);
+        }
+
     }
 
 

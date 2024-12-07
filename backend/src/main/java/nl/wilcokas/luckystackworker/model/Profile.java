@@ -75,6 +75,8 @@ public class Profile {
     private BigDecimal iansAmountMid;
     private BigDecimal iansRecovery;
     private int iansIterations;
+    private int rofTheta;
+    private int rofIterations;
     private BigDecimal denoise2Radius;
     private int denoise2Iterations;
     private int savitzkyGolaySize;
@@ -90,6 +92,8 @@ public class Profile {
     private int savitzkyGolaySizeGreen;
     private int savitzkyGolayAmountGreen;
     private int savitzkyGolayIterationsGreen;
+    private int rofThetaGreen;
+    private int rofIterationsGreen;
 
     // denoise blue
     private BigDecimal denoise1AmountBlue;
@@ -100,6 +104,8 @@ public class Profile {
     private int savitzkyGolaySizeBlue;
     private int savitzkyGolayAmountBlue;
     private int savitzkyGolayIterationsBlue;
+    private int rofThetaBlue;
+    private int rofIterationsBlue;
 
     // constrast & light
     private BigDecimal gamma;
@@ -227,6 +233,8 @@ public class Profile {
         this.iansAmountMid = profile.getIansAmountMid();
         this.iansIterations = profile.getIansIterations();
         this.iansRecovery = profile.getIansRecovery();
+        this.rofTheta = profile.getRofTheta();
+        this.rofIterations = profile.getRofIterations();
         this.savitzkyGolaySize = profile.getSavitzkyGolaySize();
         this.savitzkyGolayAmount = profile.getSavitzkyGolayAmount();
         this.savitzkyGolayIterations = profile.getSavitzkyGolayIterations();
@@ -240,6 +248,8 @@ public class Profile {
             this.savitzkyGolaySizeGreen = profile.getSavitzkyGolaySize();
             this.savitzkyGolayAmountGreen = profile.getSavitzkyGolayAmount();
             this.savitzkyGolayIterationsGreen = profile.getSavitzkyGolayIterations();
+            this.rofThetaGreen = profile.getRofTheta();
+            this.rofIterationsGreen = profile.getRofIterations();
 
             this.denoise1AmountBlue = profile.getDenoise1Amount();
             this.denoise1RadiusBlue = profile.getDenoise1Radius();
@@ -249,6 +259,8 @@ public class Profile {
             this.savitzkyGolaySizeBlue = profile.getSavitzkyGolaySize();
             this.savitzkyGolayAmountBlue = profile.getSavitzkyGolayAmount();
             this.savitzkyGolayIterationsBlue = profile.getSavitzkyGolayIterations();
+            this.rofThetaBlue = profile.getRofTheta();
+            this.rofIterationsBlue = profile.getRofIterations();
         } else {
             this.denoise1AmountGreen = profile.getDenoise1AmountGreen();
             this.denoise1RadiusGreen = profile.getDenoise1RadiusGreen();
@@ -258,6 +270,8 @@ public class Profile {
             this.savitzkyGolaySizeGreen = profile.getSavitzkyGolaySizeGreen();
             this.savitzkyGolayAmountGreen = profile.getSavitzkyGolayAmountGreen();
             this.savitzkyGolayIterationsGreen = profile.getSavitzkyGolayIterationsGreen();
+            this.rofThetaBlue = profile.getRofThetaGreen();
+            this.rofIterationsBlue = profile.getRofIterationsGreen();
 
             this.denoise1AmountBlue = profile.getDenoise1AmountBlue();
             this.denoise1RadiusBlue = profile.getDenoise1RadiusBlue();
@@ -267,6 +281,8 @@ public class Profile {
             this.savitzkyGolaySizeBlue = profile.getSavitzkyGolaySizeBlue();
             this.savitzkyGolayAmountBlue = profile.getSavitzkyGolayAmountBlue();
             this.savitzkyGolayIterationsBlue = profile.getSavitzkyGolayIterationsBlue();
+            this.rofThetaBlue = profile.getRofThetaBlue();
+            this.rofIterationsBlue = profile.getRofIterationsBlue();
         }
 
         // contrast & light

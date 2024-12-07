@@ -69,6 +69,8 @@ public class ProfileDTO {
         this.iansAmountMid = profile.getIansAmountMid();
         this.iansRecovery = profile.getIansRecovery();
         this.iansIterations = profile.getIansIterations();
+        this.rofTheta = profile.getRofTheta();
+        this.rofIterations = profile.getRofIterations();
         this.denoiseAlgorithm2 = profile.getDenoiseAlgorithm2();
         this.denoise2Radius = profile.getDenoise2Radius();
         this.denoise2Iterations = profile.getDenoise2Iterations();
@@ -84,6 +86,8 @@ public class ProfileDTO {
         this.savitzkyGolaySizeGreen = profile.getSavitzkyGolaySizeGreen();
         this.savitzkyGolayAmountGreen = profile.getSavitzkyGolayAmountGreen();
         this.savitzkyGolayIterationsGreen = profile.getSavitzkyGolayIterationsGreen();
+        this.rofThetaGreen = profile.getRofThetaGreen();
+        this.rofIterationsGreen = profile.getRofIterationsGreen();
 
         this.denoise1AmountBlue = profile.getDenoise1AmountBlue();
         this.denoise1RadiusBlue = profile.getDenoise1RadiusBlue();
@@ -93,6 +97,8 @@ public class ProfileDTO {
         this.savitzkyGolaySizeBlue = profile.getSavitzkyGolaySizeBlue();
         this.savitzkyGolayAmountBlue = profile.getSavitzkyGolayAmountBlue();
         this.savitzkyGolayIterationsBlue = profile.getSavitzkyGolayIterationsBlue();
+        this.rofThetaBlue = profile.getRofThetaBlue();
+        this.rofIterationsBlue = profile.getRofIterationsBlue();
 
         // color & dispersion
         this.red = profile.getRed();
@@ -172,6 +178,8 @@ public class ProfileDTO {
     private BigDecimal iansAmountMid;
     private BigDecimal iansRecovery;
     private int iansIterations;
+    private int rofTheta;
+    private int rofIterations;
     private String denoiseAlgorithm2;
     private int savitzkyGolaySize;
     private int savitzkyGolayAmount;
@@ -185,6 +193,8 @@ public class ProfileDTO {
     private int denoise1IterationsGreen;
     private BigDecimal iansAmountGreen;
     private BigDecimal iansRecoveryGreen;
+    private int rofThetaGreen;
+    private int rofIterationsGreen;
     private int savitzkyGolaySizeGreen;
     private int savitzkyGolayAmountGreen;
     private int savitzkyGolayIterationsGreen;
@@ -196,6 +206,8 @@ public class ProfileDTO {
     private int denoise1IterationsBlue;
     private BigDecimal iansAmountBlue;
     private BigDecimal iansRecoveryBlue;
+    private int rofThetaBlue;
+    private int rofIterationsBlue;
     private int savitzkyGolaySizeBlue;
     private int savitzkyGolayAmountBlue;
     private int savitzkyGolayIterationsBlue;

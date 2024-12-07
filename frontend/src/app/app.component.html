@@ -778,6 +778,9 @@
           <mat-radio-button value="OFF" class="radioSizeButtonDenoise"
             >Off</mat-radio-button
           >
+          <mat-radio-button value="ROF" class="denoiseMode"
+            >ROF</mat-radio-button
+          >
           <mat-radio-button value="SIGMA1" class="denoiseMode"
             >Sigma 1</mat-radio-button
           >
@@ -981,6 +984,47 @@
               [color]="colorTheme()"
             ></mat-slider>
             <span class="sliderLabel">{{ denoise1Iterations }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="denoiseAlgorithm1 === 'ROF'">
+        <div class="sliderRow">
+          <div class="sliderLabel">Theta</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              step="10"
+              min="10"
+              max="1000"
+              (input)="rofThetaChanged($event, false)"
+              (change)="rofThetaChanged($event, true)"
+              [(ngModel)]="rofTheta"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span class="sliderLabel">{{ rofTheta }}</span>
+            <span
+              *ngIf="refImageSelected"
+              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+              >{{ rofTheta == 0 ? "Off" : "" }}</span
+            >
+          </div>
+        </div>
+
+        <div class="sliderRow">
+          <div class="sliderLabel">Iterations</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              step="1"
+              min="2"
+              max="20"
+              (input)="rofIterationsChanged($event, false)"
+              (change)="rofIterationsChanged($event, true)"
+              [(ngModel)]="rofIterations"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span class="sliderLabel">{{ rofIterations }}</span>
           </div>
         </div>
       </div>
