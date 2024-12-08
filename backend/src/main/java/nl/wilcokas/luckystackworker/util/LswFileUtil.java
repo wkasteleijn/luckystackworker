@@ -381,9 +381,13 @@ public class LswFileUtil {
         // Added since 7.0.0, so older version written yaml needs to stay compatible.
         if (profile.getRofIterations() == 0) {
             profile.setRofIterations(5);
+            profile.setRofIterationsGreen(5);
+            profile.setRofIterationsBlue(5);
         }
         if (profile.getRofTheta() == 0) {
             profile.setRofTheta(50);
+            profile.setRofThetaGreen(50);
+            profile.setRofThetaBlue(50);
         }
 
     }

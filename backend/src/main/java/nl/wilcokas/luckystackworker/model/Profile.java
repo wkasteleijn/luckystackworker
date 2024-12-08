@@ -270,8 +270,8 @@ public class Profile {
             this.savitzkyGolaySizeGreen = profile.getSavitzkyGolaySizeGreen();
             this.savitzkyGolayAmountGreen = profile.getSavitzkyGolayAmountGreen();
             this.savitzkyGolayIterationsGreen = profile.getSavitzkyGolayIterationsGreen();
-            this.rofThetaBlue = profile.getRofThetaGreen();
-            this.rofIterationsBlue = profile.getRofIterationsGreen();
+            this.rofThetaGreen = profile.getRofThetaGreen();
+            this.rofIterationsGreen = profile.getRofIterationsGreen();
 
             this.denoise1AmountBlue = profile.getDenoise1AmountBlue();
             this.denoise1RadiusBlue = profile.getDenoise1RadiusBlue();
