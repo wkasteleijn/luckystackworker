@@ -382,4 +382,38 @@ public class LswImageProcessingUtil {
         return (int) correctedValue;
     }
 
+    public static ImagePlus crop(ImagePlus image, Roi roi, String filepath) {
+        int xPos = (int) roi.getXBase();
+        int yPos = (int) roi.getYBase();
+        int width = (int) roi.getFloatWidth();
+        int height = (int) roi.getFloatHeight();
+
+        ImageStack stack = image.getStack();
+        int imageWidth = stack.getWidth();
+        int imageHeight = stack.getHeight();
+        short[][] newPixels = new short[3][width * height];
+
+        Executor executor = LswUtil.getParallelExecutor();
+        for (int layer = 1; layer <= 3; layer++) {
+            int finalLayer = layer;
+            executor.execute(() -> {
+                ImageProcessor p = stack.getProcessor(finalLayer);
+                short[] shortPixels = (short[]) p.getPixels();
+                for (int y = 0; y < height; y++) {
+                    for (int x = 0; x < width; x++) {
+                        int srcX = x + xPos;
+                        int srcY = y + yPos;
+                        if (srcX >= imageWidth || srcY >= imageHeight) {
+                            continue; // Skip out-of-bounds pixels
+                        }
+                        int srcPos = srcY * imageWidth + srcX;
+                        int destPos = y * width + x;
+                        newPixels[finalLayer - 1][destPos] = shortPixels[srcPos];
+                    }
+                }
+            });
+        }
+        LswUtil.stopAndAwaitParallelExecutor(executor);
+        return create16BitRGBImage(filepath, LswImageLayersDto.builder().layers(newPixels).build(), width, height, true, true, true);
+    }
 }

@@ -1817,6 +1817,7 @@ export class AppComponent implements OnInit {
     this.profile.savitzkyGolayAmountGreen = this.savitzkyGolayAmount;
     this.profile.savitzkyGolayIterationsGreen = this.savitzkyGolayIterations;
     this.profile.rofThetaGreen = this.rofTheta;
+    this.profile.rofIterationsGreen = this.rofIterations;
     this.profile.denoise2RadiusGreen = this.denoise2Radius;
     this.profile.denoise2IterationsGreen = this.denoise2Iterations;
     this.profile.denoise1AmountBlue = this.denoise1Amount;
@@ -1828,5 +1829,6 @@ export class AppComponent implements OnInit {
     this.profile.denoise2RadiusBlue = this.denoise2Radius;
     this.profile.denoise2IterationsBlue = this.denoise2Iterations;
     this.profile.rofThetaBlue = this.rofTheta;
+    this.profile.rofIterationsBlue = this.rofIterations;
   }
 }
