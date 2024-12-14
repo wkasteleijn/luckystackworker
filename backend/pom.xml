@@ -22,6 +22,7 @@
 		<velocity.version>2.4.1</velocity.version>
 		<commons-text.version>1.12.0</commons-text.version>
 		<imagej.version>1.54k</imagej.version>
+		<ParallelIterativeDeconvolution.version>1.13</ParallelIterativeDeconvolution.version>
 	</properties>
 
 	<dependencies>
@@ -70,6 +71,11 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.stevenjwest</groupId>
+			<artifactId>ParallelIterativeDeconvolution</artifactId>
+			<version>${ParallelIterativeDeconvolution.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
