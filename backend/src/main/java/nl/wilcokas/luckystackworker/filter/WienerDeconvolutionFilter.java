@@ -37,8 +37,7 @@ public class WienerDeconvolutionFilter {
     private short[] getDeconvolvedPixels(ImageProcessor ipInput, ImagePlus psf, int iterations) {
         WPLOptions options =
                 new WPLOptions(0, 1.0, 1.0, false, false, true, 0.01, false, false, false, 0);
-        WPLFloatIterativeDeconvolver2D deconv = new WPLFloatIterativeDeconvolver2D(new ImagePlus(null, ipInput), psf, IterativeEnums.BoundaryType.REFLEXIVE, IterativeEnums.ResizingType.AUTO,
-                Enums.OutputType.SHORT, iterations, false, options);
+        LswWPLFloatIterativeDeconvolver2D deconv = new LswWPLFloatIterativeDeconvolver2D(new ImagePlus(null, ipInput), psf, IterativeEnums.BoundaryType.REFLEXIVE, IterativeEnums.ResizingType.AUTO, iterations, options);
         ShortProcessor ipOutput = (ShortProcessor) deconv.deconvolve().getProcessor();
         return (short[]) ipOutput.getPixels();
     }

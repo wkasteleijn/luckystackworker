@@ -29,7 +29,7 @@ public class Probeersels {
 
         // /*
         ImagePlus image = LswFileUtil
-                .openImage("D:\\Jup\\311024\\cropped2\\2024-10-31-2302_6-U-RGB-Jup_pipp_europa_AS_P25_lapl6_ap303.tif", OpenImageModeEnum.RGB, 1, img -> img);
+                .openImage("D:\\Jup\\311024\\cropped2\\jup_lsw\\2024-10-31-2300_2-U-RGB-Jup_pipp_europa_AS_P25_lapl6_ap303_LSW.png", OpenImageModeEnum.RGB, 1, img -> img);
         ImagePlus psf = new Opener().openImage(LswFileUtil.getIJFileFormat("D:\\Jup\\311024\\cropped2\\jup_lsw\\psf_2.png"));
 
         image.show();
@@ -40,7 +40,7 @@ public class Probeersels {
 
         log.info("Start Wiener deconvolution");
         WienerDeconvolutionFilter filter = new WienerDeconvolutionFilter();
-        filter.apply(image,psf,25);
+        filter.apply(image,psf,15);
         log.info("Completed Wiener deconvolution");
 
         LswFileUtil.saveImage(image, "jup", "C:/Users/wkast/archive/Jup/testsession/jup_denoised2.tif", true, false, false, false);
