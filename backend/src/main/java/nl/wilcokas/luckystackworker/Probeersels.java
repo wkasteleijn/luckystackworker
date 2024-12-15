@@ -9,8 +9,10 @@ import edu.emory.mathcs.restoretools.iterative.wpl.WPLOptions;
 import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
+import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.filter.ROFDenoiseFilter;
+import nl.wilcokas.luckystackworker.filter.WienerDeconvolutionFilter;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
@@ -20,16 +22,15 @@ import nl.wilcokas.luckystackworker.util.LswUtil;
 public class Probeersels {
     public static void main(String[] args) throws InterruptedException, IOException {
 
-        new ImageJ();
-        IJ.open("D:\\Jup\\311024\\cropped2\\jup_lsw\\wiener.png");
-        IJ.open("D:\\Jup\\311024\\cropped2\\jup_lsw\\psf_2.png");
-        IJ.runPlugIn("edu.emory.mathcs.restoretools.iterative.ParallelIterativeDeconvolution2D", null);
+//        new ImageJ();
+//        IJ.open("D:\\Jup\\311024\\cropped2\\jup_lsw\\wiener.png");
+//        IJ.open("D:\\Jup\\311024\\cropped2\\jup_lsw\\psf_2.png");
+//        IJ.runPlugIn("edu.emory.mathcs.restoretools.iterative.ParallelIterativeDeconvolution2D", null);
 
-        /*
+        // /*
         ImagePlus image = LswFileUtil
-                .openImage("D:\\Jup\\\\311024\\cropped2\\jup_lsw\\wiener.png", OpenImageModeEnum.RGB, 1, img -> img);
-        ImagePlus psf = LswFileUtil
-                .openImage("D:\\Jup\\\\311024\\cropped2\\jup_lsw\\psf_2.png", OpenImageModeEnum.RGB, 1, img -> img);
+                .openImage("D:\\Jup\\311024\\cropped2\\2024-10-31-2302_6-U-RGB-Jup_pipp_europa_AS_P25_lapl6_ap303.tif", OpenImageModeEnum.RGB, 1, img -> img);
+        ImagePlus psf = new Opener().openImage(LswFileUtil.getIJFileFormat("D:\\Jup\\311024\\cropped2\\jup_lsw\\psf_2.png"));
 
         image.show();
         // Set exposure back to original value
@@ -37,20 +38,10 @@ public class Probeersels {
         image.resetDisplayRange();
         image.updateAndDraw();
 
-        WPLFloatIterativeDeconvolver2D deconv = new WPLFloatIterativeDeconvolver2D(image, psf, IterativeEnums.BoundaryType.REFLEXIVE, IterativeEnums.ResizingType.AUTO,
-                Enums.OutputType.SAME_AS_SOURCE, 5, false, new WPLOptions());
-        ImagePlus deconvImage = deconv.deconvolve();
-        deconvImage.show();
-
-        ROFDenoiseFilter filter = new ROFDenoiseFilter();
-        filter.apply(image, Profile.builder()
-                .rofTheta(20000)
-                .rofThetaGreen(20000)
-                .rofThetaBlue(20000)
-                .rofIterations(15)
-                .rofIterationsGreen(15)
-                .rofIterationsBlue(15)
-                .build());
+        log.info("Start Wiener deconvolution");
+        WienerDeconvolutionFilter filter = new WienerDeconvolutionFilter();
+        filter.apply(image,psf,25);
+        log.info("Completed Wiener deconvolution");
 
         LswFileUtil.saveImage(image, "jup", "C:/Users/wkast/archive/Jup/testsession/jup_denoised2.tif", true, false, false, false);
 
@@ -59,7 +50,7 @@ public class Probeersels {
         LswUtil.waitMilliseconds(10000);
 
         System.exit(0);
-        */
+        // */
     }
 
 }
