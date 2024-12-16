@@ -1,8 +1,6 @@
 package nl.wilcokas.luckystackworker.filter;
 
-import edu.emory.mathcs.restoretools.Enums;
 import edu.emory.mathcs.restoretools.iterative.IterativeEnums;
-import edu.emory.mathcs.restoretools.iterative.wpl.WPLFloatIterativeDeconvolver2D;
 import edu.emory.mathcs.restoretools.iterative.wpl.WPLOptions;
 import ij.ImagePlus;
 import ij.ImageStack;
@@ -16,21 +14,28 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class WienerDeconvolutionFilter {
 
-    public void apply(ImagePlus image, ImagePlus psf, int iterations) {
+    public void apply(ImagePlus image, ImagePlus psf, int iterations, float deringStrength, double deringRadius, int deringThreshold, float blendRawFactor) {
         ImageStack stack = image.getStack();
         for (int channel = 1; channel <= 3; channel++) {
-            applyToLayer(stack.getProcessor(channel), psf, iterations);
+            applyToLayer(stack.getProcessor(channel), psf, iterations, deringStrength, deringRadius, deringThreshold, blendRawFactor);
         }
     }
 
-    private void applyToLayer(ImageProcessor ipInput, ImagePlus psf, int iterations) {
+    private void applyToLayer(ImageProcessor ipInput, ImagePlus psf, int iterations, float deringStrength, double deringRadius, int deringThreshold, float blendRawFactor) {
         short[] pixels = (short[]) ipInput.getPixels();
         double averagePixelValueIn = getAveragePixelValue(pixels);
         short[] outPixels = getDeconvolvedPixels(ipInput, psf, iterations);
         double averagePixelValueOut = getAveragePixelValue(outPixels);
+        final ImageProcessor ipMask = LswImageProcessingUtil.createDeringMaskProcessor(deringStrength, deringRadius, deringThreshold, ipInput);
+        short[] maskPixels = (short[]) ipMask.getPixels();
         for (int i = 0; i < pixels.length; i++) {
-            int newValue = LswImageProcessingUtil.convertToUnsignedInt(outPixels[i]);
-            pixels[i] = LswImageProcessingUtil.convertToShort((int) (newValue * (averagePixelValueIn / averagePixelValueOut)));
+            float appliedFactor = Math.max(LswImageProcessingUtil.convertToUnsignedInt(maskPixels[i]) / 65535f, 1f - blendRawFactor);
+            // correction on output is needed given that is somehow always brighter than the original value
+            int newValue = (int) (LswImageProcessingUtil.convertToUnsignedInt(outPixels[i]) * (averagePixelValueIn / averagePixelValueOut));
+            int originalValue = LswImageProcessingUtil.convertToUnsignedInt(pixels[i]);
+
+            int assignedValue = (int) (newValue * appliedFactor) + (int) (originalValue * (1 - appliedFactor));
+            pixels[i] = LswImageProcessingUtil.convertToShort(assignedValue);
         }
     }
 

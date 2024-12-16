@@ -5,6 +5,7 @@ import javax.swing.JOptionPane;
 
 import ij.CompositeImage;
 import ij.ImageStack;
+import ij.plugin.filter.GaussianBlur;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import org.apache.commons.lang3.tuple.Pair;
@@ -416,4 +417,44 @@ public class LswImageProcessingUtil {
         LswUtil.stopAndAwaitParallelExecutor(executor);
         return create16BitRGBImage(filepath, LswImageLayersDto.builder().layers(newPixels).build(), width, height, true, true, true);
     }
+
+    public static ImageProcessor createDeringMaskProcessor(
+            float deringStrength, double deringRadius, int deringThreshold, ImageProcessor ip) {
+        if (deringStrength > 0.0f) {
+            ImageProcessor maskIp = ip.duplicate();
+            FloatProcessor fp = createDeringMaskFloatProcessor(deringRadius, deringThreshold, maskIp);
+            maskIp.setPixels(1, fp);
+            return maskIp;
+        }
+        return null;
+    }
+
+    public static FloatProcessor createDeringMaskFloatProcessor(double radius, int threshold, ImageProcessor ip) {
+        int minValue = 65535;
+        int maxValue = 0;
+        short[] maskPixels = (short[]) ip.getPixels();
+        for (int position = 0; position < maskPixels.length; position++) {
+            int value = LswImageProcessingUtil.convertToUnsignedInt(maskPixels[position]);
+            if (value > maxValue) {
+                maxValue = value;
+            }
+            if (value < minValue) {
+                minValue = value;
+            }
+        }
+        int average = (maxValue - minValue) / threshold; // start cutting of from threshold times the average.
+        for (int position = 0; position < maskPixels.length; position++) {
+            int value = LswImageProcessingUtil.convertToUnsignedInt(maskPixels[position]);
+            if (value < average) {
+                maskPixels[position] = 0;
+            } else if (value > average) {
+                maskPixels[position] = -1;
+            }
+        }
+        FloatProcessor fp = ip.toFloat(1, null);
+        GaussianBlur gb = new GaussianBlur();
+        gb.blurGaussian(fp, radius, radius, 0.01);
+        return fp;
+    }
+
 }

@@ -165,7 +165,7 @@ public class LSWSharpenFilter {
             if (unsharpMaskParameters.getDeringStrengthLuminance() > 0.0f) {
                 ImageProcessor ipLum = new ShortProcessor(image.getWidth(), image.getHeight());
                 ipLum.setPixels(1, fpLum);
-                final FloatProcessor fpMask = createDeringMaskFloatProcessor(unsharpMaskParameters.getDeringRadiusLuminance(),
+                final FloatProcessor fpMask = LswImageProcessingUtil.createDeringMaskFloatProcessor(unsharpMaskParameters.getDeringRadiusLuminance(),
                         unsharpMaskParameters.getDeringThresholdLuminance(),
                         ipLum);
                 ImageProcessor ipLumMask = new ShortProcessor(image.getWidth(), image.getHeight());
@@ -323,7 +323,7 @@ public class LSWSharpenFilter {
             float deringStrength,
             int deringThreshold,
             int channel) {
-        final ImageProcessor ipMask = createDeringMaskProcessor(deringStrength,
+        final ImageProcessor ipMask = LswImageProcessingUtil.createDeringMaskProcessor(deringStrength,
                 deringRadius,
                 deringThreshold,
                 stack.getProcessor(channel));
@@ -349,45 +349,6 @@ public class LSWSharpenFilter {
             doUnsharpMask(radius, amount, blendRawFactor, fp);
             ip.setPixels(channel, fp);
         }
-    }
-
-    private ImageProcessor createDeringMaskProcessor(
-            float deringStrength, double deringRadius, int deringThreshold, ImageProcessor ip) {
-        if (deringStrength > 0.0f) {
-            ImageProcessor maskIp = ip.duplicate();
-            FloatProcessor fp = createDeringMaskFloatProcessor(deringRadius, deringThreshold, maskIp);
-            maskIp.setPixels(1, fp);
-            return maskIp;
-        }
-        return null;
-    }
-
-    private FloatProcessor createDeringMaskFloatProcessor(double radius, int threshold, ImageProcessor ip) {
-        int minValue = 65535;
-        int maxValue = 0;
-        short[] maskPixels = (short[]) ip.getPixels();
-        for (int position = 0; position < maskPixels.length; position++) {
-            int value = LswImageProcessingUtil.convertToUnsignedInt(maskPixels[position]);
-            if (value > maxValue) {
-                maxValue = value;
-            }
-            if (value < minValue) {
-                minValue = value;
-            }
-        }
-        int average = (maxValue - minValue) / threshold; // start cutting of from threshold times the average.
-        for (int position = 0; position < maskPixels.length; position++) {
-            int value = LswImageProcessingUtil.convertToUnsignedInt(maskPixels[position]);
-            if (value < average) {
-                maskPixels[position] = 0;
-            } else if (value > average) {
-                maskPixels[position] = -1;
-            }
-        }
-        FloatProcessor fp = ip.toFloat(1, null);
-        GaussianBlur gb = new GaussianBlur();
-        gb.blurGaussian(fp, radius, radius, 0.01);
-        return fp;
     }
 
     /*
