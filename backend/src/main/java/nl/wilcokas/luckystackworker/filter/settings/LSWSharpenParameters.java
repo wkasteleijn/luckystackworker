@@ -13,7 +13,7 @@ public class LSWSharpenParameters {
 
     private boolean individual;
 
-    // Applies to non individual+luminace & RGB mode
+    // Applies to non individual+luminance & RGB mode
     private UnsharpMaskParameters unsharpMaskParameters;
 
     // Applies to non individual+luminance mode
@@ -23,10 +23,5 @@ public class LSWSharpenParameters {
     private boolean includeColor;
 
     private float saturation;
-
-    // Applies to individual+luminance mode
-    private UnsharpMaskParameters unsharpMaskParametersRed;
-    private UnsharpMaskParameters unsharpMaskParametersGreen;
-    private UnsharpMaskParameters unsharpMaskParametersBlue;
 
 }

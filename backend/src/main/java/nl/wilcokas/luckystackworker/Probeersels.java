@@ -40,7 +40,7 @@ public class Probeersels {
 
         log.info("Start Wiener deconvolution");
         WienerDeconvolutionFilter filter = new WienerDeconvolutionFilter();
-        filter.apply(image,psf,15);
+        //filter.apply(image,psf,15);
         log.info("Completed Wiener deconvolution");
 
         LswFileUtil.saveImage(image, "jup", "C:/Users/wkast/archive/Jup/testsession/jup_denoised2.tif", true, false, false, false);

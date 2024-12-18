@@ -4,9 +4,12 @@ import edu.emory.mathcs.restoretools.iterative.IterativeEnums;
 import edu.emory.mathcs.restoretools.iterative.wpl.WPLOptions;
 import ij.ImagePlus;
 import ij.ImageStack;
+import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
+import nl.wilcokas.luckystackworker.filter.settings.WienerDeconvolutionParameters;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import org.springframework.stereotype.Component;
 
@@ -14,14 +17,18 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class WienerDeconvolutionFilter {
 
-    public void apply(ImagePlus image, ImagePlus psf, int iterations, float deringStrength, double deringRadius, int deringThreshold, float blendRawFactor) {
+    public void apply(ImagePlus image, ImagePlus psf, WienerDeconvolutionParameters parameters) {
         ImageStack stack = image.getStack();
-        for (int channel = 1; channel <= 3; channel++) {
-            applyToLayer(stack.getProcessor(channel), psf, iterations, deringStrength, deringRadius, deringThreshold, blendRawFactor);
+        if (parameters.getMode() == LSWSharpenMode.RGB) {
+            applyToChannel(stack.getProcessor(1), psf, parameters.getIterationsRed(), parameters.getDeringStrengthRed(), parameters.getDeringRadiusRed(), parameters.getDeringThresholdRed(), parameters.getBlendRawRed());
+            applyToChannel(stack.getProcessor(2), psf, parameters.getIterationsGreen(), parameters.getDeringStrengthGreen(), parameters.getDeringRadiusGreen(), parameters.getDeringThresholdGreen(), parameters.getBlendRawGreen());
+            applyToChannel(stack.getProcessor(3), psf, parameters.getIterationsBlue(), parameters.getDeringStrengthBlue(), parameters.getDeringRadiusBlue(), parameters.getDeringThresholdBlue(), parameters.getBlendRawBlue());
+        } else {
+            applyLuminance(image, psf, parameters);
         }
     }
 
-    private void applyToLayer(ImageProcessor ipInput, ImagePlus psf, int iterations, float deringStrength, double deringRadius, int deringThreshold, float blendRawFactor) {
+    private void applyToChannel(ImageProcessor ipInput, ImagePlus psf, int iterations, float deringStrength, double deringRadius, int deringThreshold, float blendRawFactor) {
         short[] pixels = (short[]) ipInput.getPixels();
         double averagePixelValueIn = getAveragePixelValue(pixels);
         short[] outPixels = getDeconvolvedPixels(ipInput, psf, iterations);
@@ -37,6 +44,68 @@ public class WienerDeconvolutionFilter {
             int assignedValue = (int) (newValue * appliedFactor) + (int) (originalValue * (1 - appliedFactor));
             pixels[i] = LswImageProcessingUtil.convertToShort(assignedValue);
         }
+    }
+
+    private void applyLuminance(ImagePlus image, ImagePlus psf, WienerDeconvolutionParameters parameters) {
+        ImageStack stack = image.getStack();
+        ImageProcessor ipRed = stack.getProcessor(1);
+        ImageProcessor ipGreen = stack.getProcessor(2);
+        ImageProcessor ipBlue = stack.getProcessor(3);
+
+        // Obtain the luminance channel
+        FloatProcessor fpRed = ipRed.toFloat(1, null);
+        FloatProcessor fpGreen = ipGreen.toFloat(2, null);
+        FloatProcessor fpBlue = ipBlue.toFloat(3, null);
+        float[] pixelsRed = (float[]) fpRed.getPixels();
+        float[] pixelsGreen = (float[]) fpGreen.getPixels();
+        float[] pixelsBlue = (float[]) fpBlue.getPixels();
+        float[] pixelsHue = new float[pixelsRed.length];
+        float[] pixelsSat = new float[pixelsRed.length];
+        float[] pixelsLum = new float[pixelsRed.length];
+        for (int i = 0; i < pixelsRed.length; i++) {
+            float[] hsl = LswImageProcessingUtil.rgbToHsl(pixelsRed[i],
+                    pixelsGreen[i],
+                    pixelsBlue[i],
+                    parameters.isIncludeRed(),
+                    parameters.isIncludeGreen(),
+                    parameters.isIncludeBlue(),
+                    parameters.isIncludeColor(),
+                    parameters.getMode());
+            pixelsHue[i] = hsl[0];
+            pixelsSat[i] = hsl[1];
+            pixelsLum[i] = hsl[2];
+        }
+        FloatProcessor fpLum = new FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum);
+
+        // Perform Wiener deconvolution
+        ShortProcessor ipInput = new ShortProcessor(image.getWidth(), image.getHeight());
+        ipInput.setPixels(1, fpLum);
+        short[] pixels = (short[]) ipInput.getPixels();
+        double averagePixelValueIn = getAveragePixelValue(pixels);
+        short[] outPixels = getDeconvolvedPixels(fpLum, psf, parameters.getIterations());
+        double averagePixelValueOut = getAveragePixelValue(outPixels);
+        final ImageProcessor ipMask = LswImageProcessingUtil.createDeringMaskFloatProcessor(parameters.getDeringRadius(), parameters.getDeringThreshold(), fpLum);
+        short[] maskPixels = (short[]) ipMask.getPixels();
+        for (int i = 0; i < pixels.length; i++) {
+            float appliedFactor = Math.max(LswImageProcessingUtil.convertToUnsignedInt(maskPixels[i]) / 65535f, 1f - parameters.getBlendRaw());
+            // correction on output is needed given that is somehow always brighter than the original value
+            int newValue = (int) (LswImageProcessingUtil.convertToUnsignedInt(outPixels[i]) * (averagePixelValueIn / averagePixelValueOut));
+            int originalValue = LswImageProcessingUtil.convertToUnsignedInt(pixels[i]);
+
+            int assignedValue = (int) (newValue * appliedFactor) + (int) (originalValue * (1 - appliedFactor));
+            pixels[i] = LswImageProcessingUtil.convertToShort(assignedValue);
+        }
+
+        // Convert back to 16-bit RGB and update the image
+        for (int i = 0; i < pixelsRed.length; i++) {
+            float[] rgb = LswImageProcessingUtil.hslToRgb(pixelsHue[i], pixelsSat[i], pixelsLum[i], 0f);
+            pixelsRed[i] = rgb[0];
+            pixelsGreen[i] = rgb[1];
+            pixelsBlue[i] = rgb[2];
+        }
+        ipRed.setPixels(1, fpRed);
+        ipGreen.setPixels(2, fpGreen);
+        ipBlue.setPixels(3, fpBlue);
     }
 
     private short[] getDeconvolvedPixels(ImageProcessor ipInput, ImagePlus psf, int iterations) {
