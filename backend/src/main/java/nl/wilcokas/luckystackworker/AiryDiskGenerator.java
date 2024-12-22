@@ -1,21 +1,23 @@
 package nl.wilcokas.luckystackworker;
 
 import ij.ImagePlus;
+import ij.plugin.filter.GaussianBlur;
 import ij.process.FloatProcessor;
 import nl.wilcokas.luckystackworker.util.LSWFileSaver;
 
 public class AiryDiskGenerator {
 
-    private static final int IMAGE_SIZE = 256;
+    private static final int IMAGE_SIZE = 100;
 
     public static void main(String[] args) {
         // Input parameters
         double wavelength = 600; // Light wavelength in nanometers (default: 500nm)
-        double airyDiskRadius = 200; // Radius of Airy disk in pixels
+        double airyDiskRadius = 25; // Radius of Airy disk in pixels
         double seeingIndex = 0.0; // Atmospheric seeing index (0.0 = no distortion, 1.0 = maximum distortion)
+        float diffractionIntensity = 20.0f; // Diffraction intensity (default: 20.0, min = 0, max = 1000)
 
         // Generate the Airy disk image
-        FloatProcessor airyDiskImage = generateAiryDiskImage(wavelength, airyDiskRadius, seeingIndex);
+        FloatProcessor airyDiskImage = generateAiryDiskImage(wavelength, airyDiskRadius, seeingIndex, diffractionIntensity);
 
         // Display the image using ImageJ
         ImagePlus imagePlus = new ImagePlus("Synthetic Airy Disk", airyDiskImage);
@@ -23,7 +25,7 @@ public class AiryDiskGenerator {
         new LSWFileSaver(imagePlus).saveAsPng("C:\\Users\\wkast\\Downloads\\airy_disk.png");
     }
 
-    private static FloatProcessor generateAiryDiskImage(double wavelength, double airyDiskRadius, double seeingIndex) {
+    private static FloatProcessor generateAiryDiskImage(double wavelength, double airyDiskRadius, double seeingIndex, float diffractionIntensity) {
         int imageSize = IMAGE_SIZE;
         FloatProcessor processor = new FloatProcessor(imageSize, imageSize);
 
@@ -48,9 +50,6 @@ public class AiryDiskGenerator {
                     intensity = airyDiskIntensity(radius, k, airyDiskRadius);
                 }
 
-                // Apply atmospheric seeing effect
-                intensity = applySeeingEffect(intensity, seeingIndex, radius);
-
                 // Update maximum intensity
                 maxIntensity = Math.max(maxIntensity, intensity);
 
@@ -58,7 +57,28 @@ public class AiryDiskGenerator {
             }
         }
 
-        // Step 2: Normalize the intensities to the range [0, 1]
+        normalize(maxIntensity, imageSize, processor);
+        increaseShadows(imageSize, processor, diffractionIntensity);
+
+        GaussianBlur gb = new GaussianBlur();
+        double radius =  (seeingIndex/2.0) * airyDiskRadius;
+        gb.blurGaussian(processor, radius, radius, 0.01);
+
+        return processor;
+    }
+
+    private static void increaseShadows(int imageSize, FloatProcessor processor, float preScaleFactor) {
+        for (int y = 0; y < imageSize; y++) {
+            for (int x = 0; x < imageSize; x++) {
+                float originalIntensity = processor.getf(x, y);
+                float scaledIntensity = originalIntensity * preScaleFactor;
+                float transformedIntensity = (float) Math.log(1 + scaledIntensity);
+                processor.setf(x, y, transformedIntensity);
+            }
+        }
+    }
+
+    private static void normalize(double maxIntensity, int imageSize, FloatProcessor processor) {
         if (maxIntensity > 0) {
             for (int y = 0; y < imageSize; y++) {
                 for (int x = 0; x < imageSize; x++) {
@@ -67,22 +87,6 @@ public class AiryDiskGenerator {
                 }
             }
         }
-        float preScaleFactor = 20.0f;  // Pre-scaling factor to increase intensity range before log transform
-        for (int y = 0; y < imageSize; y++) {
-            for (int x = 0; x < imageSize; x++) {
-                float originalIntensity = processor.getf(x, y);
-
-                // Pre-scale the intensities (this increases the range of values for the log transformation)
-                float scaledIntensity = originalIntensity * preScaleFactor;
-
-                // Apply log transformation to bring out darker areas (diffraction rings)
-                float transformedIntensity = (float) Math.log(1 + scaledIntensity);
-
-                // Set the transformed intensity back to the processor
-                processor.setf(x, y, transformedIntensity);
-            }
-        }
-        return processor;
     }
 
     private static double airyDiskIntensity(double radius, double k, double airyDiskRadius) {
@@ -98,17 +102,5 @@ public class AiryDiskGenerator {
 
         // Intensity is proportional to the square of the [J1(x) / x] term
         return Math.pow(2 * j1 / x, 2);
-    }
-
-    private static double applySeeingEffect(double intensity, double seeingIndex, double radius) {
-        if (seeingIndex == 0.0) return intensity; // No distortion if seeing index is 0
-
-        // To simulate the seeing effect, we'll make the intensity drop off more slowly.
-        // We'll use a Gaussian "spread" that increases with the seeing index.
-        double spreadFactor = seeingIndex * 0.5; // The factor by which the disk will spread
-        double blurFactor = Math.exp(-Math.pow(radius / (spreadFactor + 0.1), 2)); // Use a small offset to avoid division by zero
-
-        // This will spread the Airy disk and make it appear larger while maintaining intensity.
-        return intensity * blurFactor;
     }
 }
