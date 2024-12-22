@@ -217,6 +217,25 @@ public class LswImageProcessingUtil {
         return (short) (value >= Constants.SHORT_HALF_SIZE ? value - Constants.UNSIGNED_INT_SIZE : value);
     }
 
+    public static short convertToShort(float value, float min, float max) {
+        float range = max-min;
+        int intValue = (int)(((value-min)/range) * 65536.0f);
+        if (intValue<0f) intValue = 0;
+        if (intValue>65535f) intValue = 65535;
+        return convertToShort(intValue);
+    }
+
+    public static Pair<Float,Float> getMinAnMaxValues(FloatProcessor processor) {
+        float min = Float.MAX_VALUE;
+        float max = Float.MIN_VALUE;
+        float[] pixels = (float[])processor.getPixels();
+        for (int i = 0; i<pixels.length; i++) {
+            min = Math.min(min, pixels[i]);
+            max = Math.max(max, pixels[i]);
+        }
+        return Pair.of(min, max);
+    }
+
     public static void setNonPersistentSettings(Profile profile) {
         setNonPersistentSettings(profile, profile.getScale(), profile.getOpenImageMode() == null ? OpenImageModeEnum.RGB.name() : profile.getOpenImageMode().name());
     }

@@ -1,32 +1,54 @@
-package nl.wilcokas.luckystackworker;
+package nl.wilcokas.luckystackworker.util;
 
 import ij.ImagePlus;
 import ij.plugin.filter.GaussianBlur;
 import ij.process.FloatProcessor;
-import nl.wilcokas.luckystackworker.util.LSWFileSaver;
+import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.io.IOException;
 
 public class AiryDiskGenerator {
 
-    private static final int IMAGE_SIZE = 100;
+    private static final int DEFAULT_IMAGE_SIZE = 1000;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // Input parameters
         double wavelength = 600; // Light wavelength in nanometers (default: 500nm)
-        double airyDiskRadius = 25; // Radius of Airy disk in pixels
+        double airyDiskRadius = 250; // Radius of Airy disk in pixels
         double seeingIndex = 0.0; // Atmospheric seeing index (0.0 = no distortion, 1.0 = maximum distortion)
         float diffractionIntensity = 20.0f; // Diffraction intensity (default: 20.0, min = 0, max = 1000)
+        int imageSize = DEFAULT_IMAGE_SIZE; // Size of the output image (default: 100)
 
         // Generate the Airy disk image
-        FloatProcessor airyDiskImage = generateAiryDiskImage(wavelength, airyDiskRadius, seeingIndex, diffractionIntensity);
+        //FloatProcessor airyDiskImage = generate(wavelength, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
 
         // Display the image using ImageJ
-        ImagePlus imagePlus = new ImagePlus("Synthetic Airy Disk", airyDiskImage);
-        imagePlus.show();
-        new LSWFileSaver(imagePlus).saveAsPng("C:\\Users\\wkast\\Downloads\\airy_disk.png");
+//        ImagePlus image = new ImagePlus("Synthetic Airy Disk", airyDiskImage);
+        ImagePlus image = generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
+        LswFileUtil.saveImage(image, null, "C:/Users/wkast/Downloads/airy_disk.tif", false, false, false, false);
     }
 
-    private static FloatProcessor generateAiryDiskImage(double wavelength, double airyDiskRadius, double seeingIndex, float diffractionIntensity) {
-        int imageSize = IMAGE_SIZE;
+    public static ImagePlus generate16BitRGB(double airyDiskRadius, double seeingIndex, float diffractionIntensity, int imageSize) {
+        FloatProcessor fpRed = generate(630, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
+        FloatProcessor fpGreen = generate(532, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
+        FloatProcessor fpBlue = generate(465, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
+        short[] redPixels = new short[(int) Math.pow(imageSize, 2)];
+        short[] greenPixels = new short[redPixels.length];
+        short[] bluePixels = new short[redPixels.length];
+        Pair<Float, Float> redMinAndMax = LswImageProcessingUtil.getMinAnMaxValues(fpRed);
+        Pair<Float, Float> greenMinAndMax = LswImageProcessingUtil.getMinAnMaxValues(fpGreen);
+        Pair<Float, Float> blueMinAndMax = LswImageProcessingUtil.getMinAnMaxValues(fpBlue);
+        for (int i = 0; i < redPixels.length; i++) {
+            redPixels[i] = LswImageProcessingUtil.convertToShort(fpRed.getf(i), redMinAndMax.getLeft(), redMinAndMax.getRight());
+            greenPixels[i] = LswImageProcessingUtil.convertToShort(fpGreen.getf(i), greenMinAndMax.getLeft(), greenMinAndMax.getRight());
+            bluePixels[i] = LswImageProcessingUtil.convertToShort(fpBlue.getf(i), blueMinAndMax.getLeft(), blueMinAndMax.getRight());
+        }
+        LswImageLayersDto layers = LswImageLayersDto.builder().layers(new short[][]{redPixels, greenPixels, bluePixels}).build();
+        return LswImageProcessingUtil.create16BitRGBImage(null, layers, imageSize, imageSize, true, true, true);
+    }
+
+    private static FloatProcessor generate(double wavelength, double airyDiskRadius, double seeingIndex, float diffractionIntensity, int imageSize) {
         FloatProcessor processor = new FloatProcessor(imageSize, imageSize);
 
         double centerX = imageSize / 2.0;
@@ -61,7 +83,7 @@ public class AiryDiskGenerator {
         increaseShadows(imageSize, processor, diffractionIntensity);
 
         GaussianBlur gb = new GaussianBlur();
-        double radius =  (seeingIndex/2.0) * airyDiskRadius;
+        double radius = (seeingIndex / 2.0) * airyDiskRadius;
         gb.blurGaussian(processor, radius, radius, 0.01);
 
         return processor;
