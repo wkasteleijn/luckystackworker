@@ -44,6 +44,7 @@ public class OperationService {
     private final HistogramStretchFilter histogramStretchFilter;
     private final BlendRawFilter blendRawFilter;
     private final ROFDenoiseFilter rofDenoiseFilter;
+    private final WienerDeconvolutionFilter wienerDeconvolutionFilter;
 
     private int displayedProgress = 0;
     private Timer timer = new Timer();
