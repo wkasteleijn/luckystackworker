@@ -225,7 +225,7 @@ public class LswImageProcessingUtil {
         return convertToShort(intValue);
     }
 
-    public static Pair<Float,Float> getMinAnMaxValues(FloatProcessor processor) {
+    public static Pair<Float,Float> getMinAndMaxValues(FloatProcessor processor) {
         float min = Float.MAX_VALUE;
         float max = Float.MIN_VALUE;
         float[] pixels = (float[])processor.getPixels();

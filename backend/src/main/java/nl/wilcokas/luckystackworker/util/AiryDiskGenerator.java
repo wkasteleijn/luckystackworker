@@ -7,45 +7,44 @@ import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
 
 public class AiryDiskGenerator {
 
     private static final int DEFAULT_IMAGE_SIZE = 1000;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         // Input parameters
-        double wavelength = 600; // Light wavelength in nanometers (default: 500nm)
         double airyDiskRadius = 250; // Radius of Airy disk in pixels
-        double seeingIndex = 0.0; // Atmospheric seeing index (0.0 = no distortion, 1.0 = maximum distortion)
+        double seeingIndex = 0.2; // Atmospheric seeing index (0.0 = no distortion, 1.0 = maximum distortion)
         float diffractionIntensity = 20.0f; // Diffraction intensity (default: 20.0, min = 0, max = 1000)
         int imageSize = DEFAULT_IMAGE_SIZE; // Size of the output image (default: 100)
 
-        // Generate the Airy disk image
-        //FloatProcessor airyDiskImage = generate(wavelength, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
-
-        // Display the image using ImageJ
-//        ImagePlus image = new ImagePlus("Synthetic Airy Disk", airyDiskImage);
         ImagePlus image = generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
-        LswFileUtil.saveImage(image, null, "C:/Users/wkast/Downloads/airy_disk.tif", false, false, false, false);
+        image.show();
     }
 
     public static ImagePlus generate16BitRGB(double airyDiskRadius, double seeingIndex, float diffractionIntensity, int imageSize) {
-        FloatProcessor fpRed = generate(630, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
-        FloatProcessor fpGreen = generate(532, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
-        FloatProcessor fpBlue = generate(465, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
-        short[] redPixels = new short[(int) Math.pow(imageSize, 2)];
-        short[] greenPixels = new short[redPixels.length];
-        short[] bluePixels = new short[redPixels.length];
-        Pair<Float, Float> redMinAndMax = LswImageProcessingUtil.getMinAnMaxValues(fpRed);
-        Pair<Float, Float> greenMinAndMax = LswImageProcessingUtil.getMinAnMaxValues(fpGreen);
-        Pair<Float, Float> blueMinAndMax = LswImageProcessingUtil.getMinAnMaxValues(fpBlue);
-        for (int i = 0; i < redPixels.length; i++) {
-            redPixels[i] = LswImageProcessingUtil.convertToShort(fpRed.getf(i), redMinAndMax.getLeft(), redMinAndMax.getRight());
-            greenPixels[i] = LswImageProcessingUtil.convertToShort(fpGreen.getf(i), greenMinAndMax.getLeft(), greenMinAndMax.getRight());
-            bluePixels[i] = LswImageProcessingUtil.convertToShort(fpBlue.getf(i), blueMinAndMax.getLeft(), blueMinAndMax.getRight());
-        }
+
+        short[] redPixels =  new short[(int) Math.pow(imageSize, 2)];
+        short[] greenPixels  = new short[(int) Math.pow(imageSize, 2)];
+        short[] bluePixels  = new short[(int) Math.pow(imageSize, 2)];
+
+        Executor executor = LswUtil.getParallelExecutor();
+        executor.execute(() ->  generate16BitForChannel(redPixels, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize, 630));
+        executor.execute(() ->  generate16BitForChannel(greenPixels, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize, 532));
+        executor.execute(() ->  generate16BitForChannel(bluePixels, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize, 465));
+        LswUtil.stopAndAwaitParallelExecutor(executor);
+
         LswImageLayersDto layers = LswImageLayersDto.builder().layers(new short[][]{redPixels, greenPixels, bluePixels}).build();
         return LswImageProcessingUtil.create16BitRGBImage(null, layers, imageSize, imageSize, true, true, true);
+    }
+    private static void generate16BitForChannel(short[] pixels, double airyDiskRadius, double seeingIndex, float diffractionIntensity, int imageSize, double wavelength) {
+        FloatProcessor fp = generate(wavelength, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
+        Pair<Float, Float> minAndMax = LswImageProcessingUtil.getMinAndMaxValues(fp);
+        for (int i = 0; i < pixels.length; i++) {
+            pixels[i] = LswImageProcessingUtil.convertToShort(fp.getf(i), minAndMax.getLeft(), minAndMax.getRight());
+        }
     }
 
     private static FloatProcessor generate(double wavelength, double airyDiskRadius, double seeingIndex, float diffractionIntensity, int imageSize) {
