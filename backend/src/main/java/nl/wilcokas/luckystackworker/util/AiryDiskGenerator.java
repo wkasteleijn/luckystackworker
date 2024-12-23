@@ -11,17 +11,18 @@ import java.util.concurrent.Executor;
 
 public class AiryDiskGenerator {
 
-    private static final int DEFAULT_IMAGE_SIZE = 1000;
+    private static final int DEFAULT_IMAGE_SIZE = 64;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // Input parameters
-        double airyDiskRadius = 250; // Radius of Airy disk in pixels
-        double seeingIndex = 0.2; // Atmospheric seeing index (0.0 = no distortion, 1.0 = maximum distortion)
+        double airyDiskRadius = 16; // Radius of Airy disk in pixels
+        double seeingIndex = 0.0; // Atmospheric seeing index (0.0 = no distortion, 1.0 = maximum distortion)
         float diffractionIntensity = 20.0f; // Diffraction intensity (default: 20.0, min = 0, max = 1000)
         int imageSize = DEFAULT_IMAGE_SIZE; // Size of the output image (default: 100)
 
         ImagePlus image = generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
         image.show();
+        LswFileUtil.saveImage(image, null, "C:/Users/wkast/Downloads/airy_disk.tif", false, false, false, false);
     }
 
     public static ImagePlus generate16BitRGB(double airyDiskRadius, double seeingIndex, float diffractionIntensity, int imageSize) {

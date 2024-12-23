@@ -7,10 +7,10 @@ import ij.ImageStack;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.filter.settings.WienerDeconvolutionParameters;
+import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import org.springframework.stereotype.Component;
 
@@ -18,18 +18,27 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class WienerDeconvolutionFilter {
 
-    @Setter
-    private ImagePlus psf;
 
     public void apply(ImagePlus image, WienerDeconvolutionParameters parameters) {
+        ImagePlus psf = LswFileUtil.getWienerDeconvolutionPSF();
+        ImagePlus[] psfPerChannel = getPsfPerChannel(psf);
         ImageStack stack = image.getStack();
-//        if (parameters.getMode() == LSWSharpenMode.RGB) {
-//            applyToChannel(stack.getProcessor(1), psf, parameters.getIterationsRed(), parameters.getDeringStrengthRed(), parameters.getDeringRadiusRed(), parameters.getDeringThresholdRed(), parameters.getBlendRawRed());
-//            applyToChannel(stack.getProcessor(2), psf, parameters.getIterationsGreen(), parameters.getDeringStrengthGreen(), parameters.getDeringRadiusGreen(), parameters.getDeringThresholdGreen(), parameters.getBlendRawGreen());
-//            applyToChannel(stack.getProcessor(3), psf, parameters.getIterationsBlue(), parameters.getDeringStrengthBlue(), parameters.getDeringRadiusBlue(), parameters.getDeringThresholdBlue(), parameters.getBlendRawBlue());
-//        } else {
-//            applyLuminance(image, psf, parameters);
-//        }
+        if (parameters.getMode() == LSWSharpenMode.RGB) {
+            applyToChannel(stack.getProcessor(1), psfPerChannel[0], parameters.getIterationsRed(), parameters.getDeringStrengthRed(), parameters.getDeringRadiusRed(), parameters.getDeringThresholdRed(), parameters.getBlendRawRed());
+            applyToChannel(stack.getProcessor(2), psfPerChannel[1], parameters.getIterationsGreen(), parameters.getDeringStrengthGreen(), parameters.getDeringRadiusGreen(), parameters.getDeringThresholdGreen(), parameters.getBlendRawGreen());
+            applyToChannel(stack.getProcessor(3), psfPerChannel[2], parameters.getIterationsBlue(), parameters.getDeringStrengthBlue(), parameters.getDeringRadiusBlue(), parameters.getDeringThresholdBlue(), parameters.getBlendRawBlue());
+        } else {
+            applyLuminance(image, psf, parameters);
+        }
+    }
+
+    private ImagePlus[] getPsfPerChannel(ImagePlus psf) {
+        ImageStack stack = psf.getStack();
+        ImagePlus[] psfPerChannel = new ImagePlus[3];
+        for (int i = 0; i < 3; i++) {
+            psfPerChannel[i] = new ImagePlus(String.format("PSF channel %d", i), stack.getProcessor(i));
+        }
+        return psfPerChannel;
     }
 
     private void applyToChannel(ImageProcessor ipInput, ImagePlus psf, int iterations, float deringStrength, double deringRadius, int deringThreshold, float blendRawFactor) {

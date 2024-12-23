@@ -489,6 +489,10 @@ public class LswFileUtil {
         return LocalDateTime.ofInstant(((FileTime) Files.getAttribute(Paths.get(filePath), "creationTime")).toInstant(), ZoneOffset.UTC);
     }
 
+    public static ImagePlus getWienerDeconvolutionPSF() {
+        return new Opener().openImage(getDataFolder(LswUtil.getActiveOSProfile())+"/psf.tif");
+    }
+
     private static void hackIncorrectPngFileInfo(LSWFileSaver saver) {
         FileInfo fileInfo = (FileInfo) LswUtil.getPrivateField(saver, LSWFileSaver.class, "fi");
         LswUtil.setPrivateField(fileInfo, FileInfo.class, "fileType", FileInfo.RGB48);
