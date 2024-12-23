@@ -319,6 +319,9 @@
   margin-top: 3px;
   margin-left: -2px;
 }
+.sharpenTypeMargin {
+  margin-top: 6px;
+}
 .psfButtonImg {
   width: 13px;
   height: 11px;
