@@ -389,7 +389,15 @@ public class LswFileUtil {
             profile.setRofThetaGreen(50);
             profile.setRofThetaBlue(50);
         }
-
+        if (profile.getApplyUnsharpMask() == null) {
+            profile.setApplyUnsharpMask(true);
+            profile.setApplyWienerDeconvolution(false);
+        }
+        if (profile.getWienerIterations() == 0) {
+            profile.setWienerIterations(5);
+            profile.setWienerIterationsGreen(5);
+            profile.setWienerIterationsBlue(5);
+        }
     }
 
 

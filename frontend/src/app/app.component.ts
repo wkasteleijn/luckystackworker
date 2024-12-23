@@ -64,6 +64,8 @@ export class AppComponent implements OnInit {
   luminanceIncludeGreen: boolean = true;
   luminanceIncludeBlue: boolean = true;
   luminanceIncludeColor: boolean = true;
+  applyUnsharpMask: boolean = true;
+  applyWienerDeconvolution: boolean;
 
   // denoise 1
   denoiseAlgorithm1: string;
@@ -256,6 +258,39 @@ export class AppComponent implements OnInit {
     if (this.profile) {
       this.profile.openImageMode = this.openImageMode;
     }
+  }
+
+  wienerIterationsChanged(event: any, update: boolean) {
+    switch (this.applySharpenToChannel) {
+      case 'G':
+        this.profile.radiusGreen = event.value;
+        break;
+      case 'B':
+        this.profile.radiusBlue = event.value;
+        break;
+      case 'R':
+        this.profile.radius = event.value;
+        break;
+      default:
+        this.equalizeChannelsForSharpening();
+        this.profile.radius = event.value;
+        this.profile.radiusGreen = event.value;
+        this.profile.radiusBlue = event.value;
+    }
+    this.radius = event.value;
+    this.settings.operation = 'radius';
+    console.log('wienerIterationsChanged called: ' + this.profile.radius);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  loadPSF() {
+    console.log('loadPSF called');
+  }
+
+  createPSF() {
+    console.log('createPSF called');
   }
 
   radiusChanged(event: any, update: boolean) {
@@ -504,6 +539,16 @@ export class AppComponent implements OnInit {
     if (update) {
       this.updateProfile();
     }
+  }
+
+  applyWienerDeconvolutionChanged() {
+    this.profile.applyWienerDeconvolution = this.applyWienerDeconvolution;
+    this.updateProfile();
+  }
+
+  applyUnsharpMaskChanged() {
+    this.profile.applyUnsharpMask = this.applyUnsharpMask;
+    this.updateProfile();
   }
 
   localContrastModeChanged(event: any, update: boolean) {

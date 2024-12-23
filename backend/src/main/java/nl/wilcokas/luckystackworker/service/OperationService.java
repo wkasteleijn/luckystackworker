@@ -58,13 +58,14 @@ public class OperationService {
         updateProgress(viewer, 0, true);
 
         // Sharpening filters
+        applyWienerDeconvolution(image, profile);
         applySharpen(image, profile);
         updateProgress(viewer, 9);
 
         // Denoise filters -- pass 1
         applySigmaDenoise1(image, profile);
         applyIansNoiseReduction(image, profile);
-        applyROFDenoise(image,profile);
+        applyROFDenoise(image, profile);
         updateProgress(viewer, 18);
 
         // Denoise filters -- pass 2
@@ -82,7 +83,7 @@ public class OperationService {
 
         // Color filters
         applyColorNormalisation(image, profile);
-        updateProgress(viewer, 63   );
+        updateProgress(viewer, 63);
         applyRGBBalance(image, profile);
         updateProgress(viewer, 72);
         applySaturation(image, profile);
@@ -144,7 +145,7 @@ public class OperationService {
 
     private void applySharpen(final ImagePlus image, Profile profile) {
         int iterations = profile.getIterations() == 0 ? 1 : profile.getIterations();
-        if (profile.getRadius() != null && profile.getAmount() != null) {
+        if (profile.getApplyUnsharpMask().booleanValue() && profile.getRadius() != null && profile.getAmount() != null) {
             log.info("Applying sharpen with radius {}, amount {}, iterations {} to image {}", profile.getRadius(),
                     profile.getAmount(), iterations, image.getID());
             float amount = profile.getAmount().divide(new BigDecimal("10000")).floatValue();
@@ -230,6 +231,13 @@ public class OperationService {
                     lswSharpenFilter.applyLuminanceMode(image, parameters);
                 }
             }
+        }
+    }
+
+    private void applyWienerDeconvolution(final ImagePlus image, Profile profile) {
+        if (profile.getApplyWienerDeconvolution().booleanValue()) {
+            WienerDeconvolutionParameters wienerDeconvolutionParameters = WienerDeconvolutionParameters.builder().build();
+            wienerDeconvolutionFilter.apply(image, wienerDeconvolutionParameters);
         }
     }
 

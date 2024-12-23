@@ -33,6 +33,7 @@ public class Profile {
     private int deringStrength;
     private int deringThreshold;
     private int blendRaw;
+    private int wienerIterations;
 
     // sharpen green
     private BigDecimal radiusGreen;
@@ -45,6 +46,7 @@ public class Profile {
     private int deringStrengthGreen;
     private int deringThresholdGreen;
     private int blendRawGreen;
+    private int wienerIterationsGreen;
 
     // sharpen blue
     private BigDecimal radiusBlue;
@@ -57,6 +59,7 @@ public class Profile {
     private int deringStrengthBlue;
     private int deringThresholdBlue;
     private int blendRawBlue;
+    private int wienerIterationsBlue;
 
     // general sharpen settings
     private String sharpenMode;
@@ -64,6 +67,8 @@ public class Profile {
     private boolean luminanceIncludeGreen;
     private boolean luminanceIncludeBlue;
     private boolean luminanceIncludeColor;
+    private Boolean applyUnsharpMask;
+    private Boolean applyWienerDeconvolution;
 
     // denoise (red and all channels)
     private String denoiseAlgorithm1;
@@ -167,6 +172,7 @@ public class Profile {
         this.deringStrength = profile.getDeringStrength();
         this.deringThreshold = profile.getDeringThreshold();
         this.blendRaw = profile.getBlendRaw();
+        this.wienerIterations = profile.getWienerIterations();
 
         if ( profile.getApplySharpenToChannel() == ChannelEnum.RGB) {
             this.radiusGreen = profile.getRadius();
@@ -179,6 +185,7 @@ public class Profile {
             this.deringStrengthGreen = profile.getDeringStrength();
             this.deringThresholdGreen = profile.getDeringThreshold();
             this.blendRawGreen = profile.getBlendRaw();
+            this.wienerIterationsGreen = profile.getWienerIterations();
 
             this.radiusBlue = profile.getRadius();
             this.amountBlue = profile.getAmount();
@@ -190,6 +197,7 @@ public class Profile {
             this.deringStrengthBlue = profile.getDeringStrength();
             this.deringThresholdBlue = profile.getDeringThreshold();
             this.blendRawBlue = profile.getBlendRaw();
+            this.wienerIterationsBlue = profile.getWienerIterations();
 
         } else {
             this.radiusGreen = profile.getRadiusGreen();
@@ -202,6 +210,7 @@ public class Profile {
             this.deringStrengthGreen = profile.getDeringStrengthGreen();
             this.deringThresholdGreen = profile.getDeringThresholdGreen();
             this.blendRawGreen = profile.getBlendRawGreen();
+            this.wienerIterationsGreen = profile.getWienerIterationsGreen();
 
             this.radiusBlue = profile.getRadiusBlue();
             this.amountBlue = profile.getAmountBlue();
@@ -213,6 +222,7 @@ public class Profile {
             this.deringStrengthBlue = profile.getDeringStrengthBlue();
             this.deringThresholdBlue = profile.getDeringThresholdBlue();
             this.blendRawBlue = profile.getBlendRawBlue();
+            this.wienerIterationsBlue = profile.getWienerIterationsBlue();
         }
 
         this.sharpenMode = profile.getSharpenMode();
@@ -220,6 +230,8 @@ public class Profile {
         this.luminanceIncludeGreen = profile.isLuminanceIncludeGreen();
         this.luminanceIncludeBlue = profile.isLuminanceIncludeBlue();
         this.luminanceIncludeColor = profile.isLuminanceIncludeColor();
+        this.applyUnsharpMask = profile.isApplyUnsharpMask();
+        this.applyWienerDeconvolution = profile.isApplyWienerDeconvolution();
 
         // denoise
         this.denoiseAlgorithm1 = profile.getDenoiseAlgorithm1();

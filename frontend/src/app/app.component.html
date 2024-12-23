@@ -531,54 +531,147 @@
         </div>
       </div>
       <div class="sliderRow">
-        <div class="sliderLabel">Radius</div>
+        <div *ngIf="!applyWienerDeconvolution" class="noWiener">&nbsp;</div>
+        <div class="sliderLabel">Type</div>
         <div class="slider">
-          <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            step="0.1"
-            min="0.5"
-            max="4"
-            (input)="radiusChanged($event, false)"
-            (change)="radiusChanged($event, true)"
-            [(ngModel)]="radius"
+          <mat-checkbox
+            [(ngModel)]="applyWienerDeconvolution"
+            (change)="applyWienerDeconvolutionChanged()"
             [color]="colorTheme()"
-          ></mat-slider>
-          <span class="sliderLabel">{{ radius }}</span>
+            class="luminanceIncludeBox"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            >Wiener deconvolution</mat-checkbox
+          >
+          <mat-checkbox
+            [(ngModel)]="applyUnsharpMask"
+            (change)="applyUnsharpMaskChanged()"
+            [color]="colorTheme()"
+            class="luminanceIncludeBox"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            >Unsharp mask</mat-checkbox
+          >
+          <span *ngIf="applyWienerDeconvolution">
+            <button
+              *ngIf="openRefImageEnabled() && refImageSelected"
+              type="button"
+              mat-button
+              (click)="loadPSF()"
+              class="{{
+                'psfButton buttonZoom ' +
+                  (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
+              }}"
+              matTooltip="Load PSF"
+            >
+              <img src="assets/images/load-psf.png" class="psfButtonImg" />
+            </button>
+            <button
+              *ngIf="!openRefImageEnabled() || !refImageSelected"
+              type="button"
+              mat-button
+              disabled
+              class="psfButton buttonDisabledZoom"
+              matTooltip="Load PSF"
+            >
+              <img src="assets/images/load-psf.png" class="psfButtonImg" />
+            </button>
+
+            <button
+              *ngIf="openRefImageEnabled() && refImageSelected"
+              type="button"
+              mat-button
+              (click)="createPSF()"
+              class="{{
+                'psfButton buttonZoom ' +
+                  (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
+              }}"
+              matTooltip="Create synthetic PSF"
+            >
+              <img src="assets/images/synth-psf.png" class="psfButtonImg" />
+            </button>
+            <button
+              *ngIf="!openRefImageEnabled() || !refImageSelected"
+              type="button"
+              mat-button
+              disabled
+              class="psfButton buttonDisabledZoom"
+              matTooltip="Create synthetic PSF"
+            >
+              <img src="assets/images/synth-psf.png" class="psfButtonImg" />
+            </button>
+          </span>
         </div>
       </div>
-      <div class="sliderRow">
-        <div class="sliderLabel">Amount</div>
-        <div class="slider">
-          <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            step="10"
-            min="0"
-            max="9999"
-            (input)="amountChanged($event, false)"
-            (change)="amountChanged($event, true)"
-            [(ngModel)]="amount"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span class="sliderLabel">{{ amount }}</span>
+
+      <span *ngIf="applyWienerDeconvolution">
+        <div class="sliderRow">
+          <div class="sliderLabel">Wiener iterations</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              step="0.1"
+              min="0.5"
+              max="4"
+              (input)="wienerIterationsChanged($event, false)"
+              (change)="wienerIterationsChanged($event, true)"
+              [(ngModel)]="radius"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span class="sliderLabel">{{ radius }}</span>
+          </div>
         </div>
-      </div>
-      <div class="sliderRow">
-        <div class="sliderLabel">Iterations</div>
-        <div class="slider">
-          <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            tickInterval="1"
-            step="1"
-            min="1"
-            max="10"
-            (input)="iterationsChanged($event, false)"
-            (change)="iterationsChanged($event, true)"
-            [(ngModel)]="iterations"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span class="sliderLabel">{{ iterations }}</span>
+      </span>
+
+      <span *ngIf="applyUnsharpMask">
+        <div class="sliderRow">
+          <div class="sliderLabel">Radius</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              step="0.1"
+              min="0.5"
+              max="4"
+              (input)="radiusChanged($event, false)"
+              (change)="radiusChanged($event, true)"
+              [(ngModel)]="radius"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span class="sliderLabel">{{ radius }}</span>
+          </div>
         </div>
-      </div>
+        <div class="sliderRow">
+          <div class="sliderLabel">Amount</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              step="10"
+              min="0"
+              max="9999"
+              (input)="amountChanged($event, false)"
+              (change)="amountChanged($event, true)"
+              [(ngModel)]="amount"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span class="sliderLabel">{{ amount }}</span>
+          </div>
+        </div>
+        <div class="sliderRow">
+          <div class="sliderLabel">Iterations</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              tickInterval="1"
+              step="1"
+              min="1"
+              max="10"
+              (input)="iterationsChanged($event, false)"
+              (change)="iterationsChanged($event, true)"
+              [(ngModel)]="iterations"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span class="sliderLabel">{{ iterations }}</span>
+          </div>
+        </div>
+      </span>
 
       <div class="sliderRow">
         <div class="sliderLabel">Blend raw</div>
@@ -723,33 +816,6 @@
                 deringRadius === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
               }}"
               >{{ deringRadius }}</span
-            >
-          </div>
-        </div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Threshold</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="
-                shouldShowSpinner() ||
-                !refImageSelected ||
-                deringStrength === 0 ||
-                crop
-              "
-              tickInterval="1"
-              step="1"
-              min="2"
-              max="20"
-              (input)="deringThresholdChanged($event, false)"
-              (change)="deringThresholdChanged($event, true)"
-              [(ngModel)]="deringThreshold"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <span
-              class="{{
-                deringThreshold === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
-              }}"
-              >{{ deringThreshold }}</span
             >
           </div>
         </div>

@@ -31,6 +31,7 @@ public class ProfileDTO {
         this.deringStrength = profile.getDeringStrength();
         this.deringThreshold = profile.getDeringThreshold();
         this.blendRaw = profile.getBlendRaw();
+        this.wienerIterations = profile.getWienerIterations();
 
         this.radiusGreen = profile.getRadiusGreen();
         this.amountGreen = profile.getAmountGreen();
@@ -42,6 +43,7 @@ public class ProfileDTO {
         this.deringStrengthGreen = profile.getDeringStrengthGreen();
         this.deringThresholdGreen = profile.getDeringThresholdGreen();
         this.blendRawGreen = profile.getBlendRawGreen();
+        this.wienerIterationsGreen = profile.getWienerIterationsGreen();
 
         this.radiusBlue = profile.getRadiusBlue();
         this.amountBlue = profile.getAmountBlue();
@@ -53,12 +55,15 @@ public class ProfileDTO {
         this.deringStrengthBlue = profile.getDeringStrengthBlue();
         this.deringThresholdBlue = profile.getDeringThresholdBlue();
         this.blendRawBlue = profile.getBlendRawBlue();
+        this.wienerIterationsBlue = profile.getWienerIterationsBlue();
 
         this.sharpenMode = profile.getSharpenMode();
         this.luminanceIncludeRed = profile.isLuminanceIncludeRed();
         this.luminanceIncludeGreen = profile.isLuminanceIncludeGreen();
         this.luminanceIncludeBlue = profile.isLuminanceIncludeBlue();
         this.luminanceIncludeColor = profile.isLuminanceIncludeColor();
+        this.applyWienerDeconvolution = profile.getApplyWienerDeconvolution();
+        this.applyUnsharpMask = profile.getApplyUnsharpMask();
 
         // denoise
         this.denoiseAlgorithm1 = profile.getDenoiseAlgorithm1();
@@ -143,6 +148,7 @@ public class ProfileDTO {
     private int deringStrength;
     private int deringThreshold;
     private int blendRaw;
+    private int wienerIterations;
 
     private BigDecimal radiusGreen;
     private BigDecimal amountGreen;
@@ -154,6 +160,7 @@ public class ProfileDTO {
     private int deringStrengthGreen;
     private int deringThresholdGreen;
     private int blendRawGreen;
+    private int wienerIterationsGreen;
 
     private BigDecimal radiusBlue;
     private BigDecimal amountBlue;
@@ -165,9 +172,12 @@ public class ProfileDTO {
     private int deringStrengthBlue;
     private int deringThresholdBlue;
     private int blendRawBlue;
+    private int wienerIterationsBlue;
 
     private String sharpenMode;
     private ChannelEnum applySharpenToChannel;
+    private boolean applyUnsharpMask;
+    private boolean applyWienerDeconvolution;
 
     // denoise
     private String denoiseAlgorithm1;

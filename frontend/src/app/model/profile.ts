@@ -16,6 +16,7 @@ export class Profile {
   luminanceIncludeGreen: boolean;
   luminanceIncludeBlue: boolean;
   luminanceIncludeColor: boolean;
+  wienerIterations: number;
 
   // sharpen green
   radiusGreen: number;
@@ -28,6 +29,7 @@ export class Profile {
   deringRadiusGreen: number;
   deringStrengthGreen: number;
   deringThresholdGreen: number;
+  wienerIterationsGreen: number;
 
   // sharpen blue
   radiusBlue: number;
@@ -40,9 +42,12 @@ export class Profile {
   deringRadiusBlue: number;
   deringStrengthBlue: number;
   deringThresholdBlue: number;
+  wienerIterationsBlue: number;
 
   sharpenMode: string;
   applySharpenToChannel: string;
+  applyUnsharpMask: boolean;
+  applyWienerDeconvolution: boolean;
 
   // denoise 1 red or all channels
   denoiseAlgorithm1: string;

@@ -319,6 +319,21 @@
   margin-top: 3px;
   margin-left: -2px;
 }
+.psfButtonImg {
+  width: 13px;
+  height: 11px;
+  transform: scaleX(2.6) scaleY(2.9);
+  margin-top: 3px;
+  margin-left: 1px;
+}
+.psfButton {
+  height: 40px;
+  margin-left: 7px;
+}
+.noWiener {
+  margin-left: -3px;
+  margin-top: 12px;
+}
 .dispersionInnerButton {
   max-width: 44px;
   max-height: 40px;
