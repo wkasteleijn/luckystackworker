@@ -35,8 +35,8 @@ public class WienerDeconvolutionFilter {
     private ImagePlus[] getPsfPerChannel(ImagePlus psf) {
         ImageStack stack = psf.getStack();
         ImagePlus[] psfPerChannel = new ImagePlus[3];
-        for (int i = 0; i < 3; i++) {
-            psfPerChannel[i] = new ImagePlus(String.format("PSF channel %d", i), stack.getProcessor(i));
+        for (int i = 1; i <= stack.getSize(); i++) {
+            psfPerChannel[i - 1] = new ImagePlus(String.format("PSF channel %d", i), stack.getProcessor(i));
         }
         return psfPerChannel;
     }
@@ -47,9 +47,9 @@ public class WienerDeconvolutionFilter {
         short[] outPixels = getDeconvolvedPixels(ipInput, psf, iterations);
         double averagePixelValueOut = getAveragePixelValue(outPixels);
         final ImageProcessor ipMask = LswImageProcessingUtil.createDeringMaskProcessor(deringStrength, deringRadius, deringThreshold, ipInput);
-        short[] maskPixels = (short[]) ipMask.getPixels();
+        short[] maskPixels = ipMask == null ? null : (short[]) ipMask.getPixels();
         for (int i = 0; i < pixels.length; i++) {
-            float appliedFactor = Math.max(LswImageProcessingUtil.convertToUnsignedInt(maskPixels[i]) / 65535f, 1f - blendRawFactor);
+            float appliedFactor = Math.max(maskPixels == null ? 0f : LswImageProcessingUtil.convertToUnsignedInt(maskPixels[i]) / 65535f, 1f - blendRawFactor);
             // correction on output is needed given that is somehow always brighter than the original value
             int newValue = (int) (LswImageProcessingUtil.convertToUnsignedInt(outPixels[i]) * (averagePixelValueIn / averagePixelValueOut));
             int originalValue = LswImageProcessingUtil.convertToUnsignedInt(pixels[i]);
@@ -95,12 +95,12 @@ public class WienerDeconvolutionFilter {
         ipInput.setPixels(1, fpLum);
         short[] pixels = (short[]) ipInput.getPixels();
         double averagePixelValueIn = getAveragePixelValue(pixels);
-        short[] outPixels = getDeconvolvedPixels(fpLum, psf, parameters.getIterations());
+        short[] outPixels = getDeconvolvedPixels(fpLum, psf, parameters.getIterationsLuminance());
         double averagePixelValueOut = getAveragePixelValue(outPixels);
-        final ImageProcessor ipMask = LswImageProcessingUtil.createDeringMaskFloatProcessor(parameters.getDeringRadius(), parameters.getDeringThreshold(), fpLum);
+        final ImageProcessor ipMask = LswImageProcessingUtil.createDeringMaskFloatProcessor(parameters.getDeringRadiusLuminance(), parameters.getDeringThresholdLuminance(), fpLum);
         short[] maskPixels = (short[]) ipMask.getPixels();
         for (int i = 0; i < pixels.length; i++) {
-            float appliedFactor = Math.max(LswImageProcessingUtil.convertToUnsignedInt(maskPixels[i]) / 65535f, 1f - parameters.getBlendRaw());
+            float appliedFactor = Math.max(LswImageProcessingUtil.convertToUnsignedInt(maskPixels[i]) / 65535f, 1f - parameters.getBlendRawLuminance());
             // correction on output is needed given that is somehow always brighter than the original value
             int newValue = (int) (LswImageProcessingUtil.convertToUnsignedInt(outPixels[i]) * (averagePixelValueIn / averagePixelValueOut));
             int originalValue = LswImageProcessingUtil.convertToUnsignedInt(pixels[i]);

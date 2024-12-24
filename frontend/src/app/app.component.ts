@@ -66,6 +66,7 @@ export class AppComponent implements OnInit {
   luminanceIncludeColor: boolean = true;
   applyUnsharpMask: boolean = true;
   applyWienerDeconvolution: boolean;
+  wienerIterations: number;
 
   // denoise 1
   denoiseAlgorithm1: string;
@@ -263,23 +264,25 @@ export class AppComponent implements OnInit {
   wienerIterationsChanged(event: any, update: boolean) {
     switch (this.applySharpenToChannel) {
       case 'G':
-        this.profile.radiusGreen = event.value;
+        this.profile.wienerIterationsGreen = event.value;
         break;
       case 'B':
-        this.profile.radiusBlue = event.value;
+        this.profile.wienerIterationsBlue = event.value;
         break;
       case 'R':
-        this.profile.radius = event.value;
+        this.profile.wienerIterations = event.value;
         break;
       default:
         this.equalizeChannelsForSharpening();
-        this.profile.radius = event.value;
-        this.profile.radiusGreen = event.value;
-        this.profile.radiusBlue = event.value;
+        this.profile.wienerIterations = event.value;
+        this.profile.wienerIterationsGreen = event.value;
+        this.profile.wienerIterationsBlue = event.value;
     }
-    this.radius = event.value;
-    this.settings.operation = 'radius';
-    console.log('wienerIterationsChanged called: ' + this.profile.radius);
+    this.wienerIterations = event.value;
+    this.settings.operation = 'wienerIterations';
+    console.log(
+      'wienerIterationsChanged called: ' + this.profile.wienerIterations
+    );
     if (update) {
       this.updateProfile();
     }

@@ -608,15 +608,15 @@
           <div class="slider">
             <mat-slider
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-              step="0.1"
-              min="0.5"
-              max="4"
+              step="1"
+              min="1"
+              max="40"
               (input)="wienerIterationsChanged($event, false)"
               (change)="wienerIterationsChanged($event, true)"
-              [(ngModel)]="radius"
+              [(ngModel)]="wienerIterations"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel">{{ radius }}</span>
+            <span class="sliderLabel">{{ wienerIterations }}</span>
           </div>
         </div>
       </span>

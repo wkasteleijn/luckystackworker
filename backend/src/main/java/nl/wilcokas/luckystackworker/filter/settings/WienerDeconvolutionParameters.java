@@ -16,11 +16,11 @@ public class WienerDeconvolutionParameters {
     private boolean includeColor;
 
     // Luminance
-    private int iterations;
-    private float deringStrength;
-    private double deringRadius;
-    private int deringThreshold;
-    private float blendRaw;
+    private int iterationsLuminance;
+    private float deringStrengthLuminance;
+    private double deringRadiusLuminance;
+    private int deringThresholdLuminance;
+    private float blendRawLuminance;
 
     // Red
     private int iterationsRed;

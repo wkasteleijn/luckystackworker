@@ -236,8 +236,54 @@ public class OperationService {
 
     private void applyWienerDeconvolution(final ImagePlus image, Profile profile) {
         if (profile.getApplyWienerDeconvolution().booleanValue()) {
-            WienerDeconvolutionParameters wienerDeconvolutionParameters = WienerDeconvolutionParameters.builder().build();
-            wienerDeconvolutionFilter.apply(image, wienerDeconvolutionParameters);
+            float deringStrength = profile.getDeringStrength() / 100f;
+            float blendRaw = profile.getBlendRaw() / 100f;
+            int iterations = profile.getWienerIterations() == 0 ? 1 : profile.getWienerIterations();
+            WienerDeconvolutionParameters parameters;
+            LSWSharpenMode mode = (profile.getSharpenMode() == null) ? LSWSharpenMode.LUMINANCE : LSWSharpenMode.valueOf(profile.getSharpenMode());
+            if (mode == LSWSharpenMode.LUMINANCE) {
+                parameters = WienerDeconvolutionParameters.builder()
+                        .iterationsLuminance(iterations)
+                        .deringRadiusLuminance(profile.getDeringRadius().doubleValue())
+                        .deringStrengthLuminance(deringStrength)
+                        .deringThresholdLuminance(profile.getDeringThreshold())
+                        .blendRawLuminance(blendRaw)
+                        .mode(LSWSharpenMode.LUMINANCE)
+                        .build();
+            } else {
+                int iterationsGreen = profile.getWienerIterationsGreen() == 0 ? 1 : profile.getWienerIterationsGreen();
+                int iterationsBlue = profile.getWienerIterationsBlue() == 0 ? 1 : profile.getWienerIterationsBlue();
+                float deringStrengthGreen = profile.getDeringStrengthGreen() / 100f;
+                float deringStrengthBlue = profile.getDeringStrengthBlue() / 100f;
+                float blendRawGreen = profile.getBlendRawGreen() / 100f;
+                float blendRawBlue = profile.getBlendRawBlue() / 100f;
+                parameters = WienerDeconvolutionParameters.builder()
+                        .iterationsRed(iterations)
+                        .deringRadiusRed(profile.getDeringRadius().doubleValue())
+                        .deringStrengthRed(deringStrength)
+                        .deringThresholdRed(profile.getDeringThreshold())
+                        .iterationsGreen(iterationsGreen)
+                        .deringRadiusGreen(profile.getDeringRadiusGreen().doubleValue())
+                        .deringStrengthGreen(deringStrengthGreen)
+                        .deringThresholdGreen(profile.getDeringThresholdGreen())
+                        .iterationsBlue(iterationsBlue)
+                        .deringRadiusBlue(profile.getDeringRadiusBlue().doubleValue())
+                        .deringStrengthBlue(deringStrengthBlue)
+                        .deringThresholdBlue(profile.getDeringThresholdBlue())
+                        .blendRawRed(blendRaw)
+                        .blendRawGreen(blendRawGreen)
+                        .blendRawBlue(blendRawBlue)
+                        .mode(LSWSharpenMode.RGB)
+                        .build();
+            }
+
+            if (!validateLuminanceInclusion(parameters)) {
+                log.warn("Attempt to exclude all channels from luminance sharpen!");
+                parameters.setIncludeRed(true);
+                parameters.setIncludeGreen(true);
+                parameters.setIncludeBlue(true);
+            }
+            wienerDeconvolutionFilter.apply(image, parameters);
         }
     }
 
@@ -366,6 +412,10 @@ public class OperationService {
     }
 
     private boolean validateLuminanceInclusion(LSWSharpenParameters parameters) {
+        return parameters.isIncludeRed() || parameters.isIncludeGreen() || parameters.isIncludeBlue();
+    }
+
+    private boolean validateLuminanceInclusion(WienerDeconvolutionParameters parameters) {
         return parameters.isIncludeRed() || parameters.isIncludeGreen() || parameters.isIncludeBlue();
     }
 

@@ -21,7 +21,7 @@ public class AiryDiskGenerator {
         int imageSize = DEFAULT_IMAGE_SIZE; // Size of the output image (default: 100)
 
         ImagePlus image = generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
-        image.show();
+        //image.show();
         LswFileUtil.saveImage(image, null, "C:/Users/wkast/Downloads/airy_disk.tif", false, false, false, false);
     }
 
