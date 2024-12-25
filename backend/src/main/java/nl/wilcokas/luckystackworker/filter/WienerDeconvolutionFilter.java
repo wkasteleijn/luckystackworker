@@ -59,7 +59,7 @@ public class WienerDeconvolutionFilter {
         }
         for (int y = 0; y < ipInput.getHeight(); y++) {
             for (int x = 0; x < ipInput.getWidth(); x++) {
-                int i = x + y * ipInput.getHeight();
+                int i = ipInput.getWidth() * y + x;
                 double maskPixel = 0d;
                 if (maskPixels != null && x >= maskStartX && x < (ipInput.getWidth() - maskStartX) && y >= maskStartY && y < (ipInput.getHeight() - maskStartY)) {
                     int maskIndex = (x - maskStartX) + ((y - maskStartY) * ipMask.getWidth());
@@ -141,7 +141,7 @@ public class WienerDeconvolutionFilter {
     private short[] getDeconvolvedPixels(ImageProcessor ipInput, ImagePlus psf, int iterations) {
         WPLOptions options =
                 new WPLOptions(0, 1.0, 1.0, false, false, true, 0.01, false, false, false, 0);
-        LswWPLFloatIterativeDeconvolver2D deconv = new LswWPLFloatIterativeDeconvolver2D(new ImagePlus(null, ipInput), psf, IterativeEnums.BoundaryType.REFLEXIVE, IterativeEnums.ResizingType.AUTO, iterations, options);
+        LswWPLFloatIterativeDeconvolver2D deconv = new LswWPLFloatIterativeDeconvolver2D(new ImagePlus(null, ipInput), psf, IterativeEnums.BoundaryType.ZERO, IterativeEnums.ResizingType.AUTO, iterations, options);
         ShortProcessor ipOutput = (ShortProcessor) deconv.deconvolve().getProcessor();
         return (short[]) ipOutput.getPixels();
     }
