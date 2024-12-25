@@ -4,6 +4,7 @@ import edu.emory.mathcs.restoretools.iterative.IterativeEnums;
 import edu.emory.mathcs.restoretools.iterative.wpl.WPLOptions;
 import ij.ImagePlus;
 import ij.ImageStack;
+import ij.plugin.Scaler;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
@@ -46,16 +47,32 @@ public class WienerDeconvolutionFilter {
         double averagePixelValueIn = getAveragePixelValue(pixels);
         short[] outPixels = getDeconvolvedPixels(ipInput, psf, iterations);
         double averagePixelValueOut = getAveragePixelValue(outPixels);
-        final ImageProcessor ipMask = LswImageProcessingUtil.createDeringMaskProcessor(deringStrength, deringRadius, deringThreshold, ipInput);
-        short[] maskPixels = ipMask == null ? null : (short[]) ipMask.getPixels();
-        for (int i = 0; i < pixels.length; i++) {
-            float appliedFactor = Math.max(maskPixels == null ? 0f : LswImageProcessingUtil.convertToUnsignedInt(maskPixels[i]) / 65535f, 1f - blendRawFactor);
-            // correction on output is needed given that is somehow always brighter than the original value
-            int newValue = (int) (LswImageProcessingUtil.convertToUnsignedInt(outPixels[i]) * (averagePixelValueIn / averagePixelValueOut));
-            int originalValue = LswImageProcessingUtil.convertToUnsignedInt(pixels[i]);
-
-            int assignedValue = (int) (newValue * appliedFactor) + (int) (originalValue * (1 - appliedFactor));
-            pixels[i] = LswImageProcessingUtil.convertToShort(assignedValue);
+        ImageProcessor ipMask = LswImageProcessingUtil.createDeringMaskProcessor(deringStrength, deringRadius, 4.0, ipInput);
+        int maskStartX = 0;
+        int maskStartY = 0;
+        short[] maskPixels = null;
+        if (ipMask != null) {
+            ipMask = Scaler.resize(new ImagePlus("mask", ipMask), (int) (ipMask.getWidth() - (deringRadius * 2)), (int) (ipMask.getHeight() - (deringRadius * 2)), 1, "depth=%s interpolation=Bicubic create".formatted(1)).getProcessor();
+            maskStartX = ((ipInput.getWidth() - ipMask.getWidth()) / 2) + 2;
+            maskStartY = ((ipInput.getHeight() - ipMask.getHeight()) / 2) + 2;
+            maskPixels = (short[]) ipMask.getPixels();
+        }
+        for (int y = 0; y < ipInput.getHeight(); y++) {
+            for (int x = 0; x < ipInput.getWidth(); x++) {
+                int i = x + y * ipInput.getHeight();
+                double maskPixel = 0d;
+                if (maskPixels != null && x >= maskStartX && x < (ipInput.getWidth() - maskStartX) && y >= maskStartY && y < (ipInput.getHeight() - maskStartY)) {
+                    int maskIndex = (x - maskStartX) + ((y - maskStartY) * ipMask.getWidth());
+                    maskPixel = maskIndex >= maskPixels.length ? 0d : LswImageProcessingUtil.convertToUnsignedInt(maskPixels[maskIndex]);
+                }
+                double appliedMaskFactor = (1d - deringStrength) + ((maskPixel / 65535d) * deringStrength);
+                // correction on output is needed given that is somehow always brighter than the original value
+                double newValue = (LswImageProcessingUtil.convertToUnsignedInt(outPixels[i]) * (averagePixelValueIn / averagePixelValueOut));
+                double originalValue = LswImageProcessingUtil.convertToUnsignedInt(pixels[i]);
+                double assignedValueAfterMask = (newValue * appliedMaskFactor) + (originalValue * (1d - appliedMaskFactor));
+                //double assignedValue = 1f - blendRawFactor;
+                pixels[i] = LswImageProcessingUtil.convertToShort((int) assignedValueAfterMask);
+            }
         }
     }
 

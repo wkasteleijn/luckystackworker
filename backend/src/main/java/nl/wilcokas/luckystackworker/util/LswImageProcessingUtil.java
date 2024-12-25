@@ -438,7 +438,7 @@ public class LswImageProcessingUtil {
     }
 
     public static ImageProcessor createDeringMaskProcessor(
-            float deringStrength, double deringRadius, int deringThreshold, ImageProcessor ip) {
+            float deringStrength, double deringRadius, double deringThreshold, ImageProcessor ip) {
         if (deringStrength > 0.0f) {
             ImageProcessor maskIp = ip.duplicate();
             FloatProcessor fp = createDeringMaskFloatProcessor(deringRadius, deringThreshold, maskIp);
@@ -448,9 +448,9 @@ public class LswImageProcessingUtil {
         return null;
     }
 
-    public static FloatProcessor createDeringMaskFloatProcessor(double radius, int threshold, ImageProcessor ip) {
-        int minValue = 65535;
-        int maxValue = 0;
+    public static FloatProcessor createDeringMaskFloatProcessor(double radius, double threshold, ImageProcessor ip) {
+        double minValue = 65535;
+        double maxValue = 0;
         short[] maskPixels = (short[]) ip.getPixels();
         for (int position = 0; position < maskPixels.length; position++) {
             int value = LswImageProcessingUtil.convertToUnsignedInt(maskPixels[position]);
@@ -461,7 +461,7 @@ public class LswImageProcessingUtil {
                 minValue = value;
             }
         }
-        int average = (maxValue - minValue) / threshold; // start cutting of from threshold times the average.
+        int average = (int)((maxValue - minValue) / threshold); // start cutting of from threshold times the average.
         for (int position = 0; position < maskPixels.length; position++) {
             int value = LswImageProcessingUtil.convertToUnsignedInt(maskPixels[position]);
             if (value < average) {
@@ -471,8 +471,7 @@ public class LswImageProcessingUtil {
             }
         }
         FloatProcessor fp = ip.toFloat(1, null);
-        GaussianBlur gb = new GaussianBlur();
-        gb.blurGaussian(fp, radius, radius, 0.01);
+        new GaussianBlur().blurGaussian(fp, radius, radius, 0.01);
         return fp;
     }
 
