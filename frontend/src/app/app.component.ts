@@ -471,31 +471,6 @@ export class AppComponent implements OnInit {
     }
   }
 
-  deringThresholdChanged(event: any, update: boolean) {
-    switch (this.applySharpenToChannel) {
-      case 'G':
-        this.profile.deringThresholdGreen = event.value;
-        break;
-      case 'B':
-        this.profile.deringThresholdBlue = event.value;
-        break;
-      case 'R':
-        this.profile.deringThreshold = event.value;
-        break;
-      default:
-        this.equalizeChannelsForSharpening();
-        this.profile.deringThreshold = event.value;
-        this.profile.deringThresholdGreen = event.value;
-        this.profile.deringThresholdBlue = event.value;
-    }
-    this.deringThreshold = event.value;
-    this.settings.operation = 'deringThreshold';
-    console.log('deringThreshold called: ' + this.profile.deringThreshold);
-    if (update) {
-      this.updateProfile();
-    }
-  }
-
   deringStrengthChanged(event: any, update: boolean) {
     switch (this.applySharpenToChannel) {
       case 'G':
@@ -1453,7 +1428,6 @@ export class AppComponent implements OnInit {
 
     this.deringRadius = this.profile.deringRadius;
     this.deringStrength = this.profile.deringStrength;
-    this.deringThreshold = this.profile.deringThreshold;
     if (!this.profile.clippingStrength && !this.profile.deringStrength) {
       this.edgeArtefactSupressionMode = 'OFF';
     } else if (this.profile.deringStrength) {
@@ -1845,7 +1819,6 @@ export class AppComponent implements OnInit {
     this.profile.clippingRangeGreen = this.clippingRange;
     this.profile.deringRadiusGreen = this.deringRadius;
     this.profile.deringStrengthGreen = this.deringStrength;
-    this.profile.deringThresholdGreen = this.deringThreshold;
     this.profile.radiusBlue = this.radius;
     this.profile.amountBlue = this.amount;
     this.profile.iterationsBlue = this.iterations;
@@ -1854,7 +1827,6 @@ export class AppComponent implements OnInit {
     this.profile.clippingRangeBlue = this.clippingRange;
     this.profile.deringRadiusBlue = this.deringRadius;
     this.profile.deringStrengthBlue = this.deringStrength;
-    this.profile.deringThresholdBlue = this.deringThreshold;
   }
 
   private equalizeChannelsForDenoising() {

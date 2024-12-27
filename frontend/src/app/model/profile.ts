@@ -11,7 +11,6 @@ export class Profile {
   clippingRange: number;
   deringRadius: number;
   deringStrength: number;
-  deringThreshold: number;
   luminanceIncludeRed: boolean;
   luminanceIncludeGreen: boolean;
   luminanceIncludeBlue: boolean;
@@ -28,7 +27,6 @@ export class Profile {
   clippingRangeGreen: number;
   deringRadiusGreen: number;
   deringStrengthGreen: number;
-  deringThresholdGreen: number;
   wienerIterationsGreen: number;
 
   // sharpen blue
@@ -41,7 +39,6 @@ export class Profile {
   clippingRangeBlue: number;
   deringRadiusBlue: number;
   deringStrengthBlue: number;
-  deringThresholdBlue: number;
   wienerIterationsBlue: number;
 
   sharpenMode: string;
