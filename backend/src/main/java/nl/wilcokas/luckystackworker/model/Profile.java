@@ -31,7 +31,6 @@ public class Profile {
     private int clippingRange;
     private BigDecimal deringRadius;
     private int deringStrength;
-    private int deringThreshold;
     private int blendRaw;
     private int wienerIterations;
 
@@ -44,7 +43,6 @@ public class Profile {
     private int clippingRangeGreen;
     private BigDecimal deringRadiusGreen;
     private int deringStrengthGreen;
-    private int deringThresholdGreen;
     private int blendRawGreen;
     private int wienerIterationsGreen;
 
@@ -57,7 +55,6 @@ public class Profile {
     private int clippingRangeBlue;
     private BigDecimal deringRadiusBlue;
     private int deringStrengthBlue;
-    private int deringThresholdBlue;
     private int blendRawBlue;
     private int wienerIterationsBlue;
 
@@ -142,7 +139,10 @@ public class Profile {
     private OpenImageModeEnum openImageMode;
 
     // Not used any longer, needed for historical reasons. Removing this would now
-    // break the profile loading of old yaml files created prior to 4.1.0.
+    // break the profile loading of old yaml files.
+    private int deringThreshold;
+    private int deringThresholdGreen;
+    private int deringThresholdBlue;
 
     // Unused as of 5.2.0
     private int threshold;
@@ -170,7 +170,6 @@ public class Profile {
         this.clippingRange = profile.getClippingRange();
         this.deringRadius = profile.getDeringRadius();
         this.deringStrength = profile.getDeringStrength();
-        this.deringThreshold = profile.getDeringThreshold();
         this.blendRaw = profile.getBlendRaw();
         this.wienerIterations = profile.getWienerIterations();
 
@@ -183,7 +182,6 @@ public class Profile {
             this.clippingRangeGreen = profile.getClippingRange();
             this.deringRadiusGreen = profile.getDeringRadius();
             this.deringStrengthGreen = profile.getDeringStrength();
-            this.deringThresholdGreen = profile.getDeringThreshold();
             this.blendRawGreen = profile.getBlendRaw();
             this.wienerIterationsGreen = profile.getWienerIterations();
 
@@ -195,7 +193,6 @@ public class Profile {
             this.clippingRangeBlue = profile.getClippingRange();
             this.deringRadiusBlue = profile.getDeringRadius();
             this.deringStrengthBlue = profile.getDeringStrength();
-            this.deringThresholdBlue = profile.getDeringThreshold();
             this.blendRawBlue = profile.getBlendRaw();
             this.wienerIterationsBlue = profile.getWienerIterations();
 
@@ -208,7 +205,6 @@ public class Profile {
             this.clippingRangeGreen = profile.getClippingRangeGreen();
             this.deringRadiusGreen = profile.getDeringRadiusGreen();
             this.deringStrengthGreen = profile.getDeringStrengthGreen();
-            this.deringThresholdGreen = profile.getDeringThresholdGreen();
             this.blendRawGreen = profile.getBlendRawGreen();
             this.wienerIterationsGreen = profile.getWienerIterationsGreen();
 
@@ -220,7 +216,6 @@ public class Profile {
             this.clippingRangeBlue = profile.getClippingRangeBlue();
             this.deringRadiusBlue = profile.getDeringRadiusBlue();
             this.deringStrengthBlue = profile.getDeringStrengthBlue();
-            this.deringThresholdBlue = profile.getDeringThresholdBlue();
             this.blendRawBlue = profile.getBlendRawBlue();
             this.wienerIterationsBlue = profile.getWienerIterationsBlue();
         }

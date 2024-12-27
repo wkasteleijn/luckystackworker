@@ -36,7 +36,6 @@ public class LSWSharpenFilter {
                 unsharpMaskParameters.getBlendRawRed(),
                 unsharpMaskParameters.getDeringRadiusRed(),
                 unsharpMaskParameters.getDeringStrengthRed(),
-                unsharpMaskParameters.getDeringThresholdRed(),
                 1));
         executor.execute(() -> applyRGBModeToChannel(stack,
                 unsharpMaskParameters.getRadiusGreen(),
@@ -45,7 +44,6 @@ public class LSWSharpenFilter {
                 unsharpMaskParameters.getBlendRawGreen(),
                 unsharpMaskParameters.getDeringRadiusGreen(),
                 unsharpMaskParameters.getDeringStrengthGreen(),
-                unsharpMaskParameters.getDeringThresholdGreen(),
                 2));
         executor.execute(() -> applyRGBModeToChannel(stack,
                 unsharpMaskParameters.getRadiusBlue(),
@@ -54,7 +52,6 @@ public class LSWSharpenFilter {
                 unsharpMaskParameters.getBlendRawBlue(),
                 unsharpMaskParameters.getDeringRadiusBlue(),
                 unsharpMaskParameters.getDeringStrengthBlue(),
-                unsharpMaskParameters.getDeringThresholdBlue(),
                 3));
         LswUtil.stopAndAwaitParallelExecutor(executor);
     }
@@ -165,9 +162,7 @@ public class LSWSharpenFilter {
             if (unsharpMaskParameters.getDeringStrengthLuminance() > 0.0f) {
                 ImageProcessor ipLum = new ShortProcessor(image.getWidth(), image.getHeight());
                 ipLum.setPixels(1, fpLum);
-                final FloatProcessor fpMask = LswImageProcessingUtil.createDeringMaskFloatProcessor(unsharpMaskParameters.getDeringRadiusLuminance(),
-                        unsharpMaskParameters.getDeringThresholdLuminance(),
-                        ipLum);
+                final FloatProcessor fpMask = LswImageProcessingUtil.createDeringMaskFloatProcessor(unsharpMaskParameters.getDeringRadiusLuminance(), 4, ipLum);
                 ImageProcessor ipLumMask = new ShortProcessor(image.getWidth(), image.getHeight());
                 ipLumMask.setPixels(1, fpMask);
                 doUnsharpMaskDeringing(unsharpMaskParameters.getRadiusLuminance(),
@@ -321,11 +316,10 @@ public class LSWSharpenFilter {
             float blendRawFactor,
             double deringRadius,
             float deringStrength,
-            int deringThreshold,
             int channel) {
         final ImageProcessor ipMask = LswImageProcessingUtil.createDeringMaskProcessor(deringStrength,
                 deringRadius,
-                deringThreshold,
+                4,
                 stack.getProcessor(channel));
         for (int i = 0; i < iterations; i++) {
             ImageProcessor ip = stack.getProcessor(channel);

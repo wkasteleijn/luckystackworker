@@ -29,7 +29,6 @@ public class ProfileDTO {
         this.clippingRange = profile.getClippingRange();
         this.deringRadius = profile.getDeringRadius();
         this.deringStrength = profile.getDeringStrength();
-        this.deringThreshold = profile.getDeringThreshold();
         this.blendRaw = profile.getBlendRaw();
         this.wienerIterations = profile.getWienerIterations();
 
@@ -41,7 +40,6 @@ public class ProfileDTO {
         this.clippingRangeGreen = profile.getClippingRangeGreen();
         this.deringRadiusGreen = profile.getDeringRadiusGreen();
         this.deringStrengthGreen = profile.getDeringStrengthGreen();
-        this.deringThresholdGreen = profile.getDeringThresholdGreen();
         this.blendRawGreen = profile.getBlendRawGreen();
         this.wienerIterationsGreen = profile.getWienerIterationsGreen();
 
@@ -53,7 +51,6 @@ public class ProfileDTO {
         this.clippingRangeBlue = profile.getClippingRangeBlue();
         this.deringRadiusBlue = profile.getDeringRadiusBlue();
         this.deringStrengthBlue = profile.getDeringStrengthBlue();
-        this.deringThresholdBlue = profile.getDeringThresholdBlue();
         this.blendRawBlue = profile.getBlendRawBlue();
         this.wienerIterationsBlue = profile.getWienerIterationsBlue();
 
@@ -146,7 +143,6 @@ public class ProfileDTO {
     private int clippingRange;
     private BigDecimal deringRadius;
     private int deringStrength;
-    private int deringThreshold;
     private int blendRaw;
     private int wienerIterations;
 
@@ -158,7 +154,6 @@ public class ProfileDTO {
     private int clippingRangeGreen;
     private BigDecimal deringRadiusGreen;
     private int deringStrengthGreen;
-    private int deringThresholdGreen;
     private int blendRawGreen;
     private int wienerIterationsGreen;
 
@@ -170,7 +165,6 @@ public class ProfileDTO {
     private int clippingRangeBlue;
     private BigDecimal deringRadiusBlue;
     private int deringStrengthBlue;
-    private int deringThresholdBlue;
     private int blendRawBlue;
     private int wienerIterationsBlue;
 

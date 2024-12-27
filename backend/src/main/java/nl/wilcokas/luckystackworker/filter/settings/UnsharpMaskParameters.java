@@ -17,7 +17,6 @@ public class UnsharpMaskParameters {
     private float clippingRangeLuminance;
     private double deringRadiusLuminance;
     private float deringStrengthLuminance;
-    private int deringThresholdLuminance;
     private float blendRawLuminance;
 
     // red
@@ -28,7 +27,6 @@ public class UnsharpMaskParameters {
     private float clippingRangeRed;
     private double deringRadiusRed;
     private float deringStrengthRed;
-    private int deringThresholdRed;
     private float blendRawRed;
 
     // green
@@ -39,7 +37,6 @@ public class UnsharpMaskParameters {
     private float clippingRangeGreen;
     private double deringRadiusGreen;
     private float deringStrengthGreen;
-    private int deringThresholdGreen;
     private float blendRawGreen;
 
     // blue
@@ -50,6 +47,5 @@ public class UnsharpMaskParameters {
     private float clippingRangeBlue;
     private double deringRadiusBlue;
     private float deringStrengthBlue;
-    private int deringThresholdBlue;
     private float blendRawBlue;
 }

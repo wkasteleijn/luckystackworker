@@ -25,9 +25,9 @@ public class WienerDeconvolutionFilter {
         ImagePlus[] psfPerChannel = getPsfPerChannel(psf);
         ImageStack stack = image.getStack();
         if (parameters.getMode() == LSWSharpenMode.RGB) {
-            applyToChannel(stack.getProcessor(1), psfPerChannel[0], parameters.getIterationsRed(), parameters.getDeringStrengthRed(), parameters.getDeringRadiusRed(), parameters.getDeringThresholdRed(), parameters.getBlendRawRed());
-            applyToChannel(stack.getProcessor(2), psfPerChannel[1], parameters.getIterationsGreen(), parameters.getDeringStrengthGreen(), parameters.getDeringRadiusGreen(), parameters.getDeringThresholdGreen(), parameters.getBlendRawGreen());
-            applyToChannel(stack.getProcessor(3), psfPerChannel[2], parameters.getIterationsBlue(), parameters.getDeringStrengthBlue(), parameters.getDeringRadiusBlue(), parameters.getDeringThresholdBlue(), parameters.getBlendRawBlue());
+            applyToChannel(stack.getProcessor(1), psfPerChannel[0], parameters.getIterationsRed(), parameters.getDeringStrengthRed(), parameters.getDeringRadiusRed(), parameters.getBlendRawRed());
+            applyToChannel(stack.getProcessor(2), psfPerChannel[1], parameters.getIterationsGreen(), parameters.getDeringStrengthGreen(), parameters.getDeringRadiusGreen(), parameters.getBlendRawGreen());
+            applyToChannel(stack.getProcessor(3), psfPerChannel[2], parameters.getIterationsBlue(), parameters.getDeringStrengthBlue(), parameters.getDeringRadiusBlue(), parameters.getBlendRawBlue());
         } else {
             applyLuminance(image, psf, parameters);
         }
@@ -42,7 +42,7 @@ public class WienerDeconvolutionFilter {
         return psfPerChannel;
     }
 
-    private void applyToChannel(ImageProcessor ipInput, ImagePlus psf, int iterations, float deringStrength, double deringRadius, int deringThreshold, float blendRawFactor) {
+    private void applyToChannel(ImageProcessor ipInput, ImagePlus psf, int iterations, float deringStrength, double deringRadius, float blendRawFactor) {
         short[] pixels = (short[]) ipInput.getPixels();
         double averagePixelValueIn = getAveragePixelValue(pixels);
         short[] outPixels = getDeconvolvedPixels(ipInput, psf, iterations);
@@ -52,7 +52,8 @@ public class WienerDeconvolutionFilter {
         int maskStartY = 0;
         short[] maskPixels = null;
         if (ipMask != null) {
-            ipMask = Scaler.resize(new ImagePlus("mask", ipMask), (int) (ipMask.getWidth() - (deringRadius * 2)), (int) (ipMask.getHeight() - (deringRadius * 2)), 1, "depth=%s interpolation=Bicubic create".formatted(1)).getProcessor();
+            ipMask = Scaler.resize(new ImagePlus("mask", ipMask), (int) (ipMask.getWidth() - (deringRadius * 2)), (int) (ipMask.getHeight() - (deringRadius * 2)), 1,
+                    "depth=%s interpolation=Bicubic create".formatted(1)).getProcessor();
             maskStartX = ((ipInput.getWidth() - ipMask.getWidth()) / 2) + 2;
             maskStartY = ((ipInput.getHeight() - ipMask.getHeight()) / 2) + 2;
             maskPixels = (short[]) ipMask.getPixels();
@@ -70,8 +71,8 @@ public class WienerDeconvolutionFilter {
                 double newValue = (LswImageProcessingUtil.convertToUnsignedInt(outPixels[i]) * (averagePixelValueIn / averagePixelValueOut));
                 double originalValue = LswImageProcessingUtil.convertToUnsignedInt(pixels[i]);
                 double assignedValueAfterMask = (newValue * appliedMaskFactor) + (originalValue * (1d - appliedMaskFactor));
-                //double assignedValue = 1f - blendRawFactor;
-                pixels[i] = LswImageProcessingUtil.convertToShort((int) assignedValueAfterMask);
+                double assignedValue = (1f - blendRawFactor) * assignedValueAfterMask + originalValue * blendRawFactor;
+                pixels[i] = LswImageProcessingUtil.convertToShort((int) assignedValue);
             }
         }
     }
@@ -106,25 +107,12 @@ public class WienerDeconvolutionFilter {
             pixelsLum[i] = hsl[2];
         }
         FloatProcessor fpLum = new FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum);
-
-        // Perform Wiener deconvolution
         ShortProcessor ipInput = new ShortProcessor(image.getWidth(), image.getHeight());
         ipInput.setPixels(1, fpLum);
-        short[] pixels = (short[]) ipInput.getPixels();
-        double averagePixelValueIn = getAveragePixelValue(pixels);
-        short[] outPixels = getDeconvolvedPixels(fpLum, psf, parameters.getIterationsLuminance());
-        double averagePixelValueOut = getAveragePixelValue(outPixels);
-        final ImageProcessor ipMask = LswImageProcessingUtil.createDeringMaskFloatProcessor(parameters.getDeringRadiusLuminance(), parameters.getDeringThresholdLuminance(), fpLum);
-        short[] maskPixels = (short[]) ipMask.getPixels();
-        for (int i = 0; i < pixels.length; i++) {
-            float appliedFactor = Math.max(LswImageProcessingUtil.convertToUnsignedInt(maskPixels[i]) / 65535f, 1f - parameters.getBlendRawLuminance());
-            // correction on output is needed given that is somehow always brighter than the original value
-            int newValue = (int) (LswImageProcessingUtil.convertToUnsignedInt(outPixels[i]) * (averagePixelValueIn / averagePixelValueOut));
-            int originalValue = LswImageProcessingUtil.convertToUnsignedInt(pixels[i]);
-
-            int assignedValue = (int) (newValue * appliedFactor) + (int) (originalValue * (1 - appliedFactor));
-            pixels[i] = LswImageProcessingUtil.convertToShort(assignedValue);
-        }
+        ImagePlus[] psfPerChannel = getPsfPerChannel(psf);
+        applyToChannel(ipInput, psfPerChannel[1], parameters.getIterationsLuminance(), parameters.getDeringStrengthLuminance(), parameters.getDeringRadiusLuminance(), parameters.getBlendRawLuminance());
+        FloatProcessor fpOut = ipInput.toFloat(3, null);
+        pixelsLum = (float[])fpOut.getPixels();
 
         // Convert back to 16-bit RGB and update the image
         for (int i = 0; i < pixelsRed.length; i++) {
