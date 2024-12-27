@@ -141,6 +141,9 @@ export class AppComponent implements OnInit {
   visibleChannel: string = 'RGB';
   applySharpenToChannel: string = 'RGB';
   applyDenoiseToChannel: string = 'RGB';
+  isPsfPanelVisible: boolean = false;
+  psfImagePath: string =
+    'file://C:/Users/wkast/AppData/Local/LuckyStackWorker/psf.tif';
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
@@ -294,6 +297,12 @@ export class AppComponent implements OnInit {
 
   createPSF() {
     console.log('createPSF called');
+    this.isPsfPanelVisible = true;
+  }
+
+  hidePSF() {
+    console.log('hidePSF called');
+    this.isPsfPanelVisible = false;
   }
 
   radiusChanged(event: any, update: boolean) {

@@ -15,6 +15,7 @@ import { MatLegacySliderModule } from '@angular/material/legacy-slider';
 import { MatLegacySnackBarModule } from '@angular/material/legacy-snack-bar';
 import { MatLegacyTabsModule } from '@angular/material/legacy-tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { SyntheticPsfComponent } from './psf/synthetic.psf.component';
 
 import {
   BrowserAnimationsModule,
@@ -26,7 +27,12 @@ import { AppComponent } from './app.component';
 import { ConfirmationComponent } from './confirmation/confirmation.component';
 
 @NgModule({
-  declarations: [AppComponent, AboutComponent, ConfirmationComponent],
+  declarations: [
+    AppComponent,
+    AboutComponent,
+    ConfirmationComponent,
+    SyntheticPsfComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,

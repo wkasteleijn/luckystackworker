@@ -1,0 +1,32 @@
+<div class="popup-container">
+  <h2>Create synthetic PSF</h2>
+  <div class="slider-group">
+    <label for="slider1">Slider 1</label>
+    <input
+      id="slider1"
+      type="range"
+      min="0"
+      max="100"
+      [(ngModel)]="slider1Value"
+    />
+    <span>{{ slider1Value }}</span>
+  </div>
+
+  <div class="slider-group">
+    <label for="slider2">Slider 2</label>
+    <input
+      id="slider2"
+      type="range"
+      min="0"
+      max="100"
+      [(ngModel)]="slider2Value"
+    />
+    <span>{{ slider2Value }}</span>
+  </div>
+
+  <div class="image-container">
+    <img [src]="imagePath" alt="Synthetic PSF Preview" />
+  </div>
+
+  <button (click)="closePopup()">Close</button>
+</div>

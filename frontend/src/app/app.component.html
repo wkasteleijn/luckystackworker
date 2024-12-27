@@ -1,3 +1,10 @@
+<app-synthetic-psf-panel
+  *ngIf="isPsfPanelVisible"
+  [imagePath]="psfImagePath"
+  (close)="hidePSF()"
+></app-synthetic-psf-panel>
+<div *ngIf="isPsfPanelVisible" class="backdrop"></div>
+
 <div *ngIf="shouldShowSpinner()">
   <mat-progress-spinner
     class="spinner"
