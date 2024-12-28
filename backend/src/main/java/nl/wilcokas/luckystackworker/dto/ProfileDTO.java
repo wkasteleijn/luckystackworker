@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
+import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 
@@ -250,4 +251,5 @@ public class ProfileDTO {
     private double scale;
     private int equalizeLocalHistogramsStrength;
     private OpenImageModeEnum openImageMode;
+    private PSFDTO psf;
 }

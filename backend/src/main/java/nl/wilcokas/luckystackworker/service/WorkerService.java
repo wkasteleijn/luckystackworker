@@ -150,7 +150,7 @@ public class WorkerService {
                         imp = LswFileUtil.fixNonTiffOpeningSettings(imp);
                     }
                     operationService.correctExposure(imp);
-                    operationService.applyAllOperations(imp, LswImageProcessingUtil.getImageLayers(imp), null, profile);
+                    operationService.applyAllOperations(imp, LswImageProcessingUtil.getImageLayers(imp), null, profile, null);
                     imp.updateAndDraw();
                     if (LuckyStackWorkerContext.getSelectedRoi() != null) {
                         imp.setRoi(LuckyStackWorkerContext.getSelectedRoi());

@@ -10,7 +10,10 @@ import java.util.TimerTask;
 import nl.wilcokas.luckystackworker.filter.*;
 import nl.wilcokas.luckystackworker.filter.settings.*;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
+import nl.wilcokas.luckystackworker.model.OperationEnum;
+import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
+import nl.wilcokas.luckystackworker.util.AiryDiskGenerator;
 import org.apache.commons.text.StringSubstitutor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -54,10 +57,11 @@ public class OperationService {
         image.resetDisplayRange();
     }
 
-    public void applyAllOperations(ImagePlus image, LswImageLayersDto unprocessedImageLayers, LswImageViewer viewer, Profile profile) throws IOException, InterruptedException {
+    public byte[] applyAllOperations(ImagePlus image, LswImageLayersDto unprocessedImageLayers, LswImageViewer viewer, Profile profile, OperationEnum operation) throws IOException, InterruptedException {
         updateProgress(viewer, 0, true);
 
         // Sharpening filters
+        byte[] psfImage = updatePSF(profile.getPsf(),operation);
         applyWienerDeconvolution(image, profile);
         applySharpen(image, profile);
         updateProgress(viewer, 9);
@@ -106,6 +110,7 @@ public class OperationService {
                 }
             }
         }, Constants.ARTIFICIAL_PROGRESS_DELAY, Constants.ARTIFICIAL_PROGRESS_DELAY);
+        return psfImage;
     }
 
     public ImagePlus scaleImage(final ImagePlus image, final double scale) {
@@ -443,6 +448,13 @@ public class OperationService {
             double blendRawBlueFactor = profile.getBlendRawBlue() / 100.0;
             blendRawFilter.apply(image, unprocessedImageLayers, blendRawRedFactor, blendRawGreenFactor, blendRawBlueFactor);
         }
+    }
+
+    private byte[] updatePSF(PSF psf, OperationEnum operation) throws IOException {
+        if (operation == OperationEnum.PSF) {
+            return AiryDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity());
+        }
+        return null;
     }
 
 }

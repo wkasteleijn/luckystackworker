@@ -138,6 +138,8 @@ public class Profile {
     private double scale;
     private OpenImageModeEnum openImageMode;
 
+    private PSF psf;
+
     // Not used any longer, needed for historical reasons. Removing this would now
     // break the profile loading of old yaml files.
     private int deringThreshold;
@@ -151,7 +153,6 @@ public class Profile {
     private BigDecimal denoiseSigma;
 
     // Unused as of 4.1.0
-    private String operation;
     private String rootFolder;
     private boolean isLargeImage;
     private BigDecimal denoise;

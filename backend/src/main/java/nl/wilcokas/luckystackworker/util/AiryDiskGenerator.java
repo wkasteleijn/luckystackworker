@@ -18,29 +18,29 @@ public class AiryDiskGenerator {
         double airyDiskRadius = 16; // Radius of Airy disk in pixels
         double seeingIndex = 0.0; // Atmospheric seeing index (0.0 = no distortion, 1.0 = maximum distortion)
         float diffractionIntensity = 20.0f; // Diffraction intensity (default: 20.0, min = 0, max = 1000)
-        int imageSize = DEFAULT_IMAGE_SIZE; // Size of the output image (default: 100)
 
-        ImagePlus image = generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
-        //image.show();
-        LswFileUtil.saveImage(image, null, "C:/Users/wkast/Downloads/airy_disk.tif", false, false, false, false);
+        generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity);
     }
 
-    public static ImagePlus generate16BitRGB(double airyDiskRadius, double seeingIndex, float diffractionIntensity, int imageSize) {
+    public static byte[] generate16BitRGB(double airyDiskRadius, double seeingIndex, double diffractionIntensity) throws IOException {
 
-        short[] redPixels =  new short[(int) Math.pow(imageSize, 2)];
-        short[] greenPixels  = new short[(int) Math.pow(imageSize, 2)];
-        short[] bluePixels  = new short[(int) Math.pow(imageSize, 2)];
+        short[] redPixels =  new short[(int) Math.pow(DEFAULT_IMAGE_SIZE, 2)];
+        short[] greenPixels  = new short[(int) Math.pow(DEFAULT_IMAGE_SIZE, 2)];
+        short[] bluePixels  = new short[(int) Math.pow(DEFAULT_IMAGE_SIZE, 2)];
 
         Executor executor = LswUtil.getParallelExecutor();
-        executor.execute(() ->  generate16BitForChannel(redPixels, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize, 630));
-        executor.execute(() ->  generate16BitForChannel(greenPixels, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize, 532));
-        executor.execute(() ->  generate16BitForChannel(bluePixels, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize, 465));
+        executor.execute(() ->  generate16BitForChannel(redPixels, airyDiskRadius, seeingIndex, diffractionIntensity, DEFAULT_IMAGE_SIZE, 630));
+        executor.execute(() ->  generate16BitForChannel(greenPixels, airyDiskRadius, seeingIndex, diffractionIntensity, DEFAULT_IMAGE_SIZE, 532));
+        executor.execute(() ->  generate16BitForChannel(bluePixels, airyDiskRadius, seeingIndex, diffractionIntensity, DEFAULT_IMAGE_SIZE, 465));
         LswUtil.stopAndAwaitParallelExecutor(executor);
 
         LswImageLayersDto layers = LswImageLayersDto.builder().layers(new short[][]{redPixels, greenPixels, bluePixels}).build();
-        return LswImageProcessingUtil.create16BitRGBImage(null, layers, imageSize, imageSize, true, true, true);
+        ImagePlus image = LswImageProcessingUtil.create16BitRGBImage(null, layers, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, true, true);
+        LswFileUtil.saveImage(image, null, "psf.tif", false, false, false, false);
+        LswFileUtil.saveImage(image, null, "psf.jpg", false, false, true, false);
+        return LswFileUtil.getWienerDeconvolutionPSFImage();
     }
-    private static void generate16BitForChannel(short[] pixels, double airyDiskRadius, double seeingIndex, float diffractionIntensity, int imageSize, double wavelength) {
+    private static void generate16BitForChannel(short[] pixels, double airyDiskRadius, double seeingIndex, double diffractionIntensity, int imageSize, double wavelength) {
         FloatProcessor fp = generate(wavelength, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
         Pair<Float, Float> minAndMax = LswImageProcessingUtil.getMinAndMaxValues(fp);
         for (int i = 0; i < pixels.length; i++) {
@@ -48,7 +48,7 @@ public class AiryDiskGenerator {
         }
     }
 
-    private static FloatProcessor generate(double wavelength, double airyDiskRadius, double seeingIndex, float diffractionIntensity, int imageSize) {
+    private static FloatProcessor generate(double wavelength, double airyDiskRadius, double seeingIndex, double diffractionIntensity, int imageSize) {
         FloatProcessor processor = new FloatProcessor(imageSize, imageSize);
 
         double centerX = imageSize / 2.0;
@@ -89,11 +89,11 @@ public class AiryDiskGenerator {
         return processor;
     }
 
-    private static void increaseShadows(int imageSize, FloatProcessor processor, float preScaleFactor) {
+    private static void increaseShadows(int imageSize, FloatProcessor processor, double preScaleFactor) {
         for (int y = 0; y < imageSize; y++) {
             for (int x = 0; x < imageSize; x++) {
                 float originalIntensity = processor.getf(x, y);
-                float scaledIntensity = originalIntensity * preScaleFactor;
+                float scaledIntensity = originalIntensity * (float)preScaleFactor;
                 float transformedIntensity = (float) Math.log(1 + scaledIntensity);
                 processor.setf(x, y, transformedIntensity);
             }

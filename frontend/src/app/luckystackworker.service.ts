@@ -27,7 +27,7 @@ export class LuckyStackWorkerService {
     return this.http.get(`${this.baseUrl}/profiles/status`);
   }
 
-  updateProfile(profile: Profile, operation: string): Observable<Object> {
+  updateProfile(profile: Profile, operation: string): Observable<any> {
     return this.http.put(
       `${this.baseUrl}/profiles?operation=${operation}`,
       profile

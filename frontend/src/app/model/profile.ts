@@ -1,3 +1,5 @@
+import { PSF } from './psf';
+
 export class Profile {
   name: string;
 
@@ -124,4 +126,6 @@ export class Profile {
 
   scale: number;
   openImageMode: string;
+
+  psf: PSF;
 }

@@ -1,11 +1,7 @@
 package nl.wilcokas.luckystackworker.util;
 
 import java.awt.image.ColorModel;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -27,6 +23,7 @@ import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -491,6 +488,17 @@ public class LswFileUtil {
 
     public static ImagePlus getWienerDeconvolutionPSF() {
         return new Opener().openImage(getDataFolder(LswUtil.getActiveOSProfile())+"/psf.tif");
+    }
+
+    public static byte[] getWienerDeconvolutionPSFImage() {
+        String path = getDataFolder(LswUtil.getActiveOSProfile())+"/psf.jpg";
+        // Read the image from file
+        try (InputStream in = new FileInputStream(path)) {
+            return IOUtils.toByteArray(in);
+        } catch (IOException e) {
+            log.error("Error reading Wiener deconvolution PSF image", e);
+            return null;
+        }
     }
 
     private static void hackIncorrectPngFileInfo(LSWFileSaver saver) {

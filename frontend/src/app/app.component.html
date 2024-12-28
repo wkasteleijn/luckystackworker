@@ -1,7 +1,10 @@
 <app-synthetic-psf-panel
   *ngIf="isPsfPanelVisible"
-  [imagePath]="psfImagePath"
+  [imageData]="psfImage"
+  [nightMode]="nightMode"
+  [psf]="profile.psf"
   (close)="hidePSF()"
+  (sliderChange)="psfSlidersChanged($event)"
 ></app-synthetic-psf-panel>
 <div *ngIf="isPsfPanelVisible" class="backdrop"></div>
 

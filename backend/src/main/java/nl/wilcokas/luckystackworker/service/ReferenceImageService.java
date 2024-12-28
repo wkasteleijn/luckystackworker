@@ -24,7 +24,9 @@ import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.ij.LswImageWindow;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
+import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.util.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -151,12 +153,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return null;
     }
 
-    public void updateProcessing(Profile profile, String operationValue) throws IOException, InterruptedException {
+    public byte[] updateProcessing(Profile profile, String operationValue) throws IOException, InterruptedException {
         boolean includeRed = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.R;
         boolean includeGreen = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G;
         boolean includeBlue = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B;
         LswImageProcessingUtil.copyLayers(unprocessedImageLayers, finalResultImage, true, true, true);
-        operationService.applyAllOperations(finalResultImage, unprocessedImageLayers, displayedImage, profile);
+        OperationEnum operation = StringUtils.isNotBlank(operationValue) ? OperationEnum.valueOf(operationValue) : null;
+        byte[] psf = operationService.applyAllOperations(finalResultImage, unprocessedImageLayers, displayedImage, profile, operation);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
                 displayedImage,
@@ -166,6 +169,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         updateHistogramMetadata();
         displayedImage.updateMetadata(imageMetadata);
         displayedImage.updateAndDraw();
+        return psf;
     }
 
     public void saveReferenceImage(String path, boolean asJpg, Profile profile) throws IOException {

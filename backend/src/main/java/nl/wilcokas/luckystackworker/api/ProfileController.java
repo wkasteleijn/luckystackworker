@@ -3,12 +3,14 @@ package nl.wilcokas.luckystackworker.api;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import nl.wilcokas.luckystackworker.dto.*;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +27,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.dto.ProfileDTO;
-import nl.wilcokas.luckystackworker.dto.ResponseDTO;
-import nl.wilcokas.luckystackworker.dto.SettingsDTO;
-import nl.wilcokas.luckystackworker.dto.StatusUpdateDTO;
-import nl.wilcokas.luckystackworker.dto.VersionDTO;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.service.ProfileService;
@@ -105,22 +102,24 @@ public class ProfileController {
     }
 
     @PutMapping
-    public ResponseEntity<String> updateProfile(@RequestBody ProfileDTO profileDTO, @RequestParam String operation)
+    public ResponseEntity<PSFImageDto> updateProfile(@RequestBody ProfileDTO profileDTO, @RequestParam String operation)
             throws IOException, InterruptedException {
         // Rate limiting added to prevent overloading whenever scroll keys are held down
         // or pressed very quickly.
         LocalDateTime activeOperationTime = LuckyStackWorkerContext.getActiveOperationTime();
+        byte[] psfImage = null;
         if (activeOperationTime == null
                 || LocalDateTime.now()
                 .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
             LuckyStackWorkerContext.setActiveOperationTime(LocalDateTime.now());
             Profile profile = profileService.updateProfile(profileDTO);
-            referenceImageService.updateProcessing(profile, operation);
+            psfImage = referenceImageService.updateProcessing(profile, operation);
             LuckyStackWorkerContext.setActiveOperationTime(null);
         } else {
             log.warn("Attempt to update image while another operation was in progress");
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return psfImage == null ? new ResponseEntity<>(HttpStatus.OK) :
+                ResponseEntity.ok(PSFImageDto.builder().imageData(Base64.getEncoder().encodeToString(psfImage)).build());
     }
 
     @PutMapping("/apply")

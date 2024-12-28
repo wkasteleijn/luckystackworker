@@ -142,8 +142,7 @@ export class AppComponent implements OnInit {
   applySharpenToChannel: string = 'RGB';
   applyDenoiseToChannel: string = 'RGB';
   isPsfPanelVisible: boolean = false;
-  psfImagePath: string =
-    'file://C:/Users/wkast/AppData/Local/LuckyStackWorker/psf.tif';
+  psfImage: string = '';
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
@@ -1406,6 +1405,13 @@ export class AppComponent implements OnInit {
     );
   }
 
+  psfSlidersChanged(event: any) {
+    console.log('psfSlidersChanged called');
+    this.profile.psf = event.value;
+    this.settings.operation = 'PSF';
+    this.updateProfile();
+  }
+
   private updateProfileSettings() {
     this.radius = this.profile.radius;
     this.amount = this.profile.amount;
@@ -1504,7 +1510,9 @@ export class AppComponent implements OnInit {
       .updateProfile(this.profile, this.settings.operation)
       .subscribe(
         (data) => {
-          console.log(data);
+          if (data) {
+            this.psfImage = data.imageData;
+          }
           if (this.slowProcessing) {
             this.hideSpinner();
           }
