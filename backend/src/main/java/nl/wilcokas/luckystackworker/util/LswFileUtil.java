@@ -21,6 +21,7 @@ import ij.gui.NewImage;
 import ij.io.Opener;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
+import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import org.apache.commons.io.IOUtils;
@@ -394,6 +395,15 @@ public class LswFileUtil {
             profile.setWienerIterations(5);
             profile.setWienerIterationsGreen(5);
             profile.setWienerIterationsBlue(5);
+        }
+        if (profile.getPsf()==null) {
+            PSF psf = PSF.builder()
+                    .airyDiskRadius(16)
+                    .diffractionIntensity(20)
+                    .seeingIndex(0)
+                    .wavelength(532)
+                    .build();
+            profile.setPsf(psf);
         }
     }
 

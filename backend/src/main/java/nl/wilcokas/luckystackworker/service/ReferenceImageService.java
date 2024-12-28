@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.time.LocalDateTime;
+import java.util.Base64;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -146,6 +147,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
                 settingsDTO.setLargeImage(isLargeImage);
                 settingsDTO.setZoomFactor(zoomFactor);
+                settingsDTO.setPsfImage(Base64.getEncoder().encodeToString(LswFileUtil.getWienerDeconvolutionPSFImage()));
                 LuckyStackWorkerContext.setSelectedProfile(profile.getName());
                 return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
             }
@@ -158,7 +160,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         boolean includeGreen = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G;
         boolean includeBlue = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B;
         LswImageProcessingUtil.copyLayers(unprocessedImageLayers, finalResultImage, true, true, true);
-        OperationEnum operation = StringUtils.isNotBlank(operationValue) ? OperationEnum.valueOf(operationValue) : null;
+        OperationEnum operation = "PSF".equals(operationValue) ? OperationEnum.valueOf(operationValue.toUpperCase()) : null;
         byte[] psf = operationService.applyAllOperations(finalResultImage, unprocessedImageLayers, displayedImage, profile, operation);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),

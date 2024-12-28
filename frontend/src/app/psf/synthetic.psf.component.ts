@@ -36,6 +36,7 @@ export class SyntheticPsfComponent {
   }
 
   onSlidersChanged() {
+    console.log('onSlidersChanged called');
     this.slidersChanged.emit({
       airyDiskRadius: this.airyDiskRadius,
       seeingIndex: this.seeingIndex,

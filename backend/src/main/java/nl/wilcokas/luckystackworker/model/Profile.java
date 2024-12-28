@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import nl.wilcokas.luckystackworker.dto.PSFDTO;
 import nl.wilcokas.luckystackworker.dto.ProfileDTO;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 
@@ -153,6 +154,7 @@ public class Profile {
     private BigDecimal denoiseSigma;
 
     // Unused as of 4.1.0
+    private String operation;
     private String rootFolder;
     private boolean isLargeImage;
     private BigDecimal denoise;
@@ -174,7 +176,7 @@ public class Profile {
         this.blendRaw = profile.getBlendRaw();
         this.wienerIterations = profile.getWienerIterations();
 
-        if ( profile.getApplySharpenToChannel() == ChannelEnum.RGB) {
+        if (profile.getApplySharpenToChannel() == ChannelEnum.RGB) {
             this.radiusGreen = profile.getRadius();
             this.amountGreen = profile.getAmount();
             this.iterationsGreen = profile.getIterations();
@@ -321,6 +323,14 @@ public class Profile {
 
         this.scale = profile.getScale();
         this.openImageMode = profile.getOpenImageMode();
+        PSFDTO psfDTO = profile.getPsf();
+        this.psf = PSF.builder()
+                .airyDiskRadius(psfDTO.getAiryDiskRadius())
+                .diffractionIntensity(psfDTO.getDiffractionIntensity())
+                .seeingIndex(psfDTO.getSeeingIndex())
+                .wavelength(psfDTO.getWavelength())
+                .customPSF(psfDTO.getCustomPSF())
+                .build();
     }
 
 }

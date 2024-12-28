@@ -1,3 +1,5 @@
 package nl.wilcokas.luckystackworker.model;
 
-public enum OperationEnum {PSF}
+public enum OperationEnum {
+    PSF
+}

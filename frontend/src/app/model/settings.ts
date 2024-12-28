@@ -4,4 +4,5 @@ export class Settings {
   largeImage: boolean;
   gmicAvailable: boolean;
   zoomFactor: number;
+  psfImage: string;
 }

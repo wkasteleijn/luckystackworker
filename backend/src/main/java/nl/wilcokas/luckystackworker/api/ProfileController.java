@@ -102,7 +102,7 @@ public class ProfileController {
     }
 
     @PutMapping
-    public ResponseEntity<PSFImageDto> updateProfile(@RequestBody ProfileDTO profileDTO, @RequestParam String operation)
+    public ResponseEntity<PSFImageDto> updateProfile(@RequestBody ProfileDTO profileDTO, @RequestParam(required = false) String operation)
             throws IOException, InterruptedException {
         // Rate limiting added to prevent overloading whenever scroll keys are held down
         // or pressed very quickly.

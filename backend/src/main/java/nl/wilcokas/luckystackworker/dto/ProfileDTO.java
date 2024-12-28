@@ -131,6 +131,14 @@ public class ProfileDTO {
         this.scale = profile.getScale();
         this.equalizeLocalHistogramsStrength = profile.getEqualizeLocalHistogramsStrength();
         this.openImageMode = profile.getOpenImageMode();
+        PSF profilePsf = profile.getPsf();
+        this.psf = PSFDTO.builder()
+                .airyDiskRadius(profilePsf.getAiryDiskRadius())
+                .seeingIndex(profilePsf.getSeeingIndex())
+                .wavelength(profilePsf.getWavelength())
+                .diffractionIntensity(profilePsf.getDiffractionIntensity())
+                .customPSF(profilePsf.getCustomPSF())
+                .build();
     }
 
     private String name;

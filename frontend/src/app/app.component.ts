@@ -10,6 +10,7 @@ import {
 } from './confirmation/confirmation.component';
 import { LuckyStackWorkerService } from './luckystackworker.service';
 import { Profile } from './model/profile';
+import { PSF } from './model/psf';
 import { Settings } from './model/settings';
 import { NewVersionComponent } from './new_version/newversion.component';
 
@@ -180,6 +181,7 @@ export class AppComponent implements OnInit {
             this.selectedProfile = this.profile.name;
             this.rootFolder = data.settings.rootFolder;
             this.zoomFactor = data.settings.zoomFactor;
+            this.psfImage = data.settings.psfImage;
             this.checkLatestVersion();
             this.updateProfileSettings();
           }
@@ -1407,7 +1409,7 @@ export class AppComponent implements OnInit {
 
   psfSlidersChanged(event: any) {
     console.log('psfSlidersChanged called');
-    this.profile.psf = event.value;
+    this.profile.psf = Object.assign(new PSF(), event);
     this.settings.operation = 'PSF';
     this.updateProfile();
   }

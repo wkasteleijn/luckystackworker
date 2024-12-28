@@ -4,7 +4,7 @@
   [nightMode]="nightMode"
   [psf]="profile.psf"
   (close)="hidePSF()"
-  (sliderChange)="psfSlidersChanged($event)"
+  (slidersChanged)="psfSlidersChanged($event)"
 ></app-synthetic-psf-panel>
 <div *ngIf="isPsfPanelVisible" class="backdrop"></div>
 

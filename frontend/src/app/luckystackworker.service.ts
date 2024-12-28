@@ -28,10 +28,11 @@ export class LuckyStackWorkerService {
   }
 
   updateProfile(profile: Profile, operation: string): Observable<any> {
-    return this.http.put(
-      `${this.baseUrl}/profiles?operation=${operation}`,
-      profile
-    );
+    let url = `${this.baseUrl}/profiles`;
+    if (operation) {
+      url += `?operation=${operation}`;
+    }
+    return this.http.put(url, profile);
   }
 
   applyProfile(profile: Profile): Observable<Object> {

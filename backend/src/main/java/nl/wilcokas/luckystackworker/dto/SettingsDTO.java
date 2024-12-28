@@ -32,4 +32,5 @@ public class SettingsDTO {
     private boolean largeImage;
     private boolean gmicAvailable;
     private int zoomFactor;
+    private String psfImage;
 }

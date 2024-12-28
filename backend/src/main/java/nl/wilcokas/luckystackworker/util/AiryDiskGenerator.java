@@ -3,12 +3,15 @@ package nl.wilcokas.luckystackworker.util;
 import ij.ImagePlus;
 import ij.plugin.filter.GaussianBlur;
 import ij.process.FloatProcessor;
+import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.concurrent.Executor;
 
+@Slf4j
 public class AiryDiskGenerator {
 
     private static final int DEFAULT_IMAGE_SIZE = 64;
@@ -19,27 +22,32 @@ public class AiryDiskGenerator {
         double seeingIndex = 0.0; // Atmospheric seeing index (0.0 = no distortion, 1.0 = maximum distortion)
         float diffractionIntensity = 20.0f; // Diffraction intensity (default: 20.0, min = 0, max = 1000)
 
-        generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity);
+        byte[] file = generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity);
+        log.info("PSF saved {}", Base64.getEncoder().encodeToString(file));
     }
 
     public static byte[] generate16BitRGB(double airyDiskRadius, double seeingIndex, double diffractionIntensity) throws IOException {
 
-        short[] redPixels =  new short[(int) Math.pow(DEFAULT_IMAGE_SIZE, 2)];
-        short[] greenPixels  = new short[(int) Math.pow(DEFAULT_IMAGE_SIZE, 2)];
-        short[] bluePixels  = new short[(int) Math.pow(DEFAULT_IMAGE_SIZE, 2)];
+        short[] redPixels = new short[(int) Math.pow(DEFAULT_IMAGE_SIZE, 2)];
+        short[] greenPixels = new short[(int) Math.pow(DEFAULT_IMAGE_SIZE, 2)];
+        short[] bluePixels = new short[(int) Math.pow(DEFAULT_IMAGE_SIZE, 2)];
+
+        double seeingIndexConverted = seeingIndex / 4.0;
 
         Executor executor = LswUtil.getParallelExecutor();
-        executor.execute(() ->  generate16BitForChannel(redPixels, airyDiskRadius, seeingIndex, diffractionIntensity, DEFAULT_IMAGE_SIZE, 630));
-        executor.execute(() ->  generate16BitForChannel(greenPixels, airyDiskRadius, seeingIndex, diffractionIntensity, DEFAULT_IMAGE_SIZE, 532));
-        executor.execute(() ->  generate16BitForChannel(bluePixels, airyDiskRadius, seeingIndex, diffractionIntensity, DEFAULT_IMAGE_SIZE, 465));
+        executor.execute(() -> generate16BitForChannel(redPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, DEFAULT_IMAGE_SIZE, 630));
+        executor.execute(() -> generate16BitForChannel(greenPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, DEFAULT_IMAGE_SIZE, 532));
+        executor.execute(() -> generate16BitForChannel(bluePixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, DEFAULT_IMAGE_SIZE, 465));
         LswUtil.stopAndAwaitParallelExecutor(executor);
 
         LswImageLayersDto layers = LswImageLayersDto.builder().layers(new short[][]{redPixels, greenPixels, bluePixels}).build();
         ImagePlus image = LswImageProcessingUtil.create16BitRGBImage(null, layers, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, true, true);
-        LswFileUtil.saveImage(image, null, "psf.tif", false, false, false, false);
-        LswFileUtil.saveImage(image, null, "psf.jpg", false, false, true, false);
+        String dataFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile());
+        LswFileUtil.saveImage(image, null, dataFolder + "/psf.tif", false, false, false, false);
+        LswFileUtil.saveImage(image, null, dataFolder + "/psf.jpg", false, false, true, false);
         return LswFileUtil.getWienerDeconvolutionPSFImage();
     }
+
     private static void generate16BitForChannel(short[] pixels, double airyDiskRadius, double seeingIndex, double diffractionIntensity, int imageSize, double wavelength) {
         FloatProcessor fp = generate(wavelength, airyDiskRadius, seeingIndex, diffractionIntensity, imageSize);
         Pair<Float, Float> minAndMax = LswImageProcessingUtil.getMinAndMaxValues(fp);
@@ -57,7 +65,7 @@ public class AiryDiskGenerator {
         // Convert wavelength from nanometers to microns for scaling (1 nm = 1e-3 microns)
         double k = 2 * Math.PI / (wavelength / 1000.0); // wavenumber in radians per pixel
 
-        double maxIntensity = 0; // Track the maximum intensity for normalization
+        double maxIntensity = 0;
 
         // Step 1: First pass through the image to compute intensities and apply the seeing effect
         for (int y = 0; y < imageSize; y++) {
@@ -93,7 +101,7 @@ public class AiryDiskGenerator {
         for (int y = 0; y < imageSize; y++) {
             for (int x = 0; x < imageSize; x++) {
                 float originalIntensity = processor.getf(x, y);
-                float scaledIntensity = originalIntensity * (float)preScaleFactor;
+                float scaledIntensity = originalIntensity * (float) preScaleFactor;
                 float transformedIntensity = (float) Math.log(1 + scaledIntensity);
                 processor.setf(x, y, transformedIntensity);
             }
