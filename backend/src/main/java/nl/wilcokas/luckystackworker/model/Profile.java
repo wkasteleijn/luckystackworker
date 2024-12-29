@@ -328,8 +328,7 @@ public class Profile {
                 .airyDiskRadius(psfDTO.getAiryDiskRadius())
                 .diffractionIntensity(psfDTO.getDiffractionIntensity())
                 .seeingIndex(psfDTO.getSeeingIndex())
-                .wavelength(psfDTO.getWavelength())
-                .customPSF(psfDTO.getCustomPSF())
+                .type(psfDTO.getType())
                 .build();
     }
 

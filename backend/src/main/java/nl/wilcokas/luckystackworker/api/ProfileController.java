@@ -165,4 +165,10 @@ public class ProfileController {
         log.info("Exit called, ending application");
         Runtime.getRuntime().halt(0);
     }
+
+    @GetMapping("/custom-psf")
+    public SettingsDTO loadCustomPSF() {
+        log.info("loadCustomPSF called");
+        return SettingsDTO.builder().build();
+    }
 }

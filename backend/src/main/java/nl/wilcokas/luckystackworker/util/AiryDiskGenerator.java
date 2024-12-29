@@ -21,12 +21,10 @@ public class AiryDiskGenerator {
         double airyDiskRadius = 16; // Radius of Airy disk in pixels
         double seeingIndex = 0.0; // Atmospheric seeing index (0.0 = no distortion, 1.0 = maximum distortion)
         float diffractionIntensity = 20.0f; // Diffraction intensity (default: 20.0, min = 0, max = 1000)
-
-        byte[] file = generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity);
-        log.info("PSF saved {}", Base64.getEncoder().encodeToString(file));
+        generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity,"jup");
     }
 
-    public static byte[] generate16BitRGB(double airyDiskRadius, double seeingIndex, double diffractionIntensity) throws IOException {
+    public static ImagePlus generate16BitRGB(double airyDiskRadius, double seeingIndex, double diffractionIntensity, String profileName) throws IOException {
 
         short[] redPixels = new short[(int) Math.pow(DEFAULT_IMAGE_SIZE, 2)];
         short[] greenPixels = new short[(int) Math.pow(DEFAULT_IMAGE_SIZE, 2)];
@@ -43,9 +41,9 @@ public class AiryDiskGenerator {
         LswImageLayersDto layers = LswImageLayersDto.builder().layers(new short[][]{redPixels, greenPixels, bluePixels}).build();
         ImagePlus image = LswImageProcessingUtil.create16BitRGBImage(null, layers, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, true, true);
         String dataFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile());
-        LswFileUtil.saveImage(image, null, dataFolder + "/psf.tif", false, false, false, false);
-        LswFileUtil.saveImage(image, null, dataFolder + "/psf.jpg", false, false, true, false);
-        return LswFileUtil.getWienerDeconvolutionPSFImage();
+        LswFileUtil.saveImage(image, null, dataFolder + "/psf_%s.tif".formatted(profileName), false, false, false, false);
+        LswFileUtil.saveImage(image, null, dataFolder + "/psf_%s.jpg".formatted(profileName), false, false, true, false);
+        return image;
     }
 
     private static void generate16BitForChannel(short[] pixels, double airyDiskRadius, double seeingIndex, double diffractionIntensity, int imageSize, double wavelength) {

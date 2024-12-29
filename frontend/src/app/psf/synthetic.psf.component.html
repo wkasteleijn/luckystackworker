@@ -1,8 +1,16 @@
 <div class="popup-container">
   <h2>PSF</h2>
+  <div class="type">Type : {{ psf.type?.toLowerCase() }}</div>
+  <button
+    (click)="onLoadCustomPSF()"
+    matTooltip="Load custon PSF"
+    class="loadCustomPsfButton"
+  >
+    <img src="assets/images/open.png" class="buttonImg" />
+  </button>
   <img [src]="'data:image/jpeg;base64,' + imageData" class="psfImage" />
-  <button (click)="closePopup()" class="closeButton">
-    <img src="assets/images/close.png" class="closeButtonImg" />
+  <button (click)="closePopup()" class="closeButton" matTooltip="Close panel">
+    <img src="assets/images/close.png" class="buttonImg" />
   </button>
 
   <p class="slidersStartMargin"></p>

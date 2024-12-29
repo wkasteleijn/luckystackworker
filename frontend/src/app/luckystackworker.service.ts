@@ -103,4 +103,8 @@ export class LuckyStackWorkerService {
   channelChanged(channel: string) {
     return this.http.put(`${this.baseUrl}/reference/channel`, channel);
   }
+
+  loadCustomPSF(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/profiles/custom-psf`);
+  }
 }

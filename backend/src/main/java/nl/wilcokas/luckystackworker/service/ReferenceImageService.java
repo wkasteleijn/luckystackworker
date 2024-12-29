@@ -145,7 +145,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
                 settingsDTO.setLargeImage(isLargeImage);
                 settingsDTO.setZoomFactor(zoomFactor);
-                settingsDTO.setPsfImage(Base64.getEncoder().encodeToString(LswFileUtil.getWienerDeconvolutionPSFImage()));
+                settingsDTO.setPsfImage(Base64.getEncoder().encodeToString(LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName())));
                 LuckyStackWorkerContext.setSelectedProfile(profile.getName());
                 return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
             }

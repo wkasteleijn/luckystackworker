@@ -13,6 +13,5 @@ public class PSF {
     private double airyDiskRadius;
     private double seeingIndex;
     private double diffractionIntensity;
-    private int wavelength;
-    private String customPSF;
+    private PSFType type;
 }

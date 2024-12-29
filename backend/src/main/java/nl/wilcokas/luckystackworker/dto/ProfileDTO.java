@@ -135,9 +135,8 @@ public class ProfileDTO {
         this.psf = PSFDTO.builder()
                 .airyDiskRadius(profilePsf.getAiryDiskRadius())
                 .seeingIndex(profilePsf.getSeeingIndex())
-                .wavelength(profilePsf.getWavelength())
                 .diffractionIntensity(profilePsf.getDiffractionIntensity())
-                .customPSF(profilePsf.getCustomPSF())
+                .type(profilePsf.getType())
                 .build();
     }
 

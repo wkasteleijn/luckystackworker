@@ -7,7 +7,7 @@
   background-color: #191919;
   border: 1px solid rgb(168, 168, 168);
   padding: 20px;
-  width: 400px;
+  width: 350px;
   height: 250px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
@@ -54,22 +54,21 @@
   left: 151px;
 }
 .slidersStartMargin {
-  margin-top: 110px;
+  margin-top: 40px;
 }
 
 label {
   width: 130px;
 }
 
-button {
+.closeButton {
   position: fixed;
   top: 24px;
   right: 24px;
-  background-color: #191919;
   border-style: hidden;
 }
 
-.closeButton {
+button {
   height: 40px;
   font-size: 12px;
   border: 0px;
@@ -83,6 +82,19 @@ button {
   padding-bottom: 0px;
 }
 
-.closeButtonImg {
+.buttonImg {
   width: 20px;
+}
+.type {
+  height: 24px;
+  color: rgb(132, 233, 132);
+}
+
+h2 {
+  height: 20px;
+  color: rgb(132, 233, 132);
+}
+
+.loadCustomPsfButton {
+  margin-top: 8px;
 }

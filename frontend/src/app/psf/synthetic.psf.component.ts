@@ -12,9 +12,9 @@ export class SyntheticPsfComponent {
   @Input() nightMode: boolean = false;
   @Input() psf: PSF;
   @Input() spinnerShown = false;
-
   @Output() close = new EventEmitter<void>();
   @Output() slidersChanged = new EventEmitter<any>();
+  @Output() loadCustomPSF = new EventEmitter<any>();
 
   airyDiskRadius: number;
   seeingIndex: number;
@@ -55,6 +55,10 @@ export class SyntheticPsfComponent {
       wavelength: this.wavelength,
       customPSF: this.customPSF,
     });
+  }
+
+  onLoadCustomPSF() {
+    this.loadCustomPSF.emit();
   }
 
   colorTheme() {

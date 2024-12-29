@@ -4,8 +4,10 @@
   [nightMode]="nightMode"
   [spinnerShown]="shouldShowSpinner()"
   [psf]="profile.psf"
+  [profileName]="profile.name"
   (close)="hidePSF()"
   (slidersChanged)="psfSlidersChanged($event)"
+  (loadCustomPSF)="loadCustomPSFClicked()"
 ></app-synthetic-psf-panel>
 <div *ngIf="isPsfPanelVisible" class="backdrop"></div>
 
@@ -553,63 +555,47 @@
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             >Wiener deconvolution</mat-checkbox
           >
+
+          <button
+            *ngIf="
+              applyWienerDeconvolution &&
+              openRefImageEnabled() &&
+              refImageSelected
+            "
+            type="button"
+            mat-button
+            (click)="createPSF()"
+            class="{{
+              'psfButton buttonZoom ' +
+                (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
+            }}"
+            matTooltip="Load PSF"
+          >
+            <img src="assets/images/synth-psf.png" class="psfButtonImg" />
+          </button>
+          <button
+            *ngIf="
+              !applyWienerDeconvolution ||
+              !openRefImageEnabled() ||
+              !refImageSelected
+            "
+            type="button"
+            mat-button
+            disabled
+            class="psfButton psfButtonDisabled buttonDisabledZoom"
+            matTooltip="Load PSF"
+          >
+            <img src="assets/images/synth-psf.png" class="psfButtonImg" />
+          </button>
+
           <mat-checkbox
             [(ngModel)]="applyUnsharpMask"
             (change)="applyUnsharpMaskChanged()"
             [color]="colorTheme()"
-            class="luminanceIncludeBox"
+            class="applyUnsharpMaskCheckBox"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             >Unsharp mask</mat-checkbox
           >
-          <span *ngIf="applyWienerDeconvolution">
-            <button
-              *ngIf="openRefImageEnabled() && refImageSelected"
-              type="button"
-              mat-button
-              (click)="loadPSF()"
-              class="{{
-                'psfButton buttonZoom ' +
-                  (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
-              }}"
-              matTooltip="Load PSF"
-            >
-              <img src="assets/images/load-psf.png" class="psfButtonImg" />
-            </button>
-            <button
-              *ngIf="!openRefImageEnabled() || !refImageSelected"
-              type="button"
-              mat-button
-              disabled
-              class="psfButton buttonDisabledZoom"
-              matTooltip="Load PSF"
-            >
-              <img src="assets/images/load-psf.png" class="psfButtonImg" />
-            </button>
-
-            <button
-              *ngIf="openRefImageEnabled() && refImageSelected"
-              type="button"
-              mat-button
-              (click)="createPSF()"
-              class="{{
-                'psfButton buttonZoom ' +
-                  (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
-              }}"
-              matTooltip="Create synthetic PSF"
-            >
-              <img src="assets/images/synth-psf.png" class="psfButtonImg" />
-            </button>
-            <button
-              *ngIf="!openRefImageEnabled() || !refImageSelected"
-              type="button"
-              mat-button
-              disabled
-              class="psfButton buttonDisabledZoom"
-              matTooltip="Create synthetic PSF"
-            >
-              <img src="assets/images/synth-psf.png" class="psfButtonImg" />
-            </button>
-          </span>
         </div>
       </div>
 

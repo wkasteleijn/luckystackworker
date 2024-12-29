@@ -12,6 +12,7 @@ import nl.wilcokas.luckystackworker.filter.settings.*;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.PSF;
+import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import nl.wilcokas.luckystackworker.util.AiryDiskGenerator;
 import org.apache.commons.text.StringSubstitutor;
@@ -61,7 +62,7 @@ public class OperationService {
         updateProgress(viewer, 0, true);
 
         // Sharpening filters
-        byte[] psfImage = updatePSF(profile.getPsf(),operation);
+        byte[] psfImage = updatePSF(profile.getPsf(),operation, profile.getName());
         applyWienerDeconvolution(image, profile);
         applySharpen(image, profile);
         updateProgress(viewer, 9);
@@ -235,7 +236,7 @@ public class OperationService {
         }
     }
 
-    private void applyWienerDeconvolution(final ImagePlus image, Profile profile) {
+    private void applyWienerDeconvolution(final ImagePlus image, Profile profile) throws IOException {
         if (profile.getApplyWienerDeconvolution().booleanValue()) {
             float deringStrength = profile.getDeringStrength() / 100f;
             float blendRaw = profile.getBlendRaw() / 100f;
@@ -284,7 +285,13 @@ public class OperationService {
                 parameters.setIncludeGreen(true);
                 parameters.setIncludeBlue(true);
             }
-            wienerDeconvolutionFilter.apply(image, parameters);
+            ImagePlus psfImage = LswFileUtil.getWienerDeconvolutionPSF(profile.getName());
+            if (psfImage == null) {
+                PSF psf = profile.getPsf();
+                psf.setType(PSFType.SYNTHETIC);
+                psfImage = AiryDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profile.getName());
+            }
+            wienerDeconvolutionFilter.apply(image, psfImage, parameters);
         }
     }
 
@@ -441,18 +448,11 @@ public class OperationService {
         return image.getStack().size() == 3;
     }
 
-    private void blendRaw(ImagePlus image, final LswImageLayersDto unprocessedImageLayers, final Profile profile) {
-        if (profile.getBlendRaw() > 0 || profile.getBlendRawGreen() > 0 || profile.getBlendRawBlue() > 0) {
-            double blendRawRedFactor = profile.getBlendRaw() / 100.0;
-            double blendRawGreenFactor = profile.getBlendRawGreen() / 100.0;
-            double blendRawBlueFactor = profile.getBlendRawBlue() / 100.0;
-            blendRawFilter.apply(image, unprocessedImageLayers, blendRawRedFactor, blendRawGreenFactor, blendRawBlueFactor);
-        }
-    }
-
-    private byte[] updatePSF(PSF psf, OperationEnum operation) throws IOException {
+    private byte[] updatePSF(PSF psf, OperationEnum operation, String profileName) throws IOException {
         if (operation == OperationEnum.PSF) {
-            return AiryDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity());
+            AiryDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profileName);
+            psf.setType(PSFType.SYNTHETIC);
+            return LswFileUtil.getWienerDeconvolutionPSFImage(profileName);
         }
         return null;
     }

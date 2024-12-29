@@ -333,9 +333,15 @@
   height: 40px;
   margin-left: 7px;
 }
+.psfButtonDisabled {
+  margin-left: 6px;
+}
 .noWiener {
   margin-left: -3px;
-  margin-top: 12px;
+  margin-top: 11px;
+}
+.applyUnsharpMaskCheckBox {
+  margin-left: 7px;
 }
 .dispersionInnerButton {
   max-width: 44px;

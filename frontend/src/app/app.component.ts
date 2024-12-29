@@ -1414,6 +1414,20 @@ export class AppComponent implements OnInit {
     this.updateProfile();
   }
 
+  loadCustomPSFClicked() {
+    console.log('loadCustomPSFClicked called:');
+    this.showSpinner();
+    this.luckyStackWorkerService.loadCustomPSF().subscribe(
+      (data) => {
+        if (data) {
+          this.psfImage = data.psfImage;
+        }
+        this.hideSpinner();
+      },
+      (error) => console.log(error)
+    );
+  }
+
   private updateProfileSettings() {
     this.radius = this.profile.radius;
     this.amount = this.profile.amount;

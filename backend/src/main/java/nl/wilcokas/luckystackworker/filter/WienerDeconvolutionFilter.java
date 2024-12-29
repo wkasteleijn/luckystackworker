@@ -20,8 +20,7 @@ import org.springframework.stereotype.Component;
 public class WienerDeconvolutionFilter {
 
 
-    public void apply(ImagePlus image, WienerDeconvolutionParameters parameters) {
-        ImagePlus psf = LswFileUtil.getWienerDeconvolutionPSF();
+    public void apply(ImagePlus image, ImagePlus psf, WienerDeconvolutionParameters parameters) {
         ImagePlus[] psfPerChannel = getPsfPerChannel(psf);
         ImageStack stack = image.getStack();
         if (parameters.getMode() == LSWSharpenMode.RGB) {

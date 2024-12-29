@@ -4,4 +4,5 @@ export class PSF {
   diffractionIntensity: number;
   wavelength: number;
   customPSF: string;
+  type: string;
 }

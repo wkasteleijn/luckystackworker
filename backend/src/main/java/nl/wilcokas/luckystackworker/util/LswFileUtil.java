@@ -22,6 +22,7 @@ import ij.io.Opener;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.model.PSF;
+import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import org.apache.commons.io.IOUtils;
@@ -401,7 +402,7 @@ public class LswFileUtil {
                     .airyDiskRadius(16)
                     .diffractionIntensity(20)
                     .seeingIndex(0)
-                    .wavelength(532)
+                    .type(PSFType.SYNTHETIC)
                     .build();
             profile.setPsf(psf);
         }
@@ -496,12 +497,12 @@ public class LswFileUtil {
         return LocalDateTime.ofInstant(((FileTime) Files.getAttribute(Paths.get(filePath), "creationTime")).toInstant(), ZoneOffset.UTC);
     }
 
-    public static ImagePlus getWienerDeconvolutionPSF() {
-        return new Opener().openImage(getDataFolder(LswUtil.getActiveOSProfile())+"/psf.tif");
+    public static ImagePlus getWienerDeconvolutionPSF(String profileName) {
+        return new Opener().openImage(getDataFolder(LswUtil.getActiveOSProfile())+"/psf_%s.tif".formatted(profileName));
     }
 
-    public static byte[] getWienerDeconvolutionPSFImage() {
-        String path = getDataFolder(LswUtil.getActiveOSProfile())+"/psf.jpg";
+    public static byte[] getWienerDeconvolutionPSFImage(String profileName) {
+        String path = getDataFolder(LswUtil.getActiveOSProfile())+"/psf_%s.jpg".formatted(profileName);
         // Read the image from file
         try (InputStream in = new FileInputStream(path)) {
             return IOUtils.toByteArray(in);
