@@ -41,7 +41,6 @@ public class ReferenceController {
 
     private final SettingsService settingsService;
     private final ReferenceImageService referenceImageService;
-    private final ProfileService profileService;
 
     @GetMapping("/open")
     public ResponseDTO openReferenceImage(@RequestParam double scale, @RequestParam String openImageMode) throws IOException, InterruptedException {

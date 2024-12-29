@@ -5,12 +5,17 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import ij.ImagePlus;
+import ij.io.Opener;
 import nl.wilcokas.luckystackworker.dto.*;
+import nl.wilcokas.luckystackworker.model.PSFType;
+import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -167,8 +172,33 @@ public class ProfileController {
     }
 
     @GetMapping("/custom-psf")
-    public SettingsDTO loadCustomPSF() {
+    public SettingsDTO loadCustomPSF() throws IOException, InterruptedException {
         log.info("loadCustomPSF called");
-        return SettingsDTO.builder().build();
+        JFrame frame = referenceImageService.getParentFrame();
+        JFileChooser jfc = referenceImageService
+                .getJFileChooser(settingsService.getRootFolder());
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("TIF, TIFF, PNG", "tif", "tiff", "png");
+        jfc.setFileFilter(filter);
+        int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, false);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = jfc.getSelectedFile();
+            String selectedFilePath = selectedFile.getAbsolutePath();
+            String profileName = LuckyStackWorkerContext.getSelectedProfile();
+            Profile profile = profileService.findByName(profileName).orElse(null);
+            if (profile != null) {
+                String filePath = LswFileUtil.getIJFileFormat(selectedFilePath);
+                ImagePlus psf = new Opener().openImage(filePath);
+                if (psf.getStack().getSize() < 3) {
+                    psf = LswImageProcessingUtil
+                            .create16BitRGBImage(filePath, LswImageProcessingUtil.getImageLayers(psf), psf.getWidth(), psf.getHeight(), true, true, true);
+                }
+                LswFileUtil.savePSF(psf, profileName);
+                byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profileName);
+                profile.getPsf().setType(PSFType.CUSTOM);
+                referenceImageService.updateProcessing(profile, null);
+                return SettingsDTO.builder().psfImage(Base64.getEncoder().encodeToString(psfImage)).build();
+            }
+        }
+        return null;
     }
 }

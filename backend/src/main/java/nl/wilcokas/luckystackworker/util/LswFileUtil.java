@@ -507,9 +507,15 @@ public class LswFileUtil {
         try (InputStream in = new FileInputStream(path)) {
             return IOUtils.toByteArray(in);
         } catch (IOException e) {
-            log.error("Error reading Wiener deconvolution PSF image", e);
+            log.warn("PSF image not found for profile {}", profileName);
             return null;
         }
+    }
+
+    public static void savePSF(ImagePlus image,String profileName) throws IOException {
+        String dataFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile());
+        saveImage(image, null, dataFolder + "/psf_%s.tif".formatted(profileName), false, false, false, false);
+        saveImage(image, null, dataFolder + "/psf_%s.jpg".formatted(profileName), false, false, true, false);
     }
 
     private static void hackIncorrectPngFileInfo(LSWFileSaver saver) {

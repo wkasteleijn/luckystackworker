@@ -40,9 +40,7 @@ public class AiryDiskGenerator {
 
         LswImageLayersDto layers = LswImageLayersDto.builder().layers(new short[][]{redPixels, greenPixels, bluePixels}).build();
         ImagePlus image = LswImageProcessingUtil.create16BitRGBImage(null, layers, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, true, true);
-        String dataFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile());
-        LswFileUtil.saveImage(image, null, dataFolder + "/psf_%s.tif".formatted(profileName), false, false, false, false);
-        LswFileUtil.saveImage(image, null, dataFolder + "/psf_%s.jpg".formatted(profileName), false, false, true, false);
+        LswFileUtil.savePSF(image, profileName);
         return image;
     }
 
