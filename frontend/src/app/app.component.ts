@@ -1478,6 +1478,9 @@ export class AppComponent implements OnInit {
     this.equalizeLocalHistograms = this.profile.equalizeLocalHistogramsStrength;
     this.normalizeColorBalance = this.profile.normalizeColorBalance;
     this.preserveDarkBackground = this.profile.preserveDarkBackground;
+    this.applyUnsharpMask = this.profile.applyUnsharpMask;
+    this.applyWienerDeconvolution = this.profile.applyWienerDeconvolution;
+    this.wienerIterations = this.profile.wienerIterations;
     this.setNonPersistentSettings();
   }
 
@@ -1838,6 +1841,7 @@ export class AppComponent implements OnInit {
     this.profile.clippingRangeGreen = this.clippingRange;
     this.profile.deringRadiusGreen = this.deringRadius;
     this.profile.deringStrengthGreen = this.deringStrength;
+    this.profile.wienerIterationsGreen = this.wienerIterations;
     this.profile.radiusBlue = this.radius;
     this.profile.amountBlue = this.amount;
     this.profile.iterationsBlue = this.iterations;
@@ -1846,6 +1850,7 @@ export class AppComponent implements OnInit {
     this.profile.clippingRangeBlue = this.clippingRange;
     this.profile.deringRadiusBlue = this.deringRadius;
     this.profile.deringStrengthBlue = this.deringStrength;
+    this.profile.wienerIterationsBlue = this.wienerIterations;
   }
 
   private equalizeChannelsForDenoising() {

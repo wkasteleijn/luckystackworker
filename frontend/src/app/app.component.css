@@ -151,7 +151,7 @@
 
 .spinner {
   position: absolute;
-  z-index: 100;
+  z-index: 1001;
   top: 232px;
   left: 210px;
 }

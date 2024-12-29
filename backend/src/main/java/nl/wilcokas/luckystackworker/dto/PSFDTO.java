@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PSFDTO {
     private double airyDiskRadius;
-    private int seeingIndex;
+    private double seeingIndex;
     private double diffractionIntensity;
     private int wavelength;
     private String customPSF;

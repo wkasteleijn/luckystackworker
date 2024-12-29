@@ -2,6 +2,7 @@
   *ngIf="isPsfPanelVisible"
   [imageData]="psfImage"
   [nightMode]="nightMode"
+  [spinnerShown]="shouldShowSpinner()"
   [psf]="profile.psf"
   (close)="hidePSF()"
   (slidersChanged)="psfSlidersChanged($event)"

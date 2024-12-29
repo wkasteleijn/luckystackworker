@@ -20,14 +20,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ij.gui.*;
 import ij.process.ColorProcessor;
-import nl.wilcokas.luckystackworker.ij.LswImageCanvas;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.ij.LswImageWindow;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.util.*;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -591,7 +589,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 finalResultImage = LswFileUtil.fixNonTiffOpeningSettings(finalResultImage);
             }
             operationService.correctExposure(displayedImage);
-            largeImage = displayedImage.getWidth() > Constants.MAX_WINDOW_SIZE;
+            largeImage = displayedImage.getWidth() * displayedImage.getHeight() > Constants.LARGE_WINDOW_SIZE;
 
             zoomFactor = setDefaultLayoutSettings(displayedImage);
 

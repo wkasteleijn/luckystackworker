@@ -7,61 +7,53 @@
 
   <p class="slidersStartMargin"></p>
 
-  <div class="slider-group">
-    <label for="slider2">Airy disk radius</label>
-    <mat-slider
-      class="slider"
-      step="0.1"
-      min="1"
-      max="24"
-      (change)="onSlidersChanged()"
-      [(ngModel)]="airyDiskRadius"
-      [color]="colorTheme()"
-    ></mat-slider>
-    <span>{{ airyDiskRadius }}</span>
-  </div>
+  <div class="sliderContainer">
+    <div class="sliderGroup">
+      <label class="sliderLabel">Airy disk radius</label>
+      <mat-slider
+        class="slider"
+        step="0.1"
+        min="1"
+        max="50"
+        (input)="onAiryDiskRadiusUpdated($event)"
+        (change)="onSlidersChanged()"
+        [(ngModel)]="airyDiskRadius"
+        [color]="colorTheme()"
+        [disabled]="spinnerShown"
+      ></mat-slider>
+      <span class="sliderValue">{{ airyDiskRadius }}</span>
+    </div>
 
-  <div class="slider-group">
-    <label for="slider2">Diffraction intensity</label>
-    <mat-slider
-      class="slider"
-      step="10"
-      min="0"
-      max="1000"
-      (change)="onSlidersChanged()"
-      [(ngModel)]="diffractionIntensity"
-      [color]="colorTheme()"
-    ></mat-slider>
-    <span>{{ diffractionIntensity }}</span>
-  </div>
+    <div class="sliderGroup">
+      <label class="sliderLabel">Diffraction intensity</label>
+      <mat-slider
+        class="slider"
+        step="10"
+        min="10"
+        max="1000"
+        (input)="onDiffractionIntensityUpdated($event)"
+        (change)="onSlidersChanged()"
+        [(ngModel)]="diffractionIntensity"
+        [color]="colorTheme()"
+        [disabled]="spinnerShown"
+      ></mat-slider>
+      <span class="sliderValue">{{ diffractionIntensity }}</span>
+    </div>
 
-  <div class="slider-group">
-    <label for="slider2">Seeing index</label>
-    <mat-slider
-      class="slider"
-      step="1"
-      min="0"
-      max="4"
-      (change)="onSlidersChanged()"
-      [(ngModel)]="seeingIndex"
-      [color]="colorTheme()"
-    ></mat-slider>
-    <span>{{ seeingIndex }}</span>
+    <div class="sliderGroup">
+      <label class="sliderLabel">Seeing index</label>
+      <mat-slider
+        class="slider"
+        step="0.1"
+        min="0"
+        max="4"
+        (input)="onSeeingIndexUpdated($event)"
+        (change)="onSlidersChanged()"
+        [(ngModel)]="seeingIndex"
+        [color]="colorTheme()"
+        [disabled]="spinnerShown"
+      ></mat-slider>
+      <span class="sliderValue">{{ seeingIndex }}</span>
+    </div>
   </div>
-
-  <!--
-  <div class="slider-group">
-    <label for="slider2">Wavelength</label>
-    <mat-slider
-      class="slider"
-      step="1"
-      min="300"
-      max="900"
-      (change)="onSlidersChanged()"
-      [(ngModel)]="wavelength"
-      [color]="colorTheme()"
-    ></mat-slider>
-    <span>{{ wavelength }} nm</span>
-  </div>
-  -->
 </div>

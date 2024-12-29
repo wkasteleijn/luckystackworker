@@ -11,6 +11,7 @@ export class SyntheticPsfComponent {
   @Input() imageData: string = '';
   @Input() nightMode: boolean = false;
   @Input() psf: PSF;
+  @Input() spinnerShown = false;
 
   @Output() close = new EventEmitter<void>();
   @Output() slidersChanged = new EventEmitter<any>();
@@ -33,6 +34,16 @@ export class SyntheticPsfComponent {
 
   closePopup() {
     this.close.emit();
+  }
+
+  onAiryDiskRadiusUpdated(event: any) {
+    this.airyDiskRadius = event.value;
+  }
+  onSeeingIndexUpdated(event: any) {
+    this.seeingIndex = event.value;
+  }
+  onDiffractionIntensityUpdated(event: any) {
+    this.diffractionIntensity = event.value;
   }
 
   onSlidersChanged() {
