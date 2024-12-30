@@ -8,13 +8,12 @@ import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
-import java.util.Base64;
 import java.util.concurrent.Executor;
 
-@Slf4j
-public class AiryDiskGenerator {
+import static nl.wilcokas.luckystackworker.constants.Constants.*;
 
-    private static final int DEFAULT_IMAGE_SIZE = 64;
+@Slf4j
+public class PsfDiskGenerator {
 
     public static void main(String[] args) throws IOException {
         // Input parameters
@@ -26,20 +25,20 @@ public class AiryDiskGenerator {
 
     public static ImagePlus generate16BitRGB(double airyDiskRadius, double seeingIndex, double diffractionIntensity, String profileName) throws IOException {
 
-        short[] redPixels = new short[(int) Math.pow(DEFAULT_IMAGE_SIZE, 2)];
-        short[] greenPixels = new short[(int) Math.pow(DEFAULT_IMAGE_SIZE, 2)];
-        short[] bluePixels = new short[(int) Math.pow(DEFAULT_IMAGE_SIZE, 2)];
+        short[] redPixels = new short[(int) Math.pow(PSF_SIZE, 2)];
+        short[] greenPixels = new short[(int) Math.pow(PSF_SIZE, 2)];
+        short[] bluePixels = new short[(int) Math.pow(PSF_SIZE, 2)];
 
         double seeingIndexConverted = seeingIndex / 4.0;
 
         Executor executor = LswUtil.getParallelExecutor();
-        executor.execute(() -> generate16BitForChannel(redPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, DEFAULT_IMAGE_SIZE, 630));
-        executor.execute(() -> generate16BitForChannel(greenPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, DEFAULT_IMAGE_SIZE, 532));
-        executor.execute(() -> generate16BitForChannel(bluePixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, DEFAULT_IMAGE_SIZE, 465));
+        executor.execute(() -> generate16BitForChannel(redPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, 630));
+        executor.execute(() -> generate16BitForChannel(greenPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, 532));
+        executor.execute(() -> generate16BitForChannel(bluePixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, 465));
         LswUtil.stopAndAwaitParallelExecutor(executor);
 
         LswImageLayersDto layers = LswImageLayersDto.builder().layers(new short[][]{redPixels, greenPixels, bluePixels}).build();
-        ImagePlus image = LswImageProcessingUtil.create16BitRGBImage(null, layers, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, true, true);
+        ImagePlus image = LswImageProcessingUtil.create16BitRGBImage(null, layers, PSF_SIZE, PSF_SIZE, true, true, true);
         LswFileUtil.savePSF(image, profileName);
         return image;
     }

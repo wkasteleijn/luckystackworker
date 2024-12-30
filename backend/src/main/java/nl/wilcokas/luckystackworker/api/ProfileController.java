@@ -12,9 +12,11 @@ import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ij.ImagePlus;
+import ij.gui.Roi;
 import ij.io.Opener;
 import nl.wilcokas.luckystackworker.dto.*;
 import nl.wilcokas.luckystackworker.model.PSFType;
+import nl.wilcokas.luckystackworker.service.PSFService;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -40,6 +42,8 @@ import nl.wilcokas.luckystackworker.service.SettingsService;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 
+import static nl.wilcokas.luckystackworker.constants.Constants.PSF_SIZE;
+
 @CrossOrigin(origins = {"http://localhost:4200"})
 @RequiredArgsConstructor
 @RestController
@@ -50,6 +54,7 @@ public class ProfileController {
     private final ProfileService profileService;
     private final ReferenceImageService referenceImageService;
     private final SettingsService settingsService;
+    private final PSFService psfService;
 
     @GetMapping
     public List<ProfileDTO> getProfiles() {
@@ -174,31 +179,6 @@ public class ProfileController {
     @GetMapping("/custom-psf")
     public SettingsDTO loadCustomPSF() throws IOException, InterruptedException {
         log.info("loadCustomPSF called");
-        JFrame frame = referenceImageService.getParentFrame();
-        JFileChooser jfc = referenceImageService
-                .getJFileChooser(settingsService.getRootFolder());
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("TIF, TIFF, PNG", "tif", "tiff", "png");
-        jfc.setFileFilter(filter);
-        int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, false);
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = jfc.getSelectedFile();
-            String selectedFilePath = selectedFile.getAbsolutePath();
-            String profileName = LuckyStackWorkerContext.getSelectedProfile();
-            Profile profile = profileService.findByName(profileName).orElse(null);
-            if (profile != null) {
-                String filePath = LswFileUtil.getIJFileFormat(selectedFilePath);
-                ImagePlus psf = new Opener().openImage(filePath);
-                if (psf.getStack().getSize() < 3) {
-                    psf = LswImageProcessingUtil
-                            .create16BitRGBImage(filePath, LswImageProcessingUtil.getImageLayers(psf), psf.getWidth(), psf.getHeight(), true, true, true);
-                }
-                LswFileUtil.savePSF(psf, profileName);
-                byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profileName);
-                profile.getPsf().setType(PSFType.CUSTOM);
-                referenceImageService.updateProcessing(profile, null);
-                return SettingsDTO.builder().psfImage(Base64.getEncoder().encodeToString(psfImage)).build();
-            }
-        }
-        return null;
+        return psfService.loadCustomPSF();
     }
 }

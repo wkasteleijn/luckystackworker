@@ -402,6 +402,11 @@ public class LswImageProcessingUtil {
         return (int) correctedValue;
     }
 
+    public static ImagePlus expand(ImagePlus image, int width, int height) {
+        // TODO: implement this method
+        return image;
+    }
+
     public static ImagePlus crop(ImagePlus image, Roi roi, String filepath) {
         int xPos = (int) roi.getXBase();
         int yPos = (int) roi.getYBase();

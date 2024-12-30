@@ -1421,6 +1421,7 @@ export class AppComponent implements OnInit {
       (data) => {
         if (data) {
           this.psfImage = data.psfImage;
+          this.profile.psf.type = 'CUSTOM';
         }
         this.hideSpinner();
       },

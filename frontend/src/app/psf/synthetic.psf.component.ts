@@ -1,5 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
+import { MatLegacyDialog } from '@angular/material/legacy-dialog';
+import {
+  ConfirmationComponent,
+  ConfirmationModel,
+} from '../confirmation/confirmation.component';
 import { PSF } from '../model/psf';
 
 @Component({
@@ -23,6 +28,8 @@ export class SyntheticPsfComponent {
   customPSF: string;
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
+
+  constructor(private confirmationDialog: MatLegacyDialog) {}
 
   ngOnInit() {
     this.airyDiskRadius = this.psf.airyDiskRadius;
@@ -48,13 +55,27 @@ export class SyntheticPsfComponent {
 
   onSlidersChanged() {
     console.log('onSlidersChanged called');
-    this.slidersChanged.emit({
-      airyDiskRadius: this.airyDiskRadius,
-      seeingIndex: this.seeingIndex,
-      diffractionIntensity: this.diffractionIntensity,
-      wavelength: this.wavelength,
-      customPSF: this.customPSF,
-    });
+
+    if (this.psf.type === 'CUSTOM') {
+      const dialogData = new ConfirmationModel(
+        'Making changes will overwrite your custom PSF. Are you sure?'
+      );
+      const dialogRef = this.confirmationDialog.open(ConfirmationComponent, {
+        maxWidth: '400px',
+        data: dialogData,
+      });
+
+      dialogRef.afterClosed().subscribe((dialogResult) => {
+        if (!dialogResult) {
+          return;
+        } else {
+          this.psf.type = 'SYNTHETIC';
+          this.emitSlidersChanged();
+        }
+      });
+    } else {
+      this.emitSlidersChanged();
+    }
   }
 
   onLoadCustomPSF() {
@@ -63,5 +84,16 @@ export class SyntheticPsfComponent {
 
   colorTheme() {
     return this.nightMode ? this.componentColorNight : this.componentColor;
+  }
+
+  private emitSlidersChanged() {
+    this.slidersChanged.emit({
+      airyDiskRadius: this.airyDiskRadius,
+      seeingIndex: this.seeingIndex,
+      diffractionIntensity: this.diffractionIntensity,
+      wavelength: this.wavelength,
+      customPSF: this.customPSF,
+      type: this.psf.type,
+    });
   }
 }

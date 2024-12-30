@@ -2,8 +2,6 @@ package nl.wilcokas.luckystackworker.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -14,14 +12,10 @@ import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
-import nl.wilcokas.luckystackworker.util.AiryDiskGenerator;
-import org.apache.commons.text.StringSubstitutor;
-import org.springframework.core.io.ClassPathResource;
+import nl.wilcokas.luckystackworker.util.PsfDiskGenerator;
 import org.springframework.stereotype.Service;
 
 import ij.ImagePlus;
-import ij.WindowManager;
-import ij.macro.Interpreter;
 import ij.plugin.Scaler;
 import ij.process.ImageProcessor;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
-import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -214,7 +207,7 @@ public class OperationService {
                     .includeGreen(profile.isLuminanceIncludeGreen()) //
                     .includeRed(profile.isLuminanceIncludeRed()).includeColor(profile.isLuminanceIncludeColor())
                     .saturation(1f).unsharpMaskParameters(usParams).mode(mode).build();
-            if (!validateLuminanceInclusion(parameters)) {
+            if (mode == LSWSharpenMode.LUMINANCE && !validateLuminanceInclusion(parameters)) {
                 log.warn("Attempt to exclude all channels from luminance sharpen!");
                 parameters.setIncludeRed(true);
                 parameters.setIncludeGreen(true);
@@ -279,7 +272,7 @@ public class OperationService {
                         .build();
             }
 
-            if (!validateLuminanceInclusion(parameters)) {
+            if (mode == LSWSharpenMode.LUMINANCE && !validateLuminanceInclusion(parameters)) {
                 log.warn("Attempt to exclude all channels from luminance sharpen!");
                 parameters.setIncludeRed(true);
                 parameters.setIncludeGreen(true);
@@ -289,7 +282,7 @@ public class OperationService {
             if (psfImage == null) {
                 PSF psf = profile.getPsf();
                 psf.setType(PSFType.SYNTHETIC);
-                psfImage = AiryDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profile.getName());
+                psfImage = PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profile.getName());
             }
             wienerDeconvolutionFilter.apply(image, psfImage, parameters);
         }
@@ -450,7 +443,7 @@ public class OperationService {
 
     private byte[] updatePSF(PSF psf, OperationEnum operation, String profileName) throws IOException {
         if (operation == OperationEnum.PSF) {
-            AiryDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profileName);
+            PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profileName);
             psf.setType(PSFType.SYNTHETIC);
             return LswFileUtil.getWienerDeconvolutionPSFImage(profileName);
         }
