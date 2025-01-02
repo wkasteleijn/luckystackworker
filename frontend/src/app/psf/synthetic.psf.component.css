@@ -89,10 +89,19 @@ button {
   height: 24px;
   color: rgb(132, 233, 132);
 }
+.typeNight {
+  height: 24px;
+  color: orange;
+}
+.title {
+  color: rgb(132, 233, 132);
+}
+.titleNight {
+  color: orange;
+}
 
 h2 {
   height: 20px;
-  color: rgb(132, 233, 132);
 }
 
 .loadCustomPsfButton {

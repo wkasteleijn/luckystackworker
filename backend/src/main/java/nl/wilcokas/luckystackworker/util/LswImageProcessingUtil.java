@@ -403,8 +403,25 @@ public class LswImageProcessingUtil {
     }
 
     public static ImagePlus expand(ImagePlus image, int width, int height) {
-        // TODO: implement this method
-        return image;
+        ImageStack stack = image.getStack();
+        short[][] pixels = new short[3][width * height];
+        for (int layer = 1; layer <= 3; layer++) {
+            ImageProcessor p = stack.getProcessor(layer);
+            short[] layerPixels = (short[]) p.getPixels();
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int srcX = x - ((width - p.getWidth()) / 2);
+                    int srcY = y - ((height - p.getHeight()) / 2);
+                    if (srcX >= 0 && srcY >= 0 && srcX < p.getWidth() && srcY < p.getHeight()) {
+                        pixels[layer - 1][y * width + x] = layerPixels[srcY * p.getWidth() + srcX];
+                    } else {
+                        pixels[layer - 1][y * width + x] = 0;
+                    }
+                }
+            }
+        }
+        LswImageLayersDto layersDto = LswImageLayersDto.builder().layers(pixels).build();
+        return create16BitRGBImage("psf",layersDto, width, height, true,true,true);
     }
 
     public static ImagePlus crop(ImagePlus image, Roi roi, String filepath) {

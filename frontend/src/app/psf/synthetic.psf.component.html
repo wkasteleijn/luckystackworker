@@ -1,6 +1,8 @@
 <div class="popup-container">
-  <h2>PSF</h2>
-  <div class="type">Type : {{ psf.type?.toLowerCase() }}</div>
+  <h2 class="{{ nightMode ? 'titleNight' : 'title' }}">PSF</h2>
+  <div class="{{ nightMode ? 'typeNight' : 'type' }}">
+    Type : {{ psf.type?.toLowerCase() }}
+  </div>
   <button
     (click)="onLoadCustomPSF()"
     matTooltip="Load custon PSF"
