@@ -28,6 +28,7 @@ import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -397,7 +398,7 @@ public class LswFileUtil {
             profile.setWienerIterationsGreen(5);
             profile.setWienerIterationsBlue(5);
         }
-        if (profile.getPsf()==null) {
+        if (profile.getPsf() == null) {
             PSF psf = PSF.builder()
                     .airyDiskRadius(16)
                     .diffractionIntensity(20)
@@ -446,11 +447,11 @@ public class LswFileUtil {
         return dataFolder;
     }
 
-    public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode, double scale, UnaryOperator<ImagePlus> scaler) {
+    public static Pair<ImagePlus, Boolean> openImage(String filepath, OpenImageModeEnum openImageMode, double scale, UnaryOperator<ImagePlus> scaler) {
         return openImage(filepath, openImageMode, null, null, scale, scaler);
     }
 
-    public static ImagePlus openImage(String filepath, OpenImageModeEnum openImageMode, ImagePlus currentImage, LswImageLayersDto currentUnprocessedImageLayers, double scale, UnaryOperator<ImagePlus> scaler) {
+    public static Pair<ImagePlus, Boolean> openImage(String filepath, OpenImageModeEnum openImageMode, ImagePlus currentImage, LswImageLayersDto currentUnprocessedImageLayers, double scale, UnaryOperator<ImagePlus> scaler) {
         ImagePlus newImage = new Opener().openImage(LswFileUtil.getIJFileFormat(filepath));
         if (scale > 1.0) {
             newImage = scaler.apply(newImage);
@@ -460,11 +461,12 @@ public class LswFileUtil {
         boolean includeGreen = openImageMode == OpenImageModeEnum.GREEN || openImageMode == OpenImageModeEnum.RGB;
         boolean includeBlue = openImageMode == OpenImageModeEnum.BLUE || openImageMode == OpenImageModeEnum.RGB;
         if (newImage.getStackSize() == 3 && includeRed && includeGreen && includeBlue) {
-            return newImage;
+            return Pair.of(newImage, false);
         }
 
         if (currentImage == null || currentImage.getWidth() != newImage.getWidth() || currentImage.getHeight() != newImage.getHeight()) {
-            return LswImageProcessingUtil.create16BitRGBImage(filepath, unprocessedNewImageLayers, newImage.getWidth(), newImage.getHeight(), includeRed, includeGreen, includeBlue);
+            return Pair.of(LswImageProcessingUtil.create16BitRGBImage(filepath, unprocessedNewImageLayers, newImage.getWidth(), newImage.getHeight(), includeRed, includeGreen, includeBlue),
+                    newImage.getStackSize() != 3);
         } else {
             if (currentUnprocessedImageLayers != null) {
                 LswImageProcessingUtil.copyLayers(currentUnprocessedImageLayers, currentImage, true, true, true);
@@ -478,7 +480,7 @@ public class LswFileUtil {
             if (includeBlue) {
                 LswImageProcessingUtil.copyLayer(unprocessedNewImageLayers, currentImage, 3);
             }
-            return currentImage;
+            return Pair.of(currentImage, false);
         }
     }
 
@@ -498,11 +500,11 @@ public class LswFileUtil {
     }
 
     public static ImagePlus getWienerDeconvolutionPSF(String profileName) {
-        return new Opener().openImage(getDataFolder(LswUtil.getActiveOSProfile())+"/psf_%s.tif".formatted(profileName));
+        return new Opener().openImage(getDataFolder(LswUtil.getActiveOSProfile()) + "/psf_%s.tif".formatted(profileName));
     }
 
     public static byte[] getWienerDeconvolutionPSFImage(String profileName) {
-        String path = getDataFolder(LswUtil.getActiveOSProfile())+"/psf_%s.jpg".formatted(profileName);
+        String path = getDataFolder(LswUtil.getActiveOSProfile()) + "/psf_%s.jpg".formatted(profileName);
         // Read the image from file
         try (InputStream in = new FileInputStream(path)) {
             return IOUtils.toByteArray(in);
@@ -512,7 +514,7 @@ public class LswFileUtil {
         }
     }
 
-    public static void savePSF(ImagePlus image,String profileName) throws IOException {
+    public static void savePSF(ImagePlus image, String profileName) throws IOException {
         String dataFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile());
         saveImage(image, null, dataFolder + "/psf_%s.tif".formatted(profileName), false, false, false, false);
         saveImage(image, null, dataFolder + "/psf_%s.jpg".formatted(profileName), false, false, true, false);

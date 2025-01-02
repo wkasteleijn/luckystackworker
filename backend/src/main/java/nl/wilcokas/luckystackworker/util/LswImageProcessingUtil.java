@@ -218,18 +218,18 @@ public class LswImageProcessingUtil {
     }
 
     public static short convertToShort(float value, float min, float max) {
-        float range = max-min;
-        int intValue = (int)(((value-min)/range) * 65536.0f);
-        if (intValue<0f) intValue = 0;
-        if (intValue>65535f) intValue = 65535;
+        float range = max - min;
+        int intValue = (int) (((value - min) / range) * 65536.0f);
+        if (intValue < 0f) intValue = 0;
+        if (intValue > 65535f) intValue = 65535;
         return convertToShort(intValue);
     }
 
-    public static Pair<Float,Float> getMinAndMaxValues(FloatProcessor processor) {
+    public static Pair<Float, Float> getMinAndMaxValues(FloatProcessor processor) {
         float min = Float.MAX_VALUE;
         float max = Float.MIN_VALUE;
-        float[] pixels = (float[])processor.getPixels();
-        for (int i = 0; i<pixels.length; i++) {
+        float[] pixels = (float[]) processor.getPixels();
+        for (int i = 0; i < pixels.length; i++) {
             min = Math.min(min, pixels[i]);
             max = Math.max(max, pixels[i]);
         }
@@ -281,7 +281,7 @@ public class LswImageProcessingUtil {
         for (int layer = 1; layer <= 3; layer++) {
             int finalLayer = layer;
             executor.execute(() -> {
-                ImageProcessor p = stack.getProcessor(Math.min(stack.size(),finalLayer));
+                ImageProcessor p = stack.getProcessor(Math.min(stack.size(), finalLayer));
                 short[] pixels = (short[]) p.getPixels();
                 for (int i = 0; i < pixels.length; i++) {
                     newPixels[finalLayer - 1][i] = pixels[i];
@@ -466,7 +466,7 @@ public class LswImageProcessingUtil {
                 minValue = value;
             }
         }
-        int average = (int)((maxValue - minValue) / threshold); // start cutting of from threshold times the average.
+        int average = (int) ((maxValue - minValue) / threshold); // start cutting of from threshold times the average.
         for (int position = 0; position < maskPixels.length; position++) {
             int value = LswImageProcessingUtil.convertToUnsignedInt(maskPixels[position]);
             if (value < average) {

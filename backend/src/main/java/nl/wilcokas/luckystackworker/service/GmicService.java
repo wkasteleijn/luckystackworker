@@ -47,7 +47,7 @@ public class GmicService {
             }
             arguments.addAll(Arrays.asList("-output", outputFile + ",int16"));
             LswUtil.runCliCommand(activeOSProfile, arguments, true);
-            ImagePlus outputImage = LswFileUtil.openImage(LswFileUtil.getIJFileFormat(outputFile), OpenImageModeEnum.RGB, scale, img -> img);
+            ImagePlus outputImage = LswFileUtil.openImage(LswFileUtil.getIJFileFormat(outputFile), OpenImageModeEnum.RGB, scale, img -> img).getLeft();
             ImageStack outputStack = outputImage.getStack();
             ImageStack imageStack = image.getStack();
             for (int layer = 1; layer <= imageStack.getSize(); layer++) {

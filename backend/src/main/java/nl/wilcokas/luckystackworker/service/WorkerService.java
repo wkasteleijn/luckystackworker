@@ -9,6 +9,7 @@ import java.util.Optional;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -144,13 +145,15 @@ public class WorkerService {
 
                 Profile profile = profileService.findByName(profileName)
                         .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName)));
-                ImagePlus imp = LswFileUtil.openImage(filePath, OpenImageModeEnum.RGB, profile.getScale(),img -> operationService.scaleImage(img, profile.getScale()));
+                Pair<ImagePlus, Boolean> imageDetails = LswFileUtil.openImage(filePath, OpenImageModeEnum.RGB, profile.getScale(), img -> operationService.scaleImage(img, profile.getScale()));
+                ImagePlus imp = imageDetails.getLeft();
+                boolean isMono = imageDetails.getRight();
                 if (LswFileUtil.validateImageFormat(imp, null, null)) {
                     if (LswFileUtil.isPngRgbStack(imp, filePath)) {
                         imp = LswFileUtil.fixNonTiffOpeningSettings(imp);
                     }
                     operationService.correctExposure(imp);
-                    operationService.applyAllOperations(imp, LswImageProcessingUtil.getImageLayers(imp), null, profile, null);
+                    operationService.applyAllOperations(imp, null, profile, null, isMono);
                     imp.updateAndDraw();
                     if (LuckyStackWorkerContext.getSelectedRoi() != null) {
                         imp.setRoi(LuckyStackWorkerContext.getSelectedRoi());

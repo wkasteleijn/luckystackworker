@@ -51,12 +51,12 @@ public class OperationService {
         image.resetDisplayRange();
     }
 
-    public byte[] applyAllOperations(ImagePlus image, LswImageLayersDto unprocessedImageLayers, LswImageViewer viewer, Profile profile, OperationEnum operation) throws IOException, InterruptedException {
+    public byte[] applyAllOperations(ImagePlus image, LswImageViewer viewer, Profile profile, OperationEnum operation, boolean isMono) throws IOException, InterruptedException {
         updateProgress(viewer, 0, true);
 
         // Sharpening filters
-        byte[] psfImage = updatePSF(profile.getPsf(),operation, profile.getName());
-        applyWienerDeconvolution(image, profile);
+        byte[] psfImage = updatePSF(profile.getPsf(), operation, profile.getName(), isMono);
+        applyWienerDeconvolution(image, profile, isMono);
         applySharpen(image, profile);
         updateProgress(viewer, 9);
 
@@ -229,7 +229,7 @@ public class OperationService {
         }
     }
 
-    private void applyWienerDeconvolution(final ImagePlus image, Profile profile) throws IOException {
+    private void applyWienerDeconvolution(final ImagePlus image, Profile profile, boolean isMono) throws IOException {
         if (profile.getApplyWienerDeconvolution().booleanValue()) {
             float deringStrength = profile.getDeringStrength() / 100f;
             float blendRaw = profile.getBlendRaw() / 100f;
@@ -282,7 +282,7 @@ public class OperationService {
             if (psfImage == null) {
                 PSF psf = profile.getPsf();
                 psf.setType(PSFType.SYNTHETIC);
-                psfImage = PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profile.getName());
+                psfImage = PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profile.getName(), isMono);
             }
             wienerDeconvolutionFilter.apply(image, psfImage, parameters);
         }
@@ -441,9 +441,9 @@ public class OperationService {
         return image.getStack().size() == 3;
     }
 
-    private byte[] updatePSF(PSF psf, OperationEnum operation, String profileName) throws IOException {
+    private byte[] updatePSF(PSF psf, OperationEnum operation, String profileName, boolean isMono) throws IOException {
         if (operation == OperationEnum.PSF) {
-            PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profileName);
+            PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profileName, isMono);
             psf.setType(PSFType.SYNTHETIC);
             return LswFileUtil.getWienerDeconvolutionPSFImage(profileName);
         }

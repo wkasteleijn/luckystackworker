@@ -52,4 +52,7 @@ public class Constants {
     public static final int CONTROL_PANEL_WIDTH = 568;
     public static final int MINIMUK_DARK_TRESHOLD = 6144;
     public static final int PSF_SIZE = 64;
+    public static final int WAVELENGTH_NM_RED = 630;
+    public static final int WAVELENGTH_NM_GREEN = 532;
+    public static final int WAVELENGTH_NM_BLUE = 465;
 }

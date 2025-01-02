@@ -20,10 +20,10 @@ public class PsfDiskGenerator {
         double airyDiskRadius = 16; // Radius of Airy disk in pixels
         double seeingIndex = 0.0; // Atmospheric seeing index (0.0 = no distortion, 1.0 = maximum distortion)
         float diffractionIntensity = 20.0f; // Diffraction intensity (default: 20.0, min = 0, max = 1000)
-        generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity,"jup");
+        generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity, "jup", false);
     }
 
-    public static ImagePlus generate16BitRGB(double airyDiskRadius, double seeingIndex, double diffractionIntensity, String profileName) throws IOException {
+    public static ImagePlus generate16BitRGB(double airyDiskRadius, double seeingIndex, double diffractionIntensity, String profileName, boolean isMono) throws IOException {
 
         short[] redPixels = new short[(int) Math.pow(PSF_SIZE, 2)];
         short[] greenPixels = new short[(int) Math.pow(PSF_SIZE, 2)];
@@ -32,9 +32,9 @@ public class PsfDiskGenerator {
         double seeingIndexConverted = seeingIndex / 4.0;
 
         Executor executor = LswUtil.getParallelExecutor();
-        executor.execute(() -> generate16BitForChannel(redPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, 630));
-        executor.execute(() -> generate16BitForChannel(greenPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, 532));
-        executor.execute(() -> generate16BitForChannel(bluePixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, 465));
+        executor.execute(() -> generate16BitForChannel(redPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, isMono ? WAVELENGTH_NM_GREEN : WAVELENGTH_NM_RED));
+        executor.execute(() -> generate16BitForChannel(greenPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, WAVELENGTH_NM_GREEN));
+        executor.execute(() -> generate16BitForChannel(bluePixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, isMono ? WAVELENGTH_NM_GREEN : WAVELENGTH_NM_BLUE));
         LswUtil.stopAndAwaitParallelExecutor(executor);
 
         LswImageLayersDto layers = LswImageLayersDto.builder().layers(new short[][]{redPixels, greenPixels, bluePixels}).build();

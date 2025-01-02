@@ -26,6 +26,7 @@ import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.util.*;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     @Getter
     private boolean isLargeImage = false;
+
+    @Getter
+    private boolean isMono = false;
 
     private ImagePlus finalResultImage;
 
@@ -162,7 +166,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         boolean includeBlue = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B;
         LswImageProcessingUtil.copyLayers(unprocessedImageLayers, finalResultImage, true, true, true);
         OperationEnum operation = "PSF".equals(operationValue) ? OperationEnum.valueOf(operationValue.toUpperCase()) : null;
-        byte[] psf = operationService.applyAllOperations(finalResultImage, unprocessedImageLayers, displayedImage, profile, operation);
+        byte[] psf = operationService.applyAllOperations(finalResultImage, displayedImage, profile, operation, isMono);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
                 displayedImage,
@@ -567,12 +571,15 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             // Can only have 1 image open at a time.
             displayedImage.hide();
         }
-        finalResultImage = LswFileUtil.openImage(filePath,
+        Pair<ImagePlus,Boolean> imageDetails = LswFileUtil.openImage(filePath,
                 profile.getOpenImageMode(),
                 finalResultImage,
                 unprocessedImageLayers,
                 profile.getScale(),
                 img -> operationService.scaleImage(img, profile.getScale()));
+        finalResultImage = imageDetails.getLeft();
+        isMono = imageDetails.getRight();
+
         boolean largeImage = false;
         if (finalResultImage != null) {
             if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame(), activeOSProfile)) {

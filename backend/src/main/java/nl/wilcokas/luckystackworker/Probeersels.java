@@ -29,7 +29,7 @@ public class Probeersels {
 
         // /*
         ImagePlus image = LswFileUtil
-                .openImage("D:\\Jup\\311024\\cropped2\\jup_lsw\\2024-10-31-2300_2-U-RGB-Jup_pipp_europa_AS_P25_lapl6_ap303_LSW.png", OpenImageModeEnum.RGB, 1, img -> img);
+                .openImage("D:\\Jup\\311024\\cropped2\\jup_lsw\\2024-10-31-2300_2-U-RGB-Jup_pipp_europa_AS_P25_lapl6_ap303_LSW.png", OpenImageModeEnum.RGB, 1, img -> img).getLeft();
         ImagePlus psf = new Opener().openImage(LswFileUtil.getIJFileFormat("D:\\Jup\\311024\\cropped2\\jup_lsw\\psf_2.png"));
 
         image.show();
