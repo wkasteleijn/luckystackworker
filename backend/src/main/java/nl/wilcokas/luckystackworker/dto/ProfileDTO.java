@@ -80,6 +80,10 @@ public class ProfileDTO {
         this.savitzkyGolaySize = profile.getSavitzkyGolaySize();
         this.savitzkyGolayAmount = profile.getSavitzkyGolayAmount();
         this.savitzkyGolayIterations = profile.getSavitzkyGolayIterations();
+        this.bilateralIterations = profile.getBilateralIterations();
+        this.bilateralRadius = profile.getBilateralRadius();
+        this.bilateralSigmaColor = profile.getBilateralSigmaColor();
+        this.bilateralSigmaSpace = profile.getBilateralSigmaSpace();
 
         this.denoise1AmountGreen = profile.getDenoise1AmountGreen();
         this.denoise1RadiusGreen = profile.getDenoise1RadiusGreen();
@@ -91,6 +95,10 @@ public class ProfileDTO {
         this.savitzkyGolayIterationsGreen = profile.getSavitzkyGolayIterationsGreen();
         this.rofThetaGreen = profile.getRofThetaGreen();
         this.rofIterationsGreen = profile.getRofIterationsGreen();
+        this.bilateralIterationsGreen = profile.getBilateralIterationsGreen();
+        this.bilateralRadiusGreen = profile.getBilateralRadiusGreen();
+        this.bilateralSigmaColorGreen = profile.getBilateralSigmaColorGreen();
+        this.bilateralSigmaSpaceGreen = profile.getBilateralSigmaSpaceGreen();
 
         this.denoise1AmountBlue = profile.getDenoise1AmountBlue();
         this.denoise1RadiusBlue = profile.getDenoise1RadiusBlue();
@@ -102,6 +110,10 @@ public class ProfileDTO {
         this.savitzkyGolayIterationsBlue = profile.getSavitzkyGolayIterationsBlue();
         this.rofThetaBlue = profile.getRofThetaBlue();
         this.rofIterationsBlue = profile.getRofIterationsBlue();
+        this.bilateralIterationsBlue = profile.getBilateralIterationsBlue();
+        this.bilateralRadiusBlue = profile.getBilateralRadiusBlue();
+        this.bilateralSigmaColorBlue = profile.getBilateralSigmaColorBlue();
+        this.bilateralSigmaSpaceBlue = profile.getBilateralSigmaSpaceBlue();
 
         // color & dispersion
         this.red = profile.getRed();
@@ -199,6 +211,11 @@ public class ProfileDTO {
     private BigDecimal denoise2Radius;
     private int denoise2Iterations;
     private ChannelEnum applyDenoiseToChannel;
+    private int bilateralSigmaColor;
+    private int bilateralSigmaSpace;
+    private int bilateralRadius;
+    private int bilateralIterations;
+
 
     private BigDecimal denoise1AmountGreen;
     private BigDecimal denoise1RadiusGreen;
@@ -212,6 +229,10 @@ public class ProfileDTO {
     private int savitzkyGolayIterationsGreen;
     private BigDecimal denoise2RadiusGreen;
     private int denoise2IterationsGreen;
+    private int bilateralSigmaColorGreen;
+    private int bilateralSigmaSpaceGreen;
+    private int bilateralRadiusGreen;
+    private int bilateralIterationsGreen;
 
     private BigDecimal denoise1AmountBlue;
     private BigDecimal denoise1RadiusBlue;
@@ -225,6 +246,10 @@ public class ProfileDTO {
     private int savitzkyGolayIterationsBlue;
     private BigDecimal denoise2RadiusBlue;
     private int denoise2IterationsBlue;
+    private int bilateralSigmaColorBlue;
+    private int bilateralSigmaSpaceBlue;
+    private int bilateralRadiusBlue;
+    private int bilateralIterationsBlue;
 
     // light & contrast
     private BigDecimal gamma;

@@ -84,6 +84,11 @@ export class AppComponent implements OnInit {
   rofTheta: number = 1;
   rofIterations: number = 2;
 
+  bilateralSigmaColor: number;
+  bilateralSigmaSpace: number;
+  bilateralRadius: number = 1;
+  bilateralIterations: number = 1;
+
   // denoise 2
   denoiseAlgorithm2: string;
 
@@ -642,6 +647,11 @@ export class AppComponent implements OnInit {
         this.denoise2Iterations = this.profile.denoise2IterationsGreen;
         this.rofTheta = this.profile.rofThetaGreen;
         this.rofIterations = this.profile.rofIterationsGreen;
+        this.bilateralSigmaColor = this.profile.bilateralSigmaColorGreen;
+        this.bilateralSigmaSpace = this.profile.bilateralSigmaSpaceGreen;
+        this.bilateralRadius = this.profile.bilateralRadiusGreen;
+        this.bilateralIterations = this.profile.bilateralIterationsGreen;
+
         break;
       case 'B':
         this.denoise1Amount = this.profile.denoise1AmountBlue;
@@ -656,6 +666,10 @@ export class AppComponent implements OnInit {
         this.denoise2Iterations = this.profile.denoise2IterationsBlue;
         this.rofTheta = this.profile.rofThetaBlue;
         this.rofIterations = this.profile.rofIterationsBlue;
+        this.bilateralSigmaColor = this.profile.bilateralSigmaColorBlue;
+        this.bilateralSigmaSpace = this.profile.bilateralSigmaSpaceBlue;
+        this.bilateralRadius = this.profile.bilateralRadiusBlue;
+        this.bilateralIterations = this.profile.bilateralIterationsBlue;
         break;
       default:
         this.denoiseAlgorithm1 = this.profile.denoiseAlgorithm1;
@@ -674,6 +688,11 @@ export class AppComponent implements OnInit {
         this.denoise2Iterations = this.profile.denoise2Iterations;
         this.rofTheta = this.profile.rofTheta;
         this.rofIterations = this.profile.rofIterations;
+        this.rofIterations = this.profile.rofIterationsBlue;
+        this.bilateralSigmaColor = this.profile.bilateralSigmaColor;
+        this.bilateralSigmaSpace = this.profile.bilateralSigmaSpace;
+        this.bilateralRadius = this.profile.bilateralRadius;
+        this.bilateralIterations = this.profile.bilateralIterations;
     }
     this.visibleChannel = this.applyDenoiseToChannel;
     this.luckyStackWorkerService.channelChanged(this.visibleChannel).subscribe(
@@ -806,6 +825,114 @@ export class AppComponent implements OnInit {
         this.profile.rofThetaBlue = event.value;
     }
     console.log('rofThetaChanged called: ' + this.profile.rofTheta);
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  bilateralIterationsChanged(event: any, update: boolean) {
+    this.bilateralIterations = event.value;
+    this.settings.operation = 'bilateralIterations';
+    switch (this.applyDenoiseToChannel) {
+      case 'G':
+        this.profile.bilateralIterationsGreen = event.value;
+        break;
+      case 'B':
+        this.profile.bilateralIterationsBlue = event.value;
+        break;
+      case 'R':
+        this.profile.bilateralIterations = event.value;
+        break;
+      default:
+        this.equalizeChannelsForDenoising();
+        this.profile.bilateralIterations = event.value;
+        this.profile.bilateralIterationsGreen = event.value;
+        this.profile.bilateralIterationsBlue = event.value;
+    }
+    console.log(
+      'bilateralIterationsChanged called: ' + this.profile.bilateralIterations
+    );
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  bilateralSigmaColorChanged(event: any, update: boolean) {
+    this.bilateralSigmaColor = event.value;
+    this.settings.operation = 'bilateralSigmaColor';
+    switch (this.applyDenoiseToChannel) {
+      case 'G':
+        this.profile.bilateralSigmaColorGreen = event.value;
+        break;
+      case 'B':
+        this.profile.bilateralSigmaColorBlue = event.value;
+        break;
+      case 'R':
+        this.profile.bilateralSigmaColor = event.value;
+        break;
+      default:
+        this.equalizeChannelsForDenoising();
+        this.profile.bilateralSigmaColor = event.value;
+        this.profile.bilateralSigmaColorGreen = event.value;
+        this.profile.bilateralSigmaColorBlue = event.value;
+    }
+    console.log(
+      'bilateralSigmaColorChanged called: ' + this.profile.bilateralSigmaColor
+    );
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  bilateralSigmaSpaceChanged(event: any, update: boolean) {
+    this.bilateralSigmaSpace = event.value;
+    this.settings.operation = 'bilateralSigmaSpace';
+    switch (this.applyDenoiseToChannel) {
+      case 'G':
+        this.profile.bilateralSigmaSpaceGreen = event.value;
+        break;
+      case 'B':
+        this.profile.bilateralSigmaSpaceBlue = event.value;
+        break;
+      case 'R':
+        this.profile.bilateralSigmaSpace = event.value;
+        break;
+      default:
+        this.equalizeChannelsForDenoising();
+        this.profile.bilateralSigmaSpace = event.value;
+        this.profile.bilateralSigmaSpaceGreen = event.value;
+        this.profile.bilateralSigmaSpaceBlue = event.value;
+    }
+    console.log(
+      'bilateralSigmaSpaceChanged called: ' + this.profile.bilateralSigmaSpace
+    );
+    if (update) {
+      this.updateProfile();
+    }
+  }
+
+  bilateralRadiusChanged(event: any, update: boolean) {
+    this.bilateralRadius = event.value;
+    this.settings.operation = 'bilateralRadius';
+    switch (this.applyDenoiseToChannel) {
+      case 'G':
+        this.profile.bilateralRadiusGreen = event.value;
+        break;
+      case 'B':
+        this.profile.bilateralRadiusBlue = event.value;
+        break;
+      case 'R':
+        this.profile.bilateralRadius = event.value;
+        break;
+      default:
+        this.equalizeChannelsForDenoising();
+        this.profile.bilateralRadius = event.value;
+        this.profile.bilateralRadiusGreen = event.value;
+        this.profile.bilateralRadiusBlue = event.value;
+    }
+    console.log(
+      'bilateralRadiusChanged called: ' + this.profile.bilateralRadius
+    );
     if (update) {
       this.updateProfile();
     }
@@ -1151,6 +1278,9 @@ export class AppComponent implements OnInit {
     } else if (event.value === 'ROF') {
       this.settings.operation = 'rofDenoise';
       this.profile.denoiseAlgorithm1 = 'ROF';
+    } else if (event.value === 'BILATERAL') {
+      this.settings.operation = 'bilateralDenoise';
+      this.profile.denoiseAlgorithm1 = 'BILATERAL';
     } else if (event.value === 'IAN') {
       this.settings.operation = 'iansAmount';
       this.profile.denoiseAlgorithm1 = 'IAN';
@@ -1445,6 +1575,10 @@ export class AppComponent implements OnInit {
     this.iansIterations = this.profile.iansIterations;
     this.rofTheta = this.profile.rofTheta;
     this.rofIterations = this.profile.rofIterations;
+    this.bilateralIterations = this.profile.bilateralIterations;
+    this.bilateralRadius = this.profile.bilateralRadius;
+    this.bilateralSigmaColor = this.profile.bilateralSigmaColor;
+    this.bilateralSigmaSpace = this.profile.bilateralSigmaSpace;
 
     this.denoiseAlgorithm2 = this.profile.denoiseAlgorithm2;
     this.denoise2Radius = this.profile.denoise2Radius;
@@ -1877,6 +2011,11 @@ export class AppComponent implements OnInit {
     this.profile.savitzkyGolayIterationsGreen = this.savitzkyGolayIterations;
     this.profile.rofThetaGreen = this.rofTheta;
     this.profile.rofIterationsGreen = this.rofIterations;
+    this.profile.bilateralIterationsGreen = this.bilateralIterations;
+    this.profile.bilateralRadiusGreen = this.bilateralRadius;
+    this.profile.bilateralSigmaColorGreen = this.bilateralSigmaColor;
+    this.profile.bilateralSigmaSpaceGreen = this.bilateralSigmaSpace;
+
     this.profile.denoise2RadiusGreen = this.denoise2Radius;
     this.profile.denoise2IterationsGreen = this.denoise2Iterations;
     this.profile.denoise1AmountBlue = this.denoise1Amount;
@@ -1889,5 +2028,8 @@ export class AppComponent implements OnInit {
     this.profile.denoise2IterationsBlue = this.denoise2Iterations;
     this.profile.rofThetaBlue = this.rofTheta;
     this.profile.rofIterationsBlue = this.rofIterations;
+    this.profile.bilateralRadiusBlue = this.bilateralRadius;
+    this.profile.bilateralSigmaColorBlue = this.bilateralSigmaColor;
+    this.profile.bilateralSigmaSpaceBlue = this.bilateralSigmaSpace;
   }
 }

@@ -39,9 +39,9 @@ public class OperationService {
     private final EqualizeLocalHistogramsFilter equalizeLocalHistogramsFilter;
     private final ColorNormalisationFilter colorNormalisationFilter;
     private final HistogramStretchFilter histogramStretchFilter;
-    private final BlendRawFilter blendRawFilter;
     private final ROFDenoiseFilter rofDenoiseFilter;
     private final WienerDeconvolutionFilter wienerDeconvolutionFilter;
+    private final BilateralDenoiseFilter bilateralDenoiseFilter;
 
     private int displayedProgress = 0;
     private Timer timer = new Timer();
@@ -64,6 +64,7 @@ public class OperationService {
         applySigmaDenoise1(image, profile);
         applyIansNoiseReduction(image, profile);
         applyROFDenoise(image, profile);
+        applyBilateralDenoise(image, profile);
         updateProgress(viewer, 18);
 
         // Denoise filters -- pass 2
@@ -448,6 +449,14 @@ public class OperationService {
             return LswFileUtil.getWienerDeconvolutionPSFImage(profileName);
         }
         return null;
+    }
+
+    private void applyBilateralDenoise(ImagePlus image, Profile profile) {
+        if (Constants.DENOISE_ALGORITHM_BILATERAL.equals(profile.getDenoiseAlgorithm1())) {
+            for (int i=1;i<=profile.getBilateralIterations();i++) {
+                bilateralDenoiseFilter.apply(image, profile.getBilateralRadius(), profile.getBilateralSigmaColor() * 10, 1);
+            }
+        }
     }
 
 }

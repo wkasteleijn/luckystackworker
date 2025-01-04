@@ -70,7 +70,6 @@ public class Profile {
 
     // denoise (red and all channels)
     private String denoiseAlgorithm1;
-    private String denoiseAlgorithm2;
     private BigDecimal denoise1Amount;
     private BigDecimal denoise1Radius;
     private int denoise1Iterations;
@@ -80,6 +79,12 @@ public class Profile {
     private int iansIterations;
     private int rofTheta;
     private int rofIterations;
+    private int bilateralSigmaColor;
+    private int bilateralSigmaSpace;
+    private int bilateralRadius;
+    private int bilateralIterations;
+
+    private String denoiseAlgorithm2;
     private BigDecimal denoise2Radius;
     private int denoise2Iterations;
     private int savitzkyGolaySize;
@@ -97,6 +102,10 @@ public class Profile {
     private int savitzkyGolayIterationsGreen;
     private int rofThetaGreen;
     private int rofIterationsGreen;
+    private int bilateralSigmaColorGreen;
+    private int bilateralSigmaSpaceGreen;
+    private int bilateralRadiusGreen;
+    private int bilateralIterationsGreen;
 
     // denoise blue
     private BigDecimal denoise1AmountBlue;
@@ -109,6 +118,10 @@ public class Profile {
     private int savitzkyGolayIterationsBlue;
     private int rofThetaBlue;
     private int rofIterationsBlue;
+    private int bilateralSigmaColorBlue;
+    private int bilateralSigmaSpaceBlue;
+    private int bilateralRadiusBlue;
+    private int bilateralIterationsBlue;
 
     // constrast & light
     private BigDecimal gamma;
@@ -248,6 +261,10 @@ public class Profile {
         this.savitzkyGolaySize = profile.getSavitzkyGolaySize();
         this.savitzkyGolayAmount = profile.getSavitzkyGolayAmount();
         this.savitzkyGolayIterations = profile.getSavitzkyGolayIterations();
+        this.bilateralRadius = profile.getBilateralRadius();
+        this.bilateralSigmaColor = profile.getBilateralSigmaColor();
+        this.bilateralSigmaSpace = profile.getBilateralSigmaSpace();
+        this.bilateralIterations = profile.getBilateralIterations();
 
         if (profile.getApplyDenoiseToChannel() == ChannelEnum.RGB) {
             this.denoise1AmountGreen = profile.getDenoise1Amount();
@@ -260,6 +277,10 @@ public class Profile {
             this.savitzkyGolayIterationsGreen = profile.getSavitzkyGolayIterations();
             this.rofThetaGreen = profile.getRofTheta();
             this.rofIterationsGreen = profile.getRofIterations();
+            this.bilateralRadiusGreen = profile.getBilateralRadius();
+            this.bilateralSigmaColorGreen = profile.getBilateralSigmaColor();
+            this.bilateralSigmaSpaceGreen = profile.getBilateralSigmaSpace();
+            this.bilateralIterationsGreen = profile.getBilateralIterations();
 
             this.denoise1AmountBlue = profile.getDenoise1Amount();
             this.denoise1RadiusBlue = profile.getDenoise1Radius();
@@ -271,6 +292,11 @@ public class Profile {
             this.savitzkyGolayIterationsBlue = profile.getSavitzkyGolayIterations();
             this.rofThetaBlue = profile.getRofTheta();
             this.rofIterationsBlue = profile.getRofIterations();
+            this.bilateralRadiusBlue = profile.getBilateralRadius();
+            this.bilateralSigmaColorBlue = profile.getBilateralSigmaColor();
+            this.bilateralSigmaSpace = profile.getBilateralSigmaSpace();
+            this.bilateralIterationsBlue = profile.getBilateralIterations();
+
         } else {
             this.denoise1AmountGreen = profile.getDenoise1AmountGreen();
             this.denoise1RadiusGreen = profile.getDenoise1RadiusGreen();
@@ -282,6 +308,10 @@ public class Profile {
             this.savitzkyGolayIterationsGreen = profile.getSavitzkyGolayIterationsGreen();
             this.rofThetaGreen = profile.getRofThetaGreen();
             this.rofIterationsGreen = profile.getRofIterationsGreen();
+            this.bilateralRadiusGreen = profile.getBilateralRadiusGreen();
+            this.bilateralSigmaColorGreen = profile.getBilateralSigmaColorGreen();
+            this.bilateralSigmaSpaceGreen = profile.getBilateralSigmaSpaceGreen();
+            this.bilateralIterationsGreen = profile.getBilateralIterationsGreen();
 
             this.denoise1AmountBlue = profile.getDenoise1AmountBlue();
             this.denoise1RadiusBlue = profile.getDenoise1RadiusBlue();
@@ -293,6 +323,11 @@ public class Profile {
             this.savitzkyGolayIterationsBlue = profile.getSavitzkyGolayIterationsBlue();
             this.rofThetaBlue = profile.getRofThetaBlue();
             this.rofIterationsBlue = profile.getRofIterationsBlue();
+            this.bilateralRadiusBlue = profile.getBilateralRadiusBlue();
+            this.bilateralSigmaColorBlue = profile.getBilateralSigmaColorBlue();
+            this.bilateralSigmaSpaceBlue = profile.getBilateralSigmaSpaceBlue();
+            this.bilateralIterationsBlue = profile.getBilateralIterationsBlue();
+
         }
 
         // contrast & light

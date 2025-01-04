@@ -841,9 +841,14 @@
           <mat-radio-button value="OFF" class="radioSizeButtonDenoise"
             >Off</mat-radio-button
           >
+          <mat-radio-button value="BILATERAL" class="denoiseMode"
+            >Bilateral</mat-radio-button
+          >
+          <!--
           <mat-radio-button value="ROF" class="denoiseMode"
             >ROF</mat-radio-button
           >
+          -->
           <mat-radio-button value="SIGMA1" class="denoiseMode"
             >Sigma 1</mat-radio-button
           >
@@ -1088,6 +1093,72 @@
               [color]="colorTheme()"
             ></mat-slider>
             <span class="sliderLabel">{{ rofIterations }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="denoiseAlgorithm1 === 'BILATERAL'">
+        <div class="sliderRow">
+          <div class="sliderLabel">Sigma color</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              step="1"
+              min="1"
+              max="1000"
+              (input)="bilateralSigmaColorChanged($event, false)"
+              (change)="bilateralSigmaColorChanged($event, true)"
+              [(ngModel)]="bilateralSigmaColor"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span class="sliderLabel">{{ bilateralSigmaColor }}</span>
+            <span
+              *ngIf="refImageSelected"
+              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+              >{{ bilateralSigmaColor == 0 ? "Off" : "" }}</span
+            >
+          </div>
+        </div>
+        <div class="sliderRow">
+          <div class="sliderLabel">Radius</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              step="1"
+              min="1"
+              max="5"
+              (input)="bilateralRadiusChanged($event, false)"
+              (change)="bilateralRadiusChanged($event, true)"
+              [(ngModel)]="bilateralRadius"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span class="sliderLabel">{{ bilateralRadius }}</span>
+            <span
+              *ngIf="refImageSelected"
+              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+              >{{ bilateralRadius == 0 ? "Off" : "" }}</span
+            >
+          </div>
+        </div>
+        <div class="sliderRow">
+          <div class="sliderLabel">Iterations</div>
+          <div class="slider">
+            <mat-slider
+              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              step="1"
+              min="1"
+              max="10"
+              (input)="bilateralIterationsChanged($event, false)"
+              (change)="bilateralIterationsChanged($event, true)"
+              [(ngModel)]="bilateralIterations"
+              [color]="colorTheme()"
+            ></mat-slider>
+            <span class="sliderLabel">{{ bilateralIterations }}</span>
+            <span
+              *ngIf="refImageSelected"
+              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+              >{{ bilateralIterations == 0 ? "Off" : "" }}</span
+            >
           </div>
         </div>
       </div>

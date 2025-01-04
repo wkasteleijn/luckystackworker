@@ -398,6 +398,26 @@ public class LswFileUtil {
             profile.setWienerIterationsGreen(5);
             profile.setWienerIterationsBlue(5);
         }
+        if (profile.getBilateralSigmaSpace() == 0) {
+            profile.setBilateralSigmaSpace(50);
+            profile.setBilateralSigmaSpaceGreen(50);
+            profile.setBilateralSigmaSpaceBlue(50);
+        }
+        if (profile.getBilateralSigmaColor() == 0) {
+            profile.setBilateralSigmaColor(150);
+            profile.setBilateralSigmaColorGreen(150);
+            profile.setBilateralSigmaColorBlue(150);
+        }
+        if (profile.getBilateralIterations() == 0) {
+            profile.setBilateralIterations(1);
+            profile.setBilateralIterationsGreen(1);
+            profile.setBilateralIterationsBlue(1);
+        }
+        if (profile.getBilateralRadius() == 0) {
+            profile.setBilateralRadius(1);
+            profile.setBilateralRadiusGreen(1);
+            profile.setBilateralRadiusBlue(1);
+        }
         if (profile.getPsf() == null) {
             PSF psf = PSF.builder()
                     .airyDiskRadius(16)

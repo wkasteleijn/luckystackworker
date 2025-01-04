@@ -59,6 +59,10 @@ export class Profile {
   iansIterations: number;
   rofTheta: number;
   rofIterations: number;
+  bilateralSigmaColor: number;
+  bilateralSigmaSpace: number;
+  bilateralRadius: number;
+  bilateralIterations: number;
 
   // denoise 2 red or all channels
   denoiseAlgorithm2: string;
@@ -74,6 +78,10 @@ export class Profile {
   denoise1IterationsGreen: number;
   rofThetaGreen: number;
   rofIterationsGreen: number;
+  bilateralSigmaColorGreen: number;
+  bilateralSigmaSpaceGreen: number;
+  bilateralRadiusGreen: number;
+  bilateralIterationsGreen: number;
 
   // denoise 2 green
   savitzkyGolaySizeGreen: number;
@@ -88,6 +96,10 @@ export class Profile {
   denoise1IterationsBlue: number;
   rofThetaBlue: number;
   rofIterationsBlue: number;
+  bilateralSigmaColorBlue: number;
+  bilateralSigmaSpaceBlue: number;
+  bilateralRadiusBlue: number;
+  bilateralIterationsBlue: number;
 
   // denoise 2 blue
   savitzkyGolaySizeBlue: number;

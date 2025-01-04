@@ -25,8 +25,8 @@ public class BilateralDenoiseFilter {
         executor.execute(() -> applyToChannel((ShortProcessor) stack.getProcessor(1), radius, sigmaColor, sigmaSpace));
         executor.execute(() -> applyToChannel((ShortProcessor) stack.getProcessor(2), radius, sigmaColor, sigmaSpace));
         executor.execute(() -> applyToChannel((ShortProcessor) stack.getProcessor(3), radius, sigmaColor, sigmaSpace));
-
         LswUtil.stopAndAwaitParallelExecutor(executor);
+
         log.info("Bilateral denoise filter applied to image: {}", image.getTitle());
     }
 
