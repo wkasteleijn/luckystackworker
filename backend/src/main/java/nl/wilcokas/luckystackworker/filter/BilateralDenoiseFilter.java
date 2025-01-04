@@ -6,6 +6,7 @@ import ij.process.ShortProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
+import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.stereotype.Component;
 
@@ -30,15 +31,17 @@ public class BilateralDenoiseFilter {
         log.info("Bilateral denoise filter applied to image: {}", image.getTitle());
     }
 
+
     private void applyToChannel(ShortProcessor ip, int radius, double sigmaColor, double sigmaSpace) {
+        short[] newPixels = new short[ip.getPixelCount()];
         int width = ip.getWidth();
         int height = ip.getHeight();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                double newPixel = applyBilateralFilter(ip, x, y, radius, sigmaColor, sigmaSpace);
-                ip.putPixel(x, y, (int) newPixel);
+                newPixels[width * y + x] = LswImageProcessingUtil.convertToShort((long)applyBilateralFilter(ip, x, y, radius, sigmaColor, sigmaSpace));
             }
         }
+        System.arraycopy(newPixels,0, ip.getPixels(), 0, newPixels.length);
     }
 
     private double applyBilateralFilter(ShortProcessor ip, int x, int y, int radius, double sigmaColor, double sigmaSpace) {
