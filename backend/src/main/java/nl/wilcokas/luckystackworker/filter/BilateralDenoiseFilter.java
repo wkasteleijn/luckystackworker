@@ -1,80 +1,94 @@
 package nl.wilcokas.luckystackworker.filter;
+
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
+import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
+import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.concurrent.Executor;
 
+@Slf4j
 @Component
 public class BilateralDenoiseFilter {
 
-        public void apply(ImagePlus image, int radius, double sigmaColor, double sigmaSpace) {
-            ImageStack stack = image.getStack();
+    public void apply(ImagePlus image, int radius, double sigmaColor, double sigmaSpace) {
+        log.info("Applying bilateral denoise filter to image: {}", image.getTitle());
+        ImageStack stack = image.getStack();
 
-            // Run every stack in a seperate thread to increase performance.
-            Executor executor = LswUtil.getParallelExecutor();
-            executor.execute(() -> applyToChannel( (ShortProcessor)stack.getProcessor(1), radius, sigmaColor, sigmaSpace));
-            executor.execute(() -> applyToChannel( (ShortProcessor)stack.getProcessor(2), radius, sigmaColor, sigmaSpace));
-            executor.execute(() -> applyToChannel( (ShortProcessor)stack.getProcessor(3), radius, sigmaColor, sigmaSpace));
+        // Run every stack in a seperate thread to increase performance.
+        Executor executor = LswUtil.getParallelExecutor();
+        executor.execute(() -> applyToChannel((ShortProcessor) stack.getProcessor(1), radius, sigmaColor, sigmaSpace));
+        executor.execute(() -> applyToChannel((ShortProcessor) stack.getProcessor(2), radius, sigmaColor, sigmaSpace));
+        executor.execute(() -> applyToChannel((ShortProcessor) stack.getProcessor(3), radius, sigmaColor, sigmaSpace));
 
-            LswUtil.stopAndAwaitParallelExecutor(executor);
+        LswUtil.stopAndAwaitParallelExecutor(executor);
+        log.info("Bilateral denoise filter applied to image: {}", image.getTitle());
+    }
+
+    private void applyToChannel(ShortProcessor ip, int radius, double sigmaColor, double sigmaSpace) {
+        int width = ip.getWidth();
+        int height = ip.getHeight();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                double newPixel = applyBilateralFilter(ip, x, y, radius, sigmaColor, sigmaSpace);
+                ip.putPixel(x, y, (int) newPixel);
+            }
         }
+    }
 
-        private void applyToChannel(ShortProcessor ip, int radius, double sigmaColor, double sigmaSpace) {
-            //ImageProcessor ip = stack.getProcessor(channel);
+    private double applyBilateralFilter(ShortProcessor ip, int x, int y, int radius, double sigmaColor, double sigmaSpace) {
+        double weightSum = 0;
+        double intensitySum = 0;
+        int centerPixel = ip.getPixel(x, y);
 
-            // Get the dimensions of the image
-            int width = ip.getWidth();
-            int height = ip.getHeight();
+        for (int dy = -radius; dy <= radius; dy++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                int nx = x + dx;
+                int ny = y + dy;
 
-            short[] resultPixels = new short[ip.getPixelCount()];
+                // Ensure the neighbor pixel is within the image bounds
+                if (nx >= 0 && nx < ip.getWidth() && ny >= 0 && ny < ip.getHeight()) {
+                    int neighborPixel = ip.getPixel(nx, ny);
 
-            // Parameters for the bilateral filter
-//            int radius = 5; // Filter radius
-//            double sigmaColor = 75; // Color variance
-//            double sigmaSpace = 75; // Spatial variance
+                    // Calculate the Gaussian weights
+                    double spatialWeight = Math.exp(-(dx * dx + dy * dy) / (2 * sigmaSpace * sigmaSpace));
+                    double colorWeight = Math.exp(-(Math.pow(centerPixel - neighborPixel, 2)) / (2 * sigmaColor * sigmaColor));
+                    double weight = spatialWeight * colorWeight;
 
-            // Apply the bilateral filter
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    double[] newPixel = applyBilateralFilter(ip, x, y, radius, sigmaColor, sigmaSpace);
-                    resultPixels[y * width + x] = (short) Math.round(newPixel[0]);
+                    // Accumulate the weighted intensity
+                    intensitySum += weight * neighborPixel;
+                    weightSum += weight;
                 }
             }
-            short[] pixels = (short[]) ip.getPixels();
-            System.arraycopy(resultPixels, 0, pixels, 0, ip.getPixelCount());
         }
 
-        private double[] applyBilateralFilter(ImageProcessor ip, int x, int y, int radius, double sigmaColor, double sigmaSpace) {
-            double weightSum = 0;
-            double intensitySum = 0;
-            int centerPixel = ip.getPixel(x, y);
+        // Return the normalized intensity
+        return intensitySum / weightSum;
+    }
 
-            for (int dy = -radius; dy <= radius; dy++) {
-                for (int dx = -radius; dx <= radius; dx++) {
-                    int nx = x + dx;
-                    int ny = y + dy;
+    public static void main(String[] args) throws IOException {
+        ImagePlus image = LswFileUtil
+                .openImage("C:\\Users\\wkast\\archive\\Jup\\testsession\\denoise_test2.tif", OpenImageModeEnum.RGB, 1, img -> img).getLeft();
 
-                    // Ensure the neighbor pixel is within the image bounds
-                    if (nx >= 0 && nx < ip.getWidth() && ny >= 0 && ny < ip.getHeight()) {
-                        int neighborPixel = ip.getPixel(nx, ny);
+        image.show();
+        // Set exposure back to original value
+        image.setDefault16bitRange(16);
+        image.resetDisplayRange();
 
-                        // Calculate the Gaussian weights
-                        double spatialWeight = Math.exp(-(dx * dx + dy * dy) / (2 * sigmaSpace * sigmaSpace));
-                        double colorWeight = Math.exp(-(Math.pow(centerPixel - neighborPixel, 2)) / (2 * sigmaColor * sigmaColor));
-                        double weight = spatialWeight * colorWeight;
+        BilateralDenoiseFilter filter = new BilateralDenoiseFilter();
+        filter.apply(image, 2,  25000, 40000);
+        image.updateAndDraw();
 
-                        // Accumulate the weighted intensity
-                        intensitySum += weight * neighborPixel;
-                        weightSum += weight;
-                    }
-                }
-            }
+        LswFileUtil.saveImage(image, "jup", "C:/Users/wkast/archive/Jup/testsession/jup_denoised2.tif", true, false, false, false);
 
-            // Return the normalized intensity
-            return new double[] { intensitySum / weightSum };
-        }
+        LswUtil.waitMilliseconds(5000);
+
+        System.exit(0);
+
+    }
 }
