@@ -24,4 +24,9 @@ public class SigmaDenoise1Filter implements LSWFilter  {
             sigmaFilterPlus.applyDenoise1(image, profile);
         }
     }
+
+    @Override
+    public boolean isSlow() {
+        return false;
+    }
 }

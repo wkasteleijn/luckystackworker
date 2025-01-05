@@ -1,26 +1,22 @@
 package nl.wilcokas.luckystackworker.service;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
+import jakarta.annotation.PostConstruct;
 import nl.wilcokas.luckystackworker.filter.*;
-import nl.wilcokas.luckystackworker.filter.settings.*;
-import nl.wilcokas.luckystackworker.filter.sigma.SigmaFilterPlus;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.model.PSFType;
+import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.PsfDiskGenerator;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import ij.ImagePlus;
 import ij.plugin.Scaler;
-import ij.process.ImageProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
@@ -51,12 +47,35 @@ public class OperationService {
     private int displayedProgress = 0;
     private Timer timer = new Timer();
 
-    // TODO: create init method to fill the ordered map in the correct order.
-    private static Map<OperationEnum,LSWFilter> filterMap = new LinkedHashMap();
+    private final List<Pair<OperationEnum, LSWFilter>> filters = new ArrayList<>();
+    private Map<OperationEnum, LswImageLayersDto> cache = new HashMap<>();
+
+    @PostConstruct
+    void init() {
+        filters.add(Pair.of(OperationEnum.WIENER_DECONV, wienerDeconvolutionFilter));
+        filters.add(Pair.of(OperationEnum.SHARPEN, lswSharpenFilter));
+        filters.add(Pair.of(OperationEnum.SIGMA_DENOISE_1, sigmaDenoise1Filter));
+        filters.add(Pair.of(OperationEnum.IANS_NR, iansNoiseReductionFilter));
+        filters.add(Pair.of(OperationEnum.BILATERAL_DENOISE, bilateralDenoiseFilter));
+        filters.add(Pair.of(OperationEnum.SIGMA_DENOISE_2, sigmaDenoise2Filter));
+        filters.add(Pair.of(OperationEnum.SAVITSKY_GOLAY, savitzkyGolayFilter));
+        filters.add(Pair.of(OperationEnum.EQUALIZE_LOCALLY, equalizeLocalHistogramsFilter));
+        filters.add(Pair.of(OperationEnum.LOCAL_CONTRAST, localContrastFilter));
+        filters.add(Pair.of(OperationEnum.GAMMA, gammaFilter));
+        filters.add(Pair.of(OperationEnum.COLOR_NORMALIZE, colorNormalisationFilter));
+        filters.add(Pair.of(OperationEnum.RGB_BALANCE, rgbBalanceFilter));
+        filters.add(Pair.of(OperationEnum.SATURATION, saturationFilter));
+        filters.add(Pair.of(OperationEnum.DISPERSION, dispersionCorrectionFilter));
+        filters.add(Pair.of(OperationEnum.HISTOGRAM_STRETCH, histogramStretchFilter));
+    }
 
     public void correctExposure(ImagePlus image) throws IOException {
         image.setDefault16bitRange(16);
         image.resetDisplayRange();
+    }
+
+    public void clearCache() {
+        cache.clear();
     }
 
     public byte[] applyAllOperations(ImagePlus image, LswImageViewer viewer, Profile profile, OperationEnum operation, boolean isMono) throws IOException, InterruptedException {
@@ -64,42 +83,26 @@ public class OperationService {
 
         // Sharpening filters
         byte[] psfImage = updatePSF(profile.getPsf(), operation, profile.getName(), isMono);
-        wienerDeconvolutionFilter.apply(image, profile, isMono);
-        lswSharpenFilter.apply(image, profile, isMono);
-        updateProgress(viewer, 9);
 
-        // Denoise filters -- pass 1
-        sigmaDenoise1Filter.apply(image, profile, isMono);
-        iansNoiseReductionFilter.apply(image, profile, isMono);
-        bilateralDenoiseFilter.apply(image, profile, isMono);
-        updateProgress(viewer, 18);
-
-        // Denoise filters -- pass 2
-        sigmaDenoise2Filter.apply(image, profile, isMono);
-        savitzkyGolayFilter.apply(image, profile, isMono);
-        updateProgress(viewer, 27, true);
-
-        // Light and contrast filters
-        equalizeLocalHistogramsFilter.apply(image, profile, isMono);
-        updateProgress(viewer, 36);
-        localContrastFilter.apply(image, profile, isMono);
-        updateProgress(viewer, 45);
-        gammaFilter.apply(image, profile, isMono);
-        updateProgress(viewer, 54);
-
-        // Color filters
-        colorNormalisationFilter.apply(image, profile, isMono);
-        updateProgress(viewer, 63);
-        rgbBalanceFilter.apply(image, profile, isMono);
-        updateProgress(viewer, 72);
-        saturationFilter.apply(image, profile, isMono);
-        updateProgress(viewer, 81);
-        dispersionCorrectionFilter.apply(image, profile, isMono);
-        updateProgress(viewer, 90);
-
-        // Always apply last
-        histogramStretchFilter.apply(image, profile, isMono);
-        updateProgress(viewer, 100);
+        int progressIncrease = 100 / filters.size();
+        int progress = 0;
+        boolean filterApplied = false;
+        for (int i = 0; i < filters.size(); i++) {
+            Pair<OperationEnum, LSWFilter> filterData = filters.get(i);
+            OperationEnum filterOperation = filterData.getLeft();
+            LswImageLayersDto cacheValue = cache.get(filterOperation);
+            if (operation == filterOperation || filterApplied || operation == null || cacheValue == null) {
+                LSWFilter filter = filterData.getRight();
+                filter.apply(image, profile, isMono);
+                cache.put(filterOperation, LswImageProcessingUtil.getImageLayers(image));
+                filterApplied = true;
+            } else {
+                LswImageProcessingUtil.updateImageLayers(image, cacheValue);
+            }
+            progress += progressIncrease;
+            boolean nextOperationSlow = filters.get(i < filters.size() - 1 ? i + 1 : i).getRight().isSlow();
+            updateProgress(viewer, progress, nextOperationSlow);
+        }
 
         Timer resetProgressTimer = new Timer();
         resetProgressTimer.schedule(new TimerTask() {

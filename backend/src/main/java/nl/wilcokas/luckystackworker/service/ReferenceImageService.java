@@ -165,7 +165,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         boolean includeGreen = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G;
         boolean includeBlue = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B;
         LswImageProcessingUtil.copyLayers(unprocessedImageLayers, finalResultImage, true, true, true);
-        OperationEnum operation = "PSF".equals(operationValue) ? OperationEnum.valueOf(operationValue.toUpperCase()) : null;
+        OperationEnum operation = operationValue == null ? null : OperationEnum.valueOf(operationValue.toUpperCase());
         byte[] psf = operationService.applyAllOperations(finalResultImage, displayedImage, profile, operation, isMono);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
@@ -587,6 +587,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             }
             setImageMetadata(filePath, profile, dateTime, finalResultImage, profile.getScale());
             operationService.correctExposure(finalResultImage);
+            operationService.clearCache();
             unprocessedImageLayers = LswImageProcessingUtil.getImageLayers(finalResultImage);
 
             log.info("Opened final result image image with id {}", finalResultImage.getID());

@@ -21,6 +21,11 @@ public class ColorNormalisationFilter implements LSWFilter {
         }
     }
 
+    @Override
+    public boolean isSlow() {
+        return false;
+    }
+
     private void apply(ImagePlus image) {
         int width = image.getWidth();
         int height = image.getHeight();

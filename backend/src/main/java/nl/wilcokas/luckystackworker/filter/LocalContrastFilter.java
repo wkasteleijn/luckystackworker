@@ -35,6 +35,11 @@ public class LocalContrastFilter implements  LSWFilter {
         }
     }
 
+    @Override
+    public boolean isSlow() {
+        return false;
+    }
+
     private void applyLocalContrast(final ImagePlus image, int amount, BigDecimal radius, LSWSharpenMode localContrastMode) {
         log.info("Applying local contrast with mode {}, radius {} amount {} to image {}", localContrastMode, radius, amount, image.getID());
         float famount = (amount) / 100f;

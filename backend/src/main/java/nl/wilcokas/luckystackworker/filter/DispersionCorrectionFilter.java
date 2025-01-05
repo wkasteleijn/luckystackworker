@@ -24,6 +24,11 @@ public class DispersionCorrectionFilter implements LSWFilter {
         }
     }
 
+    @Override
+    public boolean isSlow() {
+        return false;
+    }
+
     public void apply(ImagePlus image, Profile profile) {
         ImageStack stack = image.getStack();
         ImageProcessor ipRed = stack.getProcessor(1);

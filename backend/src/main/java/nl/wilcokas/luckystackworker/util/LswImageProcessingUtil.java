@@ -501,4 +501,13 @@ public class LswImageProcessingUtil {
         return image.getStack().size() == 3;
     }
 
+    public static void updateImageLayers(ImagePlus image, LswImageLayersDto layers) {
+        ImageStack stack = image.getStack();
+        for (int layer = 1; layer <= 3; layer++) {
+            ImageProcessor ip = stack.getProcessor(layer);
+            short[] pixels = layers.getLayers()[layer - 1];
+            System.arraycopy(pixels, 0, ip.getPixels(), 0, pixels.length);
+        }
+    }
+
 }

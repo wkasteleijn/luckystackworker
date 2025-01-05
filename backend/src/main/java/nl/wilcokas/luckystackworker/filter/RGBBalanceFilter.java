@@ -34,6 +34,11 @@ public class RGBBalanceFilter implements LSWFilter {
         }
     }
 
+    @Override
+    public boolean isSlow() {
+        return false;
+    }
+
     public void apply(ImagePlus image, int amountRed, int amountGreen, int amountBlue, double purpleReductionAmount, boolean preserveDarkBackground) {
         ImageStack stack = image.getStack();
         short[] redPixels = (short[]) stack.getProcessor(Constants.RED_LAYER_INDEX).getPixels();

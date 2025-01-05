@@ -177,6 +177,11 @@ public class SavitzkyGolayFilter implements LSWFilter {
         }
     }
 
+    @Override
+    public boolean isSlow() {
+        return false;
+    }
+
     private void apply(ImagePlus image, Profile profile) {
         ImageStack stack = image.getStack();
         // Run every stack in a seperate thread to increase performance.

@@ -30,6 +30,11 @@ public class SaturationFilter implements LSWFilter {
         }
     }
 
+    @Override
+    public boolean isSlow() {
+        return false;
+    }
+
     private void apply(ImagePlus image, Profile profile) {
         ImageStack stack = image.getStack();
         ImageProcessor ipRed = stack.getProcessor(1);

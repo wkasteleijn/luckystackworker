@@ -34,6 +34,11 @@ public class HistogramStretchFilter implements LSWFilter {
 
     }
 
+    @Override
+    public boolean isSlow() {
+        return false;
+    }
+
     private void apply(ImagePlus image, double minValue, double maxValue, double lightnessIncreaseValue, double backgroundCutoffFactor, boolean preserveDarkBackground) {
         int width = image.getWidth();
         int height = image.getHeight();

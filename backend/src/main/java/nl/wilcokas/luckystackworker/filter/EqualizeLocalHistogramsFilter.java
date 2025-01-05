@@ -25,6 +25,11 @@ public class EqualizeLocalHistogramsFilter implements LSWFilter {
         apply(image, profile.getName(), profile.getEqualizeLocalHistogramsStrength(), profile.getScale());
     }
 
+    @Override
+    public boolean isSlow() {
+        return true;
+    }
+
     private void apply(final ImagePlus image, final String profileName, final int strength, double scale) {
         if (strength>0) {
             gmicService.callGmicCli(image, profileName, scale,

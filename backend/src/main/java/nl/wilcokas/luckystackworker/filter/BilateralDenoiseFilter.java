@@ -28,6 +28,11 @@ public class BilateralDenoiseFilter implements LSWFilter {
         }
     }
 
+    @Override
+    public boolean isSlow() {
+        return false;
+    }
+
     private void apply(ImagePlus image, int radius, double sigmaColor, double sigmaSpace) {
         log.info("Applying bilateral denoise filter to image: {}", image.getTitle());
         ImageStack stack = image.getStack();

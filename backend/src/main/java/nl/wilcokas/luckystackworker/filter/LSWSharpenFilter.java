@@ -116,6 +116,11 @@ public class LSWSharpenFilter implements LSWFilter {
         }
     }
 
+    @Override
+    public boolean isSlow() {
+        return false;
+    }
+
     private boolean validateLuminanceInclusion(LSWSharpenParameters parameters) {
         return parameters.isIncludeRed() || parameters.isIncludeGreen() || parameters.isIncludeBlue();
     }

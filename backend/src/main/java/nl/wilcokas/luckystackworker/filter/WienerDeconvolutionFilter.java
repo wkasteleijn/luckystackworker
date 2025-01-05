@@ -86,6 +86,11 @@ public class WienerDeconvolutionFilter implements LSWFilter {
         }
     }
 
+    @Override
+    public boolean isSlow() {
+        return false;
+    }
+
     private boolean validateLuminanceInclusion(WienerDeconvolutionParameters parameters) {
         return parameters.isIncludeRed() || parameters.isIncludeGreen() || parameters.isIncludeBlue();
     }

@@ -7,4 +7,5 @@ import java.io.IOException;
 
 public interface LSWFilter {
     void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException;
+    boolean isSlow();
 }

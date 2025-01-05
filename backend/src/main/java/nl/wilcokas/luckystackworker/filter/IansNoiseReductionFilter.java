@@ -32,6 +32,11 @@ public class IansNoiseReductionFilter implements LSWFilter {
         }
     }
 
+    @Override
+    public boolean isSlow() {
+        return true;
+    }
+
     private void apply(final ImagePlus image, final String profileName, final IansNoiseReductionParameters parameters, double scale)  {
         for (int i = 0; i < parameters.getIterations(); i++) {
             BigDecimal fineValue = parameters.getFine() == null ? BigDecimal.ZERO : parameters.getFine().divide(BigDecimal.valueOf(200));

@@ -23,6 +23,11 @@ public class GammaFilter implements LSWFilter {
         }
     }
 
+    @Override
+    public boolean isSlow() {
+        return false;
+    }
+
     private ImageProcessor getImageStackProcessor(final ImagePlus img, final int stackPosition) {
         return img.getStack().getProcessor(stackPosition);
     }
