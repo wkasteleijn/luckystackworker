@@ -2,6 +2,7 @@ package nl.wilcokas.luckystackworker.filter;
 
 import ij.ImagePlus;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.filter.sigma.SigmaFilterPlus;
 import nl.wilcokas.luckystackworker.model.Profile;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class SigmaDenoise1Filter implements LSWFilter  {
 
