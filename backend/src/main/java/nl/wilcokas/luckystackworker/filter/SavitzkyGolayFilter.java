@@ -1,5 +1,6 @@
 package nl.wilcokas.luckystackworker.filter;
 
+import java.io.IOException;
 import java.util.concurrent.Executor;
 
 import nl.wilcokas.luckystackworker.model.Profile;
@@ -16,7 +17,7 @@ import nl.wilcokas.luckystackworker.util.LswUtil;
 
 @Slf4j
 @Component
-public class SavitzkyGolayFilter {
+public class SavitzkyGolayFilter implements LSWFilter {
 
     private static final int[] RADIUS_25_FACTORS = { //
             -4, -22, -29, -22, -4, //
@@ -168,7 +169,15 @@ public class SavitzkyGolayFilter {
     private static final int RADIUS_169_DIVISOR = 33721;
     private static final int RADIUS_169_ROWLENGTH = 13;
 
-    public void apply(ImagePlus image, Profile profile) {
+    @Override
+    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+        if (Constants.DENOISE_ALGORITHM_SAVGOLAY.equals(profile.getDenoiseAlgorithm2())) {
+            log.info("Starting SavitzkyGolayDenoise filter");
+            apply(image, profile);
+        }
+    }
+
+    private void apply(ImagePlus image, Profile profile) {
         ImageStack stack = image.getStack();
         // Run every stack in a seperate thread to increase performance.
         Executor executor = LswUtil.getParallelExecutor();

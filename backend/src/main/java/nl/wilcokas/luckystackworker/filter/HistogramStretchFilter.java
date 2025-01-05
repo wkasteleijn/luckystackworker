@@ -4,15 +4,37 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 import static nl.wilcokas.luckystackworker.constants.Constants.MINIMUK_DARK_TRESHOLD;
 
 @Slf4j
 @Component
-public class HistogramStretchFilter {
-    public void apply(ImagePlus image, double minValue, double maxValue, double lightnessIncreaseValue, double backgroundCutoffFactor, boolean preserveDarkBackground) {
+public class HistogramStretchFilter implements LSWFilter {
+
+    @Override
+    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+        if (profile.getContrast() != 0 || profile.getBrightness() != 0 || profile.getLightness() != 0 || profile.getBackground() != 0) {
+            log.info("Applying contrast increase with factor {} to image {}", profile.getContrast(),
+                    image.getID());
+
+            // Contrast
+            double newMin = Math.round((profile.getContrast()) * (16384.0 / 100.0));
+            double newMax = 65536 - newMin;
+
+            // Brightness
+            newMax = Math.round(newMax - (profile.getBrightness()) * (49152.0 / 100.0));
+
+            apply(image, newMin, newMax, profile.getLightness(), profile.getBackground(), profile.isPreserveDarkBackground());
+        }
+
+    }
+
+    private void apply(ImagePlus image, double minValue, double maxValue, double lightnessIncreaseValue, double backgroundCutoffFactor, boolean preserveDarkBackground) {
         int width = image.getWidth();
         int height = image.getHeight();
 

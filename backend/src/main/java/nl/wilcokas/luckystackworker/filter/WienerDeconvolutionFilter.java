@@ -11,16 +11,86 @@ import ij.process.ShortProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.filter.settings.WienerDeconvolutionParameters;
+import nl.wilcokas.luckystackworker.filter.wpl.LswWPLFloatIterativeDeconvolver2D;
+import nl.wilcokas.luckystackworker.model.PSF;
+import nl.wilcokas.luckystackworker.model.PSFType;
+import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
+import nl.wilcokas.luckystackworker.util.PsfDiskGenerator;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Component
 @Slf4j
-public class WienerDeconvolutionFilter {
+public class WienerDeconvolutionFilter implements LSWFilter {
 
+    @Override
+    public void apply(final ImagePlus image, Profile profile, boolean isMono) throws IOException {
+        if (profile.getApplyWienerDeconvolution().booleanValue()) {
+            float deringStrength = profile.getDeringStrength() / 100f;
+            float blendRaw = profile.getBlendRaw() / 100f;
+            int iterations = profile.getWienerIterations() == 0 ? 1 : profile.getWienerIterations();
+            WienerDeconvolutionParameters parameters;
+            LSWSharpenMode mode = (profile.getSharpenMode() == null) ? LSWSharpenMode.LUMINANCE : LSWSharpenMode.valueOf(profile.getSharpenMode());
+            if (mode == LSWSharpenMode.LUMINANCE) {
+                parameters = WienerDeconvolutionParameters.builder()
+                        .iterationsLuminance(iterations)
+                        .deringRadiusLuminance(profile.getDeringRadius().doubleValue())
+                        .deringStrengthLuminance(deringStrength)
+                        .blendRawLuminance(blendRaw)
+                        .mode(LSWSharpenMode.LUMINANCE)
+                        .includeRed(profile.isLuminanceIncludeRed())
+                        .includeGreen(profile.isLuminanceIncludeGreen())
+                        .includeBlue(profile.isLuminanceIncludeBlue())
+                        .includeColor(profile.isLuminanceIncludeColor())
+                        .build();
+            } else {
+                int iterationsGreen = profile.getWienerIterationsGreen() == 0 ? 1 : profile.getWienerIterationsGreen();
+                int iterationsBlue = profile.getWienerIterationsBlue() == 0 ? 1 : profile.getWienerIterationsBlue();
+                float deringStrengthGreen = profile.getDeringStrengthGreen() / 100f;
+                float deringStrengthBlue = profile.getDeringStrengthBlue() / 100f;
+                float blendRawGreen = profile.getBlendRawGreen() / 100f;
+                float blendRawBlue = profile.getBlendRawBlue() / 100f;
+                parameters = WienerDeconvolutionParameters.builder()
+                        .iterationsRed(iterations)
+                        .deringRadiusRed(profile.getDeringRadius().doubleValue())
+                        .deringStrengthRed(deringStrength)
+                        .iterationsGreen(iterationsGreen)
+                        .deringRadiusGreen(profile.getDeringRadiusGreen().doubleValue())
+                        .deringStrengthGreen(deringStrengthGreen)
+                        .iterationsBlue(iterationsBlue)
+                        .deringRadiusBlue(profile.getDeringRadiusBlue().doubleValue())
+                        .deringStrengthBlue(deringStrengthBlue)
+                        .blendRawRed(blendRaw)
+                        .blendRawGreen(blendRawGreen)
+                        .blendRawBlue(blendRawBlue)
+                        .mode(LSWSharpenMode.RGB)
+                        .build();
+            }
 
-    public void apply(ImagePlus image, ImagePlus psf, WienerDeconvolutionParameters parameters) {
+            if (mode == LSWSharpenMode.LUMINANCE && !validateLuminanceInclusion(parameters)) {
+                log.warn("Attempt to exclude all channels from luminance sharpen!");
+                parameters.setIncludeRed(true);
+                parameters.setIncludeGreen(true);
+                parameters.setIncludeBlue(true);
+            }
+            ImagePlus psfImage = LswFileUtil.getWienerDeconvolutionPSF(profile.getName());
+            if (psfImage == null) {
+                PSF psf = profile.getPsf();
+                psf.setType(PSFType.SYNTHETIC);
+                psfImage = PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profile.getName(), isMono);
+            }
+            apply(image, psfImage, parameters);
+        }
+    }
+
+    private boolean validateLuminanceInclusion(WienerDeconvolutionParameters parameters) {
+        return parameters.isIncludeRed() || parameters.isIncludeGreen() || parameters.isIncludeBlue();
+    }
+
+    private void apply(ImagePlus image, ImagePlus psf, WienerDeconvolutionParameters parameters) {
         ImagePlus[] psfPerChannel = getPsfPerChannel(psf);
         ImageStack stack = image.getStack();
         if (parameters.getMode() == LSWSharpenMode.RGB) {

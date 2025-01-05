@@ -1,7 +1,10 @@
 package nl.wilcokas.luckystackworker.filter;
 
 import java.awt.Rectangle;
+import java.io.IOException;
 
+import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import org.springframework.stereotype.Component;
 
 import ij.ImagePlus;
@@ -9,8 +12,17 @@ import ij.ImageStack;
 import ij.process.ImageProcessor;
 import nl.wilcokas.luckystackworker.model.Profile;
 
+@Slf4j
 @Component
-public class DispersionCorrectionFilter {
+public class DispersionCorrectionFilter implements LSWFilter {
+
+    @Override
+    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+        if (profile.isDispersionCorrectionEnabled() && LswImageProcessingUtil.validateRGBStack(image)) {
+            log.info("Applying dispersion correction");
+            apply(image, profile);
+        }
+    }
 
     public void apply(ImagePlus image, Profile profile) {
         ImageStack stack = image.getStack();
@@ -42,5 +54,4 @@ public class DispersionCorrectionFilter {
             pixels[i] = pixelsNew[i];
         }
     }
-
 }

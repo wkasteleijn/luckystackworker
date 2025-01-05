@@ -5,6 +5,9 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.function.UnaryOperator;
 
+import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.model.Profile;
 import org.springframework.stereotype.Component;
 
 import ij.ImagePlus;
@@ -13,13 +16,23 @@ import nl.wilcokas.luckystackworker.filter.settings.IansNoiseReductionParameters
 import nl.wilcokas.luckystackworker.service.GmicService;
 
 @RequiredArgsConstructor
+@Slf4j
 @Component
-public class IansNoiseReductionFilter {
+public class IansNoiseReductionFilter implements LSWFilter {
 
     private final GmicService gmicService;
 
-    public void apply(final ImagePlus image, final String profileName, final IansNoiseReductionParameters parameters, double scale)
-            throws IOException, InterruptedException {
+    @Override
+    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+        if (Constants.DENOISE_ALGORITHM_IANS.equals(profile.getDenoiseAlgorithm1())) {
+            log.info("Applying Ian's noise reduction to image {}", image.getID());
+            IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(profile.getIansAmount()).medium(profile.getIansAmountMid())
+                    .large(BigDecimal.ZERO).recovery(profile.getIansRecovery()).iterations(profile.getIansIterations()).build();
+            apply(image, profile.getName(), parameters, profile.getScale());
+        }
+    }
+
+    private void apply(final ImagePlus image, final String profileName, final IansNoiseReductionParameters parameters, double scale)  {
         for (int i = 0; i < parameters.getIterations(); i++) {
             BigDecimal fineValue = parameters.getFine() == null ? BigDecimal.ZERO : parameters.getFine().divide(BigDecimal.valueOf(200));
             BigDecimal mediumValue = parameters.getMedium() == null ? BigDecimal.ZERO : parameters.getMedium().divide(BigDecimal.valueOf(200));
@@ -30,5 +43,4 @@ public class IansNoiseReductionFilter {
                     "1,0,0,0,0.5,1,1,%s,%s,%s,3,%s,%s,4,0".formatted(fineValue, mediumValue, largeValue, recoveryAlgorithm, recovery)));
         }
     }
-
 }

@@ -2,16 +2,19 @@ package nl.wilcokas.luckystackworker.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import nl.wilcokas.luckystackworker.filter.*;
 import nl.wilcokas.luckystackworker.filter.settings.*;
+import nl.wilcokas.luckystackworker.filter.sigma.SigmaFilterPlus;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
 import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.model.PSFType;
-import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
+import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.PsfDiskGenerator;
 import org.springframework.stereotype.Service;
 
@@ -33,18 +36,23 @@ public class OperationService {
     private final RGBBalanceFilter rgbBalanceFilter;
     private final SaturationFilter saturationFilter;
     private final SavitzkyGolayFilter savitzkyGolayFilter;
-    private final SigmaFilterPlus sigmaFilterPlusFilter;
+    private final SigmaDenoise1Filter sigmaDenoise1Filter;
+    private final SigmaDenoise2Filter sigmaDenoise2Filter;
     private final DispersionCorrectionFilter dispersionCorrectionFilter;
     private final IansNoiseReductionFilter iansNoiseReductionFilter;
     private final EqualizeLocalHistogramsFilter equalizeLocalHistogramsFilter;
     private final ColorNormalisationFilter colorNormalisationFilter;
     private final HistogramStretchFilter histogramStretchFilter;
-    private final ROFDenoiseFilter rofDenoiseFilter;
     private final WienerDeconvolutionFilter wienerDeconvolutionFilter;
     private final BilateralDenoiseFilter bilateralDenoiseFilter;
+    private final LocalContrastFilter localContrastFilter;
+    private final GammaFilter gammaFilter;
 
     private int displayedProgress = 0;
     private Timer timer = new Timer();
+
+    // TODO: create init method to fill the ordered map in the correct order.
+    private static Map<OperationEnum,LSWFilter> filterMap = new LinkedHashMap();
 
     public void correctExposure(ImagePlus image) throws IOException {
         image.setDefault16bitRange(16);
@@ -56,42 +64,41 @@ public class OperationService {
 
         // Sharpening filters
         byte[] psfImage = updatePSF(profile.getPsf(), operation, profile.getName(), isMono);
-        applyWienerDeconvolution(image, profile, isMono);
-        applySharpen(image, profile);
+        wienerDeconvolutionFilter.apply(image, profile, isMono);
+        lswSharpenFilter.apply(image, profile, isMono);
         updateProgress(viewer, 9);
 
         // Denoise filters -- pass 1
-        applySigmaDenoise1(image, profile);
-        applyIansNoiseReduction(image, profile);
-        applyROFDenoise(image, profile);
-        applyBilateralDenoise(image, profile);
+        sigmaDenoise1Filter.apply(image, profile, isMono);
+        iansNoiseReductionFilter.apply(image, profile, isMono);
+        bilateralDenoiseFilter.apply(image, profile, isMono);
         updateProgress(viewer, 18);
 
         // Denoise filters -- pass 2
-        applySigmaDenoise2(image, profile);
-        applySavitzkyGolayDenoise(image, profile);
+        sigmaDenoise2Filter.apply(image, profile, isMono);
+        savitzkyGolayFilter.apply(image, profile, isMono);
         updateProgress(viewer, 27, true);
 
         // Light and contrast filters
-        applyEqualizeLocalHistorgrams(image, profile);
+        equalizeLocalHistogramsFilter.apply(image, profile, isMono);
         updateProgress(viewer, 36);
-        applyLocalContrast(image, profile);
+        localContrastFilter.apply(image, profile, isMono);
         updateProgress(viewer, 45);
-        applyGamma(image, profile);
+        gammaFilter.apply(image, profile, isMono);
         updateProgress(viewer, 54);
 
         // Color filters
-        applyColorNormalisation(image, profile);
+        colorNormalisationFilter.apply(image, profile, isMono);
         updateProgress(viewer, 63);
-        applyRGBBalance(image, profile);
+        rgbBalanceFilter.apply(image, profile, isMono);
         updateProgress(viewer, 72);
-        applySaturation(image, profile);
+        saturationFilter.apply(image, profile, isMono);
         updateProgress(viewer, 81);
-        applyDispersionCorrection(image, profile);
+        dispersionCorrectionFilter.apply(image, profile, isMono);
         updateProgress(viewer, 90);
 
         // Always apply last
-        applyBrightnessAndContrast(image, profile);
+        histogramStretchFilter.apply(image, profile, isMono);
         updateProgress(viewer, 100);
 
         Timer resetProgressTimer = new Timer();
@@ -141,307 +148,6 @@ public class OperationService {
         }
     }
 
-    ;
-
-    private void applySharpen(final ImagePlus image, Profile profile) {
-        int iterations = profile.getIterations() == 0 ? 1 : profile.getIterations();
-        if (profile.getApplyUnsharpMask().booleanValue() && profile.getRadius() != null && profile.getAmount() != null) {
-            log.info("Applying sharpen with radius {}, amount {}, iterations {} to image {}", profile.getRadius(),
-                    profile.getAmount(), iterations, image.getID());
-            float amount = profile.getAmount().divide(new BigDecimal("10000")).floatValue();
-            float clippingStrength = (profile.getClippingStrength()) / 500f;
-            float deringStrength = profile.getDeringStrength() / 100f;
-            float blendRaw = profile.getBlendRaw() / 100f;
-            UnsharpMaskParameters usParams;
-            LSWSharpenMode mode = (profile.getSharpenMode() == null) ? LSWSharpenMode.LUMINANCE : LSWSharpenMode.valueOf(profile.getSharpenMode());
-            if (mode == LSWSharpenMode.LUMINANCE) {
-                usParams = UnsharpMaskParameters.builder()
-                        .radiusLuminance(profile.getRadius().doubleValue())
-                        .amountLuminance(amount)
-                        .iterationsLuminance(iterations)
-                        .clippingStrengthLuminance(clippingStrength)
-                        .clippingRangeLuminance(100 - profile.getClippingRange())
-                        .deringRadiusLuminance(profile.getDeringRadius().doubleValue())
-                        .deringStrengthLuminance(deringStrength)
-                        .blendRawLuminance(blendRaw)
-                        .build();
-            } else {
-                int iterationsGreen = profile.getIterationsGreen() == 0 ? 1 : profile.getIterationsGreen();
-                int iterationsBlue = profile.getIterationsBlue() == 0 ? 1 : profile.getIterationsBlue();
-                float amountGreen = profile.getAmountGreen().divide(new BigDecimal("10000")).floatValue();
-                float clippingStrengthGreen = (profile.getClippingStrengthGreen()) / 500f;
-                float deringStrengthGreen = profile.getDeringStrengthGreen() / 100f;
-                float amountBlue = profile.getAmountBlue().divide(new BigDecimal("10000")).floatValue();
-                float clippingStrengthBlue = (profile.getClippingStrengthBlue()) / 500f;
-                float deringStrengthBlue = profile.getDeringStrengthBlue() / 100f;
-                float blendRawGreen = profile.getBlendRawGreen() / 100f;
-                float blendRawBlue = profile.getBlendRawBlue() / 100f;
-                usParams = UnsharpMaskParameters.builder()
-                        .radiusRed(profile.getRadius().doubleValue())
-                        .amountRed(amount)
-                        .iterationsRed(iterations)
-                        .clippingStrengthRed(clippingStrength)
-                        .clippingRangeRed(100 - profile.getClippingRange())
-                        .deringRadiusRed(profile.getDeringRadius().doubleValue())
-                        .deringStrengthRed(deringStrength)
-                        .radiusGreen(profile.getRadiusGreen().doubleValue())
-                        .amountGreen(amountGreen)
-                        .iterationsGreen(iterationsGreen)
-                        .clippingStrengthGreen(clippingStrengthGreen)
-                        .clippingRangeGreen(100 - profile.getClippingRangeGreen())
-                        .deringRadiusGreen(profile.getDeringRadiusGreen().doubleValue())
-                        .deringStrengthGreen(deringStrengthGreen)
-                        .radiusBlue(profile.getRadiusBlue().doubleValue())
-                        .amountBlue(amountBlue)
-                        .iterationsBlue(iterationsBlue)
-                        .clippingStrengthBlue(clippingStrengthBlue)
-                        .clippingRangeBlue(100 - profile.getClippingRangeBlue())
-                        .deringRadiusBlue(profile.getDeringRadiusBlue().doubleValue())
-                        .deringStrengthBlue(deringStrengthBlue)
-                        .blendRawRed(blendRaw)
-                        .blendRawGreen(blendRawGreen)
-                        .blendRawBlue(blendRawBlue)
-                        .build();
-            }
-
-            LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(profile.isLuminanceIncludeBlue())
-                    .includeGreen(profile.isLuminanceIncludeGreen()) //
-                    .includeRed(profile.isLuminanceIncludeRed()).includeColor(profile.isLuminanceIncludeColor())
-                    .saturation(1f).unsharpMaskParameters(usParams).mode(mode).build();
-            if (mode == LSWSharpenMode.LUMINANCE && !validateLuminanceInclusion(parameters)) {
-                log.warn("Attempt to exclude all channels from luminance sharpen!");
-                parameters.setIncludeRed(true);
-                parameters.setIncludeGreen(true);
-                parameters.setIncludeBlue(true);
-            }
-            if (profile.getSharpenMode().equals(LSWSharpenMode.RGB.toString()) || !validateRGBStack(image)) {
-                if (profile.getClippingStrength() > 0) {
-                    lswSharpenFilter.applyRGBModeClippingPrevention(image, parameters.getUnsharpMaskParameters());
-                } else {
-                    lswSharpenFilter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
-                }
-            } else {
-                if (profile.getClippingStrength() > 0) {
-                    lswSharpenFilter.applyLuminanceModeClippingPrevention(image, parameters);
-                } else {
-                    lswSharpenFilter.applyLuminanceMode(image, parameters);
-                }
-            }
-        }
-    }
-
-    private void applyWienerDeconvolution(final ImagePlus image, Profile profile, boolean isMono) throws IOException {
-        if (profile.getApplyWienerDeconvolution().booleanValue()) {
-            float deringStrength = profile.getDeringStrength() / 100f;
-            float blendRaw = profile.getBlendRaw() / 100f;
-            int iterations = profile.getWienerIterations() == 0 ? 1 : profile.getWienerIterations();
-            WienerDeconvolutionParameters parameters;
-            LSWSharpenMode mode = (profile.getSharpenMode() == null) ? LSWSharpenMode.LUMINANCE : LSWSharpenMode.valueOf(profile.getSharpenMode());
-            if (mode == LSWSharpenMode.LUMINANCE) {
-                parameters = WienerDeconvolutionParameters.builder()
-                        .iterationsLuminance(iterations)
-                        .deringRadiusLuminance(profile.getDeringRadius().doubleValue())
-                        .deringStrengthLuminance(deringStrength)
-                        .blendRawLuminance(blendRaw)
-                        .mode(LSWSharpenMode.LUMINANCE)
-                        .includeRed(profile.isLuminanceIncludeRed())
-                        .includeGreen(profile.isLuminanceIncludeGreen())
-                        .includeBlue(profile.isLuminanceIncludeBlue())
-                        .includeColor(profile.isLuminanceIncludeColor())
-                        .build();
-            } else {
-                int iterationsGreen = profile.getWienerIterationsGreen() == 0 ? 1 : profile.getWienerIterationsGreen();
-                int iterationsBlue = profile.getWienerIterationsBlue() == 0 ? 1 : profile.getWienerIterationsBlue();
-                float deringStrengthGreen = profile.getDeringStrengthGreen() / 100f;
-                float deringStrengthBlue = profile.getDeringStrengthBlue() / 100f;
-                float blendRawGreen = profile.getBlendRawGreen() / 100f;
-                float blendRawBlue = profile.getBlendRawBlue() / 100f;
-                parameters = WienerDeconvolutionParameters.builder()
-                        .iterationsRed(iterations)
-                        .deringRadiusRed(profile.getDeringRadius().doubleValue())
-                        .deringStrengthRed(deringStrength)
-                        .iterationsGreen(iterationsGreen)
-                        .deringRadiusGreen(profile.getDeringRadiusGreen().doubleValue())
-                        .deringStrengthGreen(deringStrengthGreen)
-                        .iterationsBlue(iterationsBlue)
-                        .deringRadiusBlue(profile.getDeringRadiusBlue().doubleValue())
-                        .deringStrengthBlue(deringStrengthBlue)
-                        .blendRawRed(blendRaw)
-                        .blendRawGreen(blendRawGreen)
-                        .blendRawBlue(blendRawBlue)
-                        .mode(LSWSharpenMode.RGB)
-                        .build();
-            }
-
-            if (mode == LSWSharpenMode.LUMINANCE && !validateLuminanceInclusion(parameters)) {
-                log.warn("Attempt to exclude all channels from luminance sharpen!");
-                parameters.setIncludeRed(true);
-                parameters.setIncludeGreen(true);
-                parameters.setIncludeBlue(true);
-            }
-            ImagePlus psfImage = LswFileUtil.getWienerDeconvolutionPSF(profile.getName());
-            if (psfImage == null) {
-                PSF psf = profile.getPsf();
-                psf.setType(PSFType.SYNTHETIC);
-                psfImage = PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profile.getName(), isMono);
-            }
-            wienerDeconvolutionFilter.apply(image, psfImage, parameters);
-        }
-    }
-
-    private void applyLocalContrast(final ImagePlus image, Profile profile) {
-        LSWSharpenMode mode = (profile.getLocalContrastMode() == null) ? LSWSharpenMode.LUMINANCE
-                : LSWSharpenMode.valueOf(profile.getLocalContrastMode());
-        if (profile.getLocalContrastFine() != 0) {
-            applyLocalContrast(image, profile.getLocalContrastFine(), Constants.LOCAL_CONTRAST_FINE_RADIUS, mode);
-        }
-        if (profile.getLocalContrastMedium() != 0) {
-            applyLocalContrast(image, profile.getLocalContrastMedium(), Constants.LOCAL_CONTRAST_MEDIUM_RADIUS, mode);
-        }
-        if (profile.getLocalContrastLarge() != 0) {
-            applyLocalContrast(image, profile.getLocalContrastLarge(), Constants.LOCAL_CONTRAST_LARGE_RADIUS, mode);
-        }
-    }
-
-    private void applySigmaDenoise1(final ImagePlus image, final Profile profile) {
-        if (Constants.DENOISE_ALGORITHM_SIGMA1.equals(profile.getDenoiseAlgorithm1())) {
-            log.info("Applying Sigma denoise mode 1 with value {} to image {}", profile.getDenoise1Amount(), image.getID());
-            sigmaFilterPlusFilter.applyDenoise1(image, profile);
-        }
-    }
-
-    private void applySigmaDenoise2(final ImagePlus image, final Profile profile) {
-        if (Constants.DENOISE_ALGORITHM_SIGMA2.equals(profile.getDenoiseAlgorithm2())) {
-            int iterations = profile.getDenoise2Iterations() == 0 ? 1 : profile.getDenoise2Iterations();
-            log.info("Applying Sigma denoise mode 2 with radius {} and {} iterations to image {}", profile.getDenoise2Radius(), iterations,
-                    image.getID());
-            sigmaFilterPlusFilter.applyDenoise2(image, profile);
-        }
-    }
-
-    private void applyIansNoiseReduction(final ImagePlus image, final Profile profile) throws IOException, InterruptedException {
-        if (Constants.DENOISE_ALGORITHM_IANS.equals(profile.getDenoiseAlgorithm1())) {
-            log.info("Applying Ian's noise reduction to image {}", image.getID());
-            IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(profile.getIansAmount()).medium(profile.getIansAmountMid())
-                    .large(BigDecimal.ZERO).recovery(profile.getIansRecovery()).iterations(profile.getIansIterations()).build();
-            iansNoiseReductionFilter.apply(image, profile.getName(), parameters, profile.getScale());
-        }
-    }
-
-    private void applyROFDenoise(final ImagePlus image, final Profile profile) {
-        if (Constants.DENOISE_ALGORITHM_ROF.equals(profile.getDenoiseAlgorithm1())) {
-            log.info("Applying ROF denoising to image {}", image.getID());
-            rofDenoiseFilter.apply(image, profile);
-        }
-    }
-
-    private void applyGamma(final ImagePlus image, final Profile profile) {
-        if (profile.getGamma() != null && (profile.getGamma().compareTo(BigDecimal.ONE) != 0)) {
-            log.info("Applying gamma correction with value {} to image {}", profile.getGamma(), image.getID());
-            for (int slice = 1; slice <= image.getStack().getSize(); slice++) {
-                ImageProcessor ip = getImageStackProcessor(image, slice);
-                ip.gamma(2d - profile.getGamma().doubleValue());
-            }
-        }
-
-    }
-
-    private void applyRGBBalance(final ImagePlus image, final Profile profile) {
-        if ((profile.getRed() != null && (!profile.getRed().equals(BigDecimal.ZERO)))
-                || (profile.getGreen() != null && (!profile.getGreen().equals(BigDecimal.ZERO)))
-                || (profile.getBlue() != null && (!profile.getBlue().equals(BigDecimal.ZERO)))) {
-            if (validateRGBStack(image)) {
-                log.info("Applying RGB balance correction to image {} with values R {}, G {}, B {}", image.getID(), profile.getRed(), profile.getGreen(),
-                        profile.getBlue());
-                rgbBalanceFilter.apply(image, profile.getRed().intValue(), profile.getGreen().intValue(), profile.getBlue().intValue(),
-                        profile.getPurple().intValue() / 255D, profile.isPreserveDarkBackground());
-            }
-        }
-    }
-
-    private void applyColorNormalisation(final ImagePlus image, final Profile profile) {
-        if (profile.isNormalizeColorBalance()) {
-            colorNormalisationFilter.apply(image);
-        }
-    }
-
-    private void applySaturation(final ImagePlus image, final Profile profile) {
-        if (profile.getSaturation() != null) {
-            if (validateRGBStack(image)) {
-                log.info("Applying saturation increase with factor {} to image {}", profile.getSaturation(),
-                        image.getID());
-                saturationFilter.apply(image, profile);
-            } else {
-                log.debug("Attemping to apply saturation increase to a non RGB image {}", image.getFileInfo());
-            }
-        }
-    }
-
-    private void applyEqualizeLocalHistorgrams(final ImagePlus image, final Profile profile) throws IOException, InterruptedException {
-        log.info("Applying equalize local historgrams with strength {} to image {}", profile.getEqualizeLocalHistogramsStrength(), image.getID());
-        equalizeLocalHistogramsFilter.apply(image, profile.getName(), profile.getEqualizeLocalHistogramsStrength(), profile.getScale());
-    }
-
-    private void applyBrightnessAndContrast(ImagePlus image, final Profile profile) {
-        if (profile.getContrast() != 0 || profile.getBrightness() != 0 || profile.getLightness() != 0 || profile.getBackground() != 0) {
-            log.info("Applying contrast increase with factor {} to image {}", profile.getContrast(),
-                    image.getID());
-
-            // Contrast
-            double newMin = Math.round((profile.getContrast()) * (16384.0 / 100.0));
-            double newMax = 65536 - newMin;
-
-            // Brightness
-            newMax = Math.round(newMax - (profile.getBrightness()) * (49152.0 / 100.0));
-
-            histogramStretchFilter.apply(image, newMin, newMax, profile.getLightness(), profile.getBackground(), profile.isPreserveDarkBackground());
-
-        }
-    }
-
-    private void applySavitzkyGolayDenoise(ImagePlus image, final Profile profile) {
-        if (Constants.DENOISE_ALGORITHM_SAVGOLAY.equals(profile.getDenoiseAlgorithm2())) {
-            log.info("Starting SavitzkyGolayDenoise filter");
-            savitzkyGolayFilter.apply(image, profile);
-        }
-    }
-
-    private void applyDispersionCorrection(final ImagePlus image, final Profile profile) {
-        if (profile.isDispersionCorrectionEnabled() && validateRGBStack(image)) {
-            log.info("Applying dispersion correction");
-            dispersionCorrectionFilter.apply(image, profile);
-        }
-    }
-
-    private boolean validateLuminanceInclusion(LSWSharpenParameters parameters) {
-        return parameters.isIncludeRed() || parameters.isIncludeGreen() || parameters.isIncludeBlue();
-    }
-
-    private boolean validateLuminanceInclusion(WienerDeconvolutionParameters parameters) {
-        return parameters.isIncludeRed() || parameters.isIncludeGreen() || parameters.isIncludeBlue();
-    }
-
-    private void applyLocalContrast(final ImagePlus image, int amount, BigDecimal radius, LSWSharpenMode localContrastMode) {
-        log.info("Applying local contrast with mode {}, radius {} amount {} to image {}", localContrastMode, radius, amount, image.getID());
-        float famount = (amount) / 100f;
-        UnsharpMaskParameters usParams = UnsharpMaskParameters.builder()
-                .radiusRed(radius.doubleValue()).amountRed(famount).iterationsRed(1)
-                .radiusGreen(radius.doubleValue()).amountGreen(famount).iterationsGreen(1)
-                .radiusBlue(radius.doubleValue()).amountBlue(famount).iterationsBlue(1)
-                .build();
-        LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
-                .saturation(1f).unsharpMaskParameters(usParams).mode(localContrastMode).build();
-        lswSharpenFilter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
-    }
-
-    private ImageProcessor getImageStackProcessor(final ImagePlus img, final int stackPosition) {
-        return img.getStack().getProcessor(stackPosition);
-    }
-
-    private boolean validateRGBStack(ImagePlus image) {
-        return image.getStack().size() == 3;
-    }
-
     private byte[] updatePSF(PSF psf, OperationEnum operation, String profileName, boolean isMono) throws IOException {
         if (operation == OperationEnum.PSF) {
             PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profileName, isMono);
@@ -449,14 +155,6 @@ public class OperationService {
             return LswFileUtil.getWienerDeconvolutionPSFImage(profileName);
         }
         return null;
-    }
-
-    private void applyBilateralDenoise(ImagePlus image, Profile profile) {
-        if (Constants.DENOISE_ALGORITHM_BILATERAL.equals(profile.getDenoiseAlgorithm1())) {
-            for (int i=1;i<=profile.getBilateralIterations();i++) {
-                bilateralDenoiseFilter.apply(image, profile.getBilateralRadius(), profile.getBilateralSigmaColor() * 10, 1);
-            }
-        }
     }
 
 }

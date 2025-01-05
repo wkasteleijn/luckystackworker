@@ -4,6 +4,8 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import ij.process.ShortProcessor;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
@@ -15,9 +17,18 @@ import java.util.concurrent.Executor;
 
 @Slf4j
 @Component
-public class BilateralDenoiseFilter {
+public class BilateralDenoiseFilter implements LSWFilter {
 
-    public void apply(ImagePlus image, int radius, double sigmaColor, double sigmaSpace) {
+    @Override
+    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+        if (Constants.DENOISE_ALGORITHM_BILATERAL.equals(profile.getDenoiseAlgorithm1())) {
+            for (int i=1;i<=profile.getBilateralIterations();i++) {
+                apply(image, profile.getBilateralRadius(), profile.getBilateralSigmaColor() * 10D, 1);
+            }
+        }
+    }
+
+    private void apply(ImagePlus image, int radius, double sigmaColor, double sigmaSpace) {
         log.info("Applying bilateral denoise filter to image: {}", image.getTitle());
         ImageStack stack = image.getStack();
 

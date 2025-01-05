@@ -1,4 +1,4 @@
-package nl.wilcokas.luckystackworker.filter;
+package nl.wilcokas.luckystackworker.filter.wpl;
 
 import edu.emory.mathcs.restoretools.iterative.wpl.WPLOptions;
 import ij.ImagePlus;

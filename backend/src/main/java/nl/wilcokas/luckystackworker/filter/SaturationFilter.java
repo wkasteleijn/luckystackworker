@@ -1,5 +1,6 @@
 package nl.wilcokas.luckystackworker.filter;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import ij.ImagePlus;
@@ -10,9 +11,26 @@ import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 
+import java.io.IOException;
+
+@Slf4j
 @Component
-public class SaturationFilter {
-    public void apply(ImagePlus image, Profile profile) {
+public class SaturationFilter implements LSWFilter {
+
+    @Override
+    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+        if (profile.getSaturation() != null) {
+            if (LswImageProcessingUtil.validateRGBStack(image)) {
+                log.info("Applying saturation increase with factor {} to image {}", profile.getSaturation(),
+                        image.getID());
+                apply(image, profile);
+            } else {
+                log.debug("Attemping to apply saturation increase to a non RGB image {}", image.getFileInfo());
+            }
+        }
+    }
+
+    private void apply(ImagePlus image, Profile profile) {
         ImageStack stack = image.getStack();
         ImageProcessor ipRed = stack.getProcessor(1);
         ImageProcessor ipGreen = stack.getProcessor(2);

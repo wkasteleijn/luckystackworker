@@ -4,13 +4,24 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 @Slf4j
 @Component
-public class ColorNormalisationFilter {
-    public void apply(ImagePlus image) {
+public class ColorNormalisationFilter implements LSWFilter {
+
+    @Override
+    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+        if (profile.isNormalizeColorBalance()) {
+            apply(image);
+        }
+    }
+
+    private void apply(ImagePlus image) {
         int width = image.getWidth();
         int height = image.getHeight();
 

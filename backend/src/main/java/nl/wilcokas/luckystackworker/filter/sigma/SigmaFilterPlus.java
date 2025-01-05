@@ -1,12 +1,10 @@
-package nl.wilcokas.luckystackworker.filter;
+package nl.wilcokas.luckystackworker.filter.sigma;
 
 import java.awt.Rectangle;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.concurrent.Executor;
 
 import nl.wilcokas.luckystackworker.model.Profile;
-import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.stereotype.Component;
 
 import ij.ImagePlus;
@@ -48,6 +46,7 @@ import ij.process.ImageProcessor;
  * <p>
  * <p>
  * Code by Michael Schmid, 2007-10-25
+ * Adapted by Wilco Kasteleijn, 2023-02-17
  * <p>
  * Note: this class is based on the original filter from Michael Schmid, but rewritten as an LSW filter.
  */

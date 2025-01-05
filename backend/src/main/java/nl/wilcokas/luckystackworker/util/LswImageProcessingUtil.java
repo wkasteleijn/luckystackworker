@@ -497,4 +497,8 @@ public class LswImageProcessingUtil {
         return fp;
     }
 
+    public static boolean validateRGBStack(ImagePlus image) {
+        return image.getStack().size() == 3;
+    }
+
 }

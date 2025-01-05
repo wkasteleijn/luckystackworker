@@ -1,8 +1,12 @@
 package nl.wilcokas.luckystackworker.filter;
 
 import java.awt.Rectangle;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.concurrent.Executor;
 
+import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
+import nl.wilcokas.luckystackworker.model.Profile;
 import org.springframework.stereotype.Component;
 
 import ij.ImagePlus;
@@ -20,9 +24,101 @@ import nl.wilcokas.luckystackworker.util.LswUtil;
 
 @Slf4j
 @Component
-public class LSWSharpenFilter {
+public class LSWSharpenFilter implements LSWFilter {
 
     private static final float FLOAT_MAX_SATURATED_VALUE = 65535f;
+
+    @Override
+    public void apply(final ImagePlus image, Profile profile, boolean isMono) {
+        int iterations = profile.getIterations() == 0 ? 1 : profile.getIterations();
+        if (profile.getApplyUnsharpMask().booleanValue() && profile.getRadius() != null && profile.getAmount() != null) {
+            log.info("Applying sharpen with radius {}, amount {}, iterations {} to image {}", profile.getRadius(),
+                    profile.getAmount(), iterations, image.getID());
+            float amount = profile.getAmount().divide(new BigDecimal("10000")).floatValue();
+            float clippingStrength = (profile.getClippingStrength()) / 500f;
+            float deringStrength = profile.getDeringStrength() / 100f;
+            float blendRaw = profile.getBlendRaw() / 100f;
+            UnsharpMaskParameters usParams;
+            LSWSharpenMode mode = (profile.getSharpenMode() == null) ? LSWSharpenMode.LUMINANCE : LSWSharpenMode.valueOf(profile.getSharpenMode());
+            if (mode == LSWSharpenMode.LUMINANCE) {
+                usParams = UnsharpMaskParameters.builder()
+                        .radiusLuminance(profile.getRadius().doubleValue())
+                        .amountLuminance(amount)
+                        .iterationsLuminance(iterations)
+                        .clippingStrengthLuminance(clippingStrength)
+                        .clippingRangeLuminance(100 - profile.getClippingRange())
+                        .deringRadiusLuminance(profile.getDeringRadius().doubleValue())
+                        .deringStrengthLuminance(deringStrength)
+                        .blendRawLuminance(blendRaw)
+                        .build();
+            } else {
+                int iterationsGreen = profile.getIterationsGreen() == 0 ? 1 : profile.getIterationsGreen();
+                int iterationsBlue = profile.getIterationsBlue() == 0 ? 1 : profile.getIterationsBlue();
+                float amountGreen = profile.getAmountGreen().divide(new BigDecimal("10000")).floatValue();
+                float clippingStrengthGreen = (profile.getClippingStrengthGreen()) / 500f;
+                float deringStrengthGreen = profile.getDeringStrengthGreen() / 100f;
+                float amountBlue = profile.getAmountBlue().divide(new BigDecimal("10000")).floatValue();
+                float clippingStrengthBlue = (profile.getClippingStrengthBlue()) / 500f;
+                float deringStrengthBlue = profile.getDeringStrengthBlue() / 100f;
+                float blendRawGreen = profile.getBlendRawGreen() / 100f;
+                float blendRawBlue = profile.getBlendRawBlue() / 100f;
+                usParams = UnsharpMaskParameters.builder()
+                        .radiusRed(profile.getRadius().doubleValue())
+                        .amountRed(amount)
+                        .iterationsRed(iterations)
+                        .clippingStrengthRed(clippingStrength)
+                        .clippingRangeRed(100 - profile.getClippingRange())
+                        .deringRadiusRed(profile.getDeringRadius().doubleValue())
+                        .deringStrengthRed(deringStrength)
+                        .radiusGreen(profile.getRadiusGreen().doubleValue())
+                        .amountGreen(amountGreen)
+                        .iterationsGreen(iterationsGreen)
+                        .clippingStrengthGreen(clippingStrengthGreen)
+                        .clippingRangeGreen(100 - profile.getClippingRangeGreen())
+                        .deringRadiusGreen(profile.getDeringRadiusGreen().doubleValue())
+                        .deringStrengthGreen(deringStrengthGreen)
+                        .radiusBlue(profile.getRadiusBlue().doubleValue())
+                        .amountBlue(amountBlue)
+                        .iterationsBlue(iterationsBlue)
+                        .clippingStrengthBlue(clippingStrengthBlue)
+                        .clippingRangeBlue(100 - profile.getClippingRangeBlue())
+                        .deringRadiusBlue(profile.getDeringRadiusBlue().doubleValue())
+                        .deringStrengthBlue(deringStrengthBlue)
+                        .blendRawRed(blendRaw)
+                        .blendRawGreen(blendRawGreen)
+                        .blendRawBlue(blendRawBlue)
+                        .build();
+            }
+
+            LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(profile.isLuminanceIncludeBlue())
+                    .includeGreen(profile.isLuminanceIncludeGreen()) //
+                    .includeRed(profile.isLuminanceIncludeRed()).includeColor(profile.isLuminanceIncludeColor())
+                    .saturation(1f).unsharpMaskParameters(usParams).mode(mode).build();
+            if (mode == LSWSharpenMode.LUMINANCE && !validateLuminanceInclusion(parameters)) {
+                log.warn("Attempt to exclude all channels from luminance sharpen!");
+                parameters.setIncludeRed(true);
+                parameters.setIncludeGreen(true);
+                parameters.setIncludeBlue(true);
+            }
+            if (profile.getSharpenMode().equals(LSWSharpenMode.RGB.toString()) || !LswImageProcessingUtil.validateRGBStack(image)) {
+                if (profile.getClippingStrength() > 0) {
+                    applyRGBModeClippingPrevention(image, parameters.getUnsharpMaskParameters());
+                } else {
+                    applyRGBMode(image, parameters.getUnsharpMaskParameters());
+                }
+            } else {
+                if (profile.getClippingStrength() > 0) {
+                    applyLuminanceModeClippingPrevention(image, parameters);
+                } else {
+                    applyLuminanceMode(image, parameters);
+                }
+            }
+        }
+    }
+
+    private boolean validateLuminanceInclusion(LSWSharpenParameters parameters) {
+        return parameters.isIncludeRed() || parameters.isIncludeGreen() || parameters.isIncludeBlue();
+    }
 
     public void applyRGBMode(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) {
         ImageStack stack = image.getStack();
