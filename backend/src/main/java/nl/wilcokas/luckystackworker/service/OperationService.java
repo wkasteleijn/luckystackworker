@@ -87,16 +87,16 @@ public class OperationService {
         int progressIncrease = 100 / filters.size();
         int progress = 0;
         boolean filterApplied = false;
+        OperationEnum previousCachedOperation = getPreviousCachedOperation(operation);
         for (int i = 0; i < filters.size(); i++) {
             Pair<OperationEnum, LSWFilter> filterData = filters.get(i);
             OperationEnum filterOperation = filterData.getLeft();
             LswImageLayersDto cacheValue = cache.get(filterOperation);
             if (operation == filterOperation || filterApplied || operation == null || cacheValue == null) {
                 LSWFilter filter = filterData.getRight();
-                filter.apply(image, profile, isMono);
+                filterApplied = filter.apply(image, profile, isMono);
                 cache.put(filterOperation, LswImageProcessingUtil.getImageLayers(image));
-                filterApplied = true;
-            } else {
+            } else if (previousCachedOperation == filterOperation) {
                 LswImageProcessingUtil.updateImageLayers(image, cacheValue);
             }
             progress += progressIncrease;
@@ -123,6 +123,23 @@ public class OperationService {
         int newHeight = (int) (image.getHeight() * scale);
         int depth = image.getStack().size();
         return Scaler.resize(image, newWidth, newHeight, depth, "depth=%s interpolation=Bicubic create".formatted(depth));
+    }
+
+    private OperationEnum getPreviousCachedOperation(OperationEnum operation) {
+        boolean operationFound = false;
+        for (int i = filters.size() - 1; i >= 0; i--) {
+            Pair<OperationEnum, LSWFilter> filterData = filters.get(i);
+            OperationEnum currentFilterOperation = filterData.getLeft();
+            if (currentFilterOperation == operation) {
+                operationFound = true;
+                continue;
+            }
+            LswImageLayersDto cacheValue = cache.get(currentFilterOperation);
+            if (operationFound && cacheValue != null) {
+                return currentFilterOperation;
+            }
+        }
+        return null;
     }
 
     private void updateProgress(LswImageViewer viewer, int progress) {

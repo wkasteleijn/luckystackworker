@@ -20,12 +20,14 @@ import java.util.concurrent.Executor;
 public class BilateralDenoiseFilter implements LSWFilter {
 
     @Override
-    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
         if (Constants.DENOISE_ALGORITHM_BILATERAL.equals(profile.getDenoiseAlgorithm1())) {
             for (int i=1;i<=profile.getBilateralIterations();i++) {
                 apply(image, profile.getBilateralRadius(), profile.getBilateralSigmaColor() * 10D, 1);
             }
+            return true;
         }
+        return false;
     }
 
     @Override
