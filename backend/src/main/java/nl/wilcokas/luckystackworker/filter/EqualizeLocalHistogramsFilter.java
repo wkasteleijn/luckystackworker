@@ -20,9 +20,9 @@ public class EqualizeLocalHistogramsFilter implements LSWFilter {
     private final GmicService gmicService;
 
     @Override
-    public void apply(ImagePlus image, Profile profile, boolean isMono) {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
         log.info("Applying equalize local historgrams with strength {} to image {}", profile.getEqualizeLocalHistogramsStrength(), image.getID());
-        apply(image, profile.getName(), profile.getEqualizeLocalHistogramsStrength(), profile.getScale());
+        return apply(image, profile.getName(), profile.getEqualizeLocalHistogramsStrength(), profile.getScale());
     }
 
     @Override
@@ -30,11 +30,13 @@ public class EqualizeLocalHistogramsFilter implements LSWFilter {
         return true;
     }
 
-    private void apply(final ImagePlus image, final String profileName, final int strength, double scale) {
+    private boolean apply(final ImagePlus image, final String profileName, final int strength, double scale) {
         if (strength>0) {
             gmicService.callGmicCli(image, profileName, scale,
                     Arrays.asList("fx_equalize_local_histograms", "%s,2,4,100,4,1,16,0,50,50".formatted(strength)));
+            return true;
         }
+        return false;
     }
 
 }

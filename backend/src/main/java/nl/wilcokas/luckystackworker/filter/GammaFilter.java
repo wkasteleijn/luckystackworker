@@ -13,14 +13,16 @@ import java.math.BigDecimal;
 @Component
 public class GammaFilter implements LSWFilter {
     @Override
-    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
         if (profile.getGamma() != null && (profile.getGamma().compareTo(BigDecimal.ONE) != 0)) {
             log.info("Applying gamma correction with value {} to image {}", profile.getGamma(), image.getID());
             for (int slice = 1; slice <= image.getStack().getSize(); slice++) {
                 ImageProcessor ip = getImageStackProcessor(image, slice);
                 ip.gamma(2d - profile.getGamma().doubleValue());
             }
+            return true;
         }
+        return false;
     }
 
     @Override

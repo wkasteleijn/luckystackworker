@@ -78,25 +78,32 @@ public class OperationService {
         cache.clear();
     }
 
-    public byte[] applyAllOperations(ImagePlus image, LswImageViewer viewer, Profile profile, OperationEnum operation, boolean isMono) throws IOException, InterruptedException {
+    public byte[] applyAllOperations(ImagePlus image, LswImageViewer viewer, Profile profile, OperationEnum operationParam, boolean isMono) throws IOException, InterruptedException {
         updateProgress(viewer, 0, true);
 
         // Sharpening filters
-        byte[] psfImage = updatePSF(profile.getPsf(), operation, profile.getName(), isMono);
-
+        byte[] psfImage = updatePSF(profile.getPsf(), operationParam, profile.getName(), isMono);
+        OperationEnum operation = operationParam;
+        if (psfImage!=null) {
+            operation = OperationEnum.WIENER_DECONV;
+        }
         int progressIncrease = 100 / filters.size();
         int progress = 0;
-        boolean filterApplied = false;
+        boolean filterEncountered = false;
         OperationEnum previousCachedOperation = getPreviousCachedOperation(operation);
         for (int i = 0; i < filters.size(); i++) {
             Pair<OperationEnum, LSWFilter> filterData = filters.get(i);
             OperationEnum filterOperation = filterData.getLeft();
             LswImageLayersDto cacheValue = cache.get(filterOperation);
-            if (operation == filterOperation || filterApplied || operation == null || cacheValue == null) {
+            if (operation == filterOperation || filterEncountered || operation == null || cacheValue == null) {
                 LSWFilter filter = filterData.getRight();
-                filterApplied = filter.apply(image, profile, isMono);
-                cache.put(filterOperation, LswImageProcessingUtil.getImageLayers(image));
-            } else if (previousCachedOperation == filterOperation) {
+                if (filter.apply(image, profile, isMono)) {
+                    cache.put(filterOperation, LswImageProcessingUtil.getImageLayers(image));
+                } else {
+                    cache.put(filterOperation, null);
+                }
+                filterEncountered = true;
+            } else if (previousCachedOperation == filterOperation && cacheValue != null) {
                 LswImageProcessingUtil.updateImageLayers(image, cacheValue);
             }
             progress += progressIncrease;

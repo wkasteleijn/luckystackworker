@@ -21,7 +21,7 @@ public class RGBBalanceFilter implements LSWFilter {
     private static final int STEP_SIZE = 64;
 
     @Override
-    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
         if ((profile.getRed() != null && (!profile.getRed().equals(BigDecimal.ZERO)))
                 || (profile.getGreen() != null && (!profile.getGreen().equals(BigDecimal.ZERO)))
                 || (profile.getBlue() != null && (!profile.getBlue().equals(BigDecimal.ZERO)))) {
@@ -30,8 +30,10 @@ public class RGBBalanceFilter implements LSWFilter {
                         profile.getBlue());
                 apply(image, profile.getRed().intValue(), profile.getGreen().intValue(), profile.getBlue().intValue(),
                         profile.getPurple().intValue() / 255D, profile.isPreserveDarkBackground());
+                return true;
             }
         }
+        return false;
     }
 
     @Override

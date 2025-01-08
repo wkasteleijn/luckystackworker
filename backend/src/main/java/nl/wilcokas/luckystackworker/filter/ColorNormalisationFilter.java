@@ -15,10 +15,12 @@ import java.io.IOException;
 public class ColorNormalisationFilter implements LSWFilter {
 
     @Override
-    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
         if (profile.isNormalizeColorBalance()) {
             apply(image);
+            return true;
         }
+        return false;
     }
 
     @Override

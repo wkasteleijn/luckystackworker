@@ -18,16 +18,18 @@ import java.io.IOException;
 public class SaturationFilter implements LSWFilter {
 
     @Override
-    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
         if (profile.getSaturation() != null) {
             if (LswImageProcessingUtil.validateRGBStack(image)) {
                 log.info("Applying saturation increase with factor {} to image {}", profile.getSaturation(),
                         image.getID());
                 apply(image, profile);
+                return true;
             } else {
                 log.debug("Attemping to apply saturation increase to a non RGB image {}", image.getFileInfo());
             }
         }
+        return false;
     }
 
     @Override

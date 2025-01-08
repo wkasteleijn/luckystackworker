@@ -27,7 +27,7 @@ import java.io.IOException;
 public class WienerDeconvolutionFilter implements LSWFilter {
 
     @Override
-    public void apply(final ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(final ImagePlus image, Profile profile, boolean isMono) throws IOException {
         if (profile.getApplyWienerDeconvolution().booleanValue()) {
             float deringStrength = profile.getDeringStrength() / 100f;
             float blendRaw = profile.getBlendRaw() / 100f;
@@ -83,7 +83,9 @@ public class WienerDeconvolutionFilter implements LSWFilter {
                 psfImage = PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profile.getName(), isMono);
             }
             apply(image, psfImage, parameters);
+            return true;
         }
+        return false;
     }
 
     @Override

@@ -29,7 +29,7 @@ public class LSWSharpenFilter implements LSWFilter {
     private static final float FLOAT_MAX_SATURATED_VALUE = 65535f;
 
     @Override
-    public void apply(final ImagePlus image, Profile profile, boolean isMono) {
+    public boolean apply(final ImagePlus image, Profile profile, boolean isMono) {
         int iterations = profile.getIterations() == 0 ? 1 : profile.getIterations();
         if (profile.getApplyUnsharpMask().booleanValue() && profile.getRadius() != null && profile.getAmount() != null) {
             log.info("Applying sharpen with radius {}, amount {}, iterations {} to image {}", profile.getRadius(),
@@ -103,17 +103,22 @@ public class LSWSharpenFilter implements LSWFilter {
             if (profile.getSharpenMode().equals(LSWSharpenMode.RGB.toString()) || !LswImageProcessingUtil.validateRGBStack(image)) {
                 if (profile.getClippingStrength() > 0) {
                     applyRGBModeClippingPrevention(image, parameters.getUnsharpMaskParameters());
+                    return true;
                 } else {
                     applyRGBMode(image, parameters.getUnsharpMaskParameters());
+                    return true;
                 }
             } else {
                 if (profile.getClippingStrength() > 0) {
                     applyLuminanceModeClippingPrevention(image, parameters);
+                    return true;
                 } else {
                     applyLuminanceMode(image, parameters);
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     @Override

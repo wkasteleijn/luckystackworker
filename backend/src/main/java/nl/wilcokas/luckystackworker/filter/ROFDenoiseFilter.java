@@ -34,7 +34,7 @@ import java.util.concurrent.Executor;
 @Component
 public class ROFDenoiseFilter {
 
-    public void apply(ImagePlus image, Profile profile) {
+    public boolean apply(ImagePlus image, Profile profile) {
         log.info("Applying ROF denoising to image {} with theta {}, thetaGreen {}, thetaBlue {}, iterations {}, iterationsGreen {}, iterationsBlue {}",
                 image.getID(), profile.getRofTheta(), profile.getRofThetaGreen(), profile.getRofThetaBlue(), profile.getRofIterations(), profile.getRofIterationsGreen(), profile.getRofIterationsBlue());
         ImageStack stack = image.getStack();
@@ -47,6 +47,7 @@ public class ROFDenoiseFilter {
         executor.execute(() -> applyToChannel(stack, profile.getRofThetaGreen() * 10, g, dt, profile.getRofIterationsGreen(), 2));
         executor.execute(() -> applyToChannel(stack, profile.getRofThetaBlue() * 10, g, dt, profile.getRofIterationsBlue(), 3));
         LswUtil.stopAndAwaitParallelExecutor(executor);
+        return true;
     }
 
     private void applyToChannel(ImageStack stack, final float theta, final float g, final float dt, final int iterations, final int channel) {

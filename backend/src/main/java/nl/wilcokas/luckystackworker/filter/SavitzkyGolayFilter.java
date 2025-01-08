@@ -170,11 +170,13 @@ public class SavitzkyGolayFilter implements LSWFilter {
     private static final int RADIUS_169_ROWLENGTH = 13;
 
     @Override
-    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
         if (Constants.DENOISE_ALGORITHM_SAVGOLAY.equals(profile.getDenoiseAlgorithm2())) {
             log.info("Starting SavitzkyGolayDenoise filter");
             apply(image, profile);
+            return true;
         }
+        return false;
     }
 
     @Override

@@ -18,11 +18,13 @@ public class SigmaDenoise1Filter implements LSWFilter  {
     private final SigmaFilterPlus sigmaFilterPlus;
 
     @Override
-    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
         if (Constants.DENOISE_ALGORITHM_SIGMA1.equals(profile.getDenoiseAlgorithm1())) {
             log.info("Applying Sigma denoise mode 1 with value {} to image {}", profile.getDenoise1Amount(), image.getID());
             sigmaFilterPlus.applyDenoise1(image, profile);
+            return true;
         }
+        return false;
     }
 
     @Override

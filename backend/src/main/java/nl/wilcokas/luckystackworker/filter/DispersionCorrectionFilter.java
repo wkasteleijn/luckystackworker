@@ -17,11 +17,13 @@ import nl.wilcokas.luckystackworker.model.Profile;
 public class DispersionCorrectionFilter implements LSWFilter {
 
     @Override
-    public void apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
         if (profile.isDispersionCorrectionEnabled() && LswImageProcessingUtil.validateRGBStack(image)) {
             log.info("Applying dispersion correction");
             apply(image, profile);
+            return true;
         }
+        return false;
     }
 
     @Override
