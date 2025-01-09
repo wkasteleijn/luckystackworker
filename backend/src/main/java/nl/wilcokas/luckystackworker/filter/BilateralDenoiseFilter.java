@@ -22,6 +22,7 @@ public class BilateralDenoiseFilter implements LSWFilter {
     @Override
     public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
         if (Constants.DENOISE_ALGORITHM_BILATERAL.equals(profile.getDenoiseAlgorithm1())) {
+            log.info("Applying bilateral denoise filter to image: {}", image.getTitle());
             for (int i=1;i<=profile.getBilateralIterations();i++) {
                 apply(image, profile.getBilateralRadius(), profile.getBilateralSigmaColor() * 10D, 1);
             }
@@ -36,7 +37,6 @@ public class BilateralDenoiseFilter implements LSWFilter {
     }
 
     private void apply(ImagePlus image, int radius, double sigmaColor, double sigmaSpace) {
-        log.info("Applying bilateral denoise filter to image: {}", image.getTitle());
         ImageStack stack = image.getStack();
 
         // Run every stack in a seperate thread to increase performance.
@@ -45,8 +45,6 @@ public class BilateralDenoiseFilter implements LSWFilter {
         executor.execute(() -> applyToChannel((ShortProcessor) stack.getProcessor(2), radius, sigmaColor, sigmaSpace));
         executor.execute(() -> applyToChannel((ShortProcessor) stack.getProcessor(3), radius, sigmaColor, sigmaSpace));
         LswUtil.stopAndAwaitParallelExecutor(executor);
-
-        log.info("Bilateral denoise filter applied to image: {}", image.getTitle());
     }
 
 

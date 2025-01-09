@@ -29,6 +29,7 @@ public class WienerDeconvolutionFilter implements LSWFilter {
     @Override
     public boolean apply(final ImagePlus image, Profile profile, boolean isMono) throws IOException {
         if (profile.getApplyWienerDeconvolution().booleanValue()) {
+            log.info("Applying Wiener deconvolution filter");
             float deringStrength = profile.getDeringStrength() / 100f;
             float blendRaw = profile.getBlendRaw() / 100f;
             int iterations = profile.getWienerIterations() == 0 ? 1 : profile.getWienerIterations();

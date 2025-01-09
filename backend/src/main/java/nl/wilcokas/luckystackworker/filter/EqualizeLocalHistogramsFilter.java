@@ -21,7 +21,6 @@ public class EqualizeLocalHistogramsFilter implements LSWFilter {
 
     @Override
     public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
-        log.info("Applying equalize local historgrams with strength {} to image {}", profile.getEqualizeLocalHistogramsStrength(), image.getID());
         return apply(image, profile.getName(), profile.getEqualizeLocalHistogramsStrength(), profile.getScale());
     }
 
@@ -32,6 +31,7 @@ public class EqualizeLocalHistogramsFilter implements LSWFilter {
 
     private boolean apply(final ImagePlus image, final String profileName, final int strength, double scale) {
         if (strength>0) {
+            log.info("Applying equalize local historgrams with strength {} to image {}", strength, image.getID());
             gmicService.callGmicCli(image, profileName, scale,
                     Arrays.asList("fx_equalize_local_histograms", "%s,2,4,100,4,1,16,0,50,50".formatted(strength)));
             return true;

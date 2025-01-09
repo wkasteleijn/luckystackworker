@@ -172,7 +172,7 @@ public class SavitzkyGolayFilter implements LSWFilter {
     @Override
     public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
         if (Constants.DENOISE_ALGORITHM_SAVGOLAY.equals(profile.getDenoiseAlgorithm2())) {
-            log.info("Starting SavitzkyGolayDenoise filter");
+            log.info("Applying SavitzkyGolayDenoise filter");
             apply(image, profile);
             return true;
         }

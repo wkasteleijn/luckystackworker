@@ -95,15 +95,14 @@ public class OperationService {
             Pair<OperationEnum, LSWFilter> filterData = filters.get(i);
             OperationEnum filterOperation = filterData.getLeft();
             LswImageLayersDto cacheValue = cache.get(filterOperation);
-            if (operation == filterOperation || filterEncountered || operation == null || cacheValue == null) {
+            if (operation == filterOperation || filterEncountered || operation == null) {
                 LSWFilter filter = filterData.getRight();
                 if (filter.apply(image, profile, isMono)) {
                     cache.put(filterOperation, LswImageProcessingUtil.getImageLayers(image));
-                } else {
-                    cache.put(filterOperation, null);
                 }
                 filterEncountered = true;
             } else if (previousCachedOperation == filterOperation && cacheValue != null) {
+                log.info("Applying {} from cache", filterOperation);
                 LswImageProcessingUtil.updateImageLayers(image, cacheValue);
             }
             progress += progressIncrease;
