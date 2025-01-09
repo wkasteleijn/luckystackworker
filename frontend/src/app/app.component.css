@@ -420,3 +420,6 @@
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
 }
+.deprecatedColor {
+  color: rgb(110, 110, 110);
+}

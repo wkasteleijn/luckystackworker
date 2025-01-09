@@ -858,10 +858,10 @@
             disabled="{{ !this.settings?.gmicAvailable }}"
             matTooltip="{{
               this.settings?.gmicAvailable
-                ? 'Warning: slows down processing and can only be applied equally to all channels.'
+                ? 'Warning: Not recommended. It slows down processing and can only be applied equally to all channels. Use Bilateral instead.'
                 : gmicUnavailableMessage()
             }}"
-            >Ian's NR</mat-radio-button
+            ><span class="deprecatedColor">(Ian's NR)</span></mat-radio-button
           >
         </mat-radio-group>
       </div>
@@ -1383,39 +1383,6 @@
           Local Contrast
         </div>
       </div>
-      <div
-        class="sliderRow"
-        matTooltip="{{
-          this.settings?.gmicAvailable
-            ? 'Warning: slows down processing.'
-            : gmicUnavailableMessage()
-        }}"
-      >
-        <div class="sliderLabel">Equalize locally</div>
-        <div class="slider">
-          <mat-slider
-            [disabled]="
-              shouldShowSpinner() ||
-              !refImageSelected ||
-              crop ||
-              !this.settings?.gmicAvailable
-            "
-            step="1"
-            min="0"
-            max="100"
-            (input)="equalizeLocalHistogramsChanged($event, false)"
-            (change)="equalizeLocalHistogramsChanged($event, true)"
-            [(ngModel)]="equalizeLocalHistograms"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span class="sliderLabel">{{ equalizeLocalHistograms }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ equalizeLocalHistograms == 0 ? "Off" : "" }}</span
-          >
-        </div>
-      </div>
       <div class="sliderRow">
         <div class="sliderLabel">Fine Details</div>
         <div class="slider">
@@ -1476,6 +1443,39 @@
             *ngIf="refImageSelected"
             class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
             >{{ localContrastLarge == 0 ? "Off" : "" }}</span
+          >
+        </div>
+      </div>
+      <div
+        class="sliderRow"
+        matTooltip="{{
+          this.settings?.gmicAvailable
+            ? 'Warning: Not recommended. Slows down processing.'
+            : gmicUnavailableMessage()
+        }}"
+      >
+        <div class="deprecatedColor sliderLabel">(Equalize locally)</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="
+              shouldShowSpinner() ||
+              !refImageSelected ||
+              crop ||
+              !this.settings?.gmicAvailable
+            "
+            step="1"
+            min="0"
+            max="100"
+            (input)="equalizeLocalHistogramsChanged($event, false)"
+            (change)="equalizeLocalHistogramsChanged($event, true)"
+            [(ngModel)]="equalizeLocalHistograms"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ equalizeLocalHistograms }}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ equalizeLocalHistograms == 0 ? "Off" : "" }}</span
           >
         </div>
       </div>
