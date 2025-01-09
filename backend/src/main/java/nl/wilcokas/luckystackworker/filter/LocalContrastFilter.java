@@ -24,19 +24,20 @@ public class LocalContrastFilter implements  LSWFilter {
     public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
         LSWSharpenMode mode = (profile.getLocalContrastMode() == null) ? LSWSharpenMode.LUMINANCE
                 : LSWSharpenMode.valueOf(profile.getLocalContrastMode());
+        boolean filterApplied = false;
         if (profile.getLocalContrastFine() != 0) {
             applyLocalContrast(image, profile.getLocalContrastFine(), Constants.LOCAL_CONTRAST_FINE_RADIUS, mode);
-            return true;
+            filterApplied = true;
         }
         if (profile.getLocalContrastMedium() != 0) {
             applyLocalContrast(image, profile.getLocalContrastMedium(), Constants.LOCAL_CONTRAST_MEDIUM_RADIUS, mode);
-            return true;
+            filterApplied = true;
         }
         if (profile.getLocalContrastLarge() != 0) {
             applyLocalContrast(image, profile.getLocalContrastLarge(), Constants.LOCAL_CONTRAST_LARGE_RADIUS, mode);
-            return true;
+            filterApplied = true;
         }
-        return false;
+        return filterApplied;
     }
 
     @Override
