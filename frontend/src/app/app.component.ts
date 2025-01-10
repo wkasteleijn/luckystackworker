@@ -76,6 +76,7 @@ export class AppComponent implements OnInit {
   denoise1Radius: number;
   denoise1Iterations: number;
 
+  iansNrUnlocked: boolean = false;
   iansAmount: number;
   iansAmountMid: number;
   iansRecovery: number;
@@ -110,6 +111,7 @@ export class AppComponent implements OnInit {
   localContrastFine: number;
   localContrastMedium: number;
   localContrastLarge: number;
+  equalizeLocallyUnlocked: boolean = false;
   equalizeLocalHistograms: number;
   preserveDarkBackground: boolean = true;
 

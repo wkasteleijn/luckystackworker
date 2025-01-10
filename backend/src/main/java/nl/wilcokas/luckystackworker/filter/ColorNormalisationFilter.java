@@ -16,7 +16,7 @@ public class ColorNormalisationFilter implements LSWFilter {
 
     @Override
     public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
-        if (profile.isNormalizeColorBalance()) {
+        if (isApplied(profile,image)) {
             log.info("Applying color balance normalization to image {}", image.getID());
             apply(image);
             return true;
@@ -27,6 +27,11 @@ public class ColorNormalisationFilter implements LSWFilter {
     @Override
     public boolean isSlow() {
         return false;
+    }
+
+    @Override
+    public boolean isApplied(Profile profile, ImagePlus image) {
+        return profile.isNormalizeColorBalance();
     }
 
     private void apply(ImagePlus image) {

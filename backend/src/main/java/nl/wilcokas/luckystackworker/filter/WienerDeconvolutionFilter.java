@@ -28,7 +28,7 @@ public class WienerDeconvolutionFilter implements LSWFilter {
 
     @Override
     public boolean apply(final ImagePlus image, Profile profile, boolean isMono) throws IOException {
-        if (profile.getApplyWienerDeconvolution().booleanValue()) {
+        if (isApplied(profile, image)) {
             log.info("Applying Wiener deconvolution filter");
             float deringStrength = profile.getDeringStrength() / 100f;
             float blendRaw = profile.getBlendRaw() / 100f;
@@ -92,6 +92,11 @@ public class WienerDeconvolutionFilter implements LSWFilter {
     @Override
     public boolean isSlow() {
         return false;
+    }
+
+    @Override
+    public boolean isApplied(Profile profile, ImagePlus image) {
+        return profile.getApplyWienerDeconvolution().booleanValue();
     }
 
     private boolean validateLuminanceInclusion(WienerDeconvolutionParameters parameters) {
@@ -189,7 +194,7 @@ public class WienerDeconvolutionFilter implements LSWFilter {
         ImagePlus[] psfPerChannel = getPsfPerChannel(psf);
         applyToChannel(ipInput, psfPerChannel[1], parameters.getIterationsLuminance(), parameters.getDeringStrengthLuminance(), parameters.getDeringRadiusLuminance(), parameters.getBlendRawLuminance());
         FloatProcessor fpOut = ipInput.toFloat(3, null);
-        pixelsLum = (float[])fpOut.getPixels();
+        pixelsLum = (float[]) fpOut.getPixels();
 
         // Convert back to 16-bit RGB and update the image
         for (int i = 0; i < pixelsRed.length; i++) {

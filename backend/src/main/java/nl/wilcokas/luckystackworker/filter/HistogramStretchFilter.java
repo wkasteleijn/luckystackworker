@@ -18,7 +18,7 @@ public class HistogramStretchFilter implements LSWFilter {
 
     @Override
     public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
-        if (profile.getContrast() != 0 || profile.getBrightness() != 0 || profile.getLightness() != 0 || profile.getBackground() != 0) {
+        if (isApplied(profile, image)) {
             log.info("Applying contrast increase with factor {} to image {}", profile.getContrast(),
                     image.getID());
 
@@ -40,6 +40,11 @@ public class HistogramStretchFilter implements LSWFilter {
         return false;
     }
 
+    @Override
+    public boolean isApplied(Profile profile, ImagePlus image) {
+        return profile.getContrast() != 0 || profile.getBrightness() != 0 || profile.getLightness() != 0 || profile.getBackground() != 0;
+    }
+
     private void apply(ImagePlus image, double minValue, double maxValue, double lightnessIncreaseValue, double backgroundCutoffFactor, boolean preserveDarkBackground) {
         int width = image.getWidth();
         int height = image.getHeight();
@@ -55,7 +60,7 @@ public class HistogramStretchFilter implements LSWFilter {
         double factor = 65535 / (maxValue - minValue);
         long minLong = (long) minValue;
 
-        double lowestValue = 16384 * (backgroundCutoffFactor/100D);
+        double lowestValue = 16384 * (backgroundCutoffFactor / 100D);
 
         // Apply scaling to each channel
         for (int y = 0; y < height; y++) {

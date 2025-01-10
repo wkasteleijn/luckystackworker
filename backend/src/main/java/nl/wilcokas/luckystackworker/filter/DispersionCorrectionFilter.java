@@ -18,7 +18,7 @@ public class DispersionCorrectionFilter implements LSWFilter {
 
     @Override
     public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
-        if (profile.isDispersionCorrectionEnabled() && LswImageProcessingUtil.validateRGBStack(image)) {
+        if (isApplied(profile, image)) {
             log.info("Applying dispersion correction");
             apply(image, profile);
             return true;
@@ -29,6 +29,11 @@ public class DispersionCorrectionFilter implements LSWFilter {
     @Override
     public boolean isSlow() {
         return false;
+    }
+
+    @Override
+    public boolean isApplied(Profile profile, ImagePlus image) {
+        return profile.isDispersionCorrectionEnabled() && LswImageProcessingUtil.validateRGBStack(image);
     }
 
     public void apply(ImagePlus image, Profile profile) {

@@ -22,16 +22,12 @@ public class RGBBalanceFilter implements LSWFilter {
 
     @Override
     public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
-        if ((profile.getRed() != null && (!profile.getRed().equals(BigDecimal.ZERO)))
-                || (profile.getGreen() != null && (!profile.getGreen().equals(BigDecimal.ZERO)))
-                || (profile.getBlue() != null && (!profile.getBlue().equals(BigDecimal.ZERO)))) {
-            if (LswImageProcessingUtil.validateRGBStack(image)) {
-                log.info("Applying RGB balance correction to image {} with values R {}, G {}, B {}", image.getID(), profile.getRed(), profile.getGreen(),
-                        profile.getBlue());
-                apply(image, profile.getRed().intValue(), profile.getGreen().intValue(), profile.getBlue().intValue(),
-                        profile.getPurple().intValue() / 255D, profile.isPreserveDarkBackground());
-                return true;
-            }
+        if (isApplied(profile, image)) {
+            log.info("Applying RGB balance correction to image {} with values R {}, G {}, B {}", image.getID(), profile.getRed(), profile.getGreen(),
+                    profile.getBlue());
+            apply(image, profile.getRed().intValue(), profile.getGreen().intValue(), profile.getBlue().intValue(),
+                    profile.getPurple().intValue() / 255D, profile.isPreserveDarkBackground());
+            return true;
         }
         return false;
     }
@@ -39,6 +35,13 @@ public class RGBBalanceFilter implements LSWFilter {
     @Override
     public boolean isSlow() {
         return false;
+    }
+
+    @Override
+    public boolean isApplied(Profile profile, ImagePlus image) {
+        return ((profile.getRed() != null && (!profile.getRed().equals(BigDecimal.ZERO)))
+                || (profile.getGreen() != null && (!profile.getGreen().equals(BigDecimal.ZERO)))
+                || (profile.getBlue() != null && (!profile.getBlue().equals(BigDecimal.ZERO))));
     }
 
     public void apply(ImagePlus image, int amountRed, int amountGreen, int amountBlue, double purpleReductionAmount, boolean preserveDarkBackground) {

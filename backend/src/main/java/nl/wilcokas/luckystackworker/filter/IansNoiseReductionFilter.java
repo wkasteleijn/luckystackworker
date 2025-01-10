@@ -24,7 +24,7 @@ public class IansNoiseReductionFilter implements LSWFilter {
 
     @Override
     public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
-        if (Constants.DENOISE_ALGORITHM_IANS.equals(profile.getDenoiseAlgorithm1())) {
+        if (isApplied(profile, image)) {
             log.info("Applying Ian's noise reduction to image {}", image.getID());
             IansNoiseReductionParameters parameters = IansNoiseReductionParameters.builder().fine(profile.getIansAmount()).medium(profile.getIansAmountMid())
                     .large(BigDecimal.ZERO).recovery(profile.getIansRecovery()).iterations(profile.getIansIterations()).build();
@@ -35,11 +35,16 @@ public class IansNoiseReductionFilter implements LSWFilter {
     }
 
     @Override
+    public boolean isApplied(Profile profile, ImagePlus image) {
+        return Constants.DENOISE_ALGORITHM_IANS.equals(profile.getDenoiseAlgorithm1());
+    }
+
+    @Override
     public boolean isSlow() {
         return true;
     }
 
-    private void apply(final ImagePlus image, final String profileName, final IansNoiseReductionParameters parameters, double scale)  {
+    private void apply(final ImagePlus image, final String profileName, final IansNoiseReductionParameters parameters, double scale) {
         for (int i = 0; i < parameters.getIterations(); i++) {
             BigDecimal fineValue = parameters.getFine() == null ? BigDecimal.ZERO : parameters.getFine().divide(BigDecimal.valueOf(200));
             BigDecimal mediumValue = parameters.getMedium() == null ? BigDecimal.ZERO : parameters.getMedium().divide(BigDecimal.valueOf(200));

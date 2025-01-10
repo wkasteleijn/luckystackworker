@@ -31,7 +31,7 @@ public class LSWSharpenFilter implements LSWFilter {
     @Override
     public boolean apply(final ImagePlus image, Profile profile, boolean isMono) {
         int iterations = profile.getIterations() == 0 ? 1 : profile.getIterations();
-        if (profile.getApplyUnsharpMask().booleanValue() && profile.getRadius() != null && profile.getAmount() != null) {
+        if (isApplied(profile, image)) {
             log.info("Applying sharpen with radius {}, amount {}, iterations {} to image {}", profile.getRadius(),
                     profile.getAmount(), iterations, image.getID());
             float amount = profile.getAmount().divide(new BigDecimal("10000")).floatValue();
@@ -124,6 +124,11 @@ public class LSWSharpenFilter implements LSWFilter {
     @Override
     public boolean isSlow() {
         return false;
+    }
+
+    @Override
+    public boolean isApplied(Profile profile, ImagePlus image) {
+        return profile.getApplyUnsharpMask().booleanValue() && profile.getRadius() != null && profile.getAmount() != null;
     }
 
     private boolean validateLuminanceInclusion(LSWSharpenParameters parameters) {

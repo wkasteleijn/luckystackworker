@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 public class GammaFilter implements LSWFilter {
     @Override
     public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
-        if (profile.getGamma() != null && (profile.getGamma().compareTo(BigDecimal.ONE) != 0)) {
+        if (isApplied(profile,image)) {
             log.info("Applying gamma correction with value {} to image {}", profile.getGamma(), image.getID());
             for (int slice = 1; slice <= image.getStack().getSize(); slice++) {
                 ImageProcessor ip = getImageStackProcessor(image, slice);
@@ -28,6 +28,11 @@ public class GammaFilter implements LSWFilter {
     @Override
     public boolean isSlow() {
         return false;
+    }
+
+    @Override
+    public boolean isApplied(Profile profile, ImagePlus image) {
+        return profile.getGamma() != null && (profile.getGamma().compareTo(BigDecimal.ONE) != 0);
     }
 
     private ImageProcessor getImageStackProcessor(final ImagePlus img, final int stackPosition) {

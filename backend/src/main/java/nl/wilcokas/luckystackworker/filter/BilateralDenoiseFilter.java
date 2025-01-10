@@ -21,7 +21,7 @@ public class BilateralDenoiseFilter implements LSWFilter {
 
     @Override
     public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
-        if (Constants.DENOISE_ALGORITHM_BILATERAL.equals(profile.getDenoiseAlgorithm1())) {
+        if (isApplied(profile,image)) {
             log.info("Applying bilateral denoise filter to image: {}", image.getTitle());
             for (int i=1;i<=profile.getBilateralIterations();i++) {
                 apply(image, profile.getBilateralRadius(), profile.getBilateralSigmaColor() * 10D, 1);
@@ -34,6 +34,11 @@ public class BilateralDenoiseFilter implements LSWFilter {
     @Override
     public boolean isSlow() {
         return false;
+    }
+
+    @Override
+    public boolean isApplied(Profile profile, ImagePlus image) {
+        return Constants.DENOISE_ALGORITHM_BILATERAL.equals(profile.getDenoiseAlgorithm1());
     }
 
     private void apply(ImagePlus image, int radius, double sigmaColor, double sigmaSpace) {

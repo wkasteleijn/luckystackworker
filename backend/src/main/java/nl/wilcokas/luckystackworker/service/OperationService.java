@@ -84,13 +84,13 @@ public class OperationService {
         // Sharpening filters
         byte[] psfImage = updatePSF(profile.getPsf(), operationParam, profile.getName(), isMono);
         OperationEnum operation = operationParam;
-        if (psfImage!=null) {
+        if (psfImage != null) {
             operation = OperationEnum.WIENER_DECONV;
         }
         int progressIncrease = 100 / filters.size();
         int progress = 0;
         boolean filterEncountered = false;
-        OperationEnum previousCachedOperation = getPreviousCachedOperation(operation);
+        OperationEnum previousCachedOperation = getPreviousCachedOperation(profile, image, operation);
         for (int i = 0; i < filters.size(); i++) {
             Pair<OperationEnum, LSWFilter> filterData = filters.get(i);
             OperationEnum filterOperation = filterData.getLeft();
@@ -131,7 +131,7 @@ public class OperationService {
         return Scaler.resize(image, newWidth, newHeight, depth, "depth=%s interpolation=Bicubic create".formatted(depth));
     }
 
-    private OperationEnum getPreviousCachedOperation(OperationEnum operation) {
+    private OperationEnum getPreviousCachedOperation(Profile profile, ImagePlus image, OperationEnum operation) {
         boolean operationFound = false;
         for (int i = filters.size() - 1; i >= 0; i--) {
             Pair<OperationEnum, LSWFilter> filterData = filters.get(i);
@@ -141,15 +141,11 @@ public class OperationService {
                 continue;
             }
             LswImageLayersDto cacheValue = cache.get(currentFilterOperation);
-            if (operationFound && cacheValue != null) {
+            if (operationFound && cacheValue != null && filterData.getRight().isApplied(profile, image)) {
                 return currentFilterOperation;
             }
         }
         return null;
-    }
-
-    private void updateProgress(LswImageViewer viewer, int progress) {
-        updateProgress(viewer, progress, false);
     }
 
     private void updateProgress(LswImageViewer viewer, int progress, boolean slowOperationNext) {

@@ -856,13 +856,16 @@
             value="IAN"
             class="denoiseMode"
             disabled="{{ !this.settings?.gmicAvailable }}"
-            matTooltip="{{
-              this.settings?.gmicAvailable
-                ? 'Warning: Not recommended. It slows down processing and can only be applied equally to all channels. Use Bilateral instead.'
-                : gmicUnavailableMessage()
-            }}"
-            ><span class="deprecatedColor">(Ian's NR)</span></mat-radio-button
+            matTooltip="Warning: Not recommended. It slows down processing and can only be applied equally to all channels. Use Bilateral instead."
+            ><span class="deprecatedColor">Ian's NR</span></mat-radio-button
           >
+          <mat-checkbox
+            [(ngModel)]="iansNrUnlocked"
+            [color]="colorTheme()"
+            class="iansNrLockCheckbox"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            matTooltip="Unlock"
+          ></mat-checkbox>
         </mat-radio-group>
       </div>
       <div *ngIf="denoiseAlgorithm1 === 'IAN'">
@@ -871,6 +874,7 @@
           <div class="slider">
             <mat-slider
               [disabled]="
+                !iansNrUnlocked ||
                 shouldShowSpinner() ||
                 !refImageSelected ||
                 crop ||
@@ -903,6 +907,7 @@
           <div class="slider">
             <mat-slider
               [disabled]="
+                !iansNrUnlocked ||
                 shouldShowSpinner() ||
                 !refImageSelected ||
                 crop ||
@@ -935,6 +940,7 @@
           <div class="slider">
             <mat-slider
               [disabled]="
+                !iansNrUnlocked ||
                 shouldShowSpinner() ||
                 !refImageSelected ||
                 crop ||
@@ -967,6 +973,7 @@
           <div class="slider">
             <mat-slider
               [disabled]="
+                !iansNrUnlocked ||
                 shouldShowSpinner() ||
                 !refImageSelected ||
                 crop ||
@@ -1105,7 +1112,7 @@
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               step="1"
               min="1"
-              max="1000"
+              max="2000"
               (input)="bilateralSigmaColorChanged($event, false)"
               (change)="bilateralSigmaColorChanged($event, true)"
               [(ngModel)]="bilateralSigmaColor"
@@ -1448,16 +1455,21 @@
       </div>
       <div
         class="sliderRow"
-        matTooltip="{{
-          this.settings?.gmicAvailable
-            ? 'Warning: Not recommended. Slows down processing.'
-            : gmicUnavailableMessage()
-        }}"
+        matTooltip="Warning: Not recommended. Slows down processing."
       >
-        <div class="deprecatedColor sliderLabel">(Equalize locally)</div>
-        <div class="slider">
+        <div class="deprecatedColor sliderLabel sliderLabelEL">
+          Equalize locally
+        </div>
+        <mat-checkbox
+          [(ngModel)]="equalizeLocallyUnlocked"
+          [color]="colorTheme()"
+          [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+          matTooltip="Unlock"
+        ></mat-checkbox>
+        <div>
           <mat-slider
             [disabled]="
+              !equalizeLocallyUnlocked ||
               shouldShowSpinner() ||
               !refImageSelected ||
               crop ||

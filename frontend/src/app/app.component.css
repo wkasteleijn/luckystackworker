@@ -22,6 +22,10 @@
   margin-left: 16px;
 }
 
+.sliderLabelEL {
+  width: 100px !important;
+}
+
 .edgeArtifactLabel {
   width: 178px;
   color: rgb(168, 168, 168);
@@ -422,4 +426,7 @@
 }
 .deprecatedColor {
   color: rgb(110, 110, 110);
+}
+.iansNrLockCheckbox {
+  margin-left: 4px;
 }

@@ -171,7 +171,7 @@ public class SavitzkyGolayFilter implements LSWFilter {
 
     @Override
     public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
-        if (Constants.DENOISE_ALGORITHM_SAVGOLAY.equals(profile.getDenoiseAlgorithm2())) {
+        if (isApplied(profile, image)) {
             log.info("Applying SavitzkyGolayDenoise filter");
             apply(image, profile);
             return true;
@@ -184,6 +184,11 @@ public class SavitzkyGolayFilter implements LSWFilter {
         return false;
     }
 
+    @Override
+    public boolean isApplied(Profile profile, ImagePlus image) {
+        return Constants.DENOISE_ALGORITHM_SAVGOLAY.equals(profile.getDenoiseAlgorithm2());
+    }
+
     private void apply(ImagePlus image, Profile profile) {
         ImageStack stack = image.getStack();
         // Run every stack in a seperate thread to increase performance.
@@ -192,7 +197,7 @@ public class SavitzkyGolayFilter implements LSWFilter {
         executor.execute(() -> {
             ImageProcessor layerProcessor = stack.getProcessor(1);
             int iterations = profile.getSavitzkyGolayIterations() == 0 ? 1 : profile.getSavitzkyGolayIterations();
-            SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySize(),profile.getSavitzkyGolayAmount(), iterations);
+            SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySize(), profile.getSavitzkyGolayAmount(), iterations);
             if (parameters.radiusFactors != null) {
                 applySavitzkyGolayToLayer(image, layerProcessor, parameters);
             }
@@ -201,7 +206,7 @@ public class SavitzkyGolayFilter implements LSWFilter {
         executor.execute(() -> {
             ImageProcessor layerProcessor = stack.getProcessor(2);
             int iterations = profile.getSavitzkyGolayIterationsGreen() == 0 ? 1 : profile.getSavitzkyGolayIterationsGreen();
-            SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySizeGreen(),profile.getSavitzkyGolayAmountGreen(), iterations);
+            SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySizeGreen(), profile.getSavitzkyGolayAmountGreen(), iterations);
             if (parameters.radiusFactors != null) {
                 applySavitzkyGolayToLayer(image, layerProcessor, parameters);
             }
@@ -210,7 +215,7 @@ public class SavitzkyGolayFilter implements LSWFilter {
         executor.execute(() -> {
             ImageProcessor layerProcessor = stack.getProcessor(3);
             int iterations = profile.getSavitzkyGolayIterationsBlue() == 0 ? 1 : profile.getSavitzkyGolayIterationsBlue();
-            SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySizeBlue(),profile.getSavitzkyGolayAmountBlue(), iterations);
+            SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySizeBlue(), profile.getSavitzkyGolayAmountBlue(), iterations);
             if (parameters.radiusFactors != null) {
                 applySavitzkyGolayToLayer(image, layerProcessor, parameters);
             }
@@ -307,6 +312,8 @@ public class SavitzkyGolayFilter implements LSWFilter {
         return LswImageProcessingUtil.convertToUnsignedInt(pixels[position]);
     }
 
-    private record SavitzkyGolayParameters(int iterations, int amount, int[] radiusFactors, int[][] radiusOffsets, int radiusDivisor, int radiusCenter, int radiusRowLength) {}
+    private record SavitzkyGolayParameters(int iterations, int amount, int[] radiusFactors, int[][] radiusOffsets,
+                                           int radiusDivisor, int radiusCenter, int radiusRowLength) {
+    }
 
 }

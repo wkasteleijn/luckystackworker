@@ -29,6 +29,11 @@ public class EqualizeLocalHistogramsFilter implements LSWFilter {
         return true;
     }
 
+    @Override
+    public boolean isApplied(Profile profile, ImagePlus image) {
+        return false;
+    }
+
     private boolean apply(final ImagePlus image, final String profileName, final int strength, double scale) {
         if (strength>0) {
             log.info("Applying equalize local historgrams with strength {} to image {}", strength, image.getID());
