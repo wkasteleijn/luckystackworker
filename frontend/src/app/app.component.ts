@@ -481,7 +481,7 @@ export class AppComponent implements OnInit {
         this.profile.deringRadiusBlue = event.value;
     }
     this.deringRadius = event.value;
-    this.settings.operation = 'SHARPEN';
+    this.setSharpenOperationForDeringing();
     console.log('deringRadius called: ' + this.profile.deringRadius);
     if (update) {
       this.updateProfile();
@@ -506,7 +506,7 @@ export class AppComponent implements OnInit {
         this.profile.deringStrengthBlue = event.value;
     }
     this.deringStrength = event.value;
-    this.settings.operation = 'SHARPEN';
+    this.setSharpenOperationForDeringing();
     console.log('deringStrength called: ' + this.profile.deringStrength);
     if (update) {
       this.updateProfile();
@@ -1871,6 +1871,14 @@ export class AppComponent implements OnInit {
     this.profile.green = 0;
     this.profile.blue = 0;
     this.updateProfile();
+  }
+
+  private setSharpenOperationForDeringing() {
+    if (this.applyWienerDeconvolution) {
+      this.settings.operation = 'WIENER_DECONV';
+      return;
+    }
+    this.settings.operation = 'SHARPEN';
   }
 
   private restoreToInitialSettings() {
