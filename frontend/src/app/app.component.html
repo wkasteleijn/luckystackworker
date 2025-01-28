@@ -94,6 +94,31 @@
       </select>
     </mat-form-field>
 
+    <button
+      *ngIf="openRefImageEnabled() && refImageSelected"
+      type="button"
+      mat-button
+      (click)="cropSelectionChanged()"
+      class="{{
+        'buttonZoom buttonMargin ' +
+          (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+          (cropEnabled() ? 'Pressed' : '')
+      }}"
+      matTooltip="Rotate"
+    >
+      <img src="assets/images/rotate.png" class="rotate" />
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled() || !refImageSelected"
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled buttonMargin"
+      matTooltip="Rotate"
+    >
+      <img src="assets/images/rotate.png" class="rotate" />
+    </button>
+
     <mat-form-field appearance="fill">
       <select
         matNativeControl
@@ -102,11 +127,12 @@
         name="profile"
         (change)="profileSelectionChanged()"
         class="{{
-          !refImageSelected || !openRefImageEnabled()
-            ? 'dropdownMargin dropdown_disabled'
-            : nightModeEnabled()
-            ? 'dropdownMargin dropdown activeColorNight'
-            : 'dropdownMargin dropdown activeColor'
+          'dropdownMargin profileSelector ' +
+            (!refImageSelected || !openRefImageEnabled()
+              ? ' dropdown_disabled'
+              : nightModeEnabled()
+              ? ' dropdown activeColorNight'
+              : ' dropdown activeColor')
         }}"
         matTooltip="Select the object profile"
       >

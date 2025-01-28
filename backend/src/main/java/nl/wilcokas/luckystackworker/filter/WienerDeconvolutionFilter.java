@@ -17,10 +17,12 @@ import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
+import nl.wilcokas.luckystackworker.util.LswUtil;
 import nl.wilcokas.luckystackworker.util.PsfDiskGenerator;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
 
 @Component
 @Slf4j
@@ -107,9 +109,11 @@ public class WienerDeconvolutionFilter implements LSWFilter {
         ImagePlus[] psfPerChannel = getPsfPerChannel(psf);
         ImageStack stack = image.getStack();
         if (parameters.getMode() == LSWSharpenMode.RGB) {
-            applyToChannel(stack.getProcessor(1), psfPerChannel[0], parameters.getIterationsRed(), parameters.getDeringStrengthRed(), parameters.getDeringRadiusRed(), parameters.getBlendRawRed());
-            applyToChannel(stack.getProcessor(2), psfPerChannel[1], parameters.getIterationsGreen(), parameters.getDeringStrengthGreen(), parameters.getDeringRadiusGreen(), parameters.getBlendRawGreen());
-            applyToChannel(stack.getProcessor(3), psfPerChannel[2], parameters.getIterationsBlue(), parameters.getDeringStrengthBlue(), parameters.getDeringRadiusBlue(), parameters.getBlendRawBlue());
+            Executor executor = LswUtil.getParallelExecutor();
+            executor.execute(() -> applyToChannel(stack.getProcessor(1), psfPerChannel[0], parameters.getIterationsRed(), parameters.getDeringStrengthRed(), parameters.getDeringRadiusRed(), parameters.getBlendRawRed()));
+            executor.execute(() -> applyToChannel(stack.getProcessor(2), psfPerChannel[1], parameters.getIterationsGreen(), parameters.getDeringStrengthGreen(), parameters.getDeringRadiusGreen(), parameters.getBlendRawGreen()));
+            executor.execute(() -> applyToChannel(stack.getProcessor(3), psfPerChannel[2], parameters.getIterationsBlue(), parameters.getDeringStrengthBlue(), parameters.getDeringRadiusBlue(), parameters.getBlendRawBlue()));
+            LswUtil.stopAndAwaitParallelExecutor(executor);
         } else {
             applyLuminance(image, psf, parameters);
         }
@@ -125,6 +129,7 @@ public class WienerDeconvolutionFilter implements LSWFilter {
     }
 
     private void applyToChannel(ImageProcessor ipInput, ImagePlus psf, int iterations, float deringStrength, double deringRadius, float blendRawFactor) {
+        log.info("Applying Wiener deconvolution to channel {}", ipInput.getSliceNumber());
         short[] pixels = (short[]) ipInput.getPixels();
         double averagePixelValueIn = getAveragePixelValue(pixels);
         short[] outPixels = getDeconvolvedPixels(ipInput, psf, iterations);
@@ -154,7 +159,7 @@ public class WienerDeconvolutionFilter implements LSWFilter {
                 double originalValue = LswImageProcessingUtil.convertToUnsignedInt(pixels[i]);
                 double assignedValueAfterMask = (newValue * appliedMaskFactor) + (originalValue * (1d - appliedMaskFactor));
                 double assignedValue = (1f - blendRawFactor) * assignedValueAfterMask + originalValue * blendRawFactor;
-                pixels[i] = LswImageProcessingUtil.convertToShort((int) assignedValue);
+                pixels[i] = LswImageProcessingUtil.convertToShort((int) (Math.min(assignedValue, 65535d)));
             }
         }
     }

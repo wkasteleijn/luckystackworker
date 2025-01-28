@@ -306,7 +306,7 @@ public class LswWPLFloatIterativeDeconvolver2D {
                                 idx2 = cC + columns * rC;
                                 h2e = (h2[idx1] + h2[idx2]) / 2;
                                 h2o = (h2[idx1] - h2[idx2]) / 2;
-                                result[idx1] = (float) (h1[idx1] * h2e + h1[idx2] * h2o);
+                                result[idx1] = (h1[idx1] * h2e + h1[idx2] * h2o);
                             }
                         }
                     }
@@ -324,7 +324,7 @@ public class LswWPLFloatIterativeDeconvolver2D {
                     idx2 = cC + columns * rC;
                     h2e = (h2[idx1] + h2[idx2]) / 2;
                     h2o = (h2[idx1] - h2[idx2]) / 2;
-                    result[idx1] = (float) (h1[idx1] * h2e + h1[idx2] * h2o);
+                    result[idx1] = (h1[idx1] * h2e + h1[idx2] * h2o);
                 }
             }
         }
@@ -492,9 +492,9 @@ public class LswWPLFloatIterativeDeconvolver2D {
                     results[j] = (Float) futures[j].get();
                 }
             } catch (ExecutionException ex) {
-                ex.printStackTrace();
+                log.error("Error applying wiener deconvolution", ex);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("Error applying wiener deconvolution", e);
             }
             for (int j = 0; j < np; j++) {
                 sumPixels += results[j];
@@ -581,9 +581,9 @@ public class LswWPLFloatIterativeDeconvolver2D {
                     results[j] = (Float) futures[j].get();
                 }
             } catch (ExecutionException ex) {
-                ex.printStackTrace();
+                log.error("Error applying wiener deconvolution", ex);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("Error applying wiener deconvolution", e);
             }
             magMax = results[0];
             for (int j = 1; j < np; j++) {
@@ -770,9 +770,9 @@ public class LswWPLFloatIterativeDeconvolver2D {
                     results[j] = (Float) futures[j].get();
                 }
             } catch (ExecutionException ex) {
-                ex.printStackTrace();
+                log.error("Error applying wiener deconvolution", ex);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("Error applying wiener deconvolution", e);
             }
             for (int j = 0; j < np; j++) {
                 meanDelta += results[j];
@@ -856,9 +856,9 @@ public class LswWPLFloatIterativeDeconvolver2D {
                     results[j] = (Float) futures[j].get();
                 }
             } catch (ExecutionException ex) {
-                ex.printStackTrace();
+                log.error("Error applying wiener deconvolution", ex);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("Error applying wiener deconvolution", e);
             }
             min = results[0];
             for (int j = 1; j < np; j++) {
