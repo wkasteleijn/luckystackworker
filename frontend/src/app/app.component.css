@@ -105,7 +105,7 @@
   margin-top: -8px !important;
 }
 .rootFolder {
-  width: 294px;
+  width: 248px;
   margin-left: 6px;
 }
 .dropdown_label {
@@ -174,7 +174,7 @@
 
 .plusZoom {
   position: fixed;
-  top: 6px;
+  top: 49px;
   right: 8px;
   z-index: 100;
   height: 38px;
@@ -182,14 +182,14 @@
 .minZoom {
   position: fixed;
   top: 49px;
-  right: 8px;
+  right: 53px;
   z-index: 100;
   height: 38px;
 }
 .maximize {
   position: fixed;
   top: 49px;
-  right: 54px;
+  right: 98px;
   z-index: 100;
   height: 38px;
 }
@@ -380,6 +380,9 @@
 .dropdownMargin {
   margin-left: 6px;
 }
+.profileSelector {
+  max-width: 99px;
+}
 .zoomIcon {
   transform: scale(1.6);
 }
@@ -402,6 +405,12 @@
   transform: scaleX(1.7) scaleY(2.3);
   margin-top: 2px;
   margin-left: -1px;
+}
+.rotate {
+  width: 14px;
+  height: 14px;
+  transform: scaleX(2.3) scaleY(2.3);
+  margin-top: 2px;
 }
 .infoButton {
   width: 12px;
