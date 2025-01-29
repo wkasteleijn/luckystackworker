@@ -145,6 +145,7 @@ export class AppComponent implements OnInit {
   realtimeEnabled: boolean = false;
   showHistogram: boolean = true;
   scale: string = '1';
+  rotationAngle: number = 45;
   openImageMode: string = 'RGB';
   visibleChannel: string = 'RGB';
   applySharpenToChannel: string = 'RGB';
@@ -263,6 +264,13 @@ export class AppComponent implements OnInit {
         }
       );
     }
+  }
+
+  rotationAngleChanged() {
+    console.log('rotationAngleChanged called');
+    this.settings.operation = 'ROTATE';
+    this.profile.rotationAngle = this.rotationAngle;
+    this.updateProfile();
   }
 
   openImageModeChanged() {

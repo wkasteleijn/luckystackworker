@@ -150,6 +150,7 @@ public class Profile {
     private boolean normalizeColorBalance;
 
     private double scale;
+    private double rotationAngle;
     private OpenImageModeEnum openImageMode;
 
     private PSF psf;
@@ -357,6 +358,7 @@ public class Profile {
         this.normalizeColorBalance = profile.isNormalizeColorBalance();
 
         this.scale = profile.getScale();
+        this.rotationAngle = profile.getRotationAngle();
         this.openImageMode = profile.getOpenImageMode();
         PSFDTO psfDTO = profile.getPsf();
         this.psf = PSF.builder()

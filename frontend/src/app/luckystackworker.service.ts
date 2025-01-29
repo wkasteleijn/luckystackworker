@@ -57,6 +57,10 @@ export class LuckyStackWorkerService {
     return this.http.put(`${this.baseUrl}/profiles/scale`, profile);
   }
 
+  rotate(profile: Profile): Observable<any> {
+    return this.http.put(`${this.baseUrl}/profiles/rotate`, profile);
+  }
+
   selectRootFolder(): Observable<any> {
     return this.http.get(`${this.baseUrl}/reference/rootfolder`);
   }

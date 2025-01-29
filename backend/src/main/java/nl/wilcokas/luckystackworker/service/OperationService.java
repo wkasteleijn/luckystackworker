@@ -2,7 +2,9 @@ package nl.wilcokas.luckystackworker.service;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Executor;
 
+import ij.ImageStack;
 import jakarta.annotation.PostConstruct;
 import nl.wilcokas.luckystackworker.filter.*;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
@@ -11,6 +13,7 @@ import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
+import nl.wilcokas.luckystackworker.util.LswUtil;
 import nl.wilcokas.luckystackworker.util.PsfDiskGenerator;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
@@ -42,6 +45,7 @@ public class OperationService {
     private final WienerDeconvolutionFilter wienerDeconvolutionFilter;
     private final BilateralDenoiseFilter bilateralDenoiseFilter;
     private final LocalContrastFilter localContrastFilter;
+    private final RotationFilter rotationFilter;
     private final GammaFilter gammaFilter;
 
     private int displayedProgress = 0;
@@ -67,6 +71,7 @@ public class OperationService {
         filters.add(Pair.of(OperationEnum.SATURATION, saturationFilter));
         filters.add(Pair.of(OperationEnum.DISPERSION, dispersionCorrectionFilter));
         filters.add(Pair.of(OperationEnum.HISTOGRAM_STRETCH, histogramStretchFilter));
+        filters.add(Pair.of(OperationEnum.ROTATE, rotationFilter));
     }
 
     public void correctExposure(ImagePlus image) throws IOException {

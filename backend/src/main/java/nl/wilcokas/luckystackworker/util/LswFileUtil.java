@@ -427,7 +427,7 @@ public class LswFileUtil {
                     .build();
             profile.setPsf(psf);
         }
-        if (profile.getApplyUnsharpMask()==null) {
+        if (profile.getApplyUnsharpMask() == null) {
             if (profile.getRadius() != null && profile.getAmount() != null) {
                 profile.setApplyUnsharpMask(true);
             } else {

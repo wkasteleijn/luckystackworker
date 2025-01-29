@@ -5,19 +5,13 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import ij.ImagePlus;
-import ij.gui.Roi;
-import ij.io.Opener;
 import nl.wilcokas.luckystackworker.dto.*;
-import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.service.PSFService;
-import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,8 +35,6 @@ import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.service.SettingsService;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
-
-import static nl.wilcokas.luckystackworker.constants.Constants.PSF_SIZE;
 
 @CrossOrigin(origins = {"http://localhost:4200"})
 @RequiredArgsConstructor

@@ -26,7 +26,7 @@ public class GmicService {
 
     private Boolean gmicAvailable;
 
-    public void callGmicCli(ImagePlus image, final String profileName, final double scale, final List<String> commands) {
+    public void callGmicCli(ImagePlus image, final String profileName, final double scale, final double rotationAngle, final List<String> commands) {
         try {
             String activeOSProfile = LswUtil.getActiveOSProfile();
             if (!isGmicAvailable(activeOSProfile)) {

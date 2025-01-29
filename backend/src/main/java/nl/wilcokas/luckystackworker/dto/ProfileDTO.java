@@ -141,6 +141,7 @@ public class ProfileDTO {
         this.preserveDarkBackground = profile.isPreserveDarkBackground();
 
         this.scale = profile.getScale();
+        this.rotationAngle = profile.getRotationAngle();
         this.equalizeLocalHistogramsStrength = profile.getEqualizeLocalHistogramsStrength();
         this.openImageMode = profile.getOpenImageMode();
         PSF profilePsf = profile.getPsf();
@@ -281,6 +282,7 @@ public class ProfileDTO {
     private boolean normalizeColorBalance;
 
     private double scale;
+    private double rotationAngle;
     private int equalizeLocalHistogramsStrength;
     private OpenImageModeEnum openImageMode;
     private PSFDTO psf;

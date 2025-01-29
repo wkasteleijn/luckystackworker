@@ -137,6 +137,7 @@ export class Profile {
   normalizeColorBalance: boolean;
 
   scale: number;
+  rotationAngle: number;
   openImageMode: string;
 
   psf: PSF;
