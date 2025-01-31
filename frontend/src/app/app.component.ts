@@ -151,6 +151,7 @@ export class AppComponent implements OnInit {
   applySharpenToChannel: string = 'RGB';
   applyDenoiseToChannel: string = 'RGB';
   isPsfPanelVisible: boolean = false;
+  isRotationPanelVisible: boolean = false;
   psfImage: string = '';
 
   constructor(
@@ -266,10 +267,10 @@ export class AppComponent implements OnInit {
     }
   }
 
-  rotationAngleChanged() {
+  rotationAngleChanged(event: any) {
     console.log('rotationAngleChanged called');
     this.settings.operation = 'ROTATE';
-    this.profile.rotationAngle = this.rotationAngle;
+    this.profile.rotationAngle = event;
     this.updateProfile();
   }
 
@@ -316,9 +317,19 @@ export class AppComponent implements OnInit {
     this.isPsfPanelVisible = true;
   }
 
+  openRotationPanel() {
+    console.log('openRotationPanel called');
+    this.isRotationPanelVisible = true;
+  }
+
   hidePSF() {
     console.log('hidePSF called');
     this.isPsfPanelVisible = false;
+  }
+
+  hideRotationPanel() {
+    console.log('hideRotationPanel called');
+    this.isRotationPanelVisible = false;
   }
 
   radiusChanged(event: any, update: boolean) {

@@ -58,6 +58,7 @@ public class OperationService {
     void init() {
         filters.add(Pair.of(OperationEnum.WIENER_DECONV, wienerDeconvolutionFilter));
         filters.add(Pair.of(OperationEnum.SHARPEN, lswSharpenFilter));
+        filters.add(Pair.of(OperationEnum.ROTATE, rotationFilter));
         filters.add(Pair.of(OperationEnum.SIGMA_DENOISE_1, sigmaDenoise1Filter));
         filters.add(Pair.of(OperationEnum.IANS_NR, iansNoiseReductionFilter));
         filters.add(Pair.of(OperationEnum.BILATERAL_DENOISE, bilateralDenoiseFilter));
@@ -71,7 +72,6 @@ public class OperationService {
         filters.add(Pair.of(OperationEnum.SATURATION, saturationFilter));
         filters.add(Pair.of(OperationEnum.DISPERSION, dispersionCorrectionFilter));
         filters.add(Pair.of(OperationEnum.HISTOGRAM_STRETCH, histogramStretchFilter));
-        filters.add(Pair.of(OperationEnum.ROTATE, rotationFilter));
     }
 
     public void correctExposure(ImagePlus image) throws IOException {

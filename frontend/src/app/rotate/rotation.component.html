@@ -1,0 +1,26 @@
+<div class="popup-container">
+  <h2 class="{{ nightMode ? 'titleNight' : 'title' }}">Rotate</h2>
+  <button (click)="closePopup()" class="closeButton" matTooltip="Close panel">
+    <img src="assets/images/close.png" class="buttonImg" />
+  </button>
+
+  <p class="slidersStartMargin"></p>
+
+  <div class="sliderContainer">
+    <div class="sliderGroup">
+      <label class="sliderLabel">Angle</label>
+      <mat-slider
+        class="slider"
+        step="1"
+        min="-180"
+        max="180"
+        (input)="onAngleUpdated($event)"
+        (change)="onAngleChanged()"
+        [(ngModel)]="angle"
+        [color]="colorTheme()"
+        [disabled]="spinnerShown"
+      ></mat-slider>
+      <span class="sliderValue">{{ angle }}</span>
+    </div>
+  </div>
+</div>

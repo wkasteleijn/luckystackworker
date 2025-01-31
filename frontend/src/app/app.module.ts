@@ -16,6 +16,7 @@ import { MatLegacySnackBarModule } from '@angular/material/legacy-snack-bar';
 import { MatLegacyTabsModule } from '@angular/material/legacy-tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SyntheticPsfComponent } from './psf/synthetic.psf.component';
+import { RotationComponent } from './rotate/rotation.component';
 
 import {
   BrowserAnimationsModule,
@@ -32,6 +33,7 @@ import { ConfirmationComponent } from './confirmation/confirmation.component';
     AboutComponent,
     ConfirmationComponent,
     SyntheticPsfComponent,
+    RotationComponent,
   ],
   imports: [
     BrowserModule,
