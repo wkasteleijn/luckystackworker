@@ -124,7 +124,6 @@ export class AppComponent implements OnInit {
   normalizeColorBalance: boolean = false;
 
   profile: Profile;
-  profileWhenOpening: Profile;
   settings: Settings;
   selectedProfile: string;
   rootFolder: string = 'C:\\';
@@ -145,7 +144,7 @@ export class AppComponent implements OnInit {
   realtimeEnabled: boolean = false;
   showHistogram: boolean = true;
   scale: string = '1';
-  rotationAngle: number = 45;
+  rotationAngle: number = 0;
   openImageMode: string = 'RGB';
   visibleChannel: string = 'RGB';
   applySharpenToChannel: string = 'RGB';
@@ -185,7 +184,6 @@ export class AppComponent implements OnInit {
           this.crop = false;
           if (data && data.profile.amount > 0) {
             this.profile = data.profile;
-            this.profileWhenOpening = { ...this.profile };
             this.settings = data.settings;
             this.selectedProfile = this.profile.name;
             this.rootFolder = data.settings.rootFolder;
@@ -269,7 +267,7 @@ export class AppComponent implements OnInit {
 
   rotationAngleChanged(event: any) {
     console.log('rotationAngleChanged called');
-    this.settings.operation = 'ROTATE';
+    this.settings.operations = ['ROTATE'];
     this.profile.rotationAngle = event;
     this.updateProfile();
   }
@@ -299,7 +297,7 @@ export class AppComponent implements OnInit {
         this.profile.wienerIterationsBlue = event.value;
     }
     this.wienerIterations = event.value;
-    this.settings.operation = 'WIENER_DECONV';
+    this.settings.operations = ['WIENER_DECONV'];
     console.log(
       'wienerIterationsChanged called: ' + this.profile.wienerIterations
     );
@@ -350,7 +348,7 @@ export class AppComponent implements OnInit {
         this.profile.radiusBlue = event.value;
     }
     this.radius = event.value;
-    this.settings.operation = 'SHARPEN';
+    this.settings.operations = ['SHARPEN'];
     console.log('radiusChanged called: ' + this.profile.radius);
     if (update) {
       this.updateProfile();
@@ -375,7 +373,7 @@ export class AppComponent implements OnInit {
         this.profile.amountBlue = event.value;
     }
     this.amount = event.value;
-    this.settings.operation = 'SHARPEN';
+    this.settings.operations = ['SHARPEN'];
     console.log('amountChanged called: ' + this.profile.amount);
     if (update) {
       this.updateProfile();
@@ -400,7 +398,7 @@ export class AppComponent implements OnInit {
         this.profile.iterationsBlue = event.value;
     }
     this.iterations = event.value;
-    this.settings.operation = 'SHARPEN';
+    this.settings.operations = ['SHARPEN'];
     console.log('iterationsChanged called: ' + this.profile.iterations);
     if (update) {
       this.updateProfile();
@@ -425,7 +423,7 @@ export class AppComponent implements OnInit {
         this.profile.blendRawBlue = event.value;
     }
     this.blendRaw = event.value;
-    this.settings.operation = 'SHARPEN';
+    this.settings.operations = ['SHARPEN', 'WIENER_DECONV'];
     console.log('blendRawChanged called: ' + this.profile.blendRaw);
     if (update) {
       this.updateProfile();
@@ -450,7 +448,7 @@ export class AppComponent implements OnInit {
         this.profile.clippingStrengthBlue = event.value;
     }
     this.clippingStrength = event.value;
-    this.settings.operation = 'SHARPEN';
+    this.settings.operations = ['SHARPEN'];
     console.log('clippingStrength called: ' + this.profile.clippingStrength);
     if (update) {
       this.updateProfile();
@@ -475,7 +473,7 @@ export class AppComponent implements OnInit {
         this.profile.clippingRangeBlue = event.value;
     }
     this.clippingRange = event.value;
-    this.settings.operation = 'SHARPEN';
+    this.settings.operations = ['SHARPEN'];
     console.log('clippingRange called: ' + this.profile.clippingRange);
     if (update) {
       this.updateProfile();
@@ -548,7 +546,7 @@ export class AppComponent implements OnInit {
     this.profile.luminanceIncludeGreen = this.luminanceIncludeGreen;
     this.profile.luminanceIncludeBlue = this.luminanceIncludeBlue;
     this.profile.luminanceIncludeColor = this.luminanceIncludeColor;
-    this.settings.operation = 'SHARPEN';
+    this.settings.operations = ['SHARPEN'];
     console.log('sharpenMode called: ' + this.profile.sharpenMode);
     if (update) {
       this.updateProfile();
@@ -557,20 +555,20 @@ export class AppComponent implements OnInit {
 
   applyWienerDeconvolutionChanged() {
     this.profile.applyWienerDeconvolution = this.applyWienerDeconvolution;
-    this.settings.operation = 'WIENER_DECONV';
+    this.settings.operations = ['WIENER_DECONV'];
     this.updateProfile();
   }
 
   applyUnsharpMaskChanged() {
     this.profile.applyUnsharpMask = this.applyUnsharpMask;
-    this.settings.operation = 'SHARPEN';
+    this.settings.operations = ['SHARPEN'];
     this.updateProfile();
   }
 
   localContrastModeChanged(event: any, update: boolean) {
     this.profile.localContrastMode = event.value;
     this.localContrastMode = event.value;
-    this.settings.operation = 'LOCAL_CONTRAST';
+    this.settings.operations = ['LOCAL_CONTRAST'];
     console.log('localContrastMode called: ' + this.profile.localContrastMode);
     if (update) {
       this.updateProfile();
@@ -600,14 +598,14 @@ export class AppComponent implements OnInit {
       this.profile.clippingStrength = 0;
       this.profile.deringStrength = 0;
     }
-    this.settings.operation = 'SHARPEN';
+    this.settings.operations = ['SHARPEN', 'WIENER_DECONV'];
     console.log('edgeArtefactSupressionMode called: ' + event.value);
     this.updateProfile();
   }
 
   applySharpenToChannelChanged(event: any) {
     console.log('applySharpenToChannelChanged called: ' + event.value);
-    this.settings.operation = 'SHARPEN';
+    this.settings.operations = ['SHARPEN'];
     this.profile.applySharpenToChannel = this.applySharpenToChannel;
     switch (this.applySharpenToChannel) {
       case 'G':
@@ -651,7 +649,7 @@ export class AppComponent implements OnInit {
 
   applyDenoiseToChannelChanged(event: any) {
     console.log('applyDenoiseToChannelChanged called: ' + event.value);
-    this.settings.operation = 'SIGMA_DENOISE_1';
+    this.settings.operations = ['SIGMA_DENOISE_1'];
     this.profile.applyDenoiseToChannel = this.applyDenoiseToChannel;
     switch (this.applyDenoiseToChannel) {
       case 'G':
@@ -742,7 +740,7 @@ export class AppComponent implements OnInit {
         this.profile.denoise1AmountGreen = event.value;
         this.profile.denoise1AmountBlue = event.value;
     }
-    this.settings.operation = 'SIGMA_DENOISE_1';
+    this.settings.operations = ['SIGMA_DENOISE_1'];
     console.log('denoise1AmountChanged called: ' + this.denoise1Amount);
     if (update) {
       this.updateProfile();
@@ -751,7 +749,7 @@ export class AppComponent implements OnInit {
 
   denoise1RadiusChanged(event: any, update: boolean) {
     this.denoise1Radius = event.value;
-    this.settings.operation = 'SIGMA_DENOISE_1';
+    this.settings.operations = ['SIGMA_DENOISE_1'];
     switch (this.applyDenoiseToChannel) {
       case 'G':
         this.profile.denoise1RadiusGreen = event.value;
@@ -776,7 +774,7 @@ export class AppComponent implements OnInit {
 
   denoise1IterationsChanged(event: any, update: boolean) {
     this.denoise1Iterations = event.value;
-    this.settings.operation = 'SIGMA_DENOISE_1';
+    this.settings.operations = ['SIGMA_DENOISE_1'];
     switch (this.applyDenoiseToChannel) {
       case 'G':
         this.profile.denoise1IterationsGreen = event.value;
@@ -803,7 +801,7 @@ export class AppComponent implements OnInit {
 
   bilateralIterationsChanged(event: any, update: boolean) {
     this.bilateralIterations = event.value;
-    this.settings.operation = 'BILATERAL_DENOISE';
+    this.settings.operations = ['BILATERAL_DENOISE'];
     switch (this.applyDenoiseToChannel) {
       case 'G':
         this.profile.bilateralIterationsGreen = event.value;
@@ -830,7 +828,7 @@ export class AppComponent implements OnInit {
 
   bilateralSigmaColorChanged(event: any, update: boolean) {
     this.bilateralSigmaColor = event.value;
-    this.settings.operation = 'BILATERAL_DENOISE';
+    this.settings.operations = ['BILATERAL_DENOISE'];
     switch (this.applyDenoiseToChannel) {
       case 'G':
         this.profile.bilateralSigmaColorGreen = event.value;
@@ -857,7 +855,7 @@ export class AppComponent implements OnInit {
 
   bilateralRadiusChanged(event: any, update: boolean) {
     this.bilateralRadius = event.value;
-    this.settings.operation = 'BILATERAL_DENOISE';
+    this.settings.operations = ['BILATERAL_DENOISE'];
     switch (this.applyDenoiseToChannel) {
       case 'G':
         this.profile.bilateralRadiusGreen = event.value;
@@ -885,7 +883,7 @@ export class AppComponent implements OnInit {
   iansAmountChanged(event: any, update: boolean) {
     this.profile.iansAmount = event.value;
     this.iansAmount = event.value;
-    this.settings.operation = 'IANS_NR';
+    this.settings.operations = ['IANS_NR'];
     console.log('iansAmount called: ' + this.profile.iansAmount);
     if (update) {
       this.updateProfile();
@@ -895,7 +893,7 @@ export class AppComponent implements OnInit {
   iansAmountMidChanged(event: any, update: boolean) {
     this.profile.iansAmountMid = event.value;
     this.iansAmountMid = event.value;
-    this.settings.operation = 'IANS_NR';
+    this.settings.operations = ['IANS_NR'];
     console.log('iansAmountMid called: ' + this.profile.iansAmountMid);
     if (update) {
       this.updateProfile();
@@ -905,7 +903,7 @@ export class AppComponent implements OnInit {
   iansRecoveryChanged(event: any, update: boolean) {
     this.profile.iansRecovery = event.value;
     this.iansRecovery = event.value;
-    this.settings.operation = 'IANS_NR';
+    this.settings.operations = ['IANS_NR'];
     console.log('iansRecovery called: ' + this.profile.iansRecovery);
     if (update) {
       this.updateProfile();
@@ -915,7 +913,7 @@ export class AppComponent implements OnInit {
   iansIterationsChanged(event: any, update: boolean) {
     this.profile.iansIterations = event.value;
     this.iansIterations = event.value;
-    this.settings.operation = 'IANS_NR';
+    this.settings.operations = ['IANS_NR'];
     console.log('iansIterations called: ' + this.profile.iansIterations);
     if (update) {
       this.updateProfile();
@@ -924,7 +922,7 @@ export class AppComponent implements OnInit {
 
   denoise2RadiusChanged(event: any, update: boolean) {
     this.denoise2Radius = event.value;
-    this.settings.operation = 'SIGMA_DENOISE_2';
+    this.settings.operations = ['SIGMA_DENOISE_2'];
     console.log('denoise2RadiusChanged called: ' + this.profile.denoise2Radius);
     switch (this.applyDenoiseToChannel) {
       case 'G':
@@ -949,7 +947,7 @@ export class AppComponent implements OnInit {
 
   denoise2IterationsChanged(event: any, update: boolean) {
     this.denoise2Iterations = event.value;
-    this.settings.operation = 'SIGMA_DENOISE_2';
+    this.settings.operations = ['SIGMA_DENOISE_2'];
     console.log(
       'denoise2IterationsChanged called: ' + this.profile.denoise2Iterations
     );
@@ -977,7 +975,7 @@ export class AppComponent implements OnInit {
   gammaChanged(event: any, update: boolean) {
     this.profile.gamma = event.value;
     this.gamma = event.value;
-    this.settings.operation = 'GAMMA';
+    this.settings.operations = ['GAMMA'];
     console.log('gammaChanged called: ' + this.profile.gamma);
     if (update) {
       this.updateProfile();
@@ -987,7 +985,7 @@ export class AppComponent implements OnInit {
   contrastChanged(event: any, update: boolean) {
     this.profile.contrast = event.value;
     this.contrast = event.value;
-    this.settings.operation = 'HISTOGRAM_STRETCH';
+    this.settings.operations = ['HISTOGRAM_STRETCH'];
     console.log('contrastChanged called: ' + this.profile.contrast);
     if (update) {
       this.updateProfile();
@@ -997,7 +995,7 @@ export class AppComponent implements OnInit {
   localContrastFineChanged(event: any, update: boolean) {
     this.profile.localContrastFine = event.value;
     this.localContrastFine = event.value;
-    this.settings.operation = 'LOCAL_CONTRAST';
+    this.settings.operations = ['LOCAL_CONTRAST'];
     console.log('localContrastFine called: ' + this.profile.localContrastFine);
     if (update) {
       this.updateProfile();
@@ -1007,7 +1005,7 @@ export class AppComponent implements OnInit {
   localContrastMediumChanged(event: any, update: boolean) {
     this.profile.localContrastMedium = event.value;
     this.localContrastMedium = event.value;
-    this.settings.operation = 'LOCAL_CONTRAST';
+    this.settings.operations = ['LOCAL_CONTRAST'];
     console.log(
       'localContrastMedium called: ' + this.profile.localContrastMedium
     );
@@ -1019,7 +1017,7 @@ export class AppComponent implements OnInit {
   localContrastLargeChanged(event: any, update: boolean) {
     this.profile.localContrastLarge = event.value;
     this.localContrastLarge = event.value;
-    this.settings.operation = 'LOCAL_CONTRAST';
+    this.settings.operations = ['LOCAL_CONTRAST'];
     console.log(
       'localContrastLarge called: ' + this.profile.localContrastLarge
     );
@@ -1031,7 +1029,7 @@ export class AppComponent implements OnInit {
   equalizeLocalHistogramsChanged(event: any, update: boolean) {
     this.profile.equalizeLocalHistogramsStrength = event.value;
     this.equalizeLocalHistograms = event.value;
-    this.settings.operation = 'EQUALIZE_LOCALLY';
+    this.settings.operations = ['EQUALIZE_LOCALLY'];
     console.log(
       'equalizeLocalHistograms called: ' +
         this.profile.equalizeLocalHistogramsStrength
@@ -1044,7 +1042,7 @@ export class AppComponent implements OnInit {
   brightnessChanged(event: any, update: boolean) {
     this.profile.brightness = event.value;
     this.brightness = event.value;
-    this.settings.operation = 'HISTOGRAM_STRETCH';
+    this.settings.operations = ['HISTOGRAM_STRETCH'];
     console.log('brightnessChanged called: ' + this.profile.brightness);
     if (update) {
       this.updateProfile();
@@ -1054,7 +1052,7 @@ export class AppComponent implements OnInit {
   lightnessChanged(event: any, update: boolean) {
     this.profile.lightness = event.value;
     this.lightness = event.value;
-    this.settings.operation = 'HISTOGRAM_STRETCH';
+    this.settings.operations = ['HISTOGRAM_STRETCH'];
     console.log('lightnessChanged called: ' + this.profile.lightness);
     if (update) {
       this.updateProfile();
@@ -1064,7 +1062,7 @@ export class AppComponent implements OnInit {
   backgroundChanged(event: any, update: boolean) {
     this.profile.background = event.value;
     this.background = event.value;
-    this.settings.operation = 'HISTOGRAM_STRETCH';
+    this.settings.operations = ['HISTOGRAM_STRETCH'];
     console.log('backgroundChanged called: ' + this.profile.background);
     if (update) {
       this.updateProfile();
@@ -1074,7 +1072,7 @@ export class AppComponent implements OnInit {
   saturationChanged(event: any, update: boolean) {
     this.profile.saturation = event.value;
     this.saturation = event.value;
-    this.settings.operation = 'SATURATION';
+    this.settings.operations = ['SATURATION'];
     console.log('saturationChanged called: ' + this.profile.saturation);
     if (update) {
       this.updateProfile();
@@ -1084,7 +1082,7 @@ export class AppComponent implements OnInit {
   greenChanged(event: any, update: boolean) {
     this.profile.green = -event.value;
     this.green = event.value;
-    this.settings.operation = 'RGB_BALANCE';
+    this.settings.operations = ['RGB_BALANCE'];
     console.log('greenChanged called: ' + this.profile.green);
     if (update) {
       this.updateProfile();
@@ -1094,7 +1092,7 @@ export class AppComponent implements OnInit {
   redChanged(event: any, update: boolean) {
     this.profile.red = -event.value;
     this.red = event.value;
-    this.settings.operation = 'RGB_BALANCE';
+    this.settings.operations = ['RGB_BALANCE'];
     console.log('redChanged called: ' + this.profile.red);
     if (update) {
       this.updateProfile();
@@ -1103,7 +1101,7 @@ export class AppComponent implements OnInit {
 
   blueChanged(event: any, update: boolean) {
     this.profile.blue = -event.value;
-    this.settings.operation = 'RGB_BALANCE';
+    this.settings.operations = ['RGB_BALANCE'];
     this.blue = event.value;
     console.log('blueChanged called: ' + this.profile.blue);
     if (update) {
@@ -1113,7 +1111,7 @@ export class AppComponent implements OnInit {
 
   purpleChanged(event: any, update: boolean) {
     this.profile.purple = event.value;
-    this.settings.operation = 'RGB_BALANCE';
+    this.settings.operations = ['RGB_BALANCE'];
     this.purple = event.value;
     console.log('purpleChanged called: ' + this.profile.purple);
     if (update) {
@@ -1135,7 +1133,7 @@ export class AppComponent implements OnInit {
 
   savitzkyGolayIterationsChanged(event: any, update: boolean) {
     this.savitzkyGolayIterations = event.value;
-    this.settings.operation = 'SAVITSKY_GOLAY';
+    this.settings.operations = ['SAVITSKY_GOLAY'];
     console.log(
       'savitzkyGolayIterationsChanged called: ' +
         this.profile.savitzkyGolayIterations
@@ -1163,7 +1161,7 @@ export class AppComponent implements OnInit {
 
   savitzkyGolayAmountChanged(event: any, update: boolean) {
     this.savitzkyGolayAmount = event.value;
-    this.settings.operation = 'SAVITSKY_GOLAY';
+    this.settings.operations = ['SAVITSKY_GOLAY'];
     console.log(
       'savitzkyGolayAmountChanged called: ' + this.profile.savitzkyGolayAmount
     );
@@ -1190,7 +1188,7 @@ export class AppComponent implements OnInit {
 
   savitzkyGolaySizeChanged(event: any, update: boolean) {
     this.savitzkyGolaySize = event.value;
-    this.settings.operation = 'SAVITSKY_GOLAY';
+    this.settings.operations = ['SAVITSKY_GOLAY'];
     console.log(
       'savitzkyGolaySizeChanged called: ' + this.profile.savitzkyGolaySize
     );
@@ -1217,13 +1215,13 @@ export class AppComponent implements OnInit {
 
   denoiseAlgorithm1Changed(event: any) {
     if (event.value === 'SIGMA1') {
-      this.settings.operation = 'SIGMA_DENOISE_1';
+      this.settings.operations = ['SIGMA_DENOISE_1'];
       this.profile.denoiseAlgorithm1 = 'SIGMA1';
     } else if (event.value === 'BILATERAL') {
-      this.settings.operation = 'BILATERAL_DENOISE';
+      this.settings.operations = ['BILATERAL_DENOISE'];
       this.profile.denoiseAlgorithm1 = 'BILATERAL';
     } else if (event.value === 'IAN') {
-      this.settings.operation = 'IANS_NR';
+      this.settings.operations = ['IANS_NR'];
       this.profile.denoiseAlgorithm1 = 'IAN';
       this.applyDenoiseToChannel = 'RGB';
       this.profile.applyDenoiseToChannel = 'RGB';
@@ -1232,7 +1230,7 @@ export class AppComponent implements OnInit {
         .channelChanged(this.visibleChannel)
         .subscribe((error) => console.log(error));
     } else {
-      this.settings.operation = 'SIGMA_DENOISE_1';
+      this.settings.operations = ['SIGMA_DENOISE_1'];
       this.profile.denoiseAlgorithm1 = 'OFF';
     }
     console.log('denoiseAlgorithm1Changed called: ' + event.value);
@@ -1241,13 +1239,13 @@ export class AppComponent implements OnInit {
 
   denoiseAlgorithm2Changed(event: any) {
     if (event.value === 'SAVGOLAY') {
-      this.settings.operation = 'SAVITSKY_GOLAY';
+      this.settings.operations = ['SAVITSKY_GOLAY'];
       this.profile.denoiseAlgorithm2 = 'SAVGOLAY';
     } else if (event.value === 'SIGMA2') {
-      this.settings.operation = 'SIGMA_DENOISE_2';
+      this.settings.operations = ['SIGMA_DENOISE_2'];
       this.profile.denoiseAlgorithm2 = 'SIGMA2';
     } else {
-      this.settings.operation = 'SAVITSKY_GOLAY';
+      this.settings.operations = ['SAVITSKY_GOLAY'];
       this.profile.denoiseAlgorithm2 = 'OFF';
     }
     console.log('denoiseAlgorithm1Changed called: ' + event.value);
@@ -1255,7 +1253,7 @@ export class AppComponent implements OnInit {
   }
 
   colorNormalizationChanged() {
-    this.settings.operation = 'COLOR_NORMALIZE';
+    this.settings.operations = ['COLOR_NORMALIZE'];
     this.profile.normalizeColorBalance = this.normalizeColorBalance;
     console.log(
       'colorNormalizationChanged called: ' + this.normalizeColorBalance
@@ -1264,7 +1262,7 @@ export class AppComponent implements OnInit {
   }
 
   preserveDarkBackgroundChanged() {
-    this.settings.operation = 'HISTOGRAM_STRETCH';
+    this.settings.operations = ['HISTOGRAM_STRETCH'];
     this.profile.preserveDarkBackground = this.preserveDarkBackground;
     console.log(
       'preserveDarkBackgroundChanged called: ' + this.preserveDarkBackground
@@ -1293,7 +1291,7 @@ export class AppComponent implements OnInit {
         this.dispersionCorrectionEnabled
     );
     this.dispersionCorrectionEnabled = !this.dispersionCorrectionEnabled;
-    this.settings.operation = 'DISPERSION';
+    this.settings.operations = ['DISPERSION'];
     this.profile.dispersionCorrectionEnabled = this.dispersionCorrectionEnabled;
     this.resetDispersionCorrection();
   }
@@ -1304,7 +1302,7 @@ export class AppComponent implements OnInit {
 
   resetDispersionCorrection() {
     console.log('resetDispersionCorrection called');
-    this.settings.operation = 'DISPERSION';
+    this.settings.operations = ['DISPERSION'];
     this.profile.dispersionCorrectionRedX = 0;
     this.profile.dispersionCorrectionRedY = 0;
     this.profile.dispersionCorrectionBlueX = 0;
@@ -1314,7 +1312,7 @@ export class AppComponent implements OnInit {
 
   dispersionCorrectionClicked(direction: string, color: string) {
     console.log('dispersionCorrectionClicked called: ' + direction);
-    this.settings.operation = 'DISPERSION';
+    this.settings.operations = ['DISPERSION'];
     if (color === 'RED') {
       switch (direction) {
         case 'LEFT-UP':
@@ -1481,7 +1479,7 @@ export class AppComponent implements OnInit {
   psfSlidersChanged(event: any) {
     console.log('psfSlidersChanged called');
     this.profile.psf = Object.assign(new PSF(), event);
-    this.settings.operation = 'PSF';
+    this.settings.operations = ['PSF'];
     this.updateProfile();
   }
 
@@ -1602,7 +1600,7 @@ export class AppComponent implements OnInit {
       this.showSpinner();
     }
     this.luckyStackWorkerService
-      .updateProfile(this.profile, this.settings.operation)
+      .updateProfile(this.profile, this.settings.operations)
       .subscribe(
         (data) => {
           if (data) {
@@ -1876,7 +1874,7 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((dialogResult) => {
       if (dialogResult) {
-        this.restoreToInitialSettings();
+        this.resetToRaw();
       }
     });
   }
@@ -1894,14 +1892,44 @@ export class AppComponent implements OnInit {
 
   private setSharpenOperationForDeringing() {
     if (this.applyWienerDeconvolution) {
-      this.settings.operation = 'WIENER_DECONV';
+      this.settings.operations = ['WIENER_DECONV'];
       return;
     }
-    this.settings.operation = 'SHARPEN';
+    this.settings.operations = ['SHARPEN'];
   }
 
-  private restoreToInitialSettings() {
-    this.profile = { ...this.profileWhenOpening };
+  private resetToRaw() {
+    // disable sharpening
+    this.profile.applyUnsharpMask = false;
+    this.profile.applyWienerDeconvolution = false;
+    this.profile.clippingStrength = 0;
+    this.profile.deringStrength = 0;
+
+    // disable denoising
+    this.profile.denoiseAlgorithm1 = 'OFF';
+    this.profile.denoiseAlgorithm2 = 'OFF';
+
+    // reset contrast & light
+    this.profile.localContrastFine = 0;
+    this.profile.localContrastMedium = 0;
+    this.profile.localContrastLarge = 0;
+    this.profile.equalizeLocalHistogramsStrength = 0;
+    this.profile.gamma = 1;
+    this.profile.contrast = 0;
+    this.profile.brightness = 0;
+    this.profile.lightness = 0;
+    this.profile.background = 0;
+    this.profile.preserveDarkBackground = true;
+
+    // Reset color & dispersion
+    this.profile.saturation = 1;
+    this.profile.purple = 0;
+    this.profile.normalizeColorBalance = false;
+    this.profile.red = 0;
+    this.profile.green = 0;
+    this.profile.blue = 0;
+    this.profile.dispersionCorrectionEnabled = false;
+
     this.selectedProfile = this.profile.name;
     this.updateProfileSettings();
     this.updateProfile();

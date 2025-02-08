@@ -27,10 +27,13 @@ export class LuckyStackWorkerService {
     return this.http.get(`${this.baseUrl}/profiles/status`);
   }
 
-  updateProfile(profile: Profile, operation: string): Observable<any> {
+  updateProfile(profile: Profile, operations: string[]): Observable<any> {
     let url = `${this.baseUrl}/profiles`;
-    if (operation) {
-      url += `?operation=${operation}`;
+    if (operations) {
+      url += '?';
+      for (let i = 0; i < operations.length; i++) {
+        url += (i == 0 ? '' : '&') + `operations=${operations[i]}`;
+      }
     }
     return this.http.put(url, profile);
   }

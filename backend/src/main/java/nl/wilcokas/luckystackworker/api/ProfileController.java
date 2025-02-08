@@ -104,7 +104,7 @@ public class ProfileController {
     }
 
     @PutMapping
-    public ResponseEntity<PSFImageDto> updateProfile(@RequestBody ProfileDTO profileDTO, @RequestParam(required = false) String operation)
+    public ResponseEntity<PSFImageDto> updateProfile(@RequestBody ProfileDTO profileDTO, @RequestParam(required = false) List<String> operations)
             throws IOException, InterruptedException {
         // Rate limiting added to prevent overloading whenever scroll keys are held down
         // or pressed very quickly.
@@ -115,7 +115,7 @@ public class ProfileController {
                 .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
             LuckyStackWorkerContext.setActiveOperationTime(LocalDateTime.now());
             Profile profile = profileService.updateProfile(profileDTO);
-            psfImage = referenceImageService.updateProcessing(profile, operation);
+            psfImage = referenceImageService.updateProcessing(profile, operations);
             LuckyStackWorkerContext.setActiveOperationTime(null);
         } else {
             log.warn("Attempt to update image while another operation was in progress");

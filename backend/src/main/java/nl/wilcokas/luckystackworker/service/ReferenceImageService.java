@@ -1,6 +1,13 @@
 package nl.wilcokas.luckystackworker.service;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.HeadlessException;
+import java.awt.Image;
+import java.awt.Taskbar;
+import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
@@ -9,7 +16,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -44,6 +54,8 @@ import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
+
+import static java.util.Collections.*;
 
 @Slf4j
 @Service
@@ -150,7 +162,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 settingsDTO.setLargeImage(isLargeImage);
                 settingsDTO.setZoomFactor(zoomFactor);
                 byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
-                if (psfImage!=null) {
+                if (psfImage != null) {
                     settingsDTO.setPsfImage(Base64.getEncoder().encodeToString(psfImage));
                 }
                 LuckyStackWorkerContext.setSelectedProfile(profile.getName());
@@ -160,13 +172,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return null;
     }
 
-    public byte[] updateProcessing(Profile profile, String operationValue) throws IOException, InterruptedException {
+    public byte[] updateProcessing(Profile profile, List<String> operationValues) throws IOException, InterruptedException {
         boolean includeRed = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.R;
         boolean includeGreen = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G;
         boolean includeBlue = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B;
         LswImageProcessingUtil.copyLayers(unprocessedImageLayers, finalResultImage, true, true, true);
-        OperationEnum operation = operationValue == null ? null : OperationEnum.valueOf(operationValue.toUpperCase());
-        byte[] psf = operationService.applyAllOperations(finalResultImage, displayedImage, profile, operation, isMono);
+        List<OperationEnum> operations = operationValues.stream().map(operationValue -> operationValue == null ? null : OperationEnum.valueOf(operationValue.toUpperCase())).toList();
+        byte[] psf = operationService.applyAllOperations(finalResultImage, displayedImage, profile, operations, isMono);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
                 displayedImage,
@@ -571,7 +583,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             // Can only have 1 image open at a time.
             displayedImage.hide();
         }
-        Pair<ImagePlus,Boolean> imageDetails = LswFileUtil.openImage(filePath,
+        Pair<ImagePlus, Boolean> imageDetails = LswFileUtil.openImage(filePath,
                 profile.getOpenImageMode(),
                 finalResultImage,
                 unprocessedImageLayers,
@@ -609,7 +621,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             log.info("Opened reference image image with id {}", displayedImage.getID());
 
             if (profile != null) {
-                updateProcessing(profile, null);
+                updateProcessing(profile, emptyList());
             }
         }
         return largeImage;

@@ -476,9 +476,7 @@
       *ngIf="openRefImageEnabled() && refImageSelected"
       type="button"
       mat-button
-      (click)="
-        openConfirmation('Are you sure you want to revert your changes?')
-      "
+      (click)="openConfirmation('Are you sure you want to reset everything?')"
       class="{{
         'buttonRevert buttonMargin ' +
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
@@ -1145,7 +1143,7 @@
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               step="1"
               min="1"
-              max="2000"
+              max="1000"
               (input)="bilateralSigmaColorChanged($event, false)"
               (change)="bilateralSigmaColorChanged($event, true)"
               [(ngModel)]="bilateralSigmaColor"

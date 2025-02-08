@@ -1,6 +1,6 @@
 export class Settings {
   rootFolder: string;
-  operation: string;
+  operations: string[];
   largeImage: boolean;
   gmicAvailable: boolean;
   zoomFactor: number;

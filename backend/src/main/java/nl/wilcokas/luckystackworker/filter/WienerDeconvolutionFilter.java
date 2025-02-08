@@ -93,7 +93,7 @@ public class WienerDeconvolutionFilter implements LSWFilter {
 
     @Override
     public boolean isSlow() {
-        return false;
+        return true;
     }
 
     @Override

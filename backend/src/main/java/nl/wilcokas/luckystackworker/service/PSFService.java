@@ -18,7 +18,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Collections;
 
+import static java.util.Collections.*;
 import static nl.wilcokas.luckystackworker.constants.Constants.PSF_SIZE;
 
 @Service
@@ -61,7 +63,7 @@ public class PSFService {
                 LswFileUtil.savePSF(psf, profileName);
                 byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profileName);
                 profile.getPsf().setType(PSFType.CUSTOM);
-                referenceImageService.updateProcessing(profile, null);
+                referenceImageService.updateProcessing(profile, emptyList());
                 return SettingsDTO.builder().psfImage(Base64.getEncoder().encodeToString(psfImage)).build();
             }
         }
