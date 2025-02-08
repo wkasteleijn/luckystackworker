@@ -88,7 +88,7 @@ public class OperationService {
 
         // Sharpening filters
         byte[] psfImage = updatePSF(profile.getPsf(), operationParams, profile.getName(), isMono);
-        List<OperationEnum> operations = operationParams;
+        List<OperationEnum> operations = new ArrayList<>(operationParams);
         if (psfImage != null) {
             operations.add(OperationEnum.WIENER_DECONV);
         }

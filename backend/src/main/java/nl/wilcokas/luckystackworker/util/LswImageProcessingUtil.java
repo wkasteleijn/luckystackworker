@@ -248,6 +248,7 @@ public class LswImageProcessingUtil {
         profile.setLuminanceIncludeBlue(true);
         profile.setLuminanceIncludeColor(true);
         profile.setScale(scale);
+        profile.setRotationAngle(0);
         profile.setOpenImageMode(openImageMode == null ? OpenImageModeEnum.RGB : OpenImageModeEnum.valueOf(openImageMode));
     }
 

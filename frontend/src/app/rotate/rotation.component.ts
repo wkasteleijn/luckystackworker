@@ -8,7 +8,7 @@ import { MatLegacyDialog } from '@angular/material/legacy-dialog';
   styleUrls: ['./rotation.component.css'],
 })
 export class RotationComponent {
-  @Input() angle: number;
+  @Input() angle: number = 0;
   @Input() nightMode: boolean = false;
   @Input() spinnerShown = false;
   @Output() angleChanged = new EventEmitter<any>();
@@ -24,6 +24,7 @@ export class RotationComponent {
   }
 
   onAngleUpdated(event: any) {
+    console.log('onAngleUpdated called');
     this.angle = event.value;
   }
 

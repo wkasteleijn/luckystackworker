@@ -11,6 +11,7 @@
 ></app-synthetic-psf-panel>
 <app-rotation-panel
   *ngIf="isRotationPanelVisible"
+  [angle]="rotationAngle"
   [nightMode]="nightMode"
   [spinnerShown]="shouldShowSpinner()"
   (close)="hideRotationPanel()"

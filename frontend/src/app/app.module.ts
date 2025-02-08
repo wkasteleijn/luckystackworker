@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatLegacyCardModule } from '@angular/material/legacy-card';
 import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox';
@@ -54,6 +55,7 @@ import { ConfirmationComponent } from './confirmation/confirmation.component';
     MatIconModule,
     MatTooltipModule,
     MatLegacyDialogModule,
+    MatButtonToggleModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

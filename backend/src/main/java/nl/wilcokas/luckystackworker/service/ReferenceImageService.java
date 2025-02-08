@@ -177,7 +177,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         boolean includeGreen = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G;
         boolean includeBlue = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B;
         LswImageProcessingUtil.copyLayers(unprocessedImageLayers, finalResultImage, true, true, true);
-        List<OperationEnum> operations = operationValues.stream().map(operationValue -> operationValue == null ? null : OperationEnum.valueOf(operationValue.toUpperCase())).toList();
+        List<OperationEnum> operations = operationValues==null ? emptyList() : operationValues.stream().map(operationValue -> operationValue == null ? null : OperationEnum.valueOf(operationValue.toUpperCase())).toList();
         byte[] psf = operationService.applyAllOperations(finalResultImage, displayedImage, profile, operations, isMono);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
