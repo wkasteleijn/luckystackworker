@@ -126,6 +126,9 @@ public class OperationService {
                 }
             }
         }, Constants.ARTIFICIAL_PROGRESS_DELAY, Constants.ARTIFICIAL_PROGRESS_DELAY);
+        if (operations.contains(OperationEnum.WIENER_DECONV)) {
+            psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
+        }
         return psfImage;
     }
 

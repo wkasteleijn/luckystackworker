@@ -292,7 +292,8 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     }
 
     private void paintImageDetails(Graphics g) {
-        g.drawString("Image", textOffsetX + 228, textOffsetY);
+        g.drawString("Angle", textOffsetX + 228, textOffsetY);
+        g.drawString("%s\u00B0".formatted(metadata.getAngle()), textOffsetX + 318, textOffsetY);
 
         g.drawString("Original size :", textOffsetX + 228, textOffsetY + textHeight);
         g.drawString("%s x %s".formatted(metadata.getOriginalWidth(), metadata.getOriginalHeight()), textOffsetX + 318, textOffsetY + textHeight);
@@ -311,7 +312,13 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         if (metadata.getZoomFactor() >= 0) {
             return 100 + (metadata.getZoomFactor() * 25);
         } else {
-            return 100 - (Math.abs(metadata.getZoomFactor()) * 25);
+            if (metadata.getZoomFactor() == -4) {
+                return 12;
+            } else if (metadata.getZoomFactor() == -5) {
+                return 6;
+            } else {
+                return 100 - (Math.abs(metadata.getZoomFactor()) * 25);
+            }
         }
     }
 

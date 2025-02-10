@@ -29,7 +29,7 @@ public class PsfDiskGenerator {
         short[] greenPixels = new short[(int) Math.pow(PSF_SIZE, 2)];
         short[] bluePixels = new short[(int) Math.pow(PSF_SIZE, 2)];
 
-        double seeingIndexConverted = seeingIndex / 4.0;
+        double seeingIndexConverted = (4.0 - (seeingIndex - 1.0)) / 8.0;
 
         Executor executor = LswUtil.getParallelExecutor();
         executor.execute(() -> generate16BitForChannel(redPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, isMono ? WAVELENGTH_NM_GREEN : WAVELENGTH_NM_RED));

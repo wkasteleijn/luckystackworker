@@ -185,7 +185,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 includeRed,
                 includeGreen,
                 includeBlue);
-        updateHistogramMetadata();
+        updateHistogramMetadata(profile);
         displayedImage.updateMetadata(imageMetadata);
         displayedImage.updateAndDraw();
         return psf;
@@ -420,7 +420,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     public void componentHidden(ComponentEvent e) {
     }
 
-    public void updateHistogramMetadata() {
+    public void updateHistogramMetadata(Profile profile) {
         int[] histogramValuesRed = finalResultImage.getStack().getProcessor(1).getHistogram(100);
         int[] histogramValuesGreen = finalResultImage.getStack().getProcessor(2).getHistogram(100);
         int[] histogramValuesBlue = finalResultImage.getStack().getProcessor(3).getHistogram(100);
@@ -452,6 +452,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         imageMetadata.setGreen(greenPercentage);
         imageMetadata.setBlue(bluePercentage);
         imageMetadata.setLuminance((redPercentage + greenPercentage + bluePercentage) / 3);
+        if (profile!=null) {
+            imageMetadata.setAngle((int) profile.getRotationAngle());
+        }
     }
 
     public void nightMode(boolean on) {
@@ -467,7 +470,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 includeRed,
                 includeGreen,
                 includeBlue);
-        updateHistogramMetadata();
+        updateHistogramMetadata(null);
         visibleChannel = channel;
         imageMetadata.setChannel(visibleChannel);
         displayedImage.updateMetadata(imageMetadata);
@@ -490,6 +493,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 .name(LswUtil.getFullObjectName(profile.getName())).currentWidth(currentWidth)
                 .currentHeight(currentHeight).originalWidth(originalWidth).originalHeight(originalHeight).time(dateTime)
                 .channel(visibleChannel)
+                .angle((int)profile.getRotationAngle())
                 .build();
     }
 

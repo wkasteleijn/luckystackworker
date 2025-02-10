@@ -269,6 +269,7 @@ export class AppComponent implements OnInit {
     console.log('rotationAngleChanged called');
     this.settings.operations = ['ROTATE'];
     this.profile.rotationAngle = event;
+    this.rotationAngle = Number(this.profile.rotationAngle);
     this.updateProfile();
   }
 
@@ -1672,7 +1673,7 @@ export class AppComponent implements OnInit {
   }
 
   zoomOut() {
-    if (this.zoomFactor >= -2) {
+    if (this.zoomFactor >= -4) {
       console.log('zoomOut called');
       this.zoomFactor--;
       this.luckyStackWorkerService.zoomOut().subscribe(

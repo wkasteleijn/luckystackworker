@@ -22,6 +22,12 @@
   margin-left: 16px;
 }
 
+.methodsLabel {
+  width: 97px;
+  color: rgb(168, 168, 168);
+  margin-left: 16px;
+}
+
 .sliderLabelEL {
   width: 100px !important;
 }
@@ -335,10 +341,9 @@
 }
 .psfButton {
   height: 40px;
-  margin-left: 7px;
 }
 .psfButtonDisabled {
-  margin-left: 6px;
+  margin-left: 0px;
 }
 .noWiener {
   margin-left: -3px;

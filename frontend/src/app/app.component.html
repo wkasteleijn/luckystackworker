@@ -110,7 +110,7 @@
       class="{{
         'buttonZoom buttonMargin ' +
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-          (cropEnabled() ? 'Pressed' : '')
+          (rotationAngle !== 0 ? 'Pressed' : '')
       }}"
       matTooltip="Rotate"
     >
@@ -497,7 +497,7 @@
     </button>
   </div>
   <mat-tab-group class="sliderTabs" selectedIndex="0">
-    <mat-tab label="Sharpen">
+    <mat-tab label="Deconv. & Sharpen">
       <!-- Sharpen panel -->
       <div class="sliderRow">
         <div
@@ -577,17 +577,8 @@
       </div>
       <div class="sharpenTypeMargin sliderRow">
         <div *ngIf="!applyWienerDeconvolution" class="noWiener">&nbsp;</div>
-        <div class="sliderLabel">Type</div>
+        <div class="methodsLabel">Methods</div>
         <div class="slider">
-          <mat-checkbox
-            [(ngModel)]="applyWienerDeconvolution"
-            (change)="applyWienerDeconvolutionChanged()"
-            [color]="colorTheme()"
-            class="luminanceIncludeBox"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            >Wiener deconvolution</mat-checkbox
-          >
-
           <button
             *ngIf="
               applyWienerDeconvolution &&
@@ -621,19 +612,28 @@
           </button>
 
           <mat-checkbox
+            [(ngModel)]="applyWienerDeconvolution"
+            (change)="applyWienerDeconvolutionChanged()"
+            [color]="colorTheme()"
+            class="luminanceIncludeBox"
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            >Deconvolve</mat-checkbox
+          >
+
+          <mat-checkbox
             [(ngModel)]="applyUnsharpMask"
             (change)="applyUnsharpMaskChanged()"
             [color]="colorTheme()"
             class="applyUnsharpMaskCheckBox"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            >Unsharp mask</mat-checkbox
+            >Sharpen</mat-checkbox
           >
         </div>
       </div>
 
       <span *ngIf="applyWienerDeconvolution">
         <div class="sliderRow">
-          <div class="sliderLabel">Wiener iterations</div>
+          <div class="sliderLabel">Deconv. iterations</div>
           <div class="slider">
             <mat-slider
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
@@ -684,7 +684,7 @@
           </div>
         </div>
         <div class="sliderRow">
-          <div class="sliderLabel">Iterations</div>
+          <div class="sliderLabel">Sharpen iterations</div>
           <div class="slider">
             <mat-slider
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
@@ -851,7 +851,7 @@
       </div>
     </mat-tab>
 
-    <mat-tab label="Denoise">
+    <mat-tab label="Denoise & Smoothen">
       <div class="sliderRow">
         <div
           class="sliderRowCategoryTitle {{
@@ -862,7 +862,7 @@
               : 'sliderRowCategoryTitleColor'
           }}"
         >
-          Denoise pass 1
+          Denoise
         </div>
         <mat-radio-group
           [color]="colorTheme()"
@@ -1212,7 +1212,7 @@
               : 'sliderRowCategoryTitleColor'
           }}"
         >
-          Denoise pass 2
+          Smoothen
         </div>
         <mat-radio-group
           [color]="colorTheme()"
