@@ -56,6 +56,12 @@ export class LuckyStackWorkerService {
     );
   }
 
+  checkHealth(): Observable<any> {
+    return this.http.get(
+      `${this.baseUrl}/reference/health`
+    );
+  }
+
   scale(profile: Profile): Observable<any> {
     return this.http.put(`${this.baseUrl}/profiles/scale`, profile);
   }

@@ -7,8 +7,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import nl.wilcokas.luckystackworker.exceptions.LswNotReadyException;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
+import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.service.ProfileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -140,6 +142,16 @@ public class ReferenceController {
     @PutMapping("/channel")
     public void channelChanged(@RequestBody String channel) {
         referenceImageService.showChannel(ChannelEnum.valueOf(channel));
+    }
+
+    @GetMapping("/health")
+    public SettingsDTO getHealthInfo() {
+        Settings settings = settingsService.getSettings();
+        if (settings == null) {
+            log.warn("Initialization is still in progress of application startup failed");
+            throw new LswNotReadyException("Initialization is still in progress of application startup failed");
+        }
+        return new SettingsDTO(settings);
     }
 
     private boolean asJpeg(File selectedFile) {

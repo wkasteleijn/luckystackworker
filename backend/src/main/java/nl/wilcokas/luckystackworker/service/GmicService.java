@@ -66,7 +66,7 @@ public class GmicService {
     public boolean isGmicAvailable(String activeOSProfile) {
         if (gmicAvailable == null) {
             try {
-                LswUtil.runCliCommand(activeOSProfile, getGmicCommand(activeOSProfile), true);
+                LswUtil.runCliCommand(activeOSProfile, getGmicCommand(activeOSProfile), false);
                 log.warn("G'MIC is available");
                 gmicAvailable = true;
             } catch (Exception e) {

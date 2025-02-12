@@ -24,21 +24,17 @@ public class LswUtil {
 
     public static void runCliCommand(String activeOSProfile, List<String> arguments, boolean await) throws IOException, InterruptedException {
         ProcessBuilder processBuilder = getProcessBuilder(activeOSProfile, arguments);
-        if (await) {
-            processBuilder.redirectErrorStream(true);
-            if (logOutput(processBuilder.start()) != 0) {
-                throw new IOException("CLI execution failed");
-            }
-        } else {
-            processBuilder.start();
+        processBuilder.redirectErrorStream(true);
+        if (!logOutput(processBuilder.start(), await ? 12 : 3)) {
+            throw new IOException("CLI execution failed");
         }
     }
 
-    private static int logOutput(final Process process) throws IOException, InterruptedException {
+    private static boolean logOutput(final Process process, int timeoutSeconds) throws IOException, InterruptedException {
         log.info("=== CLI output start ===");
         log.info(IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8.name()));
         log.info("==== CLI output end ====");
-        return process.waitFor();
+        return process.waitFor(timeoutSeconds, TimeUnit.SECONDS);
     }
 
     private static ProcessBuilder getProcessBuilder(String activeOSProfile, List<String> arguments) {
@@ -47,9 +43,9 @@ public class LswUtil {
         } else {
             String joinedArguments = arguments.stream().collect(Collectors.joining(" "));
             String shellType = switch (activeOSProfile) {
-            case Constants.SYSTEM_PROFILE_MAC -> "zsh";
-            case Constants.SYSTEM_PROFILE_LINUX -> "bash";
-            default -> "bash";
+                case Constants.SYSTEM_PROFILE_MAC -> "zsh";
+                case Constants.SYSTEM_PROFILE_LINUX -> "bash";
+                default -> "bash";
             };
             return new ProcessBuilder(shellType, "-c", joinedArguments);
         }

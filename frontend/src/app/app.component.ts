@@ -13,6 +13,8 @@ import { Profile } from './model/profile';
 import { PSF } from './model/psf';
 import { Settings } from './model/settings';
 import { NewVersionComponent } from './new_version/newversion.component';
+import { timeout, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 const SERVICE_POLL_DELAY_MS = 250;
 
@@ -171,15 +173,31 @@ export class AppComponent implements OnInit {
   openReferenceImage() {
     console.log('openReferenceImage called');
     this.showSpinner();
-    this.callopenReferenceImage();
+    this.checkHealth();
+  }
+
+  private checkHealth() {
+    this.luckyStackWorkerService
+      .checkHealth()
+      .pipe(timeout(2000))
+      .subscribe({
+        error: (error) => {
+          console.log('Backend is still starting or is unavailable: '+error);
+          setTimeout(() => this.checkHealth(), SERVICE_POLL_DELAY_MS);
+        },
+        complete: () => {
+          console.log('Backend is up and running, opening the reference image');
+          this.callopenReferenceImage();
+        },
+      });
   }
 
   private callopenReferenceImage() {
     this.luckyStackWorkerService
       .openReferenceImage(Number(this.scale), this.openImageMode)
-      .subscribe(
-        (data) => {
-          console.log(data);
+      .subscribe({
+        next: (data) => {
+          console.log("Successfully opened the image: ",data);
           this.refImageSelected = true;
           this.crop = false;
           if (data && data.profile.amount > 0) {
@@ -195,16 +213,15 @@ export class AppComponent implements OnInit {
           this.hideSpinner();
           this.workerProgress = 0;
         },
-        (error) => {
-          console.log('Backend is still starting or is unavailable');
-          setTimeout(
-            () => this.callopenReferenceImage(),
-            SERVICE_POLL_DELAY_MS
-          );
-        }
-      );
+        error: (error) => {
+          console.log('Opening the image failed: '+error);
+        },
+        complete: () => {
+          console.log('Request completed successfully');
+        },
+      });
   }
-
+  
   saveReferenceImage() {
     console.log('saveReferenceImage called');
     this.showSpinner();
