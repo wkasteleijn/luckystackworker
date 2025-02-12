@@ -425,6 +425,11 @@
   width: 12px;
   transform: scale(2.4);
 }
+.genericButton {
+  width: 13px;
+  transform: scale(2.1);
+  margin-top: 2px;
+}
 .saveButton {
   width: 12px;
   transform: scale(2.4);

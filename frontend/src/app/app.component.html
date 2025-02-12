@@ -160,7 +160,7 @@
       (click)="loadProfile()"
       matTooltip="Load profile"
     >
-      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="tune"></mat-icon>
+    <img src="assets/images/loadprofile.png" class="genericButton" />
     </button>
     <button
       *ngIf="!openRefImageEnabled() || !refImageSelected"
@@ -170,7 +170,7 @@
       class="button_disabled buttonMargin"
       matTooltip="Load profile"
     >
-      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="tune"></mat-icon>
+    <img src="assets/images/loadprofile.png" class="genericButton" />
     </button>
 
     <button
@@ -185,7 +185,7 @@
       }}"
       matTooltip="Crop"
     >
-      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="crop"></mat-icon>
+    <img src="assets/images/crop.png" class="genericButton" />
     </button>
     <button
       *ngIf="!openRefImageEnabled() || !refImageSelected"
@@ -195,7 +195,7 @@
       class="button_disabled buttonMargin"
       matTooltip="Crop"
     >
-      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="crop"></mat-icon>
+    <img src="assets/images/crop.png" class="genericButton" />
     </button>
 
     <button
@@ -321,7 +321,7 @@
       }}"
       matTooltip="Zoom in"
     >
-      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="add"></mat-icon>
+    <img src="assets/images/zoomin.png" class="genericButton" />
     </button>
     <button
       *ngIf="!openRefImageEnabled() || !refImageSelected"
@@ -330,7 +330,7 @@
       disabled
       class="plusZoom buttonDisabledZoom"
     >
-      <mat-icon aria-hidden="false" class="zoomIcon" fontIcon="add"></mat-icon>
+    <img src="assets/images/zoomin.png" class="genericButton" />
     </button>
 
     <button
@@ -346,11 +346,7 @@
       }}"
       matTooltip="Zoom out"
     >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon"
-        fontIcon="remove"
-      ></mat-icon>
+    <img src="assets/images/zoomout.png" class="genericButton" />
     </button>
     <button
       *ngIf="!openRefImageEnabled() || !refImageSelected"
@@ -359,11 +355,7 @@
       disabled
       class="minZoom buttonDisabledZoom relatedButtonsSpace"
     >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon"
-        fontIcon="remove"
-      ></mat-icon>
+    <img src="assets/images/zoomout.png" class="genericButton" />
     </button>
 
     <button
@@ -379,11 +371,7 @@
       }}"
       matTooltip="Show image at 100% scale"
     >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon"
-        fontIcon="check_box_outline_blank"
-      ></mat-icon>
+    <img src="assets/images/maximize.png" class="genericButton" />
     </button>
     <button
       *ngIf="!openRefImageEnabled() || !refImageSelected"
@@ -392,11 +380,7 @@
       disabled
       class="maximize buttonDisabledZoom relatedButtonsSpace"
     >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon"
-        fontIcon="check_box_outline_blank"
-      ></mat-icon>
+    <img src="assets/images/maximize.png" class="genericButton" />
     </button>
   </div>
 
@@ -453,11 +437,7 @@
       }}"
       matTooltip="Night mode"
     >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon"
-        fontIcon="nightlight"
-      ></mat-icon>
+    <img src="assets/images/nightmode.png" class="genericButton" />
     </button>
     <button
       *ngIf="!refImageSelected || !openRefImageEnabled()"
@@ -466,11 +446,7 @@
       disabled
       class="button_disabled buttonMargin"
     >
-      <mat-icon
-        aria-hidden="false"
-        class="zoomIcon buttonBottom"
-        fontIcon="nightlight"
-      ></mat-icon>
+    <img src="assets/images/nightmode.png" class="genericButton" />
     </button>
 
     <button
@@ -2218,11 +2194,7 @@
                   (click)="resetDispersionCorrection()"
                   matTooltip="Reset"
                 >
-                  <mat-icon
-                    aria-hidden="false"
-                    class="zoomIcon"
-                    fontIcon="undo"
-                  ></mat-icon>
+                <img src="assets/images/revert.png" class="genericButton" />
                 </button>
               </div>
             </div>
@@ -2353,11 +2325,7 @@
                   class="buttonDisabledZoom resetButton"
                   matTooltip="Reset"
                 >
-                  <mat-icon
-                    aria-hidden="false"
-                    class="zoomIcon"
-                    fontIcon="undo"
-                  ></mat-icon>
+                  <img src="assets/images/revert.png" class="genericButton" />
                 </button>
               </div>
             </div>
@@ -2391,11 +2359,7 @@
             selectedProfile
           }} stacks found in the root folder."
         >
-          <mat-icon
-            aria-hidden="false"
-            class="zoomIcon"
-            fontIcon="play_arrow"
-          ></mat-icon>
+        <img src="assets/images/startbatch.png" class="genericButton" />
         </button>
         <button
           *ngIf="!openRefImageEnabled() || !refImageSelected"
@@ -2404,7 +2368,7 @@
           disabled
           class="button_disabled"
         >
-          <mat-icon aria-hidden="false" fontIcon="play_arrow"></mat-icon>
+        <img src="assets/images/startbatch.png" class="genericButton" />
         </button>
         <button
           *ngIf="isWorkerBusy()"
@@ -2416,7 +2380,7 @@
           }}"
           matTooltip="Stop batch process when running."
         >
-          <mat-icon aria-hidden="false" fontIcon="rectangle"></mat-icon>
+        <img src="assets/images/stopbatch.png" class="genericButton" />
         </button>
         <button
           *ngIf="!isWorkerBusy()"
@@ -2426,7 +2390,7 @@
           class="relatedButtonsSpace button_disabled"
           matTooltip="Stop batch process when running."
         >
-          <mat-icon aria-hidden="false" fontIcon="rectangle"></mat-icon>
+        <img src="assets/images/stopbatch.png" class="genericButton" />
         </button>
         <div
           class="relatedButtonsSpace workerLabelStatus {{
@@ -2451,11 +2415,7 @@
           }}"
           matTooltip="Connect to stacking software"
         >
-          <mat-icon
-            aria-hidden="false"
-            class="zoomIcon"
-            fontIcon="link"
-          ></mat-icon>
+        <img src="assets/images/connect.png" class="genericButton" />
         </button>
         <button
           *ngIf="!openRefImageEnabled() || !refImageSelected"
@@ -2465,11 +2425,7 @@
           class="buttonDisabledZoom connectButton"
           matTooltip="Connect to stacking software"
         >
-          <mat-icon
-            aria-hidden="false"
-            class="zoomIcon"
-            fontIcon="link"
-          ></mat-icon>
+        <img src="assets/images/connect.png" class="genericButton" />
         </button>
       </div>
       <div class="sliderRow">
