@@ -154,6 +154,7 @@ export class AppComponent implements OnInit {
   isPsfPanelVisible: boolean = false;
   isRotationPanelVisible: boolean = false;
   psfImage: string = '';
+  sliderTextDisplayed: boolean = false;
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
@@ -182,7 +183,7 @@ export class AppComponent implements OnInit {
       .pipe(timeout(2000))
       .subscribe({
         error: (error) => {
-          console.log('Backend is still starting or is unavailable: '+error);
+          console.log('Backend is still starting or is unavailable: ' + error);
           setTimeout(() => this.checkHealth(), SERVICE_POLL_DELAY_MS);
         },
         complete: () => {
@@ -197,7 +198,7 @@ export class AppComponent implements OnInit {
       .openReferenceImage(Number(this.scale), this.openImageMode)
       .subscribe({
         next: (data) => {
-          console.log("Successfully opened the image: ",data);
+          console.log('Successfully opened the image: ', data);
           this.refImageSelected = true;
           this.crop = false;
           if (data && data.profile.amount > 0) {
@@ -214,14 +215,14 @@ export class AppComponent implements OnInit {
           this.workerProgress = 0;
         },
         error: (error) => {
-          console.log('Opening the image failed: '+error);
+          console.log('Opening the image failed: ' + error);
         },
         complete: () => {
           console.log('Request completed successfully');
         },
       });
   }
-  
+
   saveReferenceImage() {
     console.log('saveReferenceImage called');
     this.showSpinner();
@@ -1908,6 +1909,11 @@ export class AppComponent implements OnInit {
     this.updateProfile();
   }
 
+  getSliderText(): string {
+    setTimeout(() => (this.sliderTextDisplayed = true), 10000);
+    return 'Use arrow keys to make fine adjustments, or Page-up/down for larger adjustments.';
+  }
+
   private setSharpenOperationForDeringing() {
     if (this.applyWienerDeconvolution) {
       this.settings.operations = ['WIENER_DECONV'];
@@ -1920,81 +1926,81 @@ export class AppComponent implements OnInit {
     // Disable sharpening, set values to defaults.
     this.profile.applyUnsharpMask = false;
     this.profile.applyWienerDeconvolution = false;
-    this.profile.amount=5000;
-    this.profile.amountBlue=5000;
-    this.profile.amountGreen=5000;
-    this.profile.radius=1.5;
-    this.profile.radiusGreen=1.5;
-    this.profile.radiusBlue=1.5;
-    this.profile.iterations=1;
-    this.profile.iterationsBlue=1;
-    this.profile.iterationsGreen=1;
-    this.profile.wienerIterations=5;
-    this.profile.blendRaw=0;
-    this.profile.blendRawBlue=0;
-    this.profile.blendRawGreen=0;
+    this.profile.amount = 5000;
+    this.profile.amountBlue = 5000;
+    this.profile.amountGreen = 5000;
+    this.profile.radius = 1.5;
+    this.profile.radiusGreen = 1.5;
+    this.profile.radiusBlue = 1.5;
+    this.profile.iterations = 1;
+    this.profile.iterationsBlue = 1;
+    this.profile.iterationsGreen = 1;
+    this.profile.wienerIterations = 5;
+    this.profile.blendRaw = 0;
+    this.profile.blendRawBlue = 0;
+    this.profile.blendRawGreen = 0;
 
     // Disable clipping, set values to defaults.
-    this.profile.clippingRange=50;
-    this.profile.clippingStrength=10;
+    this.profile.clippingRange = 50;
+    this.profile.clippingStrength = 10;
 
     // Disable deringing, set values to defaults.
     this.profile.deringStrength = 10;
-    this.profile.deringRadius=3;
-    this.profile.deringRadiusBlue=3;
-    this.profile.deringRadiusBlue=3;
+    this.profile.deringRadius = 3;
+    this.profile.deringRadiusBlue = 3;
+    this.profile.deringRadiusBlue = 3;
 
     // Disable denoising, set values to defaults.
     this.profile.denoiseAlgorithm1 = 'OFF';
 
     // Bilateral
-    this.profile.bilateralSigmaColor=150;
-    this.profile.bilateralSigmaColorGreen=150;
-    this.profile.bilateralSigmaColorBlue=150;
-    this.profile.bilateralRadius=1;
-    this.profile.bilateralRadiusBlue=1;
-    this.profile.bilateralRadiusGreen=1;
-    this.profile.bilateralIterations=2;
-    this.profile.bilateralIterationsBlue=2;
-    this.profile.bilateralIterationsGreen=2;
+    this.profile.bilateralSigmaColor = 150;
+    this.profile.bilateralSigmaColorGreen = 150;
+    this.profile.bilateralSigmaColorBlue = 150;
+    this.profile.bilateralRadius = 1;
+    this.profile.bilateralRadiusBlue = 1;
+    this.profile.bilateralRadiusGreen = 1;
+    this.profile.bilateralIterations = 2;
+    this.profile.bilateralIterationsBlue = 2;
+    this.profile.bilateralIterationsGreen = 2;
 
     // Sigma 1
-    this.profile.denoise1Amount=50;
-    this.profile.denoise1AmountBlue=50;
-    this.profile.denoise1AmountGreen=50;
-    this.profile.denoise1Radius=1.5;
-    this.profile.denoise1RadiusGreen=1.5;
-    this.profile.denoise1RadiusBlue=1.5;
-    this.profile.denoise1Iterations=1;
-    this.profile.denoise1IterationsBlue=1;
-    this.profile.denoise1IterationsGreen=1;
+    this.profile.denoise1Amount = 50;
+    this.profile.denoise1AmountBlue = 50;
+    this.profile.denoise1AmountGreen = 50;
+    this.profile.denoise1Radius = 1.5;
+    this.profile.denoise1RadiusGreen = 1.5;
+    this.profile.denoise1RadiusBlue = 1.5;
+    this.profile.denoise1Iterations = 1;
+    this.profile.denoise1IterationsBlue = 1;
+    this.profile.denoise1IterationsGreen = 1;
 
     // Ian's
-    this.profile.iansAmount=1;
-    this.profile.iansIterations=1;
-    this.profile.iansAmountMid=0;
-    this.profile.iansRecovery=0;
+    this.profile.iansAmount = 1;
+    this.profile.iansIterations = 1;
+    this.profile.iansAmountMid = 0;
+    this.profile.iansRecovery = 0;
 
     this.profile.denoiseAlgorithm2 = 'OFF';
 
     // SG
-    this.profile.savitzkyGolaySize=3;
-    this.profile.savitzkyGolaySizeGreen=3;
-    this.profile.savitzkyGolaySizeBlue=3;
-    this.profile.savitzkyGolayAmount=100;
-    this.profile.savitzkyGolayAmountBlue=100;
-    this.profile.savitzkyGolayAmountGreen=100;
-    this.profile.savitzkyGolayIterations=1;
-    this.profile.savitzkyGolayIterationsGreen=1;
-    this.profile.savitzkyGolayIterationsBlue=1;
+    this.profile.savitzkyGolaySize = 3;
+    this.profile.savitzkyGolaySizeGreen = 3;
+    this.profile.savitzkyGolaySizeBlue = 3;
+    this.profile.savitzkyGolayAmount = 100;
+    this.profile.savitzkyGolayAmountBlue = 100;
+    this.profile.savitzkyGolayAmountGreen = 100;
+    this.profile.savitzkyGolayIterations = 1;
+    this.profile.savitzkyGolayIterationsGreen = 1;
+    this.profile.savitzkyGolayIterationsBlue = 1;
 
     // Sigma 2
-    this.profile.denoise2Iterations=1;
-    this.profile.denoise2IterationsGreen=1;
-    this.profile.denoise2IterationsBlue=1;
-    this.profile.denoise2Radius=1;
-    this.profile.denoise2RadiusBlue=1;
-    this.profile.denoise2RadiusGreen=1;
+    this.profile.denoise2Iterations = 1;
+    this.profile.denoise2IterationsGreen = 1;
+    this.profile.denoise2IterationsBlue = 1;
+    this.profile.denoise2Radius = 1;
+    this.profile.denoise2RadiusBlue = 1;
+    this.profile.denoise2RadiusGreen = 1;
 
     // Reset contrast & light
     this.profile.localContrastFine = 0;

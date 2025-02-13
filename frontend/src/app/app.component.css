@@ -111,7 +111,7 @@
   margin-top: -8px !important;
 }
 .rootFolder {
-  width: 248px;
+  width: 244px;
   margin-left: 6px;
 }
 .dropdown_label {
@@ -427,7 +427,12 @@
 }
 .genericButton {
   width: 13px;
-  transform: scale(2.1);
+  transform: scale(1.9);
+  margin-top: 2px;
+}
+.resetDispersionCorrection {
+  width: 11px;
+  transform: scale(3.0);
   margin-top: 2px;
 }
 .saveButton {
