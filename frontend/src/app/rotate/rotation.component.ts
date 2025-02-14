@@ -3,9 +3,10 @@ import { ThemePalette } from '@angular/material/core';
 import { MatLegacyDialog } from '@angular/material/legacy-dialog';
 
 @Component({
-  selector: 'app-rotation-panel',
-  templateUrl: './rotation.component.html',
-  styleUrls: ['./rotation.component.css'],
+    selector: 'app-rotation-panel',
+    templateUrl: './rotation.component.html',
+    styleUrls: ['./rotation.component.css'],
+    standalone: false
 })
 export class RotationComponent {
   @Input() angle: number = 0;

@@ -8,9 +8,10 @@ import {
 import { PSF } from '../model/psf';
 
 @Component({
-  selector: 'app-synthetic-psf-panel',
-  templateUrl: './synthetic.psf.component.html',
-  styleUrls: ['./synthetic.psf.component.css'],
+    selector: 'app-synthetic-psf-panel',
+    templateUrl: './synthetic.psf.component.html',
+    styleUrls: ['./synthetic.psf.component.css'],
+    standalone: false
 })
 export class SyntheticPsfComponent {
   @Input() imageData: string = '';

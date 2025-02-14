@@ -885,7 +885,7 @@
           <mat-radio-button
             value="IAN"
             class="denoiseMode"
-            disabled="{{ !this.settings?.gmicAvailable }}"
+            disabled="{{ !settings?.gmicAvailable }}"
             matTooltip="Warning: Not recommended. It slows down processing and can only be applied equally to all channels. Use Bilateral instead."
             ><span class="deprecatedColor">Ian's NR</span></mat-radio-button
           >
@@ -908,7 +908,7 @@
                 shouldShowSpinner() ||
                 !refImageSelected ||
                 crop ||
-                !this.settings?.gmicAvailable
+                !settings?.gmicAvailable
               "
               step="0.1"
               min="0"
@@ -941,7 +941,7 @@
                 shouldShowSpinner() ||
                 !refImageSelected ||
                 crop ||
-                !this.settings?.gmicAvailable
+                !settings?.gmicAvailable
               "
               step="0.1"
               min="0"
@@ -974,7 +974,7 @@
                 shouldShowSpinner() ||
                 !refImageSelected ||
                 crop ||
-                !this.settings?.gmicAvailable
+                !settings?.gmicAvailable
               "
               step="0.01"
               min="0"
@@ -1007,7 +1007,7 @@
                 shouldShowSpinner() ||
                 !refImageSelected ||
                 crop ||
-                !this.settings?.gmicAvailable
+                !settings?.gmicAvailable
               "
               step="1"
               min="1"
@@ -1503,7 +1503,7 @@
               shouldShowSpinner() ||
               !refImageSelected ||
               crop ||
-              !this.settings?.gmicAvailable
+              !settings?.gmicAvailable
             "
             step="1"
             min="0"

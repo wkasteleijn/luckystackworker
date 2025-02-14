@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { MatLegacySnackBarRef } from '@angular/material/legacy-snack-bar';
 
 @Component({
-  selector: 'app-newversion',
-  templateUrl: './newversion.component.html',
-  styleUrls: ['./newversion.component.css'],
+    selector: 'app-newversion',
+    templateUrl: './newversion.component.html',
+    styleUrls: ['./newversion.component.css'],
+    standalone: false
 })
 export class NewVersionComponent implements OnInit {
   constructor(public snackBarRef: MatLegacySnackBarRef<NewVersionComponent>) {}

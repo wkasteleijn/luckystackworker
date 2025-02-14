@@ -5,9 +5,10 @@ import {
 } from '@angular/material/legacy-dialog';
 
 @Component({
-  selector: 'app-confirmation',
-  templateUrl: './confirmation.component.html',
-  styleUrl: './confirmation.component.css',
+    selector: 'app-confirmation',
+    templateUrl: './confirmation.component.html',
+    styleUrl: './confirmation.component.css',
+    standalone: false
 })
 export class ConfirmationComponent {
   message: string;
