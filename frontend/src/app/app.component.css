@@ -386,8 +386,9 @@
 .dropdownMargin {
   margin-left: 6px;
 }
+
 .profileSelector {
-  max-width: 99px;
+  max-width: 96px;
 }
 .zoomIcon {
   transform: scale(1.6);
