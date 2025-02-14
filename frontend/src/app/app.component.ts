@@ -1941,10 +1941,10 @@ export class AppComponent implements OnInit {
 
     // Disable clipping, set values to defaults.
     this.profile.clippingRange = 50;
-    this.profile.clippingStrength = 10;
+    this.profile.clippingStrength = 0;
 
     // Disable deringing, set values to defaults.
-    this.profile.deringStrength = 10;
+    this.profile.deringStrength = 0;
     this.profile.deringRadius = 3;
     this.profile.deringRadiusBlue = 3;
     this.profile.deringRadiusBlue = 3;
