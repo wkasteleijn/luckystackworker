@@ -17,7 +17,10 @@
   (close)="hideRotationPanel()"
   (angleChanged)="rotationAngleChanged($event)"
 ></app-rotation-panel>
-<div *ngIf="isPsfPanelVisible || isRotationPanelVisible" class="backdrop"></div>
+<div
+  *ngIf="isPsfPanelVisible || isRotationPanelVisible || shouldShowSpinner()"
+  class="backdrop"
+></div>
 
 <div *ngIf="shouldShowSpinner()">
   <mat-progress-spinner
@@ -199,26 +202,6 @@
     </button>
 
     <button
-      *ngIf="openRefImageEnabled() && showVersionButton()"
-      type="button"
-      mat-button
-      class="newVersionButton buttonMargin {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      (click)="showVersionButton() ? openDownloadPage() : openAbout()"
-      matTooltip="You are currently using an older version {{
-        getCurrentVersion()
-      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
-        getLatestKnownVersion()
-      }}."
-    >
-      <img
-        src="assets/images/info.png"
-        class="infoButton zoomIcon buttonBottom"
-      />
-    </button>
-
-    <button
       *ngIf="openRefImageEnabled() && refImageSelected"
       type="button"
       mat-button
@@ -277,6 +260,45 @@
         *ngIf="visibleChannel === 'B'"
         src="assets/images/blue.png"
         class="channelSwitcher"
+      />
+    </button>
+
+    <button
+      *ngIf="openRefImageEnabled() && showVersionButton()"
+      type="button"
+      mat-button
+      class="newVersionButton buttonMargin {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      (click)="showVersionButton() ? openDownloadPage() : openAbout()"
+      matTooltip="You are currently using an older version {{
+        getCurrentVersion()
+      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
+        getLatestKnownVersion()
+      }}."
+    >
+      <img
+        src="assets/images/info.png"
+        class="infoButton zoomIcon buttonBottom"
+      />
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled() && showVersionButton()"
+      type="button"
+      mat-button
+      disabled
+      class="newVersionButton buttonMargin {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      matTooltip="You are currently using an older version {{
+        getCurrentVersion()
+      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
+        getLatestKnownVersion()
+      }}."
+    >
+      <img
+        src="assets/images/info.png"
+        class="infoButton zoomIcon buttonBottom"
       />
     </button>
 
@@ -612,8 +634,6 @@
           <div class="sliderLabel">Deconv. iterations</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               step="1"
               min="1"
@@ -633,8 +653,6 @@
           <div class="sliderLabel">Radius</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               step="0.1"
               min="0.5"
@@ -651,8 +669,6 @@
           <div class="sliderLabel">Amount</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               step="10"
               min="0"
@@ -669,8 +685,6 @@
           <div class="sliderLabel">Sharpen iterations</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               tickInterval="1"
               step="1"
@@ -690,8 +704,6 @@
         <div class="sliderLabel">Blend raw</div>
         <div class="slider">
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             tickInterval="1"
             step="1"
@@ -742,8 +754,6 @@
           <div class="sliderLabel">Suppress Clipping</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               tickInterval="1"
               step="1"
@@ -761,8 +771,6 @@
           <div class="sliderLabel">Suppression Range</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="
                 shouldShowSpinner() ||
                 !refImageSelected ||
@@ -793,8 +801,6 @@
           <div class="sliderLabel">Strength</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               tickInterval="1"
               step="1"
@@ -817,8 +823,6 @@
           <div class="sliderLabel">Radius</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="
                 shouldShowSpinner() ||
                 !refImageSelected ||
@@ -899,8 +903,6 @@
           <div class="sliderLabel">Fine details</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="
                 !iansNrUnlocked ||
                 shouldShowSpinner() ||
@@ -934,8 +936,6 @@
           <div class="sliderLabel">Medium details</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="
                 !iansNrUnlocked ||
                 shouldShowSpinner() ||
@@ -969,8 +969,6 @@
           <div class="sliderLabel">Recovery</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="
                 !iansNrUnlocked ||
                 shouldShowSpinner() ||
@@ -1004,8 +1002,6 @@
           <div class="sliderLabel">Iterations</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="
                 !iansNrUnlocked ||
                 shouldShowSpinner() ||
@@ -1041,8 +1037,6 @@
           <div class="sliderLabel">Amount</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               tickInterval="1000"
               step="1"
@@ -1066,8 +1060,6 @@
           <div class="sliderLabel">Radius</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               tickInterval="1000"
               step="0.1"
@@ -1086,8 +1078,6 @@
           <div class="sliderLabel">Iterations</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               tickInterval="1"
               step="1"
@@ -1108,8 +1098,6 @@
           <div class="sliderLabel">Theta</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               step="10"
               min="10"
@@ -1132,8 +1120,6 @@
           <div class="sliderLabel">Iterations</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               step="1"
               min="2"
@@ -1153,8 +1139,6 @@
           <div class="sliderLabel">Sigma color</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               step="1"
               min="1"
@@ -1176,8 +1160,6 @@
           <div class="sliderLabel">Radius</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               step="1"
               min="1"
@@ -1199,8 +1181,6 @@
           <div class="sliderLabel">Iterations</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               step="1"
               min="1"
@@ -1254,8 +1234,6 @@
           <div class="sliderLabel">Kernel Size</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="
                 shouldShowSpinner() ||
                 !refImageSelected ||
@@ -1293,8 +1271,6 @@
           </div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="
                 shouldShowSpinner() ||
                 !refImageSelected ||
@@ -1336,8 +1312,6 @@
           </div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="
                 shouldShowSpinner() ||
                 !refImageSelected ||
@@ -1370,8 +1344,6 @@
           <div class="sliderLabel">Radius</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               tickInterval="1000"
               step="0.1"
@@ -1390,8 +1362,6 @@
           <div class="sliderLabel">Iterations</div>
           <div class="slider">
             <mat-slider
-              [matTooltip]="getSliderText()"
-              [matTooltipDisabled]="sliderTextDisplayed"
               [disabled]="shouldShowSpinner() || !refImageSelected || crop"
               tickInterval="1"
               step="1"
@@ -1454,8 +1424,6 @@
         <div class="sliderLabel">Fine Details</div>
         <div class="slider">
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="1"
             min="0"
@@ -1477,8 +1445,6 @@
         <div class="sliderLabel">Medium Details</div>
         <div class="slider">
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="1"
             min="0"
@@ -1500,8 +1466,6 @@
         <div class="sliderLabel">Large Details</div>
         <div class="slider">
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="1"
             min="0"
@@ -1534,8 +1498,6 @@
         ></mat-checkbox>
         <div>
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="
               !equalizeLocallyUnlocked ||
               shouldShowSpinner() ||
@@ -1583,8 +1545,6 @@
         <div class="sliderLabel">Gamma</div>
         <div class="slider">
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="0.01"
             min="0.0"
@@ -1607,8 +1567,6 @@
         <div class="sliderLabel">Contrast</div>
         <div class="slider">
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="1"
             min="0"
@@ -1631,8 +1589,6 @@
         <div class="sliderLabel">Brightness</div>
         <div class="slider">
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="1"
             min="0"
@@ -1655,8 +1611,6 @@
         <div class="sliderLabel">Lightness</div>
         <div class="slider">
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="1"
             min="0"
@@ -1679,8 +1633,6 @@
         <div class="sliderLabel">Darken Background</div>
         <div class="slider">
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="1"
             min="0"
@@ -1715,8 +1667,6 @@
         <div class="sliderLabel">Saturation</div>
         <div class="slider">
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="0.01"
             min="1.00"
@@ -1738,8 +1688,6 @@
         <div class="sliderLabel">Reduce Purple</div>
         <div class="slider">
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="1"
             min="0"
@@ -1809,8 +1757,6 @@
         <div class="sliderLabel">Red</div>
         <div class="slider">
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="1"
             min="-100"
@@ -1832,8 +1778,6 @@
         <div class="sliderLabel">Green</div>
         <div class="slider">
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="1"
             min="-100"
@@ -1855,8 +1799,6 @@
         <div class="sliderLabel">Blue</div>
         <div class="slider">
           <mat-slider
-            [matTooltip]="getSliderText()"
-            [matTooltipDisabled]="sliderTextDisplayed"
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
             step="1"
             min="-100"
@@ -2445,7 +2387,7 @@
             selectedProfile
           }} stacks found in the root folder."
         >
-          <img src="assets/images/startbatch.png" class="genericButton" />
+          <img src="assets/images/startbatch.png" class="startBatchButton" />
         </button>
         <button
           *ngIf="!openRefImageEnabled() || !refImageSelected"
@@ -2454,7 +2396,7 @@
           disabled
           class="button_disabled"
         >
-          <img src="assets/images/startbatch.png" class="genericButton" />
+          <img src="assets/images/startbatch.png" class="startBatchButton" />
         </button>
         <button
           *ngIf="isWorkerBusy()"
@@ -2466,7 +2408,7 @@
           }}"
           matTooltip="Stop batch process when running."
         >
-          <img src="assets/images/stopbatch.png" class="genericButton" />
+          <img src="assets/images/stopbatch.png" class="stopBatchButton" />
         </button>
         <button
           *ngIf="!isWorkerBusy()"
@@ -2476,7 +2418,7 @@
           class="relatedButtonsSpace button_disabled"
           matTooltip="Stop batch process when running."
         >
-          <img src="assets/images/stopbatch.png" class="genericButton" />
+          <img src="assets/images/stopbatch.png" class="stopBatchButton" />
         </button>
         <div
           class="relatedButtonsSpace workerLabelStatus {{

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { MatLegacyDialog } from '@angular/material/legacy-dialog';
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar';
+import { timeout } from 'rxjs/operators';
 import version from '../../package.json';
 import { AboutComponent } from './about/about.component';
 import {
@@ -13,8 +14,6 @@ import { Profile } from './model/profile';
 import { PSF } from './model/psf';
 import { Settings } from './model/settings';
 import { NewVersionComponent } from './new_version/newversion.component';
-import { timeout, catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 
 const SERVICE_POLL_DELAY_MS = 250;
 
@@ -1909,11 +1908,6 @@ export class AppComponent implements OnInit {
     this.updateProfile();
   }
 
-  getSliderText(): string {
-    setTimeout(() => (this.sliderTextDisplayed = true), 10000);
-    return 'Use arrow keys to make fine adjustments, or Page-up/down for larger adjustments.';
-  }
-
   private setSharpenOperationForDeringing() {
     if (this.applyWienerDeconvolution) {
       this.settings.operations = ['WIENER_DECONV'];
@@ -1924,8 +1918,13 @@ export class AppComponent implements OnInit {
 
   private resetToRaw() {
     // Disable sharpening, set values to defaults.
-    this.profile.applyUnsharpMask = false;
     this.profile.applyWienerDeconvolution = false;
+    this.profile.psf.airyDiskRadius = 20;
+    this.profile.psf.diffractionIntensity = 60;
+    this.profile.psf.seeingIndex = 4;
+    this.profile.psf.type = 'SYNTHETIC';
+
+    this.profile.applyUnsharpMask = false;
     this.profile.amount = 5000;
     this.profile.amountBlue = 5000;
     this.profile.amountGreen = 5000;

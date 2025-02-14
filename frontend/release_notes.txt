@@ -1,5 +1,16 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+23/02/2025 minor release 6.12.0
+- Added new Deconvolution using a Point Spread Function (PSF)
+- Added Rotation function
+- Added Bilater denoising filter
+- Added Caching mechanism to improve performance
+- Revert buttons now reverts to an unprocessed image stack
+- Improved Crop function
+- Improved look and feel for the control panel
+- Fixed bug freezing control panel when setting sharpen amount to 0.
+- Added unlock checkbox to Ians' NR and Equalize locally to discourage further usage
+
 22/11/2024 minor release 6.6.0
 - Added reset button to color balance, to easily set the sliders back to 0
 - Improved color balance, adjusting to higher Red, Green or Blue values will not increase the background brightness

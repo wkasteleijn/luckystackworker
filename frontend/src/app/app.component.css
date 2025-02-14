@@ -292,6 +292,7 @@
   width: 16px;
 }
 .channelSwitcher {
+  margin-top: 2px;
   width: 32px;
 }
 .dispersionPanelRow {
@@ -420,6 +421,7 @@
 .infoButton {
   width: 12px;
   transform: scale(2.7);
+  margin-top: 2px;
 }
 .openButton {
   width: 12px;
@@ -430,9 +432,19 @@
   transform: scale(1.9);
   margin-top: 2px;
 }
+.startBatchButton {
+  width: 13px;
+  transform: scale(2.5);
+  margin-top: 2px;
+}
+.stopBatchButton {
+  width: 13px;
+  transform: scale(2.5);
+  margin-top: 2px;
+}
 .resetDispersionCorrection {
   width: 11px;
-  transform: scale(3.0);
+  transform: scale(3);
   margin-top: 2px;
 }
 .saveButton {
