@@ -5,12 +5,12 @@ fi
 
 if [ "$1" = "x64" ]; then
     echo "Building the LSW for $1 architecture"
-    export JRE_HOME="/Users/wkasteleijn/Applications/jre21-zulu-x64/Java/zulu-21.jre/Contents/Home"
+    export JRE_HOME="/Users/wilcokasteleijn/Applications/jre21-zulu-x64/Java/zulu-21.jre/Contents/Home"
 fi
 
 if [ "$1" = "arm64" ]; then
     echo "Building the LSW for $1 architecture"
-    export JRE_HOME="/Users/wkasteleijn/Applications/jre21-zulu-arm64/Java/zulu-21.jre/Contents/Home"
+    export JRE_HOME="/Users/wilcokasteleijn/Applications/jre21-zulu-arm64/Java/zulu-21.jre/Contents/Home"
 fi
 
 rm -rf LuckyStackWorker-darwin-$1
