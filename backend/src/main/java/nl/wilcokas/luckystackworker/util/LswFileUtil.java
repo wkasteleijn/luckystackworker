@@ -420,9 +420,9 @@ public class LswFileUtil {
         }
         if (profile.getPsf() == null) {
             PSF psf = PSF.builder()
-                    .airyDiskRadius(16)
-                    .diffractionIntensity(20)
-                    .seeingIndex(0)
+                    .airyDiskRadius(20)
+                    .diffractionIntensity(60)
+                    .seeingIndex(4)
                     .type(PSFType.SYNTHETIC)
                     .build();
             profile.setPsf(psf);

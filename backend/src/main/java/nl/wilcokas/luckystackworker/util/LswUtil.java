@@ -25,7 +25,11 @@ public class LswUtil {
     public static void runCliCommand(String activeOSProfile, List<String> arguments, boolean await) throws IOException, InterruptedException {
         ProcessBuilder processBuilder = getProcessBuilder(activeOSProfile, arguments);
         processBuilder.redirectErrorStream(true);
-        if (!logOutput(processBuilder.start(), await ? 12 : 3)) {
+        Process process = processBuilder.start();
+        if (!logOutput(process, await ? 12 : 3)) {
+            throw new IOException("CLI execution failed");
+        }
+        if (process.exitValue() != 0) {
             throw new IOException("CLI execution failed");
         }
     }
@@ -53,6 +57,10 @@ public class LswUtil {
 
     public static String getActiveOSProfile() {
         return System.getProperty("spring.profiles.active");
+    }
+
+    public static String getMacOSArch() {
+        return System.getProperty("macos.arch");
     }
 
     public static String getLswVersion() {

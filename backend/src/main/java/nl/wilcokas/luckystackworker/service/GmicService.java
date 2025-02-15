@@ -81,6 +81,10 @@ public class GmicService {
         if (Constants.SYSTEM_PROFILE_WINDOWS.equals(activeOSProfile)) {
             return Collections.singletonList("./gmic/gmic.exe");
         } else if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile)) {
+            String macOSArch = LswUtil.getMacOSArch();
+            if ("arm64".equals(macOSArch) || macOSArch==null) { // If not determined assume arm64
+                return Arrays.asList("export", "PATH=/opt/homebrew/bin:$PATH", "&&", "gmic");
+            }
             return Arrays.asList("export", "PATH=/usr/local/bin:$PATH", "&&", "gmic");
         } else {
             return Arrays.asList("export", "PATH=/usr/bin:$PATH", "&&", "gmic");
