@@ -17,10 +17,7 @@
   (close)="hideRotationPanel()"
   (angleChanged)="rotationAngleChanged($event)"
 ></app-rotation-panel>
-<div
-  *ngIf="isPsfPanelVisible || isRotationPanelVisible || shouldShowSpinner()"
-  class="backdrop"
-></div>
+<div *ngIf="isPsfPanelVisible || isRotationPanelVisible" class="backdrop"></div>
 
 <div *ngIf="shouldShowSpinner()">
   <mat-progress-spinner
