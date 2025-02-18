@@ -23,10 +23,10 @@ interface ProfileSelection {
 }
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css'],
-    standalone: false
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
+  standalone: false,
 })
 export class AppComponent implements OnInit {
   profiles: ProfileSelection[] = [
@@ -565,7 +565,7 @@ export class AppComponent implements OnInit {
     this.profile.luminanceIncludeGreen = this.luminanceIncludeGreen;
     this.profile.luminanceIncludeBlue = this.luminanceIncludeBlue;
     this.profile.luminanceIncludeColor = this.luminanceIncludeColor;
-    this.settings.operations = ['SHARPEN'];
+    this.settings.operations = ['SHARPEN', 'WIENER_DECONV'];
     console.log('sharpenMode called: ' + this.profile.sharpenMode);
     if (update) {
       this.updateProfile();
