@@ -125,4 +125,7 @@ mat-button-toggle.mat-button-toggle-checked {
 
 .angleInput {
   width: 38px;
+  color: rgb(168, 168, 168);
+  border: 1px solid rgb(168, 168, 168);
+  background-color: #191919;
 }

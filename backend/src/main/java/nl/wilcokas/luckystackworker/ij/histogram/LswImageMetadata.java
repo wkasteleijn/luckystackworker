@@ -27,5 +27,5 @@ public class LswImageMetadata {
     private int cropHeight;
     private int zoomFactor;
     private ChannelEnum channel;
-    private int angle;
+    private double angle;
 }

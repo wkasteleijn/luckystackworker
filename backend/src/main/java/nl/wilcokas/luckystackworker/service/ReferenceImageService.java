@@ -453,7 +453,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         imageMetadata.setBlue(bluePercentage);
         imageMetadata.setLuminance((redPercentage + greenPercentage + bluePercentage) / 3);
         if (profile!=null) {
-            imageMetadata.setAngle((int) profile.getRotationAngle());
+            imageMetadata.setAngle(profile.getRotationAngle());
         }
     }
 

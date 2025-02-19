@@ -40,7 +40,8 @@ export class RotationComponent {
 
   onInputKeyPress(event: KeyboardEvent): boolean {
     const char = event.key;
-    const inputValue = (event.target as HTMLInputElement).value;
+    const inputElement = event.target as HTMLInputElement;
+    let inputValue = inputElement.value;
 
     if (/\d/.test(char)) {
       const decimalIndex = inputValue.indexOf('.');
@@ -59,13 +60,14 @@ export class RotationComponent {
       return true;
     }
 
-    // TODO: fix this, can still enter numbers larger than 180 or smaller than -180.
     const enteredAngle = Number(inputValue);
     if (enteredAngle < -180) {
       this.angle = -180;
+      inputElement.value = this.angle.toString();
     }
     if (enteredAngle > 180) {
       this.angle = 180;
+      inputElement.value = this.angle.toString();
     }
 
     if (char === 'Enter') {
