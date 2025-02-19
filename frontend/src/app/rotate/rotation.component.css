@@ -23,10 +23,10 @@
 
 .sliderGroup {
   display: grid;
-  grid-template-columns: 24px 10fr 10px;
+  grid-template-columns: 24px 264px 10px;
   align-items: center;
   height: 16px;
-  column-gap: 16px;
+  column-gap: 8px;
 }
 
 .sliderLabel {
@@ -55,10 +55,6 @@
 }
 .slidersStartMargin {
   margin-top: 40px;
-}
-
-label {
-  width: 130px;
 }
 
 .closeButton {
@@ -125,4 +121,8 @@ mat-button-toggle {
 mat-button-toggle.mat-button-toggle-checked {
   background-color: darkgray !important; /* Dark gray when selected */
   color: black !important; /* Black text when selected */
+}
+
+.angleInput {
+  width: 38px;
 }

@@ -5,6 +5,7 @@ backend/.project
 backend/.metadata
 backend/.idea
 backend/gmic
+backend/gmic-3.4
 backend/LuckyStackWorker
 frontend/node_modules
 frontend/.angular
