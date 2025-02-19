@@ -40,22 +40,25 @@ function createWindow() {
   });
 
   mainWindow.on("minimize", () => {
-    fetch(`${apiUrl}/reference/minimize`, {
-      method: "PUT",
-    }).catch((error) => {});
+    minimize();
+  });
+
+  mainWindow.on("hide", () => {
+    minimize();
   });
 
   mainWindow.on("restore", () => {
-    fetch(`${apiUrl}/reference/restore`, {
-      method: "PUT",
-    }).catch((error) => {});
+    restore();
   });
 
-  mainWindow.on("focus", () => {
-    fetch(`${apiUrl}/reference/focus`, {
-      method: "PUT",
-    }).catch((error) => {});
-  });
+  mainWindow.on(
+    "show",
+    () => {
+      restore();
+      setTimeout(() => app.show(), 500);
+    },
+    1000
+  );
 
   mainWindow.on("show", () => {
     callPassOnPosition();
@@ -66,15 +69,6 @@ function createWindow() {
       callPassOnPosition();
     }
   });
-
-  function callPassOnPosition() {
-    const [x, y] = mainWindow.getPosition();
-    fetch(`${apiUrl}/reference/move?x=${x}&y=${y}`, {
-      method: "PUT",
-    }).catch((error) => {
-      setTimeout(() => callPassOnPosition(), 250);
-    });
-  }
 
   mainWindow.on("moved", () => {
     const [x, y] = mainWindow.getPosition();
@@ -108,3 +102,24 @@ app.on("ready", function () {
   }
   createWindow();
 });
+
+function callPassOnPosition() {
+  const [x, y] = mainWindow.getPosition();
+  fetch(`${apiUrl}/reference/move?x=${x}&y=${y}`, {
+    method: "PUT",
+  }).catch((error) => {
+    setTimeout(() => callPassOnPosition(), 250);
+  });
+}
+
+function minimize() {
+  fetch(`${apiUrl}/reference/minimize`, {
+    method: "PUT",
+  }).catch((error) => {});
+}
+
+function restore() {
+  fetch(`${apiUrl}/reference/restore`, {
+    method: "PUT",
+  }).catch((error) => {});
+}
