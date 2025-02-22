@@ -88,11 +88,13 @@
         (change)="scaleChanged()"
         matTooltip="Select the scale used for opening the image stack. The selected scale is not persisted with the object profile."
         class="{{
-          !refImageSelected || !openRefImageEnabled()
-            ? 'dropdownMargin dropdown_disabled'
-            : nightModeEnabled()
-            ? 'dropdownMargin dropdown activeColorNight'
-            : 'dropdownMargin dropdown activeColor'
+          'dropdownMargin ' +
+            (isRunningOnWindows() ? 'winScaleSelector ' : 'macScaleSelector') +
+            (!refImageSelected || !openRefImageEnabled()
+              ? 'dropdown_disabled'
+              : nightModeEnabled()
+              ? 'dropdown activeColorNight'
+              : 'dropdown activeColor')
         }}"
       >
         <option [value]="1">1x</option>
@@ -264,7 +266,7 @@
       *ngIf="openRefImageEnabled() && showVersionButton()"
       type="button"
       mat-button
-      class="newVersionButton buttonMargin {{
+      class="newVersionButton infoButtonMargin {{
         nightModeEnabled() ? 'activeColorNight' : 'activeColor'
       }}"
       (click)="showVersionButton() ? openDownloadPage() : openAbout()"
@@ -284,7 +286,7 @@
       type="button"
       mat-button
       disabled
-      class="newVersionButton buttonMargin {{
+      class="newVersionButton infoButtonMargin {{
         nightModeEnabled() ? 'activeColorNight' : 'activeColor'
       }}"
       matTooltip="You are currently using an older version {{
@@ -303,7 +305,7 @@
       *ngIf="openRefImageEnabled() && !showVersionButton()"
       type="button"
       mat-button
-      class="button buttonMargin {{
+      class="button infoButtonMargin {{
         nightModeEnabled() ? 'activeColorNight' : 'activeColor'
       }}"
       (click)="openAbout()"
@@ -319,7 +321,7 @@
       type="button"
       mat-button
       disabled
-      class="button_disabled buttonMargin"
+      class="button_disabled infoButtonMargin"
       matTooltip="About"
     >
       <img
@@ -365,7 +367,7 @@
       }}"
       matTooltip="Zoom out"
     >
-      <img src="assets/images/zoomout.png" class="genericButton" />
+      <img src="assets/images/zoomout.png" class="minZoomButton" />
     </button>
     <button
       *ngIf="!openRefImageEnabled() || !refImageSelected"
@@ -374,7 +376,7 @@
       disabled
       class="minZoom buttonDisabledZoom relatedButtonsSpace"
     >
-      <img src="assets/images/zoomout.png" class="genericButton" />
+      <img src="assets/images/zoomout.png" class="minZoomButton" />
     </button>
 
     <button

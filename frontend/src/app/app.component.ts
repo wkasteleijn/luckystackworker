@@ -1909,6 +1909,10 @@ export class AppComponent implements OnInit {
     this.updateProfile();
   }
 
+  isRunningOnWindows() {
+    return /Win/i.test(navigator.userAgent);
+  }
+
   private setSharpenOperationForDeringing() {
     if (this.applyWienerDeconvolution) {
       this.settings.operations = ['WIENER_DECONV'];
