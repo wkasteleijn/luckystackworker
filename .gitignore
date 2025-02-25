@@ -15,6 +15,7 @@ frontend/LuckyStackWorker-win32-x64.zip
 frontend/LuckyStackWorker-linux-x64
 frontend/LuckyStackWorker-linux-x64.zip
 frontend/LuckyStackWorker-darwin-arm64
+frontend/LuckyStackWorker-darwin-x64
 frontend/jre/
 frontend/lsw-gui-darwin-x64
 frontend/lsw-gui-darwin-arm64
