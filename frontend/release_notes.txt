@@ -1,5 +1,10 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
+03/03/2024 revision release 6.2.1
+- Fixed bug when setting sharpen amount to 0 the next time you start the app it would not work anymore
+- Fixed bug in the windows startup that only happened for users with a space character in their username
+- Fixed bug in Bilateral Denoise not able to change values for green and blue channel individually.
+
 23/02/2025 minor release 6.12.0
 - Added new Deconvolution using a Point Spread Function (PSF)
 - Added Rotation function
