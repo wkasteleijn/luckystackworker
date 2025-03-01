@@ -21,10 +21,10 @@ public class BilateralDenoiseFilter implements LSWFilter {
 
     @Override
     public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
-        if (isApplied(profile,image)) {
+        if (isApplied(profile, image)) {
             log.info("Applying bilateral denoise filter to image: {}", image.getTitle());
-            for (int i=1;i<=profile.getBilateralIterations();i++) {
-                apply(image, profile.getBilateralRadius(), profile.getBilateralSigmaColor() * 10D, 1);
+            for (int i = 1; i <= profile.getBilateralIterations(); i++) {
+                doApply(image, profile);
             }
             return true;
         }
@@ -41,14 +41,16 @@ public class BilateralDenoiseFilter implements LSWFilter {
         return Constants.DENOISE_ALGORITHM_BILATERAL.equals(profile.getDenoiseAlgorithm1());
     }
 
-    private void apply(ImagePlus image, int radius, double sigmaColor, double sigmaSpace) {
+    private void doApply(ImagePlus image, Profile profile) {
+        // profile.getBilateralRadius(), profile.getBilateralSigmaColor() * 10D, 1)
+
         ImageStack stack = image.getStack();
 
         // Run every stack in a seperate thread to increase performance.
         Executor executor = LswUtil.getParallelExecutor();
-        executor.execute(() -> applyToChannel((ShortProcessor) stack.getProcessor(1), radius, sigmaColor, sigmaSpace));
-        executor.execute(() -> applyToChannel((ShortProcessor) stack.getProcessor(2), radius, sigmaColor, sigmaSpace));
-        executor.execute(() -> applyToChannel((ShortProcessor) stack.getProcessor(3), radius, sigmaColor, sigmaSpace));
+        executor.execute(() -> applyToChannel((ShortProcessor) stack.getProcessor(1), profile.getBilateralRadius(), profile.getBilateralSigmaColor() * 10D, 1));
+        executor.execute(() -> applyToChannel((ShortProcessor) stack.getProcessor(2), profile.getBilateralRadiusGreen(), profile.getBilateralSigmaColorGreen() * 10D, 1));
+        executor.execute(() -> applyToChannel((ShortProcessor) stack.getProcessor(3), profile.getBilateralRadiusBlue(), profile.getBilateralSigmaColorBlue() * 10D, 1));
         LswUtil.stopAndAwaitParallelExecutor(executor);
     }
 
@@ -59,10 +61,10 @@ public class BilateralDenoiseFilter implements LSWFilter {
         int height = ip.getHeight();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                newPixels[width * y + x] = LswImageProcessingUtil.convertToShort((long)applyBilateralFilter(ip, x, y, radius, sigmaColor, sigmaSpace));
+                newPixels[width * y + x] = LswImageProcessingUtil.convertToShort((long) applyBilateralFilter(ip, x, y, radius, sigmaColor, sigmaSpace));
             }
         }
-        System.arraycopy(newPixels,0, ip.getPixels(), 0, newPixels.length);
+        System.arraycopy(newPixels, 0, ip.getPixels(), 0, newPixels.length);
     }
 
     private double applyBilateralFilter(ShortProcessor ip, int x, int y, int radius, double sigmaColor, double sigmaSpace) {
@@ -105,7 +107,8 @@ public class BilateralDenoiseFilter implements LSWFilter {
         image.resetDisplayRange();
 
         BilateralDenoiseFilter filter = new BilateralDenoiseFilter();
-        filter.apply(image, 2,  25000, 40000);
+        Profile profile = Profile.builder().bilateralRadius(2).bilateralIterations(1).bilateralSigmaColor(25000).bilateralSigmaSpace(40000).build();
+        filter.doApply(image, profile);
         image.updateAndDraw();
 
         LswFileUtil.saveImage(image, "jup", "C:/Users/wkast/archive/Jup/testsession/jup_denoised2.tif", true, false, false, false);

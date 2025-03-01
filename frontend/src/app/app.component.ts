@@ -201,7 +201,7 @@ export class AppComponent implements OnInit {
           console.log('Successfully opened the image: ', data);
           this.refImageSelected = true;
           this.crop = false;
-          if (data && data.profile.amount > 0) {
+          if (data && data.profile) {
             this.profile = data.profile;
             this.settings = data.settings;
             this.selectedProfile = this.profile.name;
