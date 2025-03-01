@@ -9,7 +9,7 @@
 		<commons-io.version>2.18.0</commons-io.version>
 		<velocity.version>2.4.1</velocity.version>
 		<commons-text.version>1.13.0</commons-text.version>
-		<imagej.version>1.54k</imagej.version>
+		<imagej.version>1.54p</imagej.version>
 		<ParallelIterativeDeconvolution.version>1.13</ParallelIterativeDeconvolution.version>
 	</properties>
 	<parent>
