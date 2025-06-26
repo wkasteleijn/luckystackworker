@@ -139,6 +139,7 @@ public class ProfileDTO {
         this.dispersionCorrectionRedY = profile.getDispersionCorrectionRedY();
         this.dispersionCorrectionBlueY = profile.getDispersionCorrectionBlueY();
         this.preserveDarkBackground = profile.isPreserveDarkBackground();
+        this.gain = profile.getGain();
 
         this.scale = profile.getScale();
         this.rotationAngle = profile.getRotationAngle();
@@ -166,6 +167,7 @@ public class ProfileDTO {
     private int deringStrength;
     private int blendRaw;
     private int wienerIterations;
+    private double gain;
 
     private BigDecimal radiusGreen;
     private BigDecimal amountGreen;

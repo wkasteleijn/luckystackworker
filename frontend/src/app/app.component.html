@@ -628,6 +628,23 @@
         </div>
       </div>
 
+      <div class="sliderRow">
+        <div class="sliderLabel">Pre-gain</div>
+        <div class="slider">
+          <mat-slider
+            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            step="0.01"
+            min="0"
+            max="2"
+            (input)="gainChanged($event, false)"
+            (change)="gainChanged($event, true)"
+            [(ngModel)]="gain"
+            [color]="colorTheme()"
+          ></mat-slider>
+          <span class="sliderLabel">{{ gain }}</span>
+        </div>
+      </div>
+
       <span *ngIf="applyWienerDeconvolution">
         <div class="sliderRow">
           <div class="sliderLabel">Deconv. iterations</div>

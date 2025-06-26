@@ -68,7 +68,7 @@
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: baseline;
-  max-height: 32px;
+  max-height: 30px;
   color: rgb(168, 168, 168);
   margin-top: 2px;
 }

@@ -47,6 +47,7 @@ public class OperationService {
     private final LocalContrastFilter localContrastFilter;
     private final RotationFilter rotationFilter;
     private final GammaFilter gammaFilter;
+    private final GainFilter gainFilter;
 
     private int displayedProgress = 0;
     private Timer timer = new Timer();
@@ -56,6 +57,7 @@ public class OperationService {
 
     @PostConstruct
     void init() {
+        filters.add(Pair.of(OperationEnum.GAIN, gainFilter));
         filters.add(Pair.of(OperationEnum.WIENER_DECONV, wienerDeconvolutionFilter));
         filters.add(Pair.of(OperationEnum.SHARPEN, lswSharpenFilter));
         filters.add(Pair.of(OperationEnum.ROTATE, rotationFilter));
@@ -84,7 +86,7 @@ public class OperationService {
     }
 
     public byte[] applyAllOperations(ImagePlus image, LswImageViewer viewer, Profile profile, List<OperationEnum> operationParams, boolean isMono) throws IOException, InterruptedException {
-        updateProgress(viewer, 0, true);
+        updateProgress(viewer, 0, false);
 
         // Sharpening filters
         byte[] psfImage = updatePSF(profile.getPsf(), operationParams, profile.getName(), isMono);

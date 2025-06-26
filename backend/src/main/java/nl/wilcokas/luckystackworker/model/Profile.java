@@ -135,6 +135,7 @@ public class Profile {
     private int localContrastLarge;
     private int equalizeLocalHistogramsStrength;
     private boolean preserveDarkBackground;
+    private double gain;
 
     // color & dispersion
     private BigDecimal red;
@@ -343,6 +344,7 @@ public class Profile {
         this.localContrastLarge = profile.getLocalContrastLarge();
         this.equalizeLocalHistogramsStrength = profile.getEqualizeLocalHistogramsStrength();
         this.preserveDarkBackground = profile.isPreserveDarkBackground();
+        this.gain = profile.getGain();
 
         // color & dispersion
         this.red = profile.getRed();

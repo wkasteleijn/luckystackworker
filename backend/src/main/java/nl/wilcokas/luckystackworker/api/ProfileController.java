@@ -114,6 +114,7 @@ public class ProfileController {
                 || LocalDateTime.now()
                 .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
             LuckyStackWorkerContext.setActiveOperationTime(LocalDateTime.now());
+
             Profile profile = profileService.updateProfile(profileDTO);
             psfImage = referenceImageService.updateProcessing(profile, operations);
             LuckyStackWorkerContext.setActiveOperationTime(null);

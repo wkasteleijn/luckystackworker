@@ -378,7 +378,7 @@ public class LswFileUtil {
             profile.setIansIterations(1);
         }
 
-        // Added since 7.0.0, so older version written yaml needs to stay compatible.
+        // Added since 6.12.0, so older version written yaml needs to stay compatible.
         if (profile.getRofIterations() == 0) {
             profile.setRofIterations(5);
             profile.setRofIterationsGreen(5);
@@ -433,6 +433,11 @@ public class LswFileUtil {
             } else {
                 profile.setApplyUnsharpMask(false);
             }
+        }
+
+        // Added since 6.13.0, so older version written yaml needs to stay compatible.
+        if (profile.getGain() == 0) {
+            profile.setGain(1);
         }
     }
 
