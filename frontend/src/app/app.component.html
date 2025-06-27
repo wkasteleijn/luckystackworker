@@ -61,7 +61,7 @@
     <mat-form-field appearance="fill">
       <select
         matNativeControl
-        [disabled]="shouldShowSpinner() || crop"
+        [disabled]="shouldShowSpinner()"
         [(ngModel)]="openImageMode"
         name="openAs"
         (change)="openImageModeChanged()"
@@ -83,7 +83,7 @@
     <mat-form-field appearance="fill">
       <select
         matNativeControl
-        [disabled]="shouldShowSpinner() || crop"
+        [disabled]="shouldShowSpinner()"
         [(ngModel)]="scale"
         (change)="scaleChanged()"
         matTooltip="Select the scale used for opening the image stack. The selected scale is not persisted with the object profile."
@@ -533,7 +533,7 @@
         <div class="lswRadio">
           <mat-radio-group
             [color]="colorTheme()"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             [(ngModel)]="sharpenMode"
             (change)="sharpenModeChanged($event, true)"
             class="sharpenMode"
@@ -553,14 +553,14 @@
             [(ngModel)]="luminanceIncludeRed"
             (change)="sharpenModeChanged(undefined, true)"
             [color]="colorTheme()"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             >Red</mat-checkbox
           >
           <mat-checkbox
             [(ngModel)]="luminanceIncludeGreen"
             (change)="sharpenModeChanged(undefined, true)"
             [color]="colorTheme()"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             class="luminanceIncludeBox"
             >Green</mat-checkbox
           >
@@ -569,7 +569,7 @@
             (change)="sharpenModeChanged(undefined, true)"
             [color]="colorTheme()"
             class="luminanceIncludeBox"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             >Blue</mat-checkbox
           >
           <mat-checkbox
@@ -577,14 +577,14 @@
             (change)="sharpenModeChanged(undefined, true)"
             [color]="colorTheme()"
             class="luminanceIncludeBox"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             >Color</mat-checkbox
           >
         </div>
         <div *ngIf="sharpenMode === 'RGB'">
           <mat-radio-group
             [color]="colorTheme()"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             [(ngModel)]="applySharpenToChannel"
             (change)="applySharpenToChannelChanged($event)"
             class="sharpenMode"
@@ -637,7 +637,7 @@
             (change)="applyWienerDeconvolutionChanged()"
             [color]="colorTheme()"
             class="luminanceIncludeBox"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             >Deconvolve</mat-checkbox
           >
 
@@ -646,7 +646,7 @@
             (change)="applyUnsharpMaskChanged()"
             [color]="colorTheme()"
             class="applyUnsharpMaskCheckBox"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             >Sharpen</mat-checkbox
           >
         </div>
@@ -656,7 +656,7 @@
         <div class="sliderLabel">Suppress clipping</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="0"
             max="100"
@@ -674,7 +674,7 @@
           <div class="sliderLabel">Deconv. iterations</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               step="1"
               min="1"
               max="40"
@@ -693,7 +693,7 @@
           <div class="sliderLabel">Radius</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               step="0.1"
               min="0.5"
               max="4"
@@ -709,7 +709,7 @@
           <div class="sliderLabel">Amount</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               step="10"
               min="0"
               max="9999"
@@ -725,7 +725,7 @@
           <div class="sliderLabel">Sharpen iterations</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               tickInterval="1"
               step="1"
               min="1"
@@ -744,7 +744,7 @@
         <div class="sliderLabel">Blend raw</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             tickInterval="1"
             step="1"
             min="0"
@@ -771,7 +771,7 @@
         <div class="slider">
           <mat-radio-group
             [color]="colorTheme()"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             [(ngModel)]="edgeArtefactSupressionMode"
             (change)="edgeArtefactSupressionModeChanged($event, true)"
             class="sharpenMode"
@@ -794,7 +794,7 @@
           <div class="sliderLabel">Suppress Clipping</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               tickInterval="1"
               step="1"
               min="1"
@@ -814,8 +814,7 @@
               [disabled]="
                 shouldShowSpinner() ||
                 !refImageSelected ||
-                clippingStrength === 0 ||
-                crop
+                clippingStrength === 0
               "
               tickInterval="1"
               step="1"
@@ -841,7 +840,7 @@
           <div class="sliderLabel">Strength</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               tickInterval="1"
               step="1"
               min="1"
@@ -864,10 +863,7 @@
           <div class="slider">
             <mat-slider
               [disabled]="
-                shouldShowSpinner() ||
-                !refImageSelected ||
-                deringStrength === 0 ||
-                crop
+                shouldShowSpinner() || !refImageSelected || deringStrength === 0
               "
               tickInterval="1"
               step="1"
@@ -904,7 +900,7 @@
         </div>
         <mat-radio-group
           [color]="colorTheme()"
-          [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+          [disabled]="shouldShowSpinner() || !refImageSelected"
           [(ngModel)]="denoiseAlgorithm1"
           (change)="denoiseAlgorithm1Changed($event)"
         >
@@ -933,7 +929,7 @@
             [(ngModel)]="iansNrUnlocked"
             [color]="colorTheme()"
             class="iansNrLockCheckbox"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             matTooltip="Unlock"
           ></mat-checkbox>
         </mat-radio-group>
@@ -947,7 +943,6 @@
                 !iansNrUnlocked ||
                 shouldShowSpinner() ||
                 !refImageSelected ||
-                crop ||
                 !settings?.gmicAvailable
               "
               step="0.1"
@@ -980,7 +975,6 @@
                 !iansNrUnlocked ||
                 shouldShowSpinner() ||
                 !refImageSelected ||
-                crop ||
                 !settings?.gmicAvailable
               "
               step="0.1"
@@ -1013,7 +1007,6 @@
                 !iansNrUnlocked ||
                 shouldShowSpinner() ||
                 !refImageSelected ||
-                crop ||
                 !settings?.gmicAvailable
               "
               step="0.01"
@@ -1046,7 +1039,6 @@
                 !iansNrUnlocked ||
                 shouldShowSpinner() ||
                 !refImageSelected ||
-                crop ||
                 !settings?.gmicAvailable
               "
               step="1"
@@ -1077,7 +1069,7 @@
           <div class="sliderLabel">Amount</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               tickInterval="1000"
               step="1"
               min="0"
@@ -1100,7 +1092,7 @@
           <div class="sliderLabel">Radius</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               tickInterval="1000"
               step="0.1"
               min="0.5"
@@ -1118,7 +1110,7 @@
           <div class="sliderLabel">Iterations</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               tickInterval="1"
               step="1"
               min="1"
@@ -1138,7 +1130,7 @@
           <div class="sliderLabel">Theta</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               step="10"
               min="10"
               max="1000"
@@ -1160,7 +1152,7 @@
           <div class="sliderLabel">Iterations</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               step="1"
               min="2"
               max="20"
@@ -1179,7 +1171,7 @@
           <div class="sliderLabel">Sigma color</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               step="1"
               min="1"
               max="1000"
@@ -1200,7 +1192,7 @@
           <div class="sliderLabel">Radius</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               step="1"
               min="1"
               max="5"
@@ -1221,7 +1213,7 @@
           <div class="sliderLabel">Iterations</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               step="1"
               min="1"
               max="10"
@@ -1254,7 +1246,7 @@
         </div>
         <mat-radio-group
           [color]="colorTheme()"
-          [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+          [disabled]="shouldShowSpinner() || !refImageSelected"
           [(ngModel)]="denoiseAlgorithm2"
           (change)="denoiseAlgorithm2Changed($event)"
         >
@@ -1277,8 +1269,7 @@
               [disabled]="
                 shouldShowSpinner() ||
                 !refImageSelected ||
-                savitzkyGolaySize === '0' ||
-                crop
+                savitzkyGolaySize === '0'
               "
               tickInterval="1"
               step="1"
@@ -1314,8 +1305,7 @@
               [disabled]="
                 shouldShowSpinner() ||
                 !refImageSelected ||
-                savitzkyGolaySize === '0' ||
-                crop
+                savitzkyGolaySize === '0'
               "
               tickInterval="1"
               step="1"
@@ -1355,8 +1345,7 @@
               [disabled]="
                 shouldShowSpinner() ||
                 !refImageSelected ||
-                savitzkyGolaySize === '0' ||
-                crop
+                savitzkyGolaySize === '0'
               "
               tickInterval="1"
               step="1"
@@ -1384,7 +1373,7 @@
           <div class="sliderLabel">Radius</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               tickInterval="1000"
               step="0.1"
               min="0.5"
@@ -1402,7 +1391,7 @@
           <div class="sliderLabel">Iterations</div>
           <div class="slider">
             <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
               tickInterval="1"
               step="1"
               min="1"
@@ -1429,7 +1418,7 @@
         </div>
         <mat-radio-group
           [color]="colorTheme()"
-          [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+          [disabled]="shouldShowSpinner() || !refImageSelected"
           [(ngModel)]="applyDenoiseToChannel"
           (change)="applyDenoiseToChannelChanged($event)"
         >
@@ -1464,7 +1453,7 @@
         <div class="sliderLabel">Fine Details</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="0"
             max="99"
@@ -1485,7 +1474,7 @@
         <div class="sliderLabel">Medium Details</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="0"
             max="99"
@@ -1506,7 +1495,7 @@
         <div class="sliderLabel">Large Details</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="0"
             max="99"
@@ -1533,7 +1522,7 @@
         <mat-checkbox
           [(ngModel)]="equalizeLocallyUnlocked"
           [color]="colorTheme()"
-          [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+          [disabled]="shouldShowSpinner() || !refImageSelected"
           matTooltip="Unlock"
         ></mat-checkbox>
         <div>
@@ -1542,7 +1531,6 @@
               !equalizeLocallyUnlocked ||
               shouldShowSpinner() ||
               !refImageSelected ||
-              crop ||
               !settings?.gmicAvailable
             "
             step="1"
@@ -1576,7 +1564,7 @@
             [(ngModel)]="preserveDarkBackground"
             (change)="preserveDarkBackgroundChanged()"
             [color]="colorTheme()"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             >Preserve dark background</mat-checkbox
           >
         </div>
@@ -1585,7 +1573,7 @@
         <div class="sliderLabel">Gamma</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="0.01"
             min="0.0"
             max="2.0"
@@ -1607,7 +1595,7 @@
         <div class="sliderLabel">Contrast</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="0"
             max="100"
@@ -1629,7 +1617,7 @@
         <div class="sliderLabel">Brightness</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="0"
             max="100"
@@ -1651,7 +1639,7 @@
         <div class="sliderLabel">Lightness</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="0"
             max="100"
@@ -1673,7 +1661,7 @@
         <div class="sliderLabel">Darken Background</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="0"
             max="100"
@@ -1707,7 +1695,7 @@
         <div class="sliderLabel">Saturation</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="0.01"
             min="1.00"
             max="5.00"
@@ -1728,7 +1716,7 @@
         <div class="sliderLabel">Reduce Purple</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="0"
             max="255"
@@ -1788,7 +1776,7 @@
             [(ngModel)]="normalizeColorBalance"
             (change)="colorNormalizationChanged()"
             [color]="colorTheme()"
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             >Normalize</mat-checkbox
           >
         </div>
@@ -1797,7 +1785,7 @@
         <div class="sliderLabel">Red</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="-100"
             max="100"
@@ -1818,7 +1806,7 @@
         <div class="sliderLabel">Green</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="-100"
             max="100"
@@ -1839,7 +1827,7 @@
         <div class="sliderLabel">Blue</div>
         <div class="slider">
           <mat-slider
-            [disabled]="shouldShowSpinner() || !refImageSelected || crop"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
             min="-100"
             max="100"

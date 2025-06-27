@@ -4,17 +4,20 @@ import edu.emory.mathcs.restoretools.iterative.IterativeEnums;
 import edu.emory.mathcs.restoretools.iterative.wpl.WPLOptions;
 import ij.ImagePlus;
 import ij.ImageStack;
+import ij.gui.Roi;
 import ij.plugin.Scaler;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.filter.settings.WienerDeconvolutionParameters;
 import nl.wilcokas.luckystackworker.filter.wpl.LswWPLFloatIterativeDeconvolver2D;
 import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.model.Profile;
+import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
@@ -107,16 +110,64 @@ public class WienerDeconvolutionFilter implements LSWFilter {
 
     private void apply(ImagePlus image, ImagePlus psf, WienerDeconvolutionParameters parameters) {
         ImagePlus[] psfPerChannel = getPsfPerChannel(psf);
+
+        Roi roi = LuckyStackWorkerContext.getSelectedRoi();
+        ImagePlus roiImage = image;
         ImageStack stack = image.getStack();
+        int i = 0;
+        boolean roiUsed = roi != null;
+        if (roiUsed) {
+            int roiWidth = (int) roi.getFloatWidth();
+            int roiHeight = (int) roi.getFloatHeight();
+            int xOffset = (int) roi.getXBase();
+            int yOffset = (int) roi.getYBase();
+            short[][] newPixels = new short[3][roiWidth * roiHeight];
+            for (int y = yOffset; y < (roiHeight+yOffset); y++) {
+                for (int x = xOffset; x < (roiWidth+xOffset); x++) {
+                    short[] ipRedPixels = (short[]) (stack.getProcessor(1).getPixels());
+                    short[] ipGreenPixels = (short[]) (stack.getProcessor(2).getPixels());
+                    short[] ipBluePixels = (short[]) (stack.getProcessor(3).getPixels());
+
+
+                    // TODO: fix outofbounds exc
+                    newPixels[0][i++] = ipRedPixels[x + y * roiWidth];
+                    newPixels[1][i++] = ipGreenPixels[x + y * roiWidth];
+                    newPixels[2][i++] = ipBluePixels[x + y * roiWidth];
+                }
+            }
+            roiImage = LswImageProcessingUtil.create16BitRGBImage("crop",
+                    LswImageLayersDto.builder().layers(newPixels).build(), roiWidth, roiHeight, true, true, true);
+        }
+        final ImageStack roiStack = roiImage.getStack();
+
         if (parameters.getMode() == LSWSharpenMode.RGB) {
             Executor executor = LswUtil.getParallelExecutor();
-            executor.execute(() -> applyToChannel(stack.getProcessor(1), psfPerChannel[0], parameters.getIterationsRed(), parameters.getDeringStrengthRed(), parameters.getDeringRadiusRed(), parameters.getBlendRawRed()));
-            executor.execute(() -> applyToChannel(stack.getProcessor(2), psfPerChannel[1], parameters.getIterationsGreen(), parameters.getDeringStrengthGreen(), parameters.getDeringRadiusGreen(), parameters.getBlendRawGreen()));
-            executor.execute(() -> applyToChannel(stack.getProcessor(3), psfPerChannel[2], parameters.getIterationsBlue(), parameters.getDeringStrengthBlue(), parameters.getDeringRadiusBlue(), parameters.getBlendRawBlue()));
+            executor.execute(() -> applyToChannel(roiStack.getProcessor(1), psfPerChannel[0], parameters.getIterationsRed(), parameters.getDeringStrengthRed(), parameters.getDeringRadiusRed(), parameters.getBlendRawRed()));
+            executor.execute(() -> applyToChannel(roiStack.getProcessor(2), psfPerChannel[1], parameters.getIterationsGreen(), parameters.getDeringStrengthGreen(), parameters.getDeringRadiusGreen(), parameters.getBlendRawGreen()));
+            executor.execute(() -> applyToChannel(roiStack.getProcessor(3), psfPerChannel[2], parameters.getIterationsBlue(), parameters.getDeringStrengthBlue(), parameters.getDeringRadiusBlue(), parameters.getBlendRawBlue()));
             LswUtil.stopAndAwaitParallelExecutor(executor);
         } else {
-            applyLuminance(image, psf, parameters);
+            applyLuminance(roiImage, psf, parameters);
         }
+
+        if (roiUsed) {
+            int roiWidth = (int) roi.getFloatWidth();
+            int roiHeight = (int) roi.getFloatHeight();
+            for (int y = (int) roi.getYBase(); y < roiHeight; y++) {
+                for (int x = (int) roi.getXBase(); x < roiWidth; x++) {
+                    short[] roiRedPixels = (short[]) (roiStack.getProcessor(1).getPixels());
+                    short[] roiGreenPixels = (short[]) (roiStack.getProcessor(2).getPixels());
+                    short[] roiBluePixels = (short[]) (roiStack.getProcessor(3).getPixels());
+                    short[] imageRedPixels = (short[])roiStack.getProcessor(1).getPixels();
+                    short[] imageGreenPixels = (short[])roiStack.getProcessor(1).getPixels();
+                    short[] imageBluePixels = (short[])roiStack.getProcessor(1).getPixels();
+                    imageRedPixels[x + y * roiImage.getWidth()] = roiRedPixels[x + y * roiImage.getWidth()];
+                    imageGreenPixels[x + y * roiImage.getWidth()] = roiGreenPixels[x + y * roiImage.getWidth()];
+                    imageBluePixels[x + y * roiImage.getWidth()] = roiBluePixels[x + y * roiImage.getWidth()];
+                }
+            }
+        }
+
     }
 
     private ImagePlus[] getPsfPerChannel(ImagePlus psf) {
