@@ -34,7 +34,7 @@ public class ClippingSuppressionFilter implements LSWFilter {
 
     @Override
     public boolean isApplied(Profile profile, ImagePlus image) {
-        return profile.getClippingSuppression() != 1.0;
+        return profile.getClippingSuppression() != 0.0;
     }
 
     private void apply(ImagePlus image, double clippingSuppression) {

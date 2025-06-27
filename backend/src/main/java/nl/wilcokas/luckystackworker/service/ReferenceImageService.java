@@ -16,10 +16,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -89,6 +89,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private ChannelEnum visibleChannel = ChannelEnum.RGB;
 
     private static Image iconImage;
+
+    private Timer blinkClippedAreasTimer;
+    private boolean isClippedAreasHighlighted = false;
 
     static {
         try {
@@ -177,7 +180,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         boolean includeGreen = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G;
         boolean includeBlue = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B;
         LswImageProcessingUtil.copyLayers(unprocessedImageLayers, finalResultImage, true, true, true);
-        List<OperationEnum> operations = operationValues==null ? emptyList() : operationValues.stream().map(operationValue -> operationValue == null ? null : OperationEnum.valueOf(operationValue.toUpperCase())).toList();
+        List<OperationEnum> operations = operationValues == null ? emptyList() : operationValues.stream().map(operationValue -> operationValue == null ? null : OperationEnum.valueOf(operationValue.toUpperCase())).toList();
         byte[] psf = operationService.applyAllOperations(finalResultImage, displayedImage, profile, operations, isMono);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
@@ -452,7 +455,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         imageMetadata.setGreen(greenPercentage);
         imageMetadata.setBlue(bluePercentage);
         imageMetadata.setLuminance((redPercentage + greenPercentage + bluePercentage) / 3);
-        if (profile!=null) {
+        if (profile != null) {
             imageMetadata.setAngle(profile.getRotationAngle());
         }
     }
@@ -477,6 +480,40 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         displayedImage.updateAndDraw();
     }
 
+    public void blinkClippedAreas() {
+        if (blinkClippedAreasTimer == null) {
+            log.info("Enabling blinking on clipped areas");
+            blinkClippedAreasTimer = new Timer();
+            blinkClippedAreasTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (isClippedAreasHighlighted) {
+                        LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
+                                displayedImage,true,true,true);
+                        isClippedAreasHighlighted = false;
+                    } else {
+                        int[] rgbPixels = (int[]) displayedImage.getProcessor().getPixels();
+                        for (int i = 0; i < rgbPixels.length; i++) {
+                            if (rgbPixels[i] == 0xFFFFFF) {
+                                rgbPixels[i] = 0xFF0000;
+                            }
+                        }
+                        isClippedAreasHighlighted = true;
+                    }
+                    displayedImage.repaintImage();
+                }
+            }, Constants.BLINK_CLIPPING_DELAY, Constants.BLINK_CLIPPING_DELAY);
+        } else {
+            log.info("Disabling blinking on clipped areas");
+            LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
+                    displayedImage,true,true,true);
+            displayedImage.repaintImage();
+            blinkClippedAreasTimer.cancel();
+            blinkClippedAreasTimer = null;
+            isClippedAreasHighlighted = false;
+        }
+    }
+
     private void setImageMetadata(
             final String filePath,
             final Profile profile,
@@ -493,7 +530,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 .name(LswUtil.getFullObjectName(profile.getName())).currentWidth(currentWidth)
                 .currentHeight(currentHeight).originalWidth(originalWidth).originalHeight(originalHeight).time(dateTime)
                 .channel(visibleChannel)
-                .angle((int)profile.getRotationAngle())
+                .angle((int) profile.getRotationAngle())
                 .build();
     }
 

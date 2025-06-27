@@ -111,7 +111,7 @@
   margin-top: -8px !important;
 }
 .rootFolder {
-  width: 244px;
+  width: 196px;
   margin-left: 6px;
 }
 .dropdown_label {
@@ -391,7 +391,9 @@
 .dropdownMargin {
   margin-left: 6px;
 }
-
+.channelDropdown {
+  width: 88px;
+}
 .profileSelector {
   max-width: 96px;
 }

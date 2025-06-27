@@ -134,6 +134,7 @@ export class AppComponent implements OnInit {
   workerProgress: number;
   refImageSelected: boolean = true; // TODO: set to false by default!
   nightMode: boolean = false;
+  blinkClippedAreas: boolean = false;
   crop: boolean = false;
   _showSpinner = false;
   latestKnownVersion = version.version;
@@ -1758,6 +1759,17 @@ export class AppComponent implements OnInit {
       );
     }
     this.luckyStackWorkerService.nightModeChanged(this.nightMode).subscribe(
+      (data) => {
+        console.log('Response');
+      },
+      (error) => console.log(error)
+    );
+  }
+
+  blinkClippedAreasChanged() {
+    console.log('blinkClippedAreasChanged called');
+    this.blinkClippedAreas = !this.blinkClippedAreas;
+    this.luckyStackWorkerService.blinkClippedAreasChanged().subscribe(
       (data) => {
         console.log('Response');
       },

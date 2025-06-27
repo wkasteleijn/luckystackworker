@@ -68,10 +68,10 @@
         matTooltip="Select the desired channel used for opening the image stack."
         class="{{
           !refImageSelected || !openRefImageEnabled()
-            ? 'dropdownMargin dropdown_disabled'
+            ? 'channelDropdown dropdownMargin dropdown_disabled'
             : nightModeEnabled()
-            ? 'dropdownMargin dropdown activeColorNight'
-            : 'dropdownMargin dropdown activeColor'
+            ? 'channelDropdown dropdownMargin dropdown activeColorNight'
+            : 'channelDropdown dropdownMargin dropdown activeColor'
         }}"
       >
         <option *ngFor="let mode of openImageModes" [value]="mode.value">
@@ -445,6 +445,30 @@
         matTooltip="Select root folder"
       />
     </mat-form-field>
+
+    <button
+      *ngIf="openRefImageEnabled() && refImageSelected"
+      type="button"
+      mat-button
+      (click)="blinkClippedAreasChanged()"
+      class="{{
+        'buttonZoom buttonMargin ' +
+          (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+          (blinkClippedAreas ? 'Pressed' : '')
+      }}"
+      matTooltip="Reveal clipped areas"
+    >
+      <img src="assets/images/highlight-clipped.png" class="genericButton" />
+    </button>
+    <button
+      *ngIf="!refImageSelected || !openRefImageEnabled()"
+      type="button"
+      mat-button
+      disabled
+      class="button_disabled buttonMargin"
+    >
+      <img src="assets/images/highlight-clipped.png" class="genericButton" />
+    </button>
 
     <button
       *ngIf="openRefImageEnabled() && refImageSelected"

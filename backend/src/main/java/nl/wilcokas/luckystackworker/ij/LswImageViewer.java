@@ -41,6 +41,10 @@ public class LswImageViewer extends ImagePlus {
         imageWindow.repaint();
     }
 
+    public void repaintImage() {
+        super.updateAndDraw();
+    }
+
     public void updateMetadata(final LswImageMetadata metadata) {
         imageWindow.updateMetadata(metadata);
     }

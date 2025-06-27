@@ -158,4 +158,10 @@ public class ReferenceController {
         String fileExtension = LswFileUtil.getFilenameExtension(selectedFile).toLowerCase();
         return "jpg".equals(fileExtension) || "jpeg".equals(fileExtension);
     }
+
+    @PutMapping("/blink-clipped")
+    public void blinkClippedAreas() {
+        referenceImageService.blinkClippedAreas();
+    }
+
 }

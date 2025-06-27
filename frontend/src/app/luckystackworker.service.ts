@@ -57,9 +57,7 @@ export class LuckyStackWorkerService {
   }
 
   checkHealth(): Observable<any> {
-    return this.http.get(
-      `${this.baseUrl}/reference/health`
-    );
+    return this.http.get(`${this.baseUrl}/reference/health`);
   }
 
   scale(profile: Profile): Observable<any> {
@@ -99,6 +97,10 @@ export class LuckyStackWorkerService {
       `${this.baseUrl}/reference/night?on=${nightMode}`,
       null
     );
+  }
+
+  blinkClippedAreasChanged(): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/reference/blink-clipped`, null);
   }
 
   histogramSelectionChanged(): Observable<Object> {
