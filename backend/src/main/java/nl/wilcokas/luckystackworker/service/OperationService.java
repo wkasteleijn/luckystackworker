@@ -2,9 +2,7 @@ package nl.wilcokas.luckystackworker.service;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Executor;
 
-import ij.ImageStack;
 import jakarta.annotation.PostConstruct;
 import nl.wilcokas.luckystackworker.filter.*;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
@@ -13,7 +11,6 @@ import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
-import nl.wilcokas.luckystackworker.util.LswUtil;
 import nl.wilcokas.luckystackworker.util.PsfDiskGenerator;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
@@ -47,7 +44,7 @@ public class OperationService {
     private final LocalContrastFilter localContrastFilter;
     private final RotationFilter rotationFilter;
     private final GammaFilter gammaFilter;
-    private final GainFilter gainFilter;
+    private final ClippingSuppressionFilter clippingSuppressionFilter;
 
     private int displayedProgress = 0;
     private Timer timer = new Timer();
@@ -57,7 +54,7 @@ public class OperationService {
 
     @PostConstruct
     void init() {
-        filters.add(Pair.of(OperationEnum.GAIN, gainFilter));
+        filters.add(Pair.of(OperationEnum.CLIPPING_SUPPRESSION, clippingSuppressionFilter));
         filters.add(Pair.of(OperationEnum.WIENER_DECONV, wienerDeconvolutionFilter));
         filters.add(Pair.of(OperationEnum.SHARPEN, lswSharpenFilter));
         filters.add(Pair.of(OperationEnum.ROTATE, rotationFilter));

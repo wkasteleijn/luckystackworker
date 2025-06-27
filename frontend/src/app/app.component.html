@@ -629,19 +629,19 @@
       </div>
 
       <div class="sliderRow">
-        <div class="sliderLabel">Pre-gain</div>
+        <div class="sliderLabel">Suppress clipping</div>
         <div class="slider">
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected || crop"
-            step="0.01"
+            step="1"
             min="0"
-            max="2"
-            (input)="gainChanged($event, false)"
-            (change)="gainChanged($event, true)"
-            [(ngModel)]="gain"
+            max="100"
+            (input)="clippingSuppressionChanged($event, false)"
+            (change)="clippingSuppressionChanged($event, true)"
+            [(ngModel)]="clippingSuppression"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ gain }}</span>
+          <span class="sliderLabel">{{ clippingSuppression }}</span>
         </div>
       </div>
 

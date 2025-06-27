@@ -52,7 +52,7 @@ export class AppComponent implements OnInit {
   title = 'LuckyStackWorker';
 
   // sharpen
-  gain: number;
+  clippingSuppression: number;
   radius: number;
   amount: number;
   iterations: number;
@@ -326,11 +326,13 @@ export class AppComponent implements OnInit {
     }
   }
 
-  gainChanged(event: any, update: boolean) {
-    this.profile.gain = event.value;
-    this.gain = event.value;
-    this.settings.operations = ['GAIN'];
-    console.log('gainChanged called: ' + this.profile.gain);
+  clippingSuppressionChanged(event: any, update: boolean) {
+    this.profile.clippingSuppression = event.value;
+    this.clippingSuppression = event.value;
+    this.settings.operations = ['CLIPPING_SUPPRESSION'];
+    console.log(
+      'clippingSuppressionChanged called: ' + this.profile.clippingSuppression
+    );
     if (update) {
       this.updateProfile();
     }
@@ -1599,7 +1601,7 @@ export class AppComponent implements OnInit {
     this.applyUnsharpMask = this.profile.applyUnsharpMask;
     this.applyWienerDeconvolution = this.profile.applyWienerDeconvolution;
     this.wienerIterations = this.profile.wienerIterations;
-    this.gain = this.profile.gain;
+    this.clippingSuppression = this.profile.clippingSuppression;
     this.setNonPersistentSettings();
   }
 
@@ -1952,7 +1954,7 @@ export class AppComponent implements OnInit {
     this.profile.iterationsBlue = 1;
     this.profile.iterationsGreen = 1;
     this.profile.wienerIterations = 5;
-    this.profile.gain = 1;
+    this.profile.clippingSuppression = 0;
     this.profile.blendRaw = 0;
     this.profile.blendRawBlue = 0;
     this.profile.blendRawGreen = 0;

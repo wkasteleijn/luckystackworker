@@ -4,7 +4,7 @@ export class Profile {
   name: string;
 
   // sharpen red or all channels
-  gain: number;
+  clippingSuppression: number;
   radius: number;
   amount: number;
   level: number;

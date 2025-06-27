@@ -8,19 +8,13 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.concurrent.Executor;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import ij.ImageStack;
-import ij.gui.NewImage;
 import ij.io.Opener;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
-import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
@@ -436,8 +430,8 @@ public class LswFileUtil {
         }
 
         // Added since 6.13.0, so older version written yaml needs to stay compatible.
-        if (profile.getGain() == 0) {
-            profile.setGain(1);
+        if (profile.getClippingSuppression() == 0) {
+            profile.setClippingSuppression(1);
         }
     }
 

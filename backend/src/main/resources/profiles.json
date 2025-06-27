@@ -110,7 +110,7 @@
     "dispersionCorrectionBlueY": 0,
     "normalizeColorBalance": false,
     "scale": 1.0,
-    "gain": 0.6,
+    "clippingSuppression": 0,
     "rotationAngle": 0.0,
     "openImageMode": "RGB",
     "psf": {
