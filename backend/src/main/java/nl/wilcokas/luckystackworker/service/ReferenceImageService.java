@@ -78,6 +78,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private LswImageMetadata imageMetadata;
 
     private boolean roiActive = false;
+    private boolean cropSwitched = false;
 
     private int zoomFactor = 0;
 
@@ -181,6 +182,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         boolean includeBlue = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B;
         LswImageProcessingUtil.copyLayers(unprocessedImageLayers, finalResultImage, true, true, true);
         List<OperationEnum> operations = operationValues == null ? emptyList() : operationValues.stream().map(operationValue -> operationValue == null ? null : OperationEnum.valueOf(operationValue.toUpperCase())).toList();
+        if (cropSwitched) {
+            operations = emptyList();
+            cropSwitched = false;
+        }
         byte[] psf = operationService.applyAllOperations(finalResultImage, displayedImage, profile, operations, isMono);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
@@ -291,6 +296,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void crop() {
+        operationService.clearCache();
+        cropSwitched = true;
         if (!roiActive) {
             int width = displayedImage.getWidth() / 2;
             int height = displayedImage.getHeight() / 2;

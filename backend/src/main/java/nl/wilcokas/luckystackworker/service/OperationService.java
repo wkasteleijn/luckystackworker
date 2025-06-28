@@ -3,7 +3,10 @@ package nl.wilcokas.luckystackworker.service;
 import java.io.IOException;
 import java.util.*;
 
+import ij.ImageStack;
+import ij.gui.Roi;
 import jakarta.annotation.PostConstruct;
+import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.filter.*;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
@@ -95,23 +98,35 @@ public class OperationService {
         int progress = 0;
         boolean filterEncountered = false;
         OperationEnum previousCachedOperation = getPreviousCachedOperation(profile, image, operations);
+
+        ImageStack stack = image.getStack();
+        ImagePlus workImage = image;
+        Roi roi = LuckyStackWorkerContext.getSelectedRoi();
+        if (roi != null) {
+            workImage = createTempCroppedImage(roi, stack);
+        }
+
         for (int i = 0; i < filters.size(); i++) {
             Pair<OperationEnum, LSWFilter> filterData = filters.get(i);
             OperationEnum filterOperation = filterData.getLeft();
             LswImageLayersDto cacheValue = cache.get(filterOperation);
             if (operations.contains(filterOperation) || filterEncountered || operations.isEmpty()) {
                 LSWFilter filter = filterData.getRight();
-                if (filter.apply(image, profile, isMono)) {
-                    cache.put(filterOperation, LswImageProcessingUtil.getImageLayers(image));
+                if (filter.apply(workImage, profile, isMono)) {
+                    cache.put(filterOperation, LswImageProcessingUtil.getImageLayers(workImage));
                 }
                 filterEncountered = true;
             } else if (previousCachedOperation == filterOperation && cacheValue != null) {
                 log.info("Applying {} from cache", filterOperation);
-                LswImageProcessingUtil.updateImageLayers(image, cacheValue);
+                LswImageProcessingUtil.updateImageLayers(workImage, cacheValue);
             }
             progress += progressIncrease;
             boolean nextOperationSlow = filters.get(i < filters.size() - 1 ? i + 1 : i).getRight().isSlow();
             updateProgress(viewer, progress, nextOperationSlow);
+        }
+
+        if (roi != null) {
+            copyPixelsBackToImage(roi, workImage.getStack(), stack);
         }
 
         Timer resetProgressTimer = new Timer();
@@ -136,6 +151,52 @@ public class OperationService {
         int newHeight = (int) (image.getHeight() * scale);
         int depth = image.getStack().size();
         return Scaler.resize(image, newWidth, newHeight, depth, "depth=%s interpolation=Bicubic create".formatted(depth));
+    }
+
+    private ImagePlus createTempCroppedImage(Roi roi, ImageStack stack) {
+        int roiWidth = (int) roi.getFloatWidth();
+        int roiHeight = (int) roi.getFloatHeight();
+        short[][] newPixels = new short[3][roiWidth * roiHeight];
+        int xOffset = (int) roi.getXBase();
+        int yOffset = (int) roi.getYBase();
+        int imageWidth = stack.getWidth();
+        for (int y = 0; y < roiHeight; y++) {
+            for (int x = 0; x < roiWidth; x++) {
+                short[] ipRedPixels = (short[]) (stack.getProcessor(1).getPixels());
+                short[] ipGreenPixels = (short[]) (stack.getProcessor(2).getPixels());
+                short[] ipBluePixels = (short[]) (stack.getProcessor(3).getPixels());
+                int xOrg = x + xOffset;
+                int yOrg = y + yOffset;
+                newPixels[0][x + y * roiWidth] = ipRedPixels[xOrg + yOrg * imageWidth];
+                newPixels[1][x + y * roiWidth] = ipGreenPixels[xOrg + yOrg * imageWidth];
+                newPixels[2][x + y * roiWidth] = ipBluePixels[xOrg + yOrg * imageWidth];
+            }
+        }
+        return LswImageProcessingUtil.create16BitRGBImage("crop",
+                LswImageLayersDto.builder().layers(newPixels).build(), roiWidth, roiHeight, true, true, true);
+    }
+
+    private void copyPixelsBackToImage(Roi roi, ImageStack tempCroppedStack, ImageStack stack) {
+        short[] roiRedPixels = (short[]) (tempCroppedStack.getProcessor(1).getPixels());
+        short[] roiGreenPixels = (short[]) (tempCroppedStack.getProcessor(2).getPixels());
+        short[] roiBluePixels = (short[]) (tempCroppedStack.getProcessor(3).getPixels());
+        int roiWidth = (int) roi.getFloatWidth();
+        int roiHeight = (int) roi.getFloatHeight();
+        int xOffset = (int) roi.getXBase();
+        int yOffset = (int) roi.getYBase();
+        int imageWidth = stack.getWidth();
+        for (int y = 0; y < roiHeight; y++) {
+            for (int x = 0; x < roiWidth; x++) {
+                short[] imageRedPixels = (short[]) stack.getProcessor(1).getPixels();
+                short[] imageGreenPixels = (short[]) stack.getProcessor(2).getPixels();
+                short[] imageBluePixels = (short[]) stack.getProcessor(3).getPixels();
+                int xOrg = x + xOffset;
+                int yOrg = y + yOffset;
+                imageRedPixels[xOrg + yOrg * imageWidth] = roiRedPixels[x + y * roiWidth];
+                imageGreenPixels[xOrg + yOrg * imageWidth] = roiGreenPixels[x + y * roiWidth];
+                imageBluePixels[xOrg + yOrg * imageWidth] = roiBluePixels[x + y * roiWidth];
+            }
+        }
     }
 
     private OperationEnum getPreviousCachedOperation(Profile profile, ImagePlus image, List<OperationEnum> operations) {
