@@ -88,8 +88,8 @@ export class LuckyStackWorkerService {
     return this.http.put(`${this.baseUrl}/reference/maximize`, null);
   }
 
-  cropSelectionChanged(): Observable<Object> {
-    return this.http.put(`${this.baseUrl}/reference/crop`, null);
+  roiSelectionChanged(): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/reference/roi`, null);
   }
 
   nightModeChanged(nightMode: boolean): Observable<Object> {

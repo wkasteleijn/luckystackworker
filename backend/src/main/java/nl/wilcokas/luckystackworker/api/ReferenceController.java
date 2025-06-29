@@ -8,12 +8,8 @@ import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import nl.wilcokas.luckystackworker.exceptions.LswNotReadyException;
-import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.model.Settings;
-import nl.wilcokas.luckystackworker.service.ProfileService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -117,9 +113,9 @@ public class ReferenceController {
         referenceImageService.restore();
     }
 
-    @PutMapping("/crop")
-    public void crop() {
-        referenceImageService.crop();
+    @PutMapping("/roi")
+    public void roi() {
+        referenceImageService.roi();
     }
 
 

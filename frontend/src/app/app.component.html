@@ -179,15 +179,15 @@
       *ngIf="openRefImageEnabled() && refImageSelected"
       type="button"
       mat-button
-      (click)="cropSelectionChanged()"
+      (click)="roiSelectionChanged()"
       class="{{
         'buttonZoom buttonMargin ' +
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-          (cropEnabled() ? 'Pressed' : '')
+          (roiEnabled() ? 'Pressed' : '')
       }}"
-      matTooltip="Crop"
+      matTooltip="Select ROI"
     >
-      <img src="assets/images/crop.png" class="genericButton" />
+      <img src="assets/images/roi.png" class="genericButton" />
     </button>
     <button
       *ngIf="!openRefImageEnabled() || !refImageSelected"
@@ -195,9 +195,9 @@
       mat-button
       disabled
       class="button_disabled buttonMargin"
-      matTooltip="Crop"
+      matTooltip="Select ROI"
     >
-      <img src="assets/images/crop.png" class="genericButton" />
+      <img src="assets/images/roi.png" class="genericButton" />
     </button>
 
     <button
@@ -498,7 +498,7 @@
       *ngIf="openRefImageEnabled() && refImageSelected"
       type="button"
       mat-button
-      (click)="openConfirmation('Are you sure you want to reset everything?')"
+      (click)="openConfirmation(resetToRawText)"
       class="{{
         'buttonRevert buttonMargin ' +
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor')

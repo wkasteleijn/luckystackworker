@@ -102,7 +102,8 @@ public class OperationService {
         ImageStack stack = image.getStack();
         ImagePlus workImage = image;
         Roi roi = LuckyStackWorkerContext.getSelectedRoi();
-        if (roi != null) {
+        boolean roiActive = roi != null && roi.getFloatWidth()>0 && roi.getFloatHeight()>0;
+        if (roiActive) {
             workImage = createTempCroppedImage(roi, stack);
         }
 
@@ -125,7 +126,7 @@ public class OperationService {
             updateProgress(viewer, progress, nextOperationSlow);
         }
 
-        if (roi != null) {
+        if (roiActive) {
             copyPixelsBackToImage(roi, workImage.getStack(), stack);
         }
 

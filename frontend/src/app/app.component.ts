@@ -135,7 +135,8 @@ export class AppComponent implements OnInit {
   refImageSelected: boolean = true; // TODO: set to false by default!
   nightMode: boolean = false;
   blinkClippedAreas: boolean = false;
-  crop: boolean = false;
+  roi: boolean = false;
+  didChangesWhileRoiEnabled: boolean = false;
   _showSpinner = false;
   latestKnownVersion = version.version;
   private slowProcessing: boolean = false;
@@ -157,6 +158,8 @@ export class AppComponent implements OnInit {
   isRotationPanelVisible: boolean = false;
   psfImage: string = '';
   sliderTextDisplayed: boolean = false;
+
+  resetToRawText = 'Are you sure you want to reset everything?';
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
@@ -202,7 +205,7 @@ export class AppComponent implements OnInit {
         next: (data) => {
           console.log('Successfully opened the image: ', data);
           this.refImageSelected = true;
-          this.crop = false;
+          this.roi = false;
           if (data && data.profile) {
             this.profile = data.profile;
             this.settings = data.settings;
@@ -266,7 +269,7 @@ export class AppComponent implements OnInit {
         (data) => {
           console.log(data);
           this.refImageSelected = true;
-          this.crop = false;
+          this.roi = false;
           if (data && data.profile.amount > 0) {
             this.profile = data.profile;
             this.settings = data.settings;
@@ -1626,6 +1629,9 @@ export class AppComponent implements OnInit {
   }
 
   private updateProfile() {
+    if (this.roiEnabled && !this.didChangesWhileRoiEnabled) {
+      this.didChangesWhileRoiEnabled = true;
+    }
     this.slowProcessing = this.determineIfSlowProcessing(
       this.profile,
       this.settings.largeImage
@@ -1777,15 +1783,20 @@ export class AppComponent implements OnInit {
     );
   }
 
-  cropSelectionChanged() {
-    console.log('cropSelectionChanged called');
-    this.crop = !this.crop;
-    this.luckyStackWorkerService.cropSelectionChanged().subscribe(
+  roiSelectionChanged() {
+    console.log('roiSelectionChanged called');
+    this.luckyStackWorkerService.roiSelectionChanged().subscribe(
       (data) => {
         console.log('Response');
       },
       (error) => console.log(error)
     );
+    const wasRoiSelectionEnabled = this.roi;
+    this.roi = !this.roi;
+    if (wasRoiSelectionEnabled && this.didChangesWhileRoiEnabled) {
+      this.updateProfile();
+      this.didChangesWhileRoiEnabled = false;
+    }
   }
 
   channelChanged() {
@@ -1814,12 +1825,12 @@ export class AppComponent implements OnInit {
     );
   }
 
-  cropEnabled() {
-    return this.crop;
+  roiEnabled() {
+    return this.roi;
   }
 
   histogramSelectionChanged() {
-    console.log('cropSelectionChanged called');
+    console.log('roiSelectionChanged called');
     this.luckyStackWorkerService.histogramSelectionChanged().subscribe(
       (data) => {
         console.log('Response');
