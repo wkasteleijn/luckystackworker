@@ -107,12 +107,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private final ProfileService profileService;
     private final OperationService operationService;
 
-    public ReferenceImageService(
-            final SettingsService settingsService,
-            final HttpService httpService,
-            final ProfileService profileService,
-            final OperationService operationService,
-            final GmicService gmicService) {
+    public ReferenceImageService(final SettingsService settingsService, final HttpService httpService, final ProfileService profileService, final OperationService operationService, final GmicService gmicService) {
         this.settingsService = settingsService;
         this.httpService = httpService;
         this.profileService = profileService;
@@ -120,17 +115,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public ResponseDTO scale(Profile profile) throws IOException, InterruptedException {
-        this.isLargeImage = openReferenceImage(this.imageMetadata.getFilePath(),
-                profile,
-                LswFileUtil.getObjectDateTime(this.imageMetadata.getFilePath()));
+        this.isLargeImage = openReferenceImage(this.imageMetadata.getFilePath(), profile, LswFileUtil.getObjectDateTime(this.imageMetadata.getFilePath()));
         SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
         settingsDTO.setLargeImage(this.isLargeImage);
         LuckyStackWorkerContext.setSelectedProfile(profile.getName());
         return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
     }
 
-    public ResponseDTO selectReferenceImage(String filePath, double scale, String openImageMode)
-            throws IOException, InterruptedException {
+    public ResponseDTO selectReferenceImage(String filePath, double scale, String openImageMode) throws IOException, InterruptedException {
         JFrame frame = getParentFrame();
         JFileChooser jfc = getJFileChooser(filePath);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
@@ -149,17 +141,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                         log.info("Profile not found for reference image, taking the default, {}", profileName);
                         profileName = settingsService.getDefaultProfile();
                     }
-                    profile = profileService.findByName(profileName)
-                            .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
+                    profile = profileService.findByName(profileName).orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
                 } else {
                     log.info("Profile file found, profile was loaded from there.");
                 }
                 LswImageProcessingUtil.setNonPersistentSettings(profile, scale, openImageMode);
                 profileService.updateProfile(new ProfileDTO(profile));
 
-                isLargeImage = openReferenceImage(selectedFilePath,
-                        profile,
-                        LswFileUtil.getObjectDateTime(selectedFilePath));
+                isLargeImage = openReferenceImage(selectedFilePath, profile, LswFileUtil.getObjectDateTime(selectedFilePath));
 
                 final String rootFolder = LswFileUtil.getFileDirectory(selectedFilePath);
                 SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
@@ -188,11 +177,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
         byte[] psf = operationService.applyAllOperations(finalResultImage, displayedImage, profile, operations, isMono);
         finalResultImage.updateAndDraw();
-        LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
-                displayedImage,
-                includeRed,
-                includeGreen,
-                includeBlue);
+        LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage), displayedImage, includeRed, includeGreen, includeBlue);
         updateHistogramMetadata(profile);
         displayedImage.updateMetadata(imageMetadata);
         displayedImage.updateAndDraw();
@@ -208,14 +193,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         if (roi != null && roi.getFloatWidth() > 0 && roi.getFloatHeight() > 0) {
             savedImage = LswImageProcessingUtil.crop(finalResultImage, roi, path);
         }
-        LswFileUtil.saveImage(savedImage,
-                null,
-                savePath,
-                LswFileUtil.isPngRgbStack(savedImage, imageMetadata.getFilePath())
-                        || profile.getScale() > 1.0,
-                roiActive,
-                asJpg,
-                false);
+        LswFileUtil.saveImage(savedImage, null, savePath, LswFileUtil.isPngRgbStack(savedImage, imageMetadata.getFilePath()) || profile.getScale() > 1.0, roiActive, asJpg, false);
         writeProfile(pathNoExt);
     }
 
@@ -325,8 +303,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     public void writeProfile(String pathNoExt) throws IOException {
         String profileName = LuckyStackWorkerContext.getSelectedProfile();
         if (profileName != null) {
-            Profile profile = profileService.findByName(profileName)
-                    .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName)));
+            Profile profile = profileService.findByName(profileName).orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName)));
             LswFileUtil.writeProfile(profile, pathNoExt);
         } else {
             log.warn("Profile not saved, could not find the selected profile for file {}", pathNoExt);
@@ -340,9 +317,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     public VersionDTO getLatestVersion(LocalDateTime currentDate) {
         Settings settings = settingsService.getSettings();
         String latestKnowVersion = settings.getLatestKnownVersion();
-        if (settings.getLatestKnownVersionChecked() == null
-                || currentDate.isAfter(settings.getLatestKnownVersionChecked()
-                .plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
+        if (settings.getLatestKnownVersionChecked() == null || currentDate.isAfter(settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
             String latestVersionFromSite = requestLatestVersion();
             if (latestVersionFromSite != null) {
                 settings.setLatestKnownVersion(latestVersionFromSite);
@@ -362,15 +337,30 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, String title, boolean isSaveDialog) {
-        if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile) || Constants.SYSTEM_PROFILE_LINUX.equals(
-                activeOSProfile)) {
+        if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile) || Constants.SYSTEM_PROFILE_LINUX.equals(activeOSProfile)) {
             // Workaround for issue on macs, somehow needs to wait some milliseconds for the
             // frame to be initialized.
             LswUtil.waitMilliseconds(500);
         }
         int returnValue = 0;
         if (isSaveDialog) {
-            returnValue = jfc.showSaveDialog(frame);
+            while (true) {
+                returnValue = jfc.showSaveDialog(frame);
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    File fileToSave = jfc.getSelectedFile();
+                    if (fileToSave.exists()) {
+                        // TODO: set window position correctly
+                        int response = JOptionPane.showConfirmDialog(null, "The file already exists.\nDo you want to replace it?", "Confirm Overwrite", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                        if (response == JOptionPane.YES_OPTION) {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
         } else if (title != null) {
             returnValue = jfc.showDialog(frame, title);
         } else {
@@ -475,11 +465,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         boolean includeRed = channel == ChannelEnum.RGB || channel == ChannelEnum.R;
         boolean includeGreen = channel == ChannelEnum.RGB || channel == ChannelEnum.G;
         boolean includeBlue = channel == ChannelEnum.RGB || channel == ChannelEnum.B;
-        LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
-                displayedImage,
-                includeRed,
-                includeGreen,
-                includeBlue);
+        LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage), displayedImage, includeRed, includeGreen, includeBlue);
         updateHistogramMetadata(null);
         visibleChannel = channel;
         imageMetadata.setChannel(visibleChannel);
@@ -495,8 +481,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 @Override
                 public void run() {
                     if (isClippedAreasHighlighted) {
-                        LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
-                                displayedImage,true,true,true);
+                        LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage), displayedImage, true, true, true);
                         isClippedAreasHighlighted = false;
                     } else {
                         int[] rgbPixels = (int[]) displayedImage.getProcessor().getPixels();
@@ -512,8 +497,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             }, Constants.BLINK_CLIPPING_DELAY, Constants.BLINK_CLIPPING_DELAY);
         } else {
             log.info("Disabling blinking on clipped areas");
-            LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage),
-                    displayedImage,true,true,true);
+            LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage), displayedImage, true, true, true);
             displayedImage.repaintImage();
             blinkClippedAreasTimer.cancel();
             blinkClippedAreasTimer = null;
@@ -521,24 +505,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
     }
 
-    private void setImageMetadata(
-            final String filePath,
-            final Profile profile,
-            final LocalDateTime dateTime,
-            final ImagePlus finalResultImage,
-            double scale) {
+    private void setImageMetadata(final String filePath, final Profile profile, final LocalDateTime dateTime, final ImagePlus finalResultImage, double scale) {
 
         int currentWidth = finalResultImage.getWidth();
         int currentHeight = finalResultImage.getHeight();
         int originalWidth = (int) (finalResultImage.getWidth() / scale);
         int originalHeight = (int) (finalResultImage.getHeight() / scale);
 
-        this.imageMetadata = LswImageMetadata.builder().filePath(filePath)
-                .name(LswUtil.getFullObjectName(profile.getName())).currentWidth(currentWidth)
-                .currentHeight(currentHeight).originalWidth(originalWidth).originalHeight(originalHeight).time(dateTime)
-                .channel(visibleChannel)
-                .angle((int) profile.getRotationAngle())
-                .build();
+        this.imageMetadata = LswImageMetadata.builder().filePath(filePath).name(LswUtil.getFullObjectName(profile.getName())).currentWidth(currentWidth).currentHeight(currentHeight).originalWidth(originalWidth).originalHeight(originalHeight).time(dateTime).channel(visibleChannel).angle((int) profile.getRotationAngle()).build();
     }
 
     private int getHistogramMax(int[] histogramValues) {
@@ -573,14 +547,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private String requestLatestVersion() {
 
         // Retrieve version document
-        String result = httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1,
-                Constants.VERSION_URL,
-                Constants.VERSION_REQUEST_TIMEOUT);
+        String result = httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, Constants.VERSION_URL, Constants.VERSION_REQUEST_TIMEOUT);
         if (result == null) {
             log.warn("HTTP1.1 request for latest version failed, trying HTTP/2..");
-            result = httpService.sendHttpGetRequest(HttpClient.Version.HTTP_2,
-                    Constants.VERSION_URL,
-                    Constants.VERSION_REQUEST_TIMEOUT);
+            result = httpService.sendHttpGetRequest(HttpClient.Version.HTTP_2, Constants.VERSION_URL, Constants.VERSION_REQUEST_TIMEOUT);
             if (result == null) {
                 log.warn("HTTP/2 request for latest version failed as well");
             }
@@ -625,18 +595,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return true;
     }
 
-    private boolean openReferenceImage(String filePath, Profile profile, LocalDateTime dateTime)
-            throws IOException, InterruptedException {
+    private boolean openReferenceImage(String filePath, Profile profile, LocalDateTime dateTime) throws IOException, InterruptedException {
         if (displayedImage != null) {
             // Can only have 1 image open at a time.
             displayedImage.hide();
         }
-        Pair<ImagePlus, Boolean> imageDetails = LswFileUtil.openImage(filePath,
-                profile.getOpenImageMode(),
-                finalResultImage,
-                unprocessedImageLayers,
-                profile.getScale(),
-                img -> operationService.scaleImage(img, profile.getScale()));
+        Pair<ImagePlus, Boolean> imageDetails = LswFileUtil.openImage(filePath, profile.getOpenImageMode(), finalResultImage, unprocessedImageLayers, profile.getScale(), img -> operationService.scaleImage(img, profile.getScale()));
         finalResultImage = imageDetails.getLeft();
         isMono = imageDetails.getRight();
 
@@ -653,9 +617,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             log.info("Opened final result image image with id {}", finalResultImage.getID());
 
             // Display the image in a seperate color image window (8-bit RGB color).
-            displayedImage = createColorImageFrom(finalResultImage,
-                    unprocessedImageLayers,
-                    LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(imageMetadata.getFilePath())));
+            displayedImage = createColorImageFrom(finalResultImage, unprocessedImageLayers, LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(imageMetadata.getFilePath())));
             if (LswFileUtil.isPng(finalResultImage, imageMetadata.getFilePath())) {
                 finalResultImage = LswFileUtil.fixNonTiffOpeningSettings(finalResultImage);
             }
@@ -696,8 +658,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
         ImageCanvas canvas = window.getCanvas();
         int newZoomFactor = 0;
-        if ((image.getWidth() + positionX) > screenDimension.getWidth()
-                || (image.getHeight() + positionY) > screenDimension.getHeight()) {
+        if ((image.getWidth() + positionX) > screenDimension.getWidth() || (image.getHeight() + positionY) > screenDimension.getHeight()) {
             int remainingWidth = ((int) screenDimension.getWidth()) - positionX;
             int remainingHeight = ((int) screenDimension.getHeight()) - controllerLastKnownPositionY;
             canvas.zoomOut(remainingWidth, remainingHeight);
@@ -727,19 +688,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private boolean validateSelectedFile(String path) {
         String extension = LswFileUtil.getFilenameExtension(path);
         if (!settingsService.getSettings().getExtensions().contains(extension)) {
-            JOptionPane.showMessageDialog(getParentFrame(),
-                    String.format(
-                            "The selected file with extension %s is not supported. %nYou can only open 16-bit RGB and Gray PNG and TIFF images.",
-                            extension));
+            JOptionPane.showMessageDialog(getParentFrame(), String.format("The selected file with extension %s is not supported. %nYou can only open 16-bit RGB and Gray PNG and TIFF images.", extension));
             return false;
         }
         return true;
     }
 
     private LswImageViewer createColorImageFrom(ImagePlus image, LswImageLayersDto layersDto, String title) {
-        LswImageViewer singleLayerColorImage = new LswImageViewer(title,
-                new ColorProcessor(image.getWidth(),
-                        image.getHeight()));
+        LswImageViewer singleLayerColorImage = new LswImageViewer(title, new ColorProcessor(image.getWidth(), image.getHeight()));
         LswImageProcessingUtil.convertLayersToColorImage(layersDto.getLayers(), singleLayerColorImage);
         return singleLayerColorImage;
     }
