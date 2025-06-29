@@ -21,7 +21,7 @@
 
 	<groupId>nl.wilcokas</groupId>
 	<artifactId>luckystackworker</artifactId>
-	<version>6.13.0</version>
+	<version>6.13-beta</version>
 	<name>LuckyStackWorker</name>
 	<description>LuckyStackWorker Application</description>
 

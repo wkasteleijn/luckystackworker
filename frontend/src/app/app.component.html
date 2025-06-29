@@ -456,7 +456,7 @@
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
           (blinkClippedAreas ? 'Pressed' : '')
       }}"
-      matTooltip="Reveal clipped areas"
+      matTooltip="Highlight clipped areas"
     >
       <img src="assets/images/highlight-clipped.png" class="genericButton" />
     </button>
@@ -1619,7 +1619,7 @@
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
-            min="0"
+            min="-100"
             max="100"
             (input)="brightnessChanged($event, false)"
             (change)="brightnessChanged($event, true)"
@@ -1641,7 +1641,7 @@
           <mat-slider
             [disabled]="shouldShowSpinner() || !refImageSelected"
             step="1"
-            min="0"
+            min="-100"
             max="100"
             (input)="lightnessChanged($event, false)"
             (change)="lightnessChanged($event, true)"
