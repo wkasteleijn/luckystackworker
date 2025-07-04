@@ -405,27 +405,50 @@
     </button>
   </div>
 
+  <button
+    type="button"
+    *ngIf="openRefImageEnabled() && refImageSelected"
+    mat-button
+    (click)="saveReferenceImage()"
+    class="save button {{
+      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+    }}"
+    matTooltip="This will save the currently open stack with all applied the post-processing. You can save it as a 16-bit TIFF or a 100% quality JPG. To do so add the applicable extension to the filename (filename.tif, filename.jpg)."
+  >
+    <img src="assets/images/save.png" class="saveButton zoomIcon" />
+  </button>
+  <button
+    *ngIf="!refImageSelected || !openRefImageEnabled()"
+    type="button"
+    mat-button
+    disabled
+    class="save button_disabled"
+  >
+    <img src="assets/images/save.png" class="saveButton zoomIcon" />
+  </button>
+
   <div class="button_container_top button_container">
     <button
-      type="button"
       *ngIf="openRefImageEnabled() && refImageSelected"
+      type="button"
       mat-button
-      (click)="saveReferenceImage()"
-      class="button {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      (click)="openConfirmation(resetToRawText)"
+      class="{{
+        'buttonRevert ' +
+          (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
       }}"
-      matTooltip="This will save the currently open stack with all applied the post-processing. You can save it as a 16-bit TIFF or a 100% quality JPG. To do so add the applicable extension to the filename (filename.tif, filename.jpg)."
+      matTooltip="Revert changes"
     >
-      <img src="assets/images/save.png" class="saveButton zoomIcon" />
+      <img src="assets/images/reset.png" class="revertImg" />
     </button>
     <button
       *ngIf="!refImageSelected || !openRefImageEnabled()"
       type="button"
       mat-button
       disabled
-      class="button_disabled"
+      class="buttonRevertDisabled"
     >
-      <img src="assets/images/save.png" class="saveButton zoomIcon" />
+      <img src="assets/images/reset.png" class="revertImg" />
     </button>
 
     <mat-form-field appearance="fill">
@@ -492,29 +515,6 @@
       class="button_disabled buttonMargin"
     >
       <img src="assets/images/nightmode.png" class="genericButton" />
-    </button>
-
-    <button
-      *ngIf="openRefImageEnabled() && refImageSelected"
-      type="button"
-      mat-button
-      (click)="openConfirmation(resetToRawText)"
-      class="{{
-        'buttonRevert buttonMargin ' +
-          (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
-      }}"
-      matTooltip="Revert changes"
-    >
-      <img src="assets/images/reset.png" class="revertImg" />
-    </button>
-    <button
-      *ngIf="!refImageSelected || !openRefImageEnabled()"
-      type="button"
-      mat-button
-      disabled
-      class="buttonRevertDisabled buttonMargin"
-    >
-      <img src="assets/images/reset.png" class="revertImg" />
     </button>
   </div>
   <mat-tab-group class="sliderTabs" selectedIndex="0">

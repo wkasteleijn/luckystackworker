@@ -367,20 +367,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return returnValue;
     }
 
-    private boolean confirmOverwrite() {
-        JOptionPane confirmation = new JOptionPane(
-                "The file already exists.\nDo you want to replace it?",
-                JOptionPane.WARNING_MESSAGE,
-                JOptionPane.YES_NO_OPTION);
-        JDialog dialog = confirmation.createDialog(null, "Confirm Overwrite");
-        dialog.setLocation(controllerLastKnownPositionX + 160, controllerLastKnownPositionY + 256);
-        dialog.setVisible(true);
-        if (((int) confirmation.getValue()) == JOptionPane.YES_OPTION) {
-            return true;
-        }
-        return false;
-    }
-
     @Override
     public void roiModified(ImagePlus imp, int id) {
         luckyStackWorkerContext.setSelectedRoi(imp.getRoi());
@@ -516,6 +502,20 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
     }
 
+    private boolean confirmOverwrite() {
+        JOptionPane confirmation = new JOptionPane(
+                "The file already exists.\nDo you want to replace it?",
+                JOptionPane.WARNING_MESSAGE,
+                JOptionPane.YES_NO_OPTION);
+        JDialog dialog = confirmation.createDialog(null, "Confirm Overwrite");
+        dialog.setLocation(controllerLastKnownPositionX + 160, controllerLastKnownPositionY + 256);
+        dialog.setVisible(true);
+        if (((int) confirmation.getValue()) == JOptionPane.YES_OPTION) {
+            return true;
+        }
+        return false;
+    }
+    
     private void setImageMetadata(final String filePath, final Profile profile, final LocalDateTime dateTime, final ImagePlus finalResultImage, double scale) {
 
         int currentWidth = finalResultImage.getWidth();

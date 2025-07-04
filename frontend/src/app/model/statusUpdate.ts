@@ -1,5 +1,5 @@
 export class StatusUpdate {
   filesProcessedCount: number;
-	totalfilesCount: number;
-	message: string;
+  totalFilesCount: number;
+  message: string;
 }

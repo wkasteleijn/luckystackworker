@@ -1676,9 +1676,9 @@ export class AppComponent implements OnInit {
       (data) => {
         console.log(data);
         this.workerStatus = data.message;
-        if (data.filesProcessedCount && data.totalfilesCount) {
+        if (data.filesProcessedCount && data.totalFilesCount) {
           this.workerProgress = Math.round(
-            (data.filesProcessedCount / data.totalfilesCount) * 100
+            (data.filesProcessedCount / data.totalFilesCount) * 100
           );
         }
       },
