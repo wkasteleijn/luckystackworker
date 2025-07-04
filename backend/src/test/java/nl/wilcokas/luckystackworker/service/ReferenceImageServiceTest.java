@@ -3,6 +3,7 @@ package nl.wilcokas.luckystackworker.service;
 import java.net.http.HttpClient;
 import java.time.LocalDateTime;
 
+import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,14 +35,14 @@ class ReferenceImageServiceTest {
     @Mock
     private OperationService operationService;
     @Mock
-    private GmicService gmicService;
+    private LuckyStackWorkerContext luckyStackWorkerContext;
 
     @InjectMocks
     private ReferenceImageService referenceImageService;
 
     @BeforeEach
     void setup() {
-        referenceImageService = new ReferenceImageService(settingsService, httpService, profileService, operationService, gmicService);
+        referenceImageService = new ReferenceImageService(settingsService, httpService, profileService, operationService, luckyStackWorkerContext);
     }
 
     @Test

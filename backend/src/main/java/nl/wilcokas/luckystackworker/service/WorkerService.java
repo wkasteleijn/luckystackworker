@@ -34,6 +34,7 @@ public class WorkerService {
     private final OperationService operationService;
     private final SettingsService settingsService;
     private final ProfileService profileService;
+    private final LuckyStackWorkerContext luckyStackWorkerContext;
 
     private static final int WAIT_DELAY = 4000;
     private static final int REALTIME_WAIT_LOOP = 1;
@@ -42,12 +43,12 @@ public class WorkerService {
     @Scheduled(fixedDelay = WAIT_DELAY)
     public void doWork() {
         try {
-            String profile = LuckyStackWorkerContext.getSelectedProfile();
-            if (LuckyStackWorkerContext.isProfileBeingApplied()) {
+            String profile = luckyStackWorkerContext.getSelectedProfile();
+            if (luckyStackWorkerContext.isProfileBeingApplied()) {
                 applyProfile(profile);
             } else {
                 log.debug("Waiting for a profile to be applied...");
-                if (LuckyStackWorkerContext.isRealTimeEnabled() && LuckyStackWorkerContext.isRootFolderSelected()) {
+                if (luckyStackWorkerContext.isRealTimeEnabled() && luckyStackWorkerContext.isRootFolderSelected()) {
                     if (realtimeCountdown == 0) {
                         realtimeCountdown = REALTIME_WAIT_LOOP;
                         realtimeProcess();
@@ -58,26 +59,26 @@ public class WorkerService {
             }
         } catch (Exception e) {
             log.error("Error:", e);
-            LuckyStackWorkerContext.statusUpdate(Constants.STATUS_IDLE);
-            LuckyStackWorkerContext.setFilesProcessedCount(0);
-            LuckyStackWorkerContext.setTotalfilesCount(0);
-            LuckyStackWorkerContext.setProfileBeingApplied(false);
+            luckyStackWorkerContext.setStatus(Constants.STATUS_IDLE);
+            luckyStackWorkerContext.setFilesProcessedCount(0);
+            luckyStackWorkerContext.setTotalFilesCount(0);
+            luckyStackWorkerContext.setProfileBeingApplied(false);
         }
     }
 
     private void applyProfile(String activeProfile) {
         log.info("Applying profile {}", activeProfile);
         Collection<File> files = getImages(true);
-        LuckyStackWorkerContext.setTotalfilesCount(files.size());
-        LuckyStackWorkerContext.setFilesProcessedCount(0);
+        luckyStackWorkerContext.setTotalFilesCount(files.size());
+        luckyStackWorkerContext.setFilesProcessedCount(0);
         if (!processFiles(files)) {
             log.warn("Worker did not process any file from {}, active profile {} not matching with any files", settingsService.getRootFolder(),
                     activeProfile);
         }
-        LuckyStackWorkerContext.statusUpdate(Constants.STATUS_IDLE);
-        LuckyStackWorkerContext.setFilesProcessedCount(0);
-        LuckyStackWorkerContext.setTotalfilesCount(0);
-        LuckyStackWorkerContext.setProfileBeingApplied(false);
+        luckyStackWorkerContext.setStatus(Constants.STATUS_IDLE);
+        luckyStackWorkerContext.setFilesProcessedCount(0);
+        luckyStackWorkerContext.setTotalFilesCount(0);
+        luckyStackWorkerContext.setProfileBeingApplied(false);
     }
 
     private Collection<File> getImages(boolean recursive) {
@@ -121,9 +122,9 @@ public class WorkerService {
                     && Arrays.asList(settingsService.getExtensions()).contains(extension)) {
                 filesProcessed = filesProcessed | processFile(file, false);
             }
-            LuckyStackWorkerContext.setFilesProcessedCount(++count);
-            if (LuckyStackWorkerContext.isWorkerStopped()) {
-                LuckyStackWorkerContext.setWorkerStopped(false);
+            luckyStackWorkerContext.setFilesProcessedCount(++count);
+            if (luckyStackWorkerContext.isWorkerStopped()) {
+                luckyStackWorkerContext.setWorkerStopped(false);
                 break;
             }
         }
@@ -138,12 +139,12 @@ public class WorkerService {
             return false;
         }
         String profileName = profileOpt.get();
-        if (realtime || profileName.equals(LuckyStackWorkerContext.getSelectedProfile())) {
+        if (realtime || profileName.equals(luckyStackWorkerContext.getSelectedProfile())) {
             try {
                 final String filename = LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(filePath));
                 log.info("Applying profile '{}' to: {}", profileName, filename);
                 if (!realtime) {
-                    LuckyStackWorkerContext.statusUpdate("Processing : " + filename);
+                    luckyStackWorkerContext.setStatus("Processing : " + filename);
                 }
 
                 Profile profile = profileService.findByName(profileName)
@@ -158,12 +159,12 @@ public class WorkerService {
                     operationService.correctExposure(imp);
                     operationService.applyAllOperations(imp, null, profile, emptyList(), isMono);
                     imp.updateAndDraw();
-                    if (LuckyStackWorkerContext.getSelectedRoi() != null) {
-                        imp.setRoi(LuckyStackWorkerContext.getSelectedRoi());
+                    if (luckyStackWorkerContext.isRoiActive()) {
+                        imp.setRoi(luckyStackWorkerContext.getSelectedRoi());
                         imp = imp.crop();
                     }
                     LswFileUtil.saveImage(imp, profileName, getOutputFile(file), LswFileUtil.isPngRgbStack(imp, filePath) || profile.getScale() > 1.0,
-                            LuckyStackWorkerContext.getSelectedRoi() != null, false, true);
+                            luckyStackWorkerContext.isRoiActive(), false, true);
                     return true;
                 }
             } catch (Exception e) {

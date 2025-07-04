@@ -31,6 +31,7 @@ public class PSFService {
     private final ReferenceImageService referenceImageService;
     private final SettingsService settingsService;
     private final ProfileService profileService;
+    private final LuckyStackWorkerContext luckyStackWorkerContext;
 
     public SettingsDTO loadCustomPSF() throws IOException, InterruptedException {
         JFrame frame = referenceImageService.getParentFrame();
@@ -42,7 +43,7 @@ public class PSFService {
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
             String selectedFilePath = selectedFile.getAbsolutePath();
-            String profileName = LuckyStackWorkerContext.getSelectedProfile();
+            String profileName = luckyStackWorkerContext.getSelectedProfile();
             Profile profile = profileService.findByName(profileName).orElse(null);
             if (profile != null) {
                 String filePath = LswFileUtil.getIJFileFormat(selectedFilePath);

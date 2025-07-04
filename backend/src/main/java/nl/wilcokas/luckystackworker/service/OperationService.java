@@ -48,6 +48,7 @@ public class OperationService {
     private final RotationFilter rotationFilter;
     private final GammaFilter gammaFilter;
     private final ClippingSuppressionFilter clippingSuppressionFilter;
+    private final LuckyStackWorkerContext luckyStackWorkerContext;
 
     private int displayedProgress = 0;
     private Timer timer = new Timer();
@@ -101,9 +102,8 @@ public class OperationService {
 
         ImageStack stack = image.getStack();
         ImagePlus workImage = image;
-        Roi roi = LuckyStackWorkerContext.getSelectedRoi();
-        boolean roiActive = roi != null && roi.getFloatWidth()>0 && roi.getFloatHeight()>0;
-        if (roiActive) {
+        Roi roi = luckyStackWorkerContext.getSelectedRoi();
+        if (luckyStackWorkerContext.isRoiActive()) {
             workImage = createTempCroppedImage(roi, stack);
         }
 
@@ -126,7 +126,7 @@ public class OperationService {
             updateProgress(viewer, progress, nextOperationSlow);
         }
 
-        if (roiActive) {
+        if (luckyStackWorkerContext.isRoiActive()) {
             copyPixelsBackToImage(roi, workImage.getStack(), stack);
         }
 

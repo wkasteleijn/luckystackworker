@@ -30,6 +30,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ij.gui.*;
 import ij.process.ColorProcessor;
+import lombok.RequiredArgsConstructor;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.ij.LswImageWindow;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
@@ -59,6 +60,7 @@ import static java.util.Collections.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ReferenceImageService implements RoiListener, WindowListener, ComponentListener {
 
     @Value("${spring.profiles.active}")
@@ -77,7 +79,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     private LswImageMetadata imageMetadata;
 
-    private boolean roiActive = false;
     private boolean roiSwitched = false;
 
     private int zoomFactor = 0;
@@ -106,19 +107,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private final HttpService httpService;
     private final ProfileService profileService;
     private final OperationService operationService;
-
-    public ReferenceImageService(final SettingsService settingsService, final HttpService httpService, final ProfileService profileService, final OperationService operationService, final GmicService gmicService) {
-        this.settingsService = settingsService;
-        this.httpService = httpService;
-        this.profileService = profileService;
-        this.operationService = operationService;
-    }
+    private final LuckyStackWorkerContext luckyStackWorkerContext;
 
     public ResponseDTO scale(Profile profile) throws IOException, InterruptedException {
         this.isLargeImage = openReferenceImage(this.imageMetadata.getFilePath(), profile, LswFileUtil.getObjectDateTime(this.imageMetadata.getFilePath()));
         SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
         settingsDTO.setLargeImage(this.isLargeImage);
-        LuckyStackWorkerContext.setSelectedProfile(profile.getName());
+        luckyStackWorkerContext.setSelectedProfile(profile.getName());
         return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
     }
 
@@ -158,7 +153,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 if (psfImage != null) {
                     settingsDTO.setPsfImage(Base64.getEncoder().encodeToString(psfImage));
                 }
-                LuckyStackWorkerContext.setSelectedProfile(profile.getName());
+                luckyStackWorkerContext.setSelectedProfile(profile.getName());
                 return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
             }
         }
@@ -189,11 +184,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         String savePath = pathNoExt + "." + (asJpg ? "jpg" : Constants.DEFAULT_OUTPUT_FORMAT);
         log.info("Saving image to  {}", savePath);
         ImagePlus savedImage = finalResultImage;
-        Roi roi = LuckyStackWorkerContext.getSelectedRoi();
-        if (roi != null && roi.getFloatWidth() > 0 && roi.getFloatHeight() > 0) {
+        if (luckyStackWorkerContext.isRoiActive()) {
+            Roi roi = luckyStackWorkerContext.getSelectedRoi();
             savedImage = LswImageProcessingUtil.crop(finalResultImage, roi, path);
         }
-        LswFileUtil.saveImage(savedImage, null, savePath, LswFileUtil.isPngRgbStack(savedImage, imageMetadata.getFilePath()) || profile.getScale() > 1.0, roiActive, asJpg, false);
+        LswFileUtil.saveImage(savedImage, null, savePath, LswFileUtil.isPngRgbStack(savedImage, imageMetadata.getFilePath()) || profile.getScale() > 1.0, luckyStackWorkerContext.isRoiActive(), asJpg, false);
         writeProfile(pathNoExt);
     }
 
@@ -218,7 +213,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         Settings settings = settingsService.getSettings();
         settings.setRootFolder(rootFolder);
         settingsService.saveSettings(settings);
-        LuckyStackWorkerContext.setRootFolderIsSelected();
+        luckyStackWorkerContext.setRootFolderSelected(true);
         return settings;
     }
 
@@ -276,21 +271,24 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     public void roi() {
         operationService.clearCache();
         roiSwitched = true;
-        if (!roiActive) {
-            int width = displayedImage.getWidth() / 2;
-            int height = displayedImage.getHeight() / 2;
-            int x = (displayedImage.getWidth() - width) / 2;
-            int y = (displayedImage.getHeight() - height) / 2;
-            displayedImage.setRoi(x, y, width, height);
+        if (!luckyStackWorkerContext.isRoiActive()) {
+            if (luckyStackWorkerContext.getSelectedRoi() == null) {
+                int width = displayedImage.getWidth() / 2;
+                int height = displayedImage.getHeight() / 2;
+                int x = (displayedImage.getWidth() - width) / 2;
+                int y = (displayedImage.getHeight() - height) / 2;
+                displayedImage.setRoi(x, y, width, height);
+                luckyStackWorkerContext.setSelectedRoi(displayedImage.getRoi());
+            } else {
+                displayedImage.setRoi(luckyStackWorkerContext.getSelectedRoi());
+            }
             new Toolbar().setTool(Toolbar.RECTANGLE);
-            LuckyStackWorkerContext.setSelectedRoi(displayedImage.getRoi());
-            roiActive = true;
+            luckyStackWorkerContext.setRoiActive(true);
             updateRoiIndicator();
         } else {
-            roiActive = false;
+            luckyStackWorkerContext.setRoiActive(false);
             displayedImage.deleteRoi();
             new Toolbar().setTool(Toolbar.HAND);
-            LuckyStackWorkerContext.setSelectedRoi(null);
             hideRoiIndicator();
         }
     }
@@ -301,7 +299,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void writeProfile(String pathNoExt) throws IOException {
-        String profileName = LuckyStackWorkerContext.getSelectedProfile();
+        String profileName = luckyStackWorkerContext.getSelectedProfile();
         if (profileName != null) {
             Profile profile = profileService.findByName(profileName).orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName)));
             LswFileUtil.writeProfile(profile, pathNoExt);
@@ -344,23 +342,22 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
         int returnValue = 0;
         if (isSaveDialog) {
-            while (true) {
+            boolean confirmed = false;
+            do {
                 returnValue = jfc.showSaveDialog(frame);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File fileToSave = jfc.getSelectedFile();
                     if (fileToSave.exists()) {
-                        // TODO: set window position correctly
-                        int response = JOptionPane.showConfirmDialog(null, "The file already exists.\nDo you want to replace it?", "Confirm Overwrite", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                        if (response == JOptionPane.YES_OPTION) {
-                            break;
+                        if (confirmOverwrite()) {
+                            confirmed = true;
                         }
                     } else {
-                        break;
+                        confirmed = true;
                     }
                 } else {
-                    break;
+                    confirmed = true;
                 }
-            }
+            } while (!confirmed);
         } else if (title != null) {
             returnValue = jfc.showDialog(frame, title);
         } else {
@@ -370,9 +367,23 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return returnValue;
     }
 
+    private boolean confirmOverwrite() {
+        JOptionPane confirmation = new JOptionPane(
+                "The file already exists.\nDo you want to replace it?",
+                JOptionPane.WARNING_MESSAGE,
+                JOptionPane.YES_NO_OPTION);
+        JDialog dialog = confirmation.createDialog(null, "Confirm Overwrite");
+        dialog.setLocation(controllerLastKnownPositionX + 160, controllerLastKnownPositionY + 256);
+        dialog.setVisible(true);
+        if (((int) confirmation.getValue()) == JOptionPane.YES_OPTION) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void roiModified(ImagePlus imp, int id) {
-        LuckyStackWorkerContext.setSelectedRoi(imp.getRoi());
+        luckyStackWorkerContext.setSelectedRoi(imp.getRoi());
         updateRoiIndicator();
     }
 
@@ -541,7 +552,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         imageMetadata.setCropWidth(0);
         imageMetadata.setCropHeight(0);
         displayedImage.getImageWindow().updateCrop(imageMetadata);
-        roiActive = false;
+        luckyStackWorkerContext.setRoiActive(false);
     }
 
     private String requestLatestVersion() {
@@ -626,7 +637,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
             zoomFactor = setDefaultLayoutSettings(displayedImage);
 
-            roiActive = false;
+            luckyStackWorkerContext.setRoiActive(false);
+            luckyStackWorkerContext.setSelectedRoi(null);
 
             log.info("Opened reference image image with id {}", displayedImage.getID());
 

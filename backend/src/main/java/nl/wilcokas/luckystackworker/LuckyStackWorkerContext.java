@@ -7,86 +7,37 @@ import lombok.Getter;
 import lombok.Setter;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.dto.StatusUpdateDTO;
+import org.springframework.stereotype.Component;
 
+@Component
+@Getter
+@Setter
 public class LuckyStackWorkerContext {
-    private static String status = Constants.STATUS_WORKING;
-    private static int filesProcessedCount = 0;
-    private static int totalfilesCount = 0;
-    private static boolean realTimeEnabled = false;
-    private static boolean rootFolderSelected = false;
-    private static boolean profileBeingApplied = false;
-    private static boolean workerStopped = false;
-    private static String selectedProfile;
+    private String status = Constants.STATUS_WORKING;
+    private int filesProcessedCount = 0;
+    private int totalFilesCount = 0;
 
-    @Getter
-    @Setter
-    private static LocalDateTime activeOperationTime = null;
+    private boolean realTimeEnabled = false;
 
-    @Getter
-    @Setter
-    private static Roi selectedRoi = null;
+    private boolean rootFolderSelected = false;
 
-    private LuckyStackWorkerContext() {
-    }
+    private boolean profileBeingApplied = false;
 
-    public static void statusUpdate(String message) {
-        status = message;
-    }
+    private boolean workerStopped = false;
 
-    public static void setFilesProcessedCount(int aFilesProcessedCount) {
-        filesProcessedCount = aFilesProcessedCount;
-    }
+    private String selectedProfile;
 
-    public static void setTotalfilesCount(int aTotalfilesCount) {
-        totalfilesCount = aTotalfilesCount;
-    }
+    private LocalDateTime activeOperationTime = null;
 
-    public static StatusUpdateDTO getStatus() {
-        return StatusUpdateDTO.builder().message(status).filesProcessedCount(filesProcessedCount)
-                .totalfilesCount(totalfilesCount).build();
-    }
+    private boolean roiActive = false;
+    private Roi selectedRoi = null;
 
-    public static boolean isRealTimeEnabled() {
-        return realTimeEnabled;
-    }
-
-    public static void disableRealTimeEnabled() {
-        realTimeEnabled = false;
-    }
-
-    public static void enableRealTimeEnabled() {
-        realTimeEnabled = true;
-    }
-
-    public static boolean isRootFolderSelected() {
-        return rootFolderSelected;
-    }
-
-    public static void setRootFolderIsSelected() {
-        rootFolderSelected = true;
-    }
-
-    public static boolean isProfileBeingApplied() {
-        return profileBeingApplied;
-    }
-
-    public static void setProfileBeingApplied(boolean profileBeingApplied) {
-        LuckyStackWorkerContext.profileBeingApplied = profileBeingApplied;
-    }
-
-    public static void setWorkerStopped(boolean workerStopped) {
-        LuckyStackWorkerContext.workerStopped = workerStopped;
-    }
-
-    public static boolean isWorkerStopped() {
-        return workerStopped;
-    }
-
-    public static String getSelectedProfile() {
-        return selectedProfile;
-    }
-
-    public static void setSelectedProfile(String profileName) {
-        selectedProfile = profileName;
+    public StatusUpdateDTO getStatusUpdateDTO() {
+        return StatusUpdateDTO.builder()
+               .message(status)
+               .filesProcessedCount(filesProcessedCount)
+               .totalFilesCount(totalFilesCount)
+               .build();
     }
 }
+

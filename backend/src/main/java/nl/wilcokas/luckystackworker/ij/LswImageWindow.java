@@ -292,7 +292,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     }
 
     private void paintImageDetails(Graphics g) {
-        g.drawString("Angle", textOffsetX + 228, textOffsetY);
+        g.drawString("Angle :", textOffsetX + 228, textOffsetY);
         g.drawString("%s\u00B0".formatted(metadata.getAngle()), textOffsetX + 318, textOffsetY);
 
         g.drawString("Original size :", textOffsetX + 228, textOffsetY + textHeight);

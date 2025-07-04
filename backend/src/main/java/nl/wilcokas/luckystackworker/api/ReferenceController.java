@@ -39,6 +39,7 @@ public class ReferenceController {
 
     private final SettingsService settingsService;
     private final ReferenceImageService referenceImageService;
+    private final LuckyStackWorkerContext luckyStackWorkerContext;
 
     @GetMapping("/open")
     public ResponseDTO openReferenceImage(@RequestParam double scale, @RequestParam String openImageMode) throws IOException, InterruptedException {
@@ -128,10 +129,10 @@ public class ReferenceController {
     public void realTimeChanged(@RequestBody boolean realtime) {
         if (realtime) {
             log.info("Re-enabling realtime processing");
-            LuckyStackWorkerContext.enableRealTimeEnabled();
+            luckyStackWorkerContext.setRealTimeEnabled(true);
         } else {
             log.info("Disabling realtime processing");
-            LuckyStackWorkerContext.disableRealTimeEnabled();
+            luckyStackWorkerContext.setRealTimeEnabled(false);
         }
     }
 

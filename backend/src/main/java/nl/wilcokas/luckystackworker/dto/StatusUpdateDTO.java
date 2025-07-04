@@ -7,6 +7,6 @@ import lombok.Data;
 @Builder
 public class StatusUpdateDTO {
 	private int filesProcessedCount;
-	private int totalfilesCount;
+	private int totalFilesCount;
 	private String message;
 }

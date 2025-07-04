@@ -47,6 +47,7 @@ public class ProfileController {
     private final ReferenceImageService referenceImageService;
     private final SettingsService settingsService;
     private final PSFService psfService;
+    private final LuckyStackWorkerContext luckyStackWorkerContext;
 
     @GetMapping
     public List<ProfileDTO> getProfiles() {
@@ -58,7 +59,7 @@ public class ProfileController {
     public ResponseDTO getSelectedProfile() {
         log.info("getSelectedProfile called");
         ProfileDTO profile = new ProfileDTO();
-        String profileName = LuckyStackWorkerContext.getSelectedProfile();
+        String profileName = luckyStackWorkerContext.getSelectedProfile();
         if (profileName != null) {
             profile = new ProfileDTO(profileService.findByName(profileName)
                     .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName))));
@@ -96,7 +97,7 @@ public class ProfileController {
                 LswImageProcessingUtil.setNonPersistentSettings(profile);
                 ProfileDTO profileDTO = new ProfileDTO(profile);
                 updateProfile(profileDTO, null);
-                LuckyStackWorkerContext.setSelectedProfile(profile.getName());
+                luckyStackWorkerContext.setSelectedProfile(profile.getName());
                 return new ResponseDTO(profileDTO, settingsDTO);
             }
         }
@@ -108,16 +109,16 @@ public class ProfileController {
             throws IOException, InterruptedException {
         // Rate limiting added to prevent overloading whenever scroll keys are held down
         // or pressed very quickly.
-        LocalDateTime activeOperationTime = LuckyStackWorkerContext.getActiveOperationTime();
+        LocalDateTime activeOperationTime = luckyStackWorkerContext.getActiveOperationTime();
         byte[] psfImage = null;
         if (activeOperationTime == null
                 || LocalDateTime.now()
                 .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
-            LuckyStackWorkerContext.setActiveOperationTime(LocalDateTime.now());
+            luckyStackWorkerContext.setActiveOperationTime(LocalDateTime.now());
 
             Profile profile = profileService.updateProfile(profileDTO);
             psfImage = referenceImageService.updateProcessing(profile, operations);
-            LuckyStackWorkerContext.setActiveOperationTime(null);
+            luckyStackWorkerContext.setActiveOperationTime(null);
         } else {
             log.warn("Attempt to update image while another operation was in progress");
         }
@@ -129,21 +130,21 @@ public class ProfileController {
     public void applyProfile(@RequestBody ProfileDTO profile) throws IOException {
         String profileName = profile.getName();
         if (profileName != null) {
-            LuckyStackWorkerContext.statusUpdate(Constants.STATUS_WORKING);
-            LuckyStackWorkerContext.setSelectedRoi(referenceImageService.getDisplayedImage().getRoi());
-            LuckyStackWorkerContext.setSelectedProfile(profileName);
+            luckyStackWorkerContext.setStatus(Constants.STATUS_WORKING);
+            luckyStackWorkerContext.setSelectedRoi(referenceImageService.getDisplayedImage().getRoi());
+            luckyStackWorkerContext.setSelectedProfile(profileName);
             referenceImageService.writeProfile();
-            LuckyStackWorkerContext.setProfileBeingApplied(true);
+            luckyStackWorkerContext.setProfileBeingApplied(true);
         } else {
             log.warn("Attempt to apply profile while nothing was selected");
-            LuckyStackWorkerContext.statusUpdate(Constants.STATUS_IDLE);
+            luckyStackWorkerContext.setStatus(Constants.STATUS_IDLE);
         }
     }
 
     @GetMapping("/status")
     public StatusUpdateDTO getStatus() {
         log.info("getStatus called");
-        return LuckyStackWorkerContext.getStatus();
+        return luckyStackWorkerContext.getStatusUpdateDTO();
     }
 
     @GetMapping("/version")
@@ -160,7 +161,7 @@ public class ProfileController {
 
     @PutMapping("/stop")
     public void stopWorker() {
-        LuckyStackWorkerContext.setWorkerStopped(true);
+        luckyStackWorkerContext.setWorkerStopped(true);
     }
 
     @PutMapping("/exit")
