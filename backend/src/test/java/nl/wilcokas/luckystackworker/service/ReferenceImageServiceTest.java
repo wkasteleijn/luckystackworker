@@ -3,6 +3,8 @@ package nl.wilcokas.luckystackworker.service;
 import java.net.http.HttpClient;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.wilcokas.luckystackworker.LswConfiguration;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +18,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.dto.VersionDTO;
 import nl.wilcokas.luckystackworker.model.Settings;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ReferenceImageServiceTest {
 
-    private static final String LATESTVERSIONLOCAL = "1.5.0";
-    private static final String NEWERVERSIONSERVER = "1.6.1";
+    private static final String LATESTVERSIONLOCAL = "6.12.1";
+    private static final String NEWERVERSIONSERVER = "6.15.0";
     private static final LocalDateTime TODAY = LocalDateTime.now();
     private static final LocalDateTime MORE_THAN_2_WEEKS_AGO = TODAY.minusDays(15);
     private static final LocalDateTime LESS_THAN_2_WEEKS_AGO = TODAY.minusDays(13);
@@ -39,10 +47,15 @@ class ReferenceImageServiceTest {
 
     @InjectMocks
     private ReferenceImageService referenceImageService;
+    @Mock
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setup() {
-        referenceImageService = new ReferenceImageService(settingsService, httpService, profileService, operationService, luckyStackWorkerContext);
+        referenceImageService = new ReferenceImageService(settingsService, httpService, profileService, operationService, luckyStackWorkerContext, objectMapper);
+        ReflectionTestUtils.setField(referenceImageService, "currentVersion", "0.0.0");
+        ReflectionTestUtils.setField(referenceImageService, "githubApiUrl", "https://api.github.com/repos/wilcokas/luckystackworker/releases/latest");
+        ReflectionTestUtils.setField(referenceImageService, "objectMapper", LswConfiguration.createObjectMapper());
     }
 
     @Test
@@ -52,10 +65,11 @@ class ReferenceImageServiceTest {
 
         VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
-        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());
-        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        assertNull(result.getReleaseNotes());
     }
 
     @Test
@@ -66,10 +80,14 @@ class ReferenceImageServiceTest {
 
         VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
-        Assertions.assertEquals(NEWERVERSIONSERVER, result.getLatestVersion());
-        Assertions.assertTrue(result.isNewVersion());
-        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-        Assertions.assertEquals(NEWERVERSIONSERVER, settings.getLatestKnownVersion());
+        assertEquals(NEWERVERSIONSERVER, result.getLatestVersion());
+        assertTrue(result.isNewVersion());
+        assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        assertEquals(NEWERVERSIONSERVER, settings.getLatestKnownVersion());
+        assertEquals(3, result.getReleaseNotes().size());
+        assertEquals("Fixed bug when setting sharpen amount to 0 the next time you start the app it would not work anymore", result.getReleaseNotes().get(0));
+        assertEquals("Fixed bug in the windows startup that only happened for users with a space character in their username", result.getReleaseNotes().get(1));
+        assertEquals("Fixed bug in Bilateral Denoise not able to change values for green and blue channel individually.", result.getReleaseNotes().get(2));
     }
 
     @Test
@@ -79,10 +97,11 @@ class ReferenceImageServiceTest {
 
         VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
-        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());
-        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        assertNull(result.getReleaseNotes());
     }
 
     @Test
@@ -93,10 +112,14 @@ class ReferenceImageServiceTest {
 
         VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
-        Assertions.assertEquals(NEWERVERSIONSERVER, result.getLatestVersion());
-        Assertions.assertTrue(result.isNewVersion());
-        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-        Assertions.assertEquals(NEWERVERSIONSERVER, settings.getLatestKnownVersion());
+        assertEquals(NEWERVERSIONSERVER, result.getLatestVersion());
+        assertTrue(result.isNewVersion());
+        assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        assertEquals(NEWERVERSIONSERVER, settings.getLatestKnownVersion());
+        assertEquals(3, result.getReleaseNotes().size());
+        assertEquals("Fixed bug when setting sharpen amount to 0 the next time you start the app it would not work anymore", result.getReleaseNotes().get(0));
+        assertEquals("Fixed bug in the windows startup that only happened for users with a space character in their username", result.getReleaseNotes().get(1));
+        assertEquals("Fixed bug in Bilateral Denoise not able to change values for green and blue channel individually.", result.getReleaseNotes().get(2));
     }
 
     @Test
@@ -107,10 +130,11 @@ class ReferenceImageServiceTest {
 
         VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
-        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());
-        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        assertNull(result.getReleaseNotes());
     }
 
     @Test
@@ -120,10 +144,11 @@ class ReferenceImageServiceTest {
 
         VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
-        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());
-        Assertions.assertEquals(LESS_THAN_2_WEEKS_AGO, settings.getLatestKnownVersionChecked());
-        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        assertEquals(LESS_THAN_2_WEEKS_AGO, settings.getLatestKnownVersionChecked());
+        assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        assertNull(result.getReleaseNotes());
         Mockito.verifyNoInteractions(httpService);
     }
 
@@ -131,15 +156,16 @@ class ReferenceImageServiceTest {
     void testGetLatestVersion_receivedUnrecognizedResponseFromServer() {
 
         Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
-        Mockito.when(httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, Constants.VERSION_URL,
-                Constants.VERSION_REQUEST_TIMEOUT)).thenReturn("<html><body>nothing</body></html>");
+        when(httpService.sendHttpGetRequest(eq(HttpClient.Version.HTTP_1_1), anyString(),
+                eq(Constants.VERSION_REQUEST_TIMEOUT))).thenReturn("<html><body>nothing</body></html>");
 
         VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
-        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());
-        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        assertNull(result.getReleaseNotes());
     }
 
     @Test
@@ -150,51 +176,43 @@ class ReferenceImageServiceTest {
 
         VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
-        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());
-        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
-    }
-
-    @Test
-    void testGetLatestVersion_receivedMissingEndMarkerResponseFromServer() {
-
-        Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
-        Mockito.when(httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, Constants.VERSION_URL,
-                Constants.VERSION_REQUEST_TIMEOUT)).thenReturn("<html><body>{lswVersion:%s</body></html>");
-
-        VersionDTO result = referenceImageService.getLatestVersion(TODAY);
-
-        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
-        Assertions.assertFalse(result.isNewVersion());
-        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        assertNull(result.getReleaseNotes());
     }
 
     @Test
     void testGetLatestVersion_receivedInvalidVersionResponseFromServer() {
 
         Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
-        mockServerResponse("100.100.100");
+        mockServerResponse("100.100");
 
         VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
-        Assertions.assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
+        assertEquals(LATESTVERSIONLOCAL, result.getLatestVersion());
         Assertions.assertFalse(result.isNewVersion());
-        Assertions.assertEquals(TODAY, settings.getLatestKnownVersionChecked());
-        Assertions.assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        assertEquals(TODAY, settings.getLatestKnownVersionChecked());
+        assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
+        assertNull(result.getReleaseNotes());
     }
 
     private Settings mockSettings(String version, LocalDateTime lastChecked) {
         Settings settings = Settings.builder().latestKnownVersion(version).latestKnownVersionChecked(lastChecked)
                 .build();
-        Mockito.when(settingsService.getSettings()).thenReturn(settings);
+        when(settingsService.getSettings()).thenReturn(settings);
         return settings;
     }
 
     private void mockServerResponse(String version) {
-        Mockito.when(httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, Constants.VERSION_URL,
-                Constants.VERSION_REQUEST_TIMEOUT)).thenReturn(String.format("<html>{lswVersion:%s}</html>", version));
+        when(httpService.sendHttpGetRequest(eq(HttpClient.Version.HTTP_1_1), anyString(),
+                eq(Constants.VERSION_REQUEST_TIMEOUT))).thenReturn(String.format("""
+                {
+                    "tag_name": "v%s", 
+                    "body": "Some random text. ## Release notes\\r\\n- Fixed bug when setting sharpen amount to 0 the next time you start the app it would not work anymore\\r\\n- Fixed bug in the windows startup that only happened for users with a space character in their username\\r\\n- Fixed bug in Bilateral Denoise not able to change values for green and blue channel individually."
+                }""",
+                version));
     }
 
 }

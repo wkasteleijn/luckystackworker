@@ -34,24 +34,13 @@ public class LswUtil {
         }
     }
 
-    private static boolean logOutput(final Process process, int timeoutSeconds) throws IOException, InterruptedException {
-        log.info("=== CLI output start ===");
-        log.info(IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8.name()));
-        log.info("==== CLI output end ====");
-        return process.waitFor(timeoutSeconds, TimeUnit.SECONDS);
-    }
-
-    private static ProcessBuilder getProcessBuilder(String activeOSProfile, List<String> arguments) {
-        if (Constants.SYSTEM_PROFILE_WINDOWS.equals(activeOSProfile)) {
-            return new ProcessBuilder(arguments);
-        } else {
-            String joinedArguments = arguments.stream().collect(Collectors.joining(" "));
-            String shellType = switch (activeOSProfile) {
-                case Constants.SYSTEM_PROFILE_MAC -> "zsh";
-                case Constants.SYSTEM_PROFILE_LINUX -> "bash";
-                default -> "bash";
-            };
-            return new ProcessBuilder(shellType, "-c", joinedArguments);
+    public static void delayMacOS() {
+        String activeOSProfile = getActiveOSProfile();
+        // On macs (and maybe linux?), we need to wait a bit for the frame to be initialized
+        if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile) || Constants.SYSTEM_PROFILE_LINUX.equals(activeOSProfile)) {
+            // Workaround for issue on macs, somehow needs to wait some milliseconds for the
+            // frame to be initialized.
+            LswUtil.waitMilliseconds(500);
         }
     }
 
@@ -61,10 +50,6 @@ public class LswUtil {
 
     public static String getMacOSArch() {
         return System.getProperty("macos.arch");
-    }
-
-    public static String getLswVersion() {
-        return System.getProperty("lsw.version");
     }
 
     public static void waitMilliseconds(int milliseconds) {
@@ -114,4 +99,26 @@ public class LswUtil {
             default -> "Moon";
         };
     }
+
+    private static boolean logOutput(final Process process, int timeoutSeconds) throws IOException, InterruptedException {
+        log.info("=== CLI output start ===");
+        log.info(IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8.name()));
+        log.info("==== CLI output end ====");
+        return process.waitFor(timeoutSeconds, TimeUnit.SECONDS);
+    }
+
+    private static ProcessBuilder getProcessBuilder(String activeOSProfile, List<String> arguments) {
+        if (Constants.SYSTEM_PROFILE_WINDOWS.equals(activeOSProfile)) {
+            return new ProcessBuilder(arguments);
+        } else {
+            String joinedArguments = arguments.stream().collect(Collectors.joining(" "));
+            String shellType = switch (activeOSProfile) {
+                case Constants.SYSTEM_PROFILE_MAC -> "zsh";
+                case Constants.SYSTEM_PROFILE_LINUX -> "bash";
+                default -> "bash";
+            };
+            return new ProcessBuilder(shellType, "-c", joinedArguments);
+        }
+    }
+
 }

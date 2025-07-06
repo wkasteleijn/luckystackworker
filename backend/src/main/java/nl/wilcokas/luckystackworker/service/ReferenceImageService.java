@@ -18,6 +18,7 @@ import java.net.http.HttpClient;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -28,6 +29,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ij.gui.*;
 import ij.process.ColorProcessor;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +39,7 @@ import nl.wilcokas.luckystackworker.ij.LswImageWindow;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.model.OperationEnum;
+import nl.wilcokas.luckystackworker.service.dto.GithubReleaseDto;
 import nl.wilcokas.luckystackworker.util.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,6 +69,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     @Value("${spring.profiles.active}")
     private String activeOSProfile;
+
+    @Value("${github.api.url}")
+    private String githubApiUrl;
+
+    @Value("${lsw.version}")
+    private String currentVersion;
 
     @Getter
     private LswImageViewer displayedImage;
@@ -108,6 +118,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private final ProfileService profileService;
     private final OperationService operationService;
     private final LuckyStackWorkerContext luckyStackWorkerContext;
+    private final ObjectMapper objectMapper;
 
     public ResponseDTO scale(Profile profile) throws IOException, InterruptedException {
         this.isLargeImage = openReferenceImage(this.imageMetadata.getFilePath(), profile, LswFileUtil.getObjectDateTime(this.imageMetadata.getFilePath()));
@@ -314,20 +325,25 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     public VersionDTO getLatestVersion(LocalDateTime currentDate) {
         Settings settings = settingsService.getSettings();
-        String latestKnowVersion = settings.getLatestKnownVersion();
+        LswVersionNumber latestKnowVersion = LswVersionNumber.fromString(settings.getLatestKnownVersion())
+                .orElse(LswVersionNumber.fromString(currentVersion) // the first time the app is opened
+                        .orElse(LswVersionNumber.fromString("0.0.0").get())); // should only happen in dev mode
+        VersionDTO result = VersionDTO.builder().latestVersion(latestKnowVersion.toString()).isNewVersion(false).build();
         if (settings.getLatestKnownVersionChecked() == null || currentDate.isAfter(settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
-            String latestVersionFromSite = requestLatestVersion();
-            if (latestVersionFromSite != null) {
-                settings.setLatestKnownVersion(latestVersionFromSite);
+            LswVersionNumber latestVersionFromGithub = requestLatestVersion().orElse(null);
+            if (latestVersionFromGithub != null && (latestVersionFromGithub.getConvertedVersion() > latestKnowVersion.getConvertedVersion())) {
+                settings.setLatestKnownVersion(latestVersionFromGithub.toString());
+                result = VersionDTO.builder()
+                        .latestVersion(latestVersionFromGithub.toString())
+                        .latestVersionConverted(latestVersionFromGithub.getConvertedVersion())
+                        .isNewVersion(true)
+                        .releaseNotes(latestVersionFromGithub.getReleaseNotes())
+                        .build();
             }
             settings.setLatestKnownVersionChecked(currentDate);
             settingsService.saveSettings(settings);
-
-            if (latestVersionFromSite != null && !latestVersionFromSite.equals(latestKnowVersion)) {
-                return VersionDTO.builder().latestVersion(latestVersionFromSite).isNewVersion(true).build();
-            }
         }
-        return VersionDTO.builder().latestVersion(latestKnowVersion).isNewVersion(false).build();
+        return result;
     }
 
     public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, boolean isSaveDialog) {
@@ -335,11 +351,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, String title, boolean isSaveDialog) {
-        if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile) || Constants.SYSTEM_PROFILE_LINUX.equals(activeOSProfile)) {
-            // Workaround for issue on macs, somehow needs to wait some milliseconds for the
-            // frame to be initialized.
-            LswUtil.waitMilliseconds(500);
-        }
+        LswUtil.delayMacOS();
         int returnValue = 0;
         if (isSaveDialog) {
             boolean confirmed = false;
@@ -515,7 +527,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
         return false;
     }
-    
+
     private void setImageMetadata(final String filePath, final Profile profile, final LocalDateTime dateTime, final ImagePlus finalResultImage, double scale) {
 
         int currentWidth = finalResultImage.getWidth();
@@ -555,55 +567,24 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         luckyStackWorkerContext.setRoiActive(false);
     }
 
-    private String requestLatestVersion() {
-
-        // Retrieve version document
-        String result = httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, Constants.VERSION_URL, Constants.VERSION_REQUEST_TIMEOUT);
+    private Optional<LswVersionNumber> requestLatestVersion() {
+        String result = httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, githubApiUrl, Constants.VERSION_REQUEST_TIMEOUT);
         if (result == null) {
             log.warn("HTTP1.1 request for latest version failed, trying HTTP/2..");
-            result = httpService.sendHttpGetRequest(HttpClient.Version.HTTP_2, Constants.VERSION_URL, Constants.VERSION_REQUEST_TIMEOUT);
+            result = httpService.sendHttpGetRequest(HttpClient.Version.HTTP_2, githubApiUrl, Constants.VERSION_REQUEST_TIMEOUT);
             if (result == null) {
                 log.warn("HTTP/2 request for latest version failed as well");
             }
         }
-
-        // Extract version
-        String version = null;
-        if (result != null) {
-            version = getLatestVersion(result);
-        }
-        return version;
-    }
-
-    private String getLatestVersion(String htmlResponse) {
-        int start = htmlResponse.indexOf(Constants.VERSION_URL_MARKER);
-        if (start > 0) {
-            int startVersionPos = start + Constants.VERSION_URL_MARKER.length();
-            int endMarkerPos = htmlResponse.indexOf(Constants.VERSION_URL_ENDMARKER, startVersionPos);
-            endMarkerPos = endMarkerPos < 0 ? startVersionPos : endMarkerPos; // robustness, don't fail if end marker
-            // was missing
-            String version = htmlResponse.substring(startVersionPos, endMarkerPos);
-            if (validateVersion(version)) {
-                log.info("Received valid version from server : {}", version);
-                return version;
-            } else {
-                log.warn("Received an invalid version from the server");
+        try {
+            if (result != null) {
+                GithubReleaseDto releaseDto = objectMapper.readValue(result, GithubReleaseDto.class);
+                return LswVersionNumber.fromString(releaseDto.getTagName(),releaseDto.getBody());
             }
+        } catch (JsonProcessingException e) {
+            log.warn("Unable to parse version string from tag: ", e);
         }
-        log.warn("Could not read the version from the server response to {}", Constants.VERSION_URL);
-        return null;
-    }
-
-    private boolean validateVersion(String version) {
-        if (version == null || version.length() == 0) {
-            log.warn("Received an empty version from server : {}", version);
-            return false;
-        }
-        if (version.length() > 10) { // 10.100.100 will never be reached :)
-            log.warn("Received an invalid version nr from server : {}", version);
-            return false;
-        }
-        return true;
+        return Optional.empty();
     }
 
     private boolean openReferenceImage(String filePath, Profile profile, LocalDateTime dateTime) throws IOException, InterruptedException {
@@ -617,7 +598,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
         boolean largeImage = false;
         if (finalResultImage != null) {
-            if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame(), activeOSProfile)) {
+            if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame())) {
                 return false;
             }
             setImageMetadata(filePath, profile, dateTime, finalResultImage, profile.getScale());

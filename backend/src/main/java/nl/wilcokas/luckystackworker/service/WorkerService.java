@@ -152,7 +152,7 @@ public class WorkerService {
                 Pair<ImagePlus, Boolean> imageDetails = LswFileUtil.openImage(filePath, OpenImageModeEnum.RGB, profile.getScale(), img -> operationService.scaleImage(img, profile.getScale()));
                 ImagePlus imp = imageDetails.getLeft();
                 boolean isMono = imageDetails.getRight();
-                if (LswFileUtil.validateImageFormat(imp, null, null)) {
+                if (LswFileUtil.validateImageFormat(imp, null)) {
                     if (LswFileUtil.isPngRgbStack(imp, filePath)) {
                         imp = LswFileUtil.fixNonTiffOpeningSettings(imp);
                     }

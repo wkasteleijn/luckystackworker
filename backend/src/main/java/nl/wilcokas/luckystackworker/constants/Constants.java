@@ -19,9 +19,6 @@ public class Constants {
     public static final BigDecimal DEFAULT_DENOISE_RADIUS = BigDecimal.valueOf(1);
     public static final BigDecimal DEFAULT_DENOISE_SIGMA = BigDecimal.valueOf(2);
     public static final int DEFAULT_DENOISE_ITERATIONS = 1;
-    public static final String VERSION_URL = "https://www.wilcokas.com/luckystackworker/version";
-    public static final String VERSION_URL_MARKER = "{lswVersion:";
-    public static final String VERSION_URL_ENDMARKER = "}";
     public static final int VERSION_REQUEST_TIMEOUT = 5; // seconds
     public static final int VERSION_REQUEST_FREQUENCY = 14; // days
     public static final int DEFAULT_WINDOWS_POSITION_X = 754;

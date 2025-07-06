@@ -197,11 +197,7 @@ public class LswImageProcessingUtil {
         if (!is16Bit) {
             log.warn("Attempt to open a non 16-bit image");
             if (parentFrame != null) {
-                if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile) || Constants.SYSTEM_PROFILE_LINUX.equals(activeOSProfile)) {
-                    // Workaround for issue on macs, somehow needs to wait some milliseconds for the
-                    // frame to be initialized.
-                    LswUtil.waitMilliseconds(500);
-                }
+                LswUtil.delayMacOS();
                 JOptionPane.showMessageDialog(parentFrame, String.format(message));
             }
             return false;
