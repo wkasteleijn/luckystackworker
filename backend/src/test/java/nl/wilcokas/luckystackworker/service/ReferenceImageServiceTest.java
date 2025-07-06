@@ -48,14 +48,14 @@ class ReferenceImageServiceTest {
     @InjectMocks
     private ReferenceImageService referenceImageService;
     @Mock
-    private ObjectMapper objectMapper;
+    private ObjectMapper snakeCaseObjectMapper;
 
     @BeforeEach
     void setup() {
-        referenceImageService = new ReferenceImageService(settingsService, httpService, profileService, operationService, luckyStackWorkerContext, objectMapper);
+        referenceImageService = new ReferenceImageService(settingsService, httpService, profileService, operationService, luckyStackWorkerContext, snakeCaseObjectMapper);
         ReflectionTestUtils.setField(referenceImageService, "currentVersion", "0.0.0");
         ReflectionTestUtils.setField(referenceImageService, "githubApiUrl", "https://api.github.com/repos/wilcokas/luckystackworker/releases/latest");
-        ReflectionTestUtils.setField(referenceImageService, "objectMapper", LswConfiguration.createObjectMapper());
+        ReflectionTestUtils.setField(referenceImageService, "snakeCaseObjectMapper", LswConfiguration.createSnakeCaseObjectMapper());
     }
 
     @Test

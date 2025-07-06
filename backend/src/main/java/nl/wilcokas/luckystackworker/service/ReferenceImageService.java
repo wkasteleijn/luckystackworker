@@ -118,7 +118,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private final ProfileService profileService;
     private final OperationService operationService;
     private final LuckyStackWorkerContext luckyStackWorkerContext;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper snakeCaseObjectMapper;
 
     public ResponseDTO scale(Profile profile) throws IOException, InterruptedException {
         this.isLargeImage = openReferenceImage(this.imageMetadata.getFilePath(), profile, LswFileUtil.getObjectDateTime(this.imageMetadata.getFilePath()));
@@ -327,7 +327,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         Settings settings = settingsService.getSettings();
         LswVersionNumber latestKnowVersion = LswVersionNumber.fromString(settings.getLatestKnownVersion())
                 .orElse(LswVersionNumber.fromString(currentVersion) // the first time the app is opened
-                        .orElse(LswVersionNumber.fromString("0.0.0").get())); // should only happen in dev mode
+                        .orElse(LswVersionNumber.fromString("0.0.0").get()));
+
+        latestKnowVersion.setMajor(1); // TODO: remove after testing
+        // should only happen in dev mode
         VersionDTO result = VersionDTO.builder().latestVersion(latestKnowVersion.toString()).isNewVersion(false).build();
         if (settings.getLatestKnownVersionChecked() == null || currentDate.isAfter(settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
             LswVersionNumber latestVersionFromGithub = requestLatestVersion().orElse(null);
@@ -578,7 +581,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
         try {
             if (result != null) {
-                GithubReleaseDto releaseDto = objectMapper.readValue(result, GithubReleaseDto.class);
+                GithubReleaseDto releaseDto = snakeCaseObjectMapper.readValue(result, GithubReleaseDto.class);
                 return LswVersionNumber.fromString(releaseDto.getTagName(),releaseDto.getBody());
             }
         } catch (JsonProcessingException e) {

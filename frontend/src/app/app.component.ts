@@ -13,7 +13,6 @@ import { LuckyStackWorkerService } from './luckystackworker.service';
 import { Profile } from './model/profile';
 import { PSF } from './model/psf';
 import { Settings } from './model/settings';
-import { NewVersionComponent } from './new_version/newversion.component';
 
 const SERVICE_POLL_DELAY_MS = 250;
 
@@ -158,13 +157,15 @@ export class AppComponent implements OnInit {
   isRotationPanelVisible: boolean = false;
   psfImage: string = '';
   sliderTextDisplayed: boolean = false;
+  showNewVersionPopup: boolean = false;
+  lswVersion: string = '';
+  releaseNotes: string[] = [];
 
   resetToRawText = 'Are you sure you want to reset everything?';
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
     private aboutSnackbar: MatLegacySnackBar,
-    private newVersionSnackbar: MatLegacySnackBar,
     private confirmationDialog: MatLegacyDialog
   ) {}
 
@@ -1950,6 +1951,10 @@ export class AppComponent implements OnInit {
     return /Win/i.test(navigator.userAgent);
   }
 
+  hideNewVersionPopup() {
+    this.showNewVersionPopup = false;
+  }
+
   private setSharpenOperationForDeringing() {
     if (this.applyWienerDeconvolution) {
       this.settings.operations = ['WIENER_DECONV'];
@@ -2083,10 +2088,9 @@ export class AppComponent implements OnInit {
       (data) => {
         this.latestKnownVersion = data.latestVersion;
         if (data.newVersion) {
-          this.newVersionSnackbar.openFromComponent(NewVersionComponent, {
-            horizontalPosition: 'center',
-            verticalPosition: 'top',
-          });
+          this.showNewVersionPopup = true;
+          this.lswVersion = data.latestVersion;
+          this.releaseNotes = data.releaseNotes;
         }
       },
       (error) => console.log(error)

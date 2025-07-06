@@ -18,6 +18,12 @@
   (angleChanged)="rotationAngleChanged($event)"
 ></app-rotation-panel>
 <div *ngIf="isPsfPanelVisible || isRotationPanelVisible" class="backdrop"></div>
+<app-newversion
+  *ngIf="showNewVersionPopup"
+  [version]="lswVersion"
+  (close)="hideNewVersionPopup()"
+  [releaseNotes]="releaseNotes"
+></app-newversion>
 
 <div *ngIf="shouldShowSpinner()">
   <mat-progress-spinner
