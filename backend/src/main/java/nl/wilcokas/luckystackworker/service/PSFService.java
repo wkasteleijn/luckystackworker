@@ -33,7 +33,7 @@ public class PSFService {
     private final ProfileService profileService;
     private final LuckyStackWorkerContext luckyStackWorkerContext;
 
-    public SettingsDTO loadCustomPSF() throws IOException, InterruptedException {
+    public SettingsDTO loadCustomPSF() throws Exception {
         JFrame frame = referenceImageService.getParentFrame();
         JFileChooser jfc = referenceImageService
                 .getJFileChooser(settingsService.getRootFolder());

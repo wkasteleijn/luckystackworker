@@ -86,7 +86,7 @@ public class OperationService {
         cache.clear();
     }
 
-    public byte[] applyAllOperations(ImagePlus image, LswImageViewer viewer, Profile profile, List<OperationEnum> operationParams, boolean isMono) throws IOException, InterruptedException {
+    public byte[] applyAllOperations(ImagePlus image, LswImageViewer viewer, Profile profile, List<OperationEnum> operationParams, boolean isMono) throws Exception {
         updateProgress(viewer, 0, false);
 
         // Sharpening filters
@@ -239,7 +239,7 @@ public class OperationService {
         }
     }
 
-    private byte[] updatePSF(PSF psf, List<OperationEnum> operations, String profileName, boolean isMono) throws IOException {
+    private byte[] updatePSF(PSF psf, List<OperationEnum> operations, String profileName, boolean isMono) throws Exception {
         if (operations.contains(OperationEnum.PSF)) {
             PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profileName, isMono);
             psf.setType(PSFType.SYNTHETIC);

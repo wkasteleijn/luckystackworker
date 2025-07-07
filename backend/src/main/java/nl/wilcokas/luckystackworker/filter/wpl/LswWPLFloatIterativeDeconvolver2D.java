@@ -5,8 +5,12 @@ import ij.ImagePlus;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import cern.colt.matrix.tfloat.FloatMatrix2D;
@@ -151,16 +155,21 @@ public class LswWPLFloatIterativeDeconvolver2D {
     protected boolean detectDivergence;
 
     /**
+     * Number of virtual threads created for parallel processing.
+     */
+    private int numberOfThreads;
+
+    /**
      * Creates a new instance of WPLFloatIterativeDeconvolver2D
      *
-     * @param imB      blurred image
-     * @param imPSF    Point Spread Function
-     * @param boundary type of boundary conditions
-     * @param resizing type of resizing
+     * @param imB        blurred image
+     * @param imPSF      Point Spread Function
+     * @param boundary   type of boundary conditions
+     * @param resizing   type of resizing
      * @param iterations maximal number of iterations
-     * @param options  WPL options
+     * @param options    WPL options
      */
-    public LswWPLFloatIterativeDeconvolver2D(ImagePlus imB, ImagePlus imPSF, BoundaryType boundary, ResizingType resizing, int iterations, WPLOptions options) {
+    public LswWPLFloatIterativeDeconvolver2D(ImagePlus imB, ImagePlus imPSF, BoundaryType boundary, ResizingType resizing, int iterations, WPLOptions options, int numberOfThreads) {
         log.info("WPL initialization...");
         ImageProcessor ipB = imB.getProcessor();
         cmY = ipB.getColorModel();
@@ -213,6 +222,7 @@ public class LswWPLFloatIterativeDeconvolver2D {
         padSize[1] = columns - psfColumns;
         PSF = FloatCommon2D.padZero(PSF, padSize, PaddingType.POST);
         PSF = FloatCommon2D.circShift(PSF, new int[]{(int) maxLoc[1], (int) maxLoc[2]});
+        this.numberOfThreads = numberOfThreads;
     }
 
     /**
@@ -220,7 +230,7 @@ public class LswWPLFloatIterativeDeconvolver2D {
      *
      * @return deconvolved image
      */
-    public ImagePlus deconvolve() {
+    public ImagePlus deconvolve() throws ExecutionException, InterruptedException {
         ((DenseFloatMatrix2D) PSF).dht2();
         FloatMatrix2D X;
         FloatMatrix2D AX = B.like();
@@ -283,19 +293,19 @@ public class LswWPLFloatIterativeDeconvolver2D {
         return imX;
     }
 
-    private static void convolveFD(final int rows, final int columns, FloatMatrix2D H1, FloatMatrix2D H2, FloatMatrix2D Result) {
+    private void convolveFD(final int rows, final int columns, FloatMatrix2D H1, FloatMatrix2D H2, FloatMatrix2D Result) throws ExecutionException, InterruptedException {
         final float[] h1 = (float[]) H1.elements();
         final float[] h2 = (float[]) H2.elements();
         final float[] result = (float[]) Result.elements();
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int np = numberOfThreads;
         if ((np > 1) && (columns * rows >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int firstRow = j * k;
-                final int lastRow = (j == np - 1) ? rows : firstRow + k;
-                futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                    public void run() {
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                int k = rows / np;
+                CompletableFuture<?>[] futures = new CompletableFuture[np];
+                for (int j = 0; j < np; j++) {
+                    final int firstRow = j * k;
+                    final int lastRow = (j == np - 1) ? rows : firstRow + k;
+                    futures[j] = CompletableFuture.runAsync(() -> {
                         int cC, rC, idx1, idx2;
                         float h2e, h2o;
                         for (int r = firstRow; r < lastRow; r++) {
@@ -308,11 +318,12 @@ public class LswWPLFloatIterativeDeconvolver2D {
                                 h2o = (h2[idx1] - h2[idx2]) / 2;
                                 result[idx1] = (h1[idx1] * h2e + h1[idx2] * h2o);
                             }
+
                         }
-                    }
-                });
+                    }, executor);
+                }
+                CompletableFuture.allOf(futures).get();
             }
-            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int cC, rC, idx1, idx2;
             float h2e, h2o;
@@ -330,23 +341,22 @@ public class LswWPLFloatIterativeDeconvolver2D {
         }
     }
 
-    private static void copyDataAverage(final int rows, final int columns, final int rowsE, final int columnsE, final float sum, FloatMatrix2D DataIn, FloatMatrix2D DataOut, FloatMatrix2D Result) {
+    private void copyDataAverage(final int rows, final int columns, final int rowsE, final int columnsE, final float sum, FloatMatrix2D DataIn, FloatMatrix2D DataOut, FloatMatrix2D Result) throws ExecutionException, InterruptedException {
         final float[] dataIn = (float[]) DataIn.elements();
         final float[] dataOut = (float[]) DataOut.elements();
         final float[] result = (float[]) Result.elements();
 
         final int rOff = (rowsE - rows + 1) / 2;
         final int cOff = (columnsE - columns + 1) / 2;
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int np = numberOfThreads;
         if ((np > 1) && (columnsE * rowsE >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rowsE / np;
-            for (int j = 0; j < np; j++) {
-                final int firstRow = -rOff + j * k;
-                final int lastRow = (j == np - 1) ? rowsE - rOff : firstRow + k;
-                futures[j] = ConcurrencyUtils.submit(new Runnable() {
-
-                    public void run() {
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                CompletableFuture<?>[] futures = new CompletableFuture[np];
+                int k = rowsE / np;
+                for (int j = 0; j < np; j++) {
+                    final int firstRow = -rOff + j * k;
+                    final int lastRow = (j == np - 1) ? rowsE - rOff : firstRow + k;
+                    futures[j] = CompletableFuture.runAsync(() -> {
                         int cOut, rOut, idx;
                         float alphaI, alphaJ;
                         float a;
@@ -375,10 +385,11 @@ public class LswWPLFloatIterativeDeconvolver2D {
                                 result[idx] = (1 - a) * dataIn[idx] + a * dataOut[idx] / sum;
                             }
                         }
-                    }
-                });
+                    }, executor);
+                }
+                CompletableFuture.allOf(futures).get();
             }
-            ConcurrencyUtils.waitForCompletion(futures);
+
         } else {
             int cOut, rOut, idx;
             float alphaI, alphaJ;
@@ -411,20 +422,20 @@ public class LswWPLFloatIterativeDeconvolver2D {
         }
     }
 
-    private static void deconvolveFD(final float gamma, final float magMax, final int rows, final int columns, FloatMatrix2D H1, FloatMatrix2D H2, FloatMatrix2D Result) {
+    private void deconvolveFD(final float gamma, final float magMax, final int rows, final int columns, FloatMatrix2D H1, FloatMatrix2D H2, FloatMatrix2D Result) throws ExecutionException, InterruptedException {
         final float gammaScaled = gamma * magMax;
         final float[] h1 = (float[]) H1.elements();
         final float[] h2 = (float[]) H2.elements();
         final float[] result = (float[]) Result.elements();
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int np = numberOfThreads;
         if ((np > 1) && (columns * rows >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int firstRow = j * k;
-                final int lastRow = (j == np - 1) ? rows : firstRow + k;
-                futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                    public void run() {
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                CompletableFuture<?>[] futures = new CompletableFuture[np];
+                int k = rows / np;
+                for (int j = 0; j < np; j++) {
+                    final int firstRow = j * k;
+                    final int lastRow = (j == np - 1) ? rows : firstRow + k;
+                    futures[j] = CompletableFuture.runAsync(() -> {
                         int cC, rC, idx1, idx2;
                         float mag, h2e, h2o;
                         for (int r = firstRow; r < lastRow; r++) {
@@ -440,10 +451,11 @@ public class LswWPLFloatIterativeDeconvolver2D {
                                 result[idx1] = (tmp / (mag + gammaScaled));
                             }
                         }
-                    }
-                });
+
+                    }, executor);
+                }
+                CompletableFuture.allOf(futures).get();
             }
-            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int cC, rC, idx1, idx2;
             float mag, h2e, h2o;
@@ -463,41 +475,39 @@ public class LswWPLFloatIterativeDeconvolver2D {
         }
     }
 
-    private static float energySum(FloatMatrix2D X, final int rows, final int columns, final int cOff, final int rOff) {
+    private float energySum(FloatMatrix2D X, final int rows, final int columns, final int cOff, final int rOff) {
         float sumPixels = 0;
         final int rowStride = X.rowStride();
         final float[] elemsX = (float[]) X.elements();
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int np = numberOfThreads;
         if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
+            List<CompletableFuture<Float>> futures = new ArrayList<>();
             Float[] results = new Float[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int firstRow = j * k;
-                final int lastRow = (j == np - 1) ? rows : firstRow + k;
-                futures[j] = ConcurrencyUtils.submit(new Callable<Float>() {
-                    public Float call() throws Exception {
-                        float sumPixels = 0;
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                int k = rows / np;
+                for (int j = 0; j < np; j++) {
+                    final int firstRow = j * k;
+                    final int lastRow = (j == np - 1) ? rows : firstRow + k;
+                    futures.add(CompletableFuture.supplyAsync(() -> {
+                        float sum = 0;
                         for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
-                                sumPixels += elemsX[c + cOff + rowStride * (r + rOff)];
+                                sum += elemsX[c + cOff + rowStride * (r + rOff)];
                             }
                         }
-                        return sumPixels;
-                    }
-                });
+                        return sum;
+                    }, executor));
+                }
             }
             try {
                 for (int j = 0; j < np; j++) {
-                    results[j] = (Float) futures[j].get();
+                    results[j] = futures.get(j).get();
                 }
-            } catch (ExecutionException ex) {
+            } catch (ExecutionException | InterruptedException ex) {
                 log.error("Error applying wiener deconvolution", ex);
-            } catch (InterruptedException e) {
-                log.error("Error applying wiener deconvolution", e);
-            }
-            for (int j = 0; j < np; j++) {
-                sumPixels += results[j];
+                for (int j = 0; j < np; j++) {
+                    sumPixels += results[j];
+                }
             }
         } else {
             for (int r = 0; r < rows; r++) {
@@ -509,7 +519,7 @@ public class LswWPLFloatIterativeDeconvolver2D {
         return sumPixels;
     }
 
-    private static int expandedSize(int psfSize, int bSize, ResizingType resizing) {
+    private int expandedSize(int psfSize, int bSize, ResizingType resizing) {
         int result = 0;
         int minimal = psfSize + bSize;
         switch (resizing) {
@@ -543,23 +553,23 @@ public class LswWPLFloatIterativeDeconvolver2D {
         return result;
     }
 
-    private static float findMagMax(FloatMatrix2D H2) {
+    private float findMagMax(FloatMatrix2D H2) {
         final float[] h2 = (float[]) H2.elements();
         float magMax = 0;
         final int rows = H2.rows();
         final int columns = H2.columns();
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int np = numberOfThreads;
         if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
+            List<CompletableFuture<Float>> futures = new ArrayList<>();
             Float[] results = new Float[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int firstRow = j * k;
-                final int lastRow = (j == np - 1) ? rows : firstRow + k;
-                futures[j] = ConcurrencyUtils.submit(new Callable<Float>() {
-                    public Float call() throws Exception {
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                int k = rows / np;
+                for (int j = 0; j < np; j++) {
+                    final int firstRow = j * k;
+                    final int lastRow = (j == np - 1) ? rows : firstRow + k;
+                    futures.add(CompletableFuture.supplyAsync(() -> {
                         int cC, rC, idx1, idx2;
-                        float magMax = 0;
+                        float max = 0;
                         float mag;
                         for (int r = firstRow; r < lastRow; r++) {
                             rC = (rows - r) % rows;
@@ -568,22 +578,21 @@ public class LswWPLFloatIterativeDeconvolver2D {
                                 idx1 = c + columns * r;
                                 idx2 = cC + columns * rC;
                                 mag = h2[idx1] * h2[idx1] + h2[idx2] * h2[idx2];
-                                if (mag > magMax)
-                                    magMax = mag;
+                                if (mag > max)
+                                    max = mag;
                             }
                         }
-                        return magMax;
-                    }
-                });
+                        return max;
+                    }, executor));
+                }
             }
+
             try {
                 for (int j = 0; j < np; j++) {
-                    results[j] = (Float) futures[j].get();
+                    results[j] = futures.get(j).get();
                 }
-            } catch (ExecutionException ex) {
+            } catch (ExecutionException | InterruptedException ex) {
                 log.error("Error applying wiener deconvolution", ex);
-            } catch (InterruptedException e) {
-                log.error("Error applying wiener deconvolution", e);
             }
             magMax = results[0];
             for (int j = 1; j < np; j++) {
@@ -608,19 +617,20 @@ public class LswWPLFloatIterativeDeconvolver2D {
         return magMax;
     }
 
-    private static void gaussianFilter(FloatMatrix2D X, final float[][] weights) {
+    private void gaussianFilter(FloatMatrix2D X, final float[][] weights) throws ExecutionException, InterruptedException {
         final float[] elems = (float[]) X.elements();
         final int rows = X.rows();
         final int columns = X.columns();
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int np = numberOfThreads;
         if ((np > 1) && (columns * rows >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int firstRow = j * k;
-                final int lastRow = (j == np - 1) ? rows : firstRow + k;
-                futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                    public void run() {
+
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                int k = rows / np;
+                CompletableFuture<?>[] futures = new CompletableFuture[np];
+                for (int j = 0; j < np; j++) {
+                    final int firstRow = j * k;
+                    final int lastRow = (j == np - 1) ? rows : firstRow + k;
+                    futures[j] = CompletableFuture.runAsync(() -> {
                         int idx = firstRow * columns;
                         for (int r = firstRow; r < lastRow; r++) {
                             for (int i = idx, c = 0; c < columns; c++) {
@@ -628,10 +638,10 @@ public class LswWPLFloatIterativeDeconvolver2D {
                             }
                             idx += columns;
                         }
-                    }
-                });
+                    }, executor);
+                }
+                CompletableFuture.allOf(futures).get();
             }
-            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = 0;
             for (int r = 0; r < rows; r++) {
@@ -643,19 +653,19 @@ public class LswWPLFloatIterativeDeconvolver2D {
         }
     }
 
-    private static void gaussianFilterWithScaling(FloatMatrix2D X, final float[][] weights, final float scale) {
+    private void gaussianFilterWithScaling(FloatMatrix2D X, final float[][] weights, final float scale) throws ExecutionException, InterruptedException {
         final float[] elems = (float[]) X.elements();
         final int rows = X.rows();
         final int columns = X.columns();
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int np = numberOfThreads;
         if ((np > 1) && (columns * rows >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int firstRow = j * k;
-                final int lastRow = (j == np - 1) ? rows : firstRow + k;
-                futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                    public void run() {
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                CompletableFuture<?>[] futures = new CompletableFuture[np];
+                int k = rows / np;
+                for (int j = 0; j < np; j++) {
+                    final int firstRow = j * k;
+                    final int lastRow = (j == np - 1) ? rows : firstRow + k;
+                    futures[j] = CompletableFuture.runAsync(() -> {
                         int idx = firstRow * columns;
                         for (int r = firstRow; r < lastRow; r++) {
                             for (int i = idx, c = 0; c < columns; c++) {
@@ -663,10 +673,11 @@ public class LswWPLFloatIterativeDeconvolver2D {
                             }
                             idx += columns;
                         }
-                    }
-                });
+
+                    }, executor);
+                }
+                CompletableFuture.allOf(futures).get();
             }
-            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = 0;
             for (int r = 0; r < rows; r++) {
@@ -678,25 +689,24 @@ public class LswWPLFloatIterativeDeconvolver2D {
         }
     }
 
-    private static float[][] gaussianWeights(final int rows, final int columns, final float filterX, final float filterY) {
+    private float[][] gaussianWeights(final int rows, final int columns, final float filterX, final float filterY) {
         final float[][] weights = new float[2][];
         weights[0] = new float[columns];
         weights[1] = new float[rows];
         final float cc = (float) (columns / (filterX + 0.000001));
         final float rc = (float) (rows / (filterY + 0.000001));
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int np = numberOfThreads;
         if ((np > 1) && (Math.max(columns, rows) >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int kcol = columns / np;
-            int krow = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int firstCol = j * kcol;
-                final int lastCol = (j == np - 1) ? columns : firstCol + kcol;
-                final int firstRow = j * krow;
-                final int lastRow = (j == np - 1) ? rows : firstRow + krow;
-                futures[j] = ConcurrencyUtils.submit(new Runnable() {
-
-                    public void run() {
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                CompletableFuture<?>[] futures = new CompletableFuture[np];
+                int kcol = columns / np;
+                int krow = rows / np;
+                for (int j = 0; j < np; j++) {
+                    final int firstCol = j * kcol;
+                    final int lastCol = (j == np - 1) ? columns : firstCol + kcol;
+                    final int firstRow = j * krow;
+                    final int lastRow = (j == np - 1) ? rows : firstRow + krow;
+                    futures[j] = CompletableFuture.runAsync(() -> {
                         for (int c = firstCol; c < lastCol; c++) {
                             int cShifted = c;
                             if (cShifted > columns / 2)
@@ -711,10 +721,10 @@ public class LswWPLFloatIterativeDeconvolver2D {
                             float tmp = (rShifted / rc);
                             weights[1][r] = (float) Math.exp(-tmp * tmp);
                         }
-                    }
-                });
+                    }, executor);
+                }
+                ConcurrencyUtils.waitForCompletion(futures);
             }
-            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int c = 0; c < columns; c++) {
                 int cShifted = c;
@@ -734,23 +744,24 @@ public class LswWPLFloatIterativeDeconvolver2D {
         return weights;
     }
 
-    private static float meanDelta(FloatMatrix2D B, FloatMatrix2D AX, FloatMatrix2D X, final float aSum) {
+    private float meanDelta(FloatMatrix2D B, FloatMatrix2D AX, FloatMatrix2D X, final float aSum) {
         float meanDelta = 0;
         final float[] elemsB = (float[]) B.elements();
         final float[] elemsAX = (float[]) AX.elements();
         final float[] elemsX = (float[]) X.elements();
         final int size = (int) B.size();
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int np = numberOfThreads;
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
+
+            List<CompletableFuture<Float>> futures = new ArrayList<>();
             Float[] results = new Float[np];
             int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int firstIdx = j * k;
-                final int lastIdx = (j == np - 1) ? size : firstIdx + k;
-                futures[j] = ConcurrencyUtils.submit(new Callable<Float>() {
-                    public Float call() throws Exception {
-                        float meanDelta = 0;
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                for (int j = 0; j < np; j++) {
+                    final int firstIdx = j * k;
+                    final int lastIdx = (j == np - 1) ? size : firstIdx + k;
+                    futures.add(CompletableFuture.supplyAsync(() -> {
+                        float mean = 0;
                         float delta;
                         for (int i = firstIdx; i < lastIdx; i++) {
                             delta = (elemsB[i] - elemsAX[i] / aSum);
@@ -758,21 +769,19 @@ public class LswWPLFloatIterativeDeconvolver2D {
                             if (elemsX[i] < 0) {
                                 elemsX[i] = 0;
                             } else {
-                                meanDelta += Math.abs(delta);
+                                mean += Math.abs(delta);
                             }
                         }
-                        return meanDelta;
-                    }
-                });
+                        return mean;
+                    }, executor));
+                }
             }
             try {
                 for (int j = 0; j < np; j++) {
-                    results[j] = (Float) futures[j].get();
+                    results[j] = futures.get(j).get();
                 }
-            } catch (ExecutionException ex) {
+            } catch (ExecutionException | InterruptedException ex) {
                 log.error("Error applying wiener deconvolution", ex);
-            } catch (InterruptedException e) {
-                log.error("Error applying wiener deconvolution", e);
             }
             for (int j = 0; j < np; j++) {
                 meanDelta += results[j];
@@ -792,30 +801,30 @@ public class LswWPLFloatIterativeDeconvolver2D {
         return meanDelta;
     }
 
-    private static void toDB(FloatMatrix2D X, final float minDB) {
+    private void toDB(FloatMatrix2D X, final float minDB) throws ExecutionException, InterruptedException {
         final float[] x = (float[]) X.elements();
         final float SCALE = (float) (10 / Math.log(10));
         final float minVal = (float) Math.exp(minDB / SCALE);
         int size = (int) X.size();
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int np = numberOfThreads;
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int firstIdx = j * k;
-                final int lastIdx = (j == np - 1) ? size : firstIdx + k;
-                futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                    public void run() {
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                CompletableFuture<?>[] futures = new CompletableFuture[np];
+                int k = size / np;
+                for (int j = 0; j < np; j++) {
+                    final int firstIdx = j * k;
+                    final int lastIdx = (j == np - 1) ? size : firstIdx + k;
+                    futures[j] = CompletableFuture.runAsync(() -> {
                         for (int i = firstIdx; i < lastIdx; i++) {
                             if (x[i] > minVal)
                                 x[i] = (float) (SCALE * Math.log(x[i]));
                             else
                                 x[i] = minDB;
                         }
-                    }
-                });
+                    }, executor);
+                }
+                CompletableFuture.allOf(futures).get();
             }
-            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int i = 0; i < size; i++) {
                 if (x[i] > minVal)
@@ -826,39 +835,37 @@ public class LswWPLFloatIterativeDeconvolver2D {
         }
     }
 
-    private static float unDB(FloatMatrix2D X) {
+    private float unDB(FloatMatrix2D X) {
         final float[] x = (float[]) X.elements();
         final float SCALE = (float) (10 / Math.log(10));
         final int size = (int) X.size();
         float min = Float.MAX_VALUE;
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int np = numberOfThreads;
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
+            List<CompletableFuture<Float>> futures = new ArrayList<>();
             Float[] results = new Float[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int firstIdx = j * k;
-                final int lastIdx = (j == np - 1) ? size : firstIdx + k;
-                futures[j] = ConcurrencyUtils.submit(new Callable<Float>() {
-                    public Float call() throws Exception {
-                        float min = Float.MAX_VALUE;
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                int k = size / np;
+                for (int j = 0; j < np; j++) {
+                    final int firstIdx = j * k;
+                    final int lastIdx = (j == np - 1) ? size : firstIdx + k;
+                    futures.add(CompletableFuture.supplyAsync(() -> {
+                        float minimum = Float.MAX_VALUE;
                         for (int i = firstIdx; i < lastIdx; i++) {
-                            if (x[i] < min)
-                                min = x[i];
+                            if (x[i] < minimum)
+                                minimum = x[i];
                             x[i] = (float) Math.exp(x[i] / SCALE);
                         }
-                        return min;
-                    }
-                });
+                        return minimum;
+                    }, executor));
+                }
             }
             try {
                 for (int j = 0; j < np; j++) {
-                    results[j] = (Float) futures[j].get();
+                    results[j] = futures.get(j).get();
                 }
-            } catch (ExecutionException ex) {
+            } catch (ExecutionException | InterruptedException ex) {
                 log.error("Error applying wiener deconvolution", ex);
-            } catch (InterruptedException e) {
-                log.error("Error applying wiener deconvolution", e);
             }
             min = results[0];
             for (int j = 1; j < np; j++) {

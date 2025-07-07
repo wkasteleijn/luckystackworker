@@ -8,14 +8,17 @@ import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import static nl.wilcokas.luckystackworker.constants.Constants.*;
 
 @Slf4j
 public class PsfDiskGenerator {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         // Input parameters
         double airyDiskRadius = 16; // Radius of Airy disk in pixels
         double seeingIndex = 0.0; // Atmospheric seeing index (0.0 = no distortion, 1.0 = maximum distortion)
@@ -23,7 +26,7 @@ public class PsfDiskGenerator {
         generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity, "jup", false);
     }
 
-    public static ImagePlus generate16BitRGB(double airyDiskRadius, double seeingIndex, double diffractionIntensity, String profileName, boolean isMono) throws IOException {
+    public static ImagePlus generate16BitRGB(double airyDiskRadius, double seeingIndex, double diffractionIntensity, String profileName, boolean isMono) throws Exception {
 
         short[] redPixels = new short[(int) Math.pow(PSF_SIZE, 2)];
         short[] greenPixels = new short[(int) Math.pow(PSF_SIZE, 2)];
@@ -31,11 +34,13 @@ public class PsfDiskGenerator {
 
         double seeingIndexConverted = (4.0 - (seeingIndex - 1.0)) / 8.0;
 
-        Executor executor = LswUtil.getParallelExecutor();
-        executor.execute(() -> generate16BitForChannel(redPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, isMono ? WAVELENGTH_NM_GREEN : WAVELENGTH_NM_RED));
-        executor.execute(() -> generate16BitForChannel(greenPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, WAVELENGTH_NM_GREEN));
-        executor.execute(() -> generate16BitForChannel(bluePixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, isMono ? WAVELENGTH_NM_GREEN : WAVELENGTH_NM_BLUE));
-        LswUtil.stopAndAwaitParallelExecutor(executor);
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            CompletableFuture<?>[] futures = new CompletableFuture[3];
+            futures[0] = CompletableFuture.runAsync(() -> generate16BitForChannel(redPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, isMono ? WAVELENGTH_NM_GREEN : WAVELENGTH_NM_RED), executor);
+            futures[1] = CompletableFuture.runAsync(() -> generate16BitForChannel(greenPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, WAVELENGTH_NM_GREEN), executor);
+            futures[2] = CompletableFuture.runAsync(() -> generate16BitForChannel(bluePixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, isMono ? WAVELENGTH_NM_GREEN : WAVELENGTH_NM_BLUE), executor);
+            CompletableFuture.allOf(futures).get();
+        }
 
         LswImageLayersDto layers = LswImageLayersDto.builder().layers(new short[][]{redPixels, greenPixels, bluePixels}).build();
         ImagePlus image = LswImageProcessingUtil.create16BitRGBImage(null, layers, PSF_SIZE, PSF_SIZE, true, true, true);

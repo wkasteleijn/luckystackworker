@@ -7,19 +7,23 @@ import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 @Component
 public class RotationFilter implements LSWFilter {
     @Override
-    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws Exception {
         if (isApplied(profile, image)) {
             ImageStack stack = image.getStack();
-            Executor executor = LswUtil.getParallelExecutor();
-            executor.execute(() -> stack.getProcessor(1).rotate(profile.getRotationAngle()));
-            executor.execute(() -> stack.getProcessor(2).rotate(profile.getRotationAngle()));
-            executor.execute(() -> stack.getProcessor(3).rotate(profile.getRotationAngle()));
-            LswUtil.stopAndAwaitParallelExecutor(executor);
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                CompletableFuture<?>[] futures = new CompletableFuture[3];
+                futures[0] = CompletableFuture.runAsync(() -> stack.getProcessor(1).rotate(profile.getRotationAngle()), executor);
+                futures[1] = CompletableFuture.runAsync(() -> stack.getProcessor(2).rotate(profile.getRotationAngle()), executor);
+                futures[2] = CompletableFuture.runAsync(() -> stack.getProcessor(3).rotate(profile.getRotationAngle()), executor);
+                CompletableFuture.allOf(futures).get();
+            }
             return true;
         }
         return false;

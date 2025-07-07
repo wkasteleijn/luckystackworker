@@ -20,7 +20,7 @@ import nl.wilcokas.luckystackworker.util.LswUtil;
 
 @Slf4j
 public class Probeersels {
-    public static void main(String[] args) throws InterruptedException, IOException {
+    public static void main(String[] args) throws Exception {
 
 //        new ImageJ();
 //        IJ.open("D:\\Jup\\311024\\cropped2\\jup_lsw\\wiener.png");

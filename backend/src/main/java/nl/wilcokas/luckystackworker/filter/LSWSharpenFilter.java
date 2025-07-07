@@ -3,7 +3,9 @@ package nl.wilcokas.luckystackworker.filter;
 import java.awt.Rectangle;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.model.Profile;
@@ -29,7 +31,7 @@ public class LSWSharpenFilter implements LSWFilter {
     private static final float FLOAT_MAX_SATURATED_VALUE = 65535f;
 
     @Override
-    public boolean apply(final ImagePlus image, Profile profile, boolean isMono) {
+    public boolean apply(final ImagePlus image, Profile profile, boolean isMono) throws Exception {
         int iterations = profile.getIterations() == 0 ? 1 : profile.getIterations();
         if (isApplied(profile, image)) {
             log.info("Applying sharpen with radius {}, amount {}, iterations {} to image {}", profile.getRadius(),
@@ -135,96 +137,101 @@ public class LSWSharpenFilter implements LSWFilter {
         return parameters.isIncludeRed() || parameters.isIncludeGreen() || parameters.isIncludeBlue();
     }
 
-    public void applyRGBMode(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) {
+    public void applyRGBMode(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) throws Exception {
         ImageStack stack = image.getStack();
 
         // Run every stack in a seperate thread to increase performance.
-        Executor executor = LswUtil.getParallelExecutor();
-        executor.execute(() -> applyRGBModeToChannel(stack,
-                unsharpMaskParameters.getRadiusRed(),
-                unsharpMaskParameters.getAmountRed(),
-                unsharpMaskParameters.getIterationsRed(),
-                unsharpMaskParameters.getBlendRawRed(),
-                unsharpMaskParameters.getDeringRadiusRed(),
-                unsharpMaskParameters.getDeringStrengthRed(),
-                1));
-        executor.execute(() -> applyRGBModeToChannel(stack,
-                unsharpMaskParameters.getRadiusGreen(),
-                unsharpMaskParameters.getAmountGreen(),
-                unsharpMaskParameters.getIterationsGreen(),
-                unsharpMaskParameters.getBlendRawGreen(),
-                unsharpMaskParameters.getDeringRadiusGreen(),
-                unsharpMaskParameters.getDeringStrengthGreen(),
-                2));
-        executor.execute(() -> applyRGBModeToChannel(stack,
-                unsharpMaskParameters.getRadiusBlue(),
-                unsharpMaskParameters.getAmountBlue(),
-                unsharpMaskParameters.getIterationsBlue(),
-                unsharpMaskParameters.getBlendRawBlue(),
-                unsharpMaskParameters.getDeringRadiusBlue(),
-                unsharpMaskParameters.getDeringStrengthBlue(),
-                3));
-        LswUtil.stopAndAwaitParallelExecutor(executor);
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            CompletableFuture<?>[] futures = new CompletableFuture[3];
+            futures[0] = CompletableFuture.runAsync(() -> applyRGBModeToChannel(stack,
+                    unsharpMaskParameters.getRadiusRed(),
+                    unsharpMaskParameters.getAmountRed(),
+                    unsharpMaskParameters.getIterationsRed(),
+                    unsharpMaskParameters.getBlendRawRed(),
+                    unsharpMaskParameters.getDeringRadiusRed(),
+                    unsharpMaskParameters.getDeringStrengthRed(),
+                    1), executor);
+            futures[1] = CompletableFuture.runAsync(() -> applyRGBModeToChannel(stack,
+                    unsharpMaskParameters.getRadiusGreen(),
+                    unsharpMaskParameters.getAmountGreen(),
+                    unsharpMaskParameters.getIterationsGreen(),
+                    unsharpMaskParameters.getBlendRawGreen(),
+                    unsharpMaskParameters.getDeringRadiusGreen(),
+                    unsharpMaskParameters.getDeringStrengthGreen(),
+                    2), executor);
+            futures[2] = CompletableFuture.runAsync(() -> applyRGBModeToChannel(stack,
+                    unsharpMaskParameters.getRadiusBlue(),
+                    unsharpMaskParameters.getAmountBlue(),
+                    unsharpMaskParameters.getIterationsBlue(),
+                    unsharpMaskParameters.getBlendRawBlue(),
+                    unsharpMaskParameters.getDeringRadiusBlue(),
+                    unsharpMaskParameters.getDeringStrengthBlue(),
+                    3), executor);
+            CompletableFuture.allOf(futures).get();
+        }
     }
 
-    public void applyRGBModeClippingPrevention(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) {
+    public void applyRGBModeClippingPrevention(ImagePlus image, final UnsharpMaskParameters unsharpMaskParameters) throws Exception {
         ImageStack finalStack = image.getStack();
         ImageStack intialStack = finalStack.duplicate();
 
         // Pass 1, first apply the filter normally to the intialStack.
         // Run every stack in a seperate thread to increase performance.
-        Executor executor = LswUtil.getParallelExecutor();
-        executor.execute(() -> applyRGBModeClippingPreventionToChannelPass1(intialStack,
-                unsharpMaskParameters.getRadiusRed(),
-                unsharpMaskParameters.getAmountRed(),
-                unsharpMaskParameters.getIterationsRed(),
-                unsharpMaskParameters.getBlendRawRed(),
-                1));
-        executor.execute(() -> applyRGBModeClippingPreventionToChannelPass1(intialStack,
-                unsharpMaskParameters.getRadiusGreen(),
-                unsharpMaskParameters.getAmountGreen(),
-                unsharpMaskParameters.getIterationsGreen(),
-                unsharpMaskParameters.getBlendRawGreen(),
-                2));
-        executor.execute(() -> applyRGBModeClippingPreventionToChannelPass1(intialStack,
-                unsharpMaskParameters.getRadiusBlue(),
-                unsharpMaskParameters.getAmountBlue(),
-                unsharpMaskParameters.getIterationsBlue(),
-                unsharpMaskParameters.getBlendRawBlue(),
-                3));
-        LswUtil.stopAndAwaitParallelExecutor(executor);
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            CompletableFuture<?>[] futures = new CompletableFuture[3];
+            futures[0] = CompletableFuture.runAsync(() -> applyRGBModeClippingPreventionToChannelPass1(intialStack,
+                    unsharpMaskParameters.getRadiusRed(),
+                    unsharpMaskParameters.getAmountRed(),
+                    unsharpMaskParameters.getIterationsRed(),
+                    unsharpMaskParameters.getBlendRawRed(),
+                    1), executor);
+            futures[1] = CompletableFuture.runAsync(() -> applyRGBModeClippingPreventionToChannelPass1(intialStack,
+                    unsharpMaskParameters.getRadiusGreen(),
+                    unsharpMaskParameters.getAmountGreen(),
+                    unsharpMaskParameters.getIterationsGreen(),
+                    unsharpMaskParameters.getBlendRawGreen(),
+                    2), executor);
+            futures[2] = CompletableFuture.runAsync(() -> applyRGBModeClippingPreventionToChannelPass1(intialStack,
+                    unsharpMaskParameters.getRadiusBlue(),
+                    unsharpMaskParameters.getAmountBlue(),
+                    unsharpMaskParameters.getIterationsBlue(),
+                    unsharpMaskParameters.getBlendRawBlue(),
+                    3), executor);
+            CompletableFuture.allOf(futures).get();
+        }
 
         // Pass 2, apply the adaptive filter based on the result of pass 1.
         // Run every stack in a seperate thread to increase performance.
-        executor = LswUtil.getParallelExecutor();
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            CompletableFuture<?>[] futures = new CompletableFuture[3];
+            futures[0] = CompletableFuture.runAsync(() -> doUnsharpMarkClippingPrevention(unsharpMaskParameters.getIterationsRed(),
+                    unsharpMaskParameters.getRadiusRed(),
+                    unsharpMaskParameters.getAmountRed(),
+                    unsharpMaskParameters.getClippingStrengthRed(),
+                    unsharpMaskParameters.getClippingRangeRed(),
+                    unsharpMaskParameters.getBlendRawRed(),
+                    intialStack,
+                    finalStack, 1), executor);
 
-        executor.execute(() -> doUnsharpMarkClippingPrevention(unsharpMaskParameters.getIterationsRed(),
-                unsharpMaskParameters.getRadiusRed(),
-                unsharpMaskParameters.getAmountRed(),
-                unsharpMaskParameters.getClippingStrengthRed(),
-                unsharpMaskParameters.getClippingRangeRed(),
-                unsharpMaskParameters.getBlendRawRed(),
-                intialStack,
-                finalStack, 1));
+            futures[1] = CompletableFuture.runAsync(() -> doUnsharpMarkClippingPrevention(unsharpMaskParameters.getIterationsGreen(),
+                    unsharpMaskParameters.getRadiusGreen(),
+                    unsharpMaskParameters.getAmountGreen(),
+                    unsharpMaskParameters.getClippingStrengthGreen(),
+                    unsharpMaskParameters.getClippingRangeGreen(),
+                    unsharpMaskParameters.getBlendRawGreen(),
+                    intialStack,
+                    finalStack, 2), executor);
 
-        executor.execute(() -> doUnsharpMarkClippingPrevention(unsharpMaskParameters.getIterationsGreen(),
-                unsharpMaskParameters.getRadiusGreen(),
-                unsharpMaskParameters.getAmountGreen(),
-                unsharpMaskParameters.getClippingStrengthGreen(),
-                unsharpMaskParameters.getClippingRangeGreen(),
-                unsharpMaskParameters.getBlendRawGreen(),
-                intialStack,
-                finalStack, 2));
-
-        executor.execute(() -> doUnsharpMarkClippingPrevention(unsharpMaskParameters.getIterationsBlue(),
-                unsharpMaskParameters.getRadiusBlue(),
-                unsharpMaskParameters.getAmountBlue(),
-                unsharpMaskParameters.getClippingStrengthBlue(),
-                unsharpMaskParameters.getClippingRangeBlue(),
-                unsharpMaskParameters.getBlendRawBlue(),
-                intialStack,
-                finalStack, 3));
-        LswUtil.stopAndAwaitParallelExecutor(executor);
+            futures[2] = CompletableFuture.runAsync(() -> doUnsharpMarkClippingPrevention(unsharpMaskParameters.getIterationsBlue(),
+                    unsharpMaskParameters.getRadiusBlue(),
+                    unsharpMaskParameters.getAmountBlue(),
+                    unsharpMaskParameters.getClippingStrengthBlue(),
+                    unsharpMaskParameters.getClippingRangeBlue(),
+                    unsharpMaskParameters.getBlendRawBlue(),
+                    intialStack,
+                    finalStack, 3), executor);
+            CompletableFuture.allOf(futures).get();
+        }
     }
 
     public void applyLuminanceMode(ImagePlus image, final LSWSharpenParameters parameters) {

@@ -120,7 +120,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private final LuckyStackWorkerContext luckyStackWorkerContext;
     private final ObjectMapper snakeCaseObjectMapper;
 
-    public ResponseDTO scale(Profile profile) throws IOException, InterruptedException {
+    public ResponseDTO scale(Profile profile) throws Exception {
         this.isLargeImage = openReferenceImage(this.imageMetadata.getFilePath(), profile, LswFileUtil.getObjectDateTime(this.imageMetadata.getFilePath()));
         SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
         settingsDTO.setLargeImage(this.isLargeImage);
@@ -128,7 +128,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
     }
 
-    public ResponseDTO selectReferenceImage(String filePath, double scale, String openImageMode) throws IOException, InterruptedException {
+    public ResponseDTO selectReferenceImage(String filePath, double scale, String openImageMode) throws Exception {
         JFrame frame = getParentFrame();
         JFileChooser jfc = getJFileChooser(filePath);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
@@ -171,7 +171,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return null;
     }
 
-    public byte[] updateProcessing(Profile profile, List<String> operationValues) throws IOException, InterruptedException {
+    public byte[] updateProcessing(Profile profile, List<String> operationValues) throws Exception {
         boolean includeRed = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.R;
         boolean includeGreen = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G;
         boolean includeBlue = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B;
@@ -190,7 +190,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return psf;
     }
 
-    public void saveReferenceImage(String path, boolean asJpg, Profile profile) throws IOException {
+    public void saveReferenceImage(String path, boolean asJpg, Profile profile) throws Exception {
         String pathNoExt = LswFileUtil.getPathWithoutExtension(path);
         String savePath = pathNoExt + "." + (asJpg ? "jpg" : Constants.DEFAULT_OUTPUT_FORMAT);
         log.info("Saving image to  {}", savePath);
@@ -473,7 +473,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         displayedImage.getImageWindow().nightMode(on);
     }
 
-    public void showChannel(ChannelEnum channel) {
+    public void showChannel(ChannelEnum channel) throws Exception {
         boolean includeRed = channel == ChannelEnum.RGB || channel == ChannelEnum.R;
         boolean includeGreen = channel == ChannelEnum.RGB || channel == ChannelEnum.G;
         boolean includeBlue = channel == ChannelEnum.RGB || channel == ChannelEnum.B;
@@ -485,7 +485,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         displayedImage.updateAndDraw();
     }
 
-    public void blinkClippedAreas() {
+    public void blinkClippedAreas() throws Exception {
         if (blinkClippedAreasTimer == null) {
             log.info("Enabling blinking on clipped areas");
             blinkClippedAreasTimer = new Timer();
@@ -493,7 +493,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 @Override
                 public void run() {
                     if (isClippedAreasHighlighted) {
-                        LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage), displayedImage, true, true, true);
+                        try {
+                            LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage), displayedImage, true, true, true);
+                        } catch (Exception e) {
+                            log.error("Error while restoring highlighted clipped areas", e);
+                        }
                         isClippedAreasHighlighted = false;
                     } else {
                         int[] rgbPixels = (int[]) displayedImage.getProcessor().getPixels();
@@ -590,7 +594,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return Optional.empty();
     }
 
-    private boolean openReferenceImage(String filePath, Profile profile, LocalDateTime dateTime) throws IOException, InterruptedException {
+    private boolean openReferenceImage(String filePath, Profile profile, LocalDateTime dateTime) throws Exception {
         if (displayedImage != null) {
             // Can only have 1 image open at a time.
             displayedImage.hide();

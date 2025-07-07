@@ -9,7 +9,10 @@ import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * This denoising method is based on total-variation, originally proposed by
@@ -34,7 +37,7 @@ import java.util.concurrent.Executor;
 @Component
 public class ROFDenoiseFilter {
 
-    public boolean apply(ImagePlus image, Profile profile) {
+    public boolean apply(ImagePlus image, Profile profile) throws Exception {
         log.info("Applying ROF denoising to image {} with theta {}, thetaGreen {}, thetaBlue {}, iterations {}, iterationsGreen {}, iterationsBlue {}",
                 image.getID(), profile.getRofTheta(), profile.getRofThetaGreen(), profile.getRofThetaBlue(), profile.getRofIterations(), profile.getRofIterationsGreen(), profile.getRofIterationsBlue());
         ImageStack stack = image.getStack();
@@ -42,11 +45,16 @@ public class ROFDenoiseFilter {
         final float dt = 0.25f;
 
         // Run every stack in a seperate thread to increase performance.
-        Executor executor = LswUtil.getParallelExecutor();
-        executor.execute(() -> applyToChannel(stack, profile.getRofTheta() * 10, g, dt, profile.getRofIterations(), 1));
-        executor.execute(() -> applyToChannel(stack, profile.getRofThetaGreen() * 10, g, dt, profile.getRofIterationsGreen(), 2));
-        executor.execute(() -> applyToChannel(stack, profile.getRofThetaBlue() * 10, g, dt, profile.getRofIterationsBlue(), 3));
-        LswUtil.stopAndAwaitParallelExecutor(executor);
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            CompletableFuture<?>[] futures = new CompletableFuture[3];
+            futures[0] = CompletableFuture.runAsync(() ->
+                    applyToChannel(stack, profile.getRofTheta() * 10, g, dt, profile.getRofIterations(), 1), executor);
+            futures[1] = CompletableFuture.runAsync(() ->
+                    applyToChannel(stack, profile.getRofThetaGreen() * 10, g, dt, profile.getRofIterationsGreen(), 2), executor);
+            futures[2] = CompletableFuture.runAsync(() ->
+                    applyToChannel(stack, profile.getRofThetaBlue() * 10, g, dt, profile.getRofIterationsBlue(), 3), executor);
+            CompletableFuture.allOf(futures).get();
+        }
         return true;
     }
 

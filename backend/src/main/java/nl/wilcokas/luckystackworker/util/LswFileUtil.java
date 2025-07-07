@@ -134,7 +134,7 @@ public class LswFileUtil {
         Files.delete(Paths.get(path));
     }
 
-    public static void saveImage(ImagePlus image, String profileName, String path, boolean fixRgbStack, boolean crop, boolean asJpg, boolean fromWorker) throws IOException {
+    public static void saveImage(ImagePlus image, String profileName, String path, boolean fixRgbStack, boolean crop, boolean asJpg, boolean fromWorker) throws Exception {
         if (crop) {
             image = image.crop();
         }
@@ -469,11 +469,11 @@ public class LswFileUtil {
         return dataFolder;
     }
 
-    public static Pair<ImagePlus, Boolean> openImage(String filepath, OpenImageModeEnum openImageMode, double scale, UnaryOperator<ImagePlus> scaler) {
+    public static Pair<ImagePlus, Boolean> openImage(String filepath, OpenImageModeEnum openImageMode, double scale, UnaryOperator<ImagePlus> scaler) throws Exception {
         return openImage(filepath, openImageMode, null, null, scale, scaler);
     }
 
-    public static Pair<ImagePlus, Boolean> openImage(String filepath, OpenImageModeEnum openImageMode, ImagePlus currentImage, LswImageLayersDto currentUnprocessedImageLayers, double scale, UnaryOperator<ImagePlus> scaler) {
+    public static Pair<ImagePlus, Boolean> openImage(String filepath, OpenImageModeEnum openImageMode, ImagePlus currentImage, LswImageLayersDto currentUnprocessedImageLayers, double scale, UnaryOperator<ImagePlus> scaler) throws Exception {
         ImagePlus newImage = new Opener().openImage(LswFileUtil.getIJFileFormat(filepath));
         if (scale > 1.0) {
             newImage = scaler.apply(newImage);
@@ -536,7 +536,7 @@ public class LswFileUtil {
         }
     }
 
-    public static void savePSF(ImagePlus image, String profileName) throws IOException {
+    public static void savePSF(ImagePlus image, String profileName) throws Exception {
         String dataFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile());
         saveImage(image, null, dataFolder + "/psf_%s.tif".formatted(profileName), false, false, false, false);
         saveImage(image, null, dataFolder + "/psf_%s.jpg".formatted(profileName), false, false, true, false);

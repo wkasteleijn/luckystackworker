@@ -22,17 +22,24 @@ import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import nl.wilcokas.luckystackworker.util.PsfDiskGenerator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 @Component
 @Slf4j
 public class WienerDeconvolutionFilter implements LSWFilter {
 
+    @Value("${deconvolve.number.of.virtualThreads}")
+    private int numberOfVirtualThreads;
+
     @Override
-    public boolean apply(final ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(final ImagePlus image, Profile profile, boolean isMono) throws Exception {
         if (isApplied(profile, image)) {
             log.info("Applying Wiener deconvolution filter");
             float deringStrength = profile.getDeringStrength() / 100f;
@@ -108,15 +115,20 @@ public class WienerDeconvolutionFilter implements LSWFilter {
         return parameters.isIncludeRed() || parameters.isIncludeGreen() || parameters.isIncludeBlue();
     }
 
-    private void apply(ImagePlus image, ImagePlus psf, WienerDeconvolutionParameters parameters) {
+    private void apply(ImagePlus image, ImagePlus psf, WienerDeconvolutionParameters parameters) throws ExecutionException, InterruptedException {
         ImagePlus[] psfPerChannel = getPsfPerChannel(psf);
         ImageStack stack = image.getStack();
         if (parameters.getMode() == LSWSharpenMode.RGB) {
-            Executor executor = LswUtil.getParallelExecutor();
-            executor.execute(() -> applyToChannel(stack.getProcessor(1), psfPerChannel[0], parameters.getIterationsRed(), parameters.getDeringStrengthRed(), parameters.getDeringRadiusRed(), parameters.getBlendRawRed()));
-            executor.execute(() -> applyToChannel(stack.getProcessor(2), psfPerChannel[1], parameters.getIterationsGreen(), parameters.getDeringStrengthGreen(), parameters.getDeringRadiusGreen(), parameters.getBlendRawGreen()));
-            executor.execute(() -> applyToChannel(stack.getProcessor(3), psfPerChannel[2], parameters.getIterationsBlue(), parameters.getDeringStrengthBlue(), parameters.getDeringRadiusBlue(), parameters.getBlendRawBlue()));
-            LswUtil.stopAndAwaitParallelExecutor(executor);
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                CompletableFuture<?>[] futures = new CompletableFuture[3];
+                futures[0] = CompletableFuture.runAsync(() ->
+                        applyToChannel(stack.getProcessor(1), psfPerChannel[0], parameters.getIterationsRed(), parameters.getDeringStrengthRed(), parameters.getDeringRadiusRed(), parameters.getBlendRawRed()), executor);
+                futures[1] = CompletableFuture.runAsync(() ->
+                        applyToChannel(stack.getProcessor(2), psfPerChannel[1], parameters.getIterationsGreen(), parameters.getDeringStrengthGreen(), parameters.getDeringRadiusGreen(), parameters.getBlendRawGreen()), executor);
+                futures[2] = CompletableFuture.runAsync(() ->
+                        applyToChannel(stack.getProcessor(3), psfPerChannel[2], parameters.getIterationsBlue(), parameters.getDeringStrengthBlue(), parameters.getDeringRadiusBlue(), parameters.getBlendRawBlue()), executor);
+                CompletableFuture.allOf(futures).get();
+            }
         } else {
             applyLuminance(image, psf, parameters);
         }
@@ -219,9 +231,14 @@ public class WienerDeconvolutionFilter implements LSWFilter {
     private short[] getDeconvolvedPixels(ImageProcessor ipInput, ImagePlus psf, int iterations) {
         WPLOptions options =
                 new WPLOptions(0, 1.0, 1.0, false, false, true, 0.01, false, false, false, 0);
-        LswWPLFloatIterativeDeconvolver2D deconv = new LswWPLFloatIterativeDeconvolver2D(new ImagePlus(null, ipInput), psf, IterativeEnums.BoundaryType.ZERO, IterativeEnums.ResizingType.AUTO, iterations, options);
-        ShortProcessor ipOutput = (ShortProcessor) deconv.deconvolve().getProcessor();
-        return (short[]) ipOutput.getPixels();
+        LswWPLFloatIterativeDeconvolver2D deconv = new LswWPLFloatIterativeDeconvolver2D(new ImagePlus(null, ipInput), psf, IterativeEnums.BoundaryType.ZERO, IterativeEnums.ResizingType.AUTO, iterations, options, numberOfVirtualThreads);
+        try {
+            ShortProcessor ipOutput = (ShortProcessor) deconv.deconvolve().getProcessor();
+            return (short[]) ipOutput.getPixels();
+        } catch (Exception e) {
+            log.error("Error during deconvolution: ", e);
+            return (short[]) ipInput.getPixels();
+        }
     }
 
     private double getAveragePixelValue(short[] pixels) {

@@ -60,20 +60,6 @@ public class LswUtil {
         }
     }
 
-    public static Executor getParallelExecutor() {
-        int numThreads = Runtime.getRuntime().availableProcessors();
-        return Executors.newFixedThreadPool(numThreads);
-    }
-
-    public static void stopAndAwaitParallelExecutor(Executor executor) {
-        ((ExecutorService) executor).shutdown();
-        try {
-            ((ExecutorService) executor).awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            log.warn("LSWSharpenFilter thread execution was stopped: ", e);
-        }
-    }
-
     public static void setPrivateField(Object object, Class<?> objectClass, String fieldName, Object value) {
         Field field = ReflectionUtils.findField(objectClass, fieldName);
         ReflectionUtils.makeAccessible(field);
