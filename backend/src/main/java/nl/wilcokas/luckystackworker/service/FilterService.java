@@ -57,6 +57,7 @@ public class FilterService {
     private Timer timer = new Timer();
 
     private final List<Pair<FilterEnum, LSWFilter>> filters = new ArrayList<>();
+
     private Map<FilterEnum, LswImageLayers> cache = new HashMap<>();
 
     @PostConstruct
