@@ -572,6 +572,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     private Optional<LswVersionNumber> requestLatestVersion() {
+
+        // TODO: replace httpService with spring WebClient
         String result = httpService.sendHttpGetRequest(HttpClient.Version.HTTP_1_1, githubApiUrl, Constants.VERSION_REQUEST_TIMEOUT);
         if (result == null) {
             log.warn("HTTP1.1 request for latest version failed, trying HTTP/2..");
