@@ -5,6 +5,7 @@ import ij.ImageStack;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.exceptions.FilterException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.stereotype.Component;
@@ -37,24 +38,29 @@ import java.util.concurrent.Executors;
 @Component
 public class ROFDenoiseFilter {
 
-    public boolean apply(ImagePlus image, Profile profile) throws Exception {
+    public boolean apply(ImagePlus image, Profile profile) {
         log.info("Applying ROF denoising to image {} with theta {}, thetaGreen {}, thetaBlue {}, iterations {}, iterationsGreen {}, iterationsBlue {}",
                 image.getID(), profile.getRofTheta(), profile.getRofThetaGreen(), profile.getRofThetaBlue(), profile.getRofIterations(), profile.getRofIterationsGreen(), profile.getRofIterationsBlue());
         ImageStack stack = image.getStack();
         final float g = 1;
         final float dt = 0.25f;
 
-        // Run every stack in a seperate thread to increase performance.
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            CompletableFuture<?>[] futures = new CompletableFuture[3];
-            futures[0] = CompletableFuture.runAsync(() ->
-                    applyToChannel(stack, profile.getRofTheta() * 10, g, dt, profile.getRofIterations(), 1), executor);
-            futures[1] = CompletableFuture.runAsync(() ->
-                    applyToChannel(stack, profile.getRofThetaGreen() * 10, g, dt, profile.getRofIterationsGreen(), 2), executor);
-            futures[2] = CompletableFuture.runAsync(() ->
-                    applyToChannel(stack, profile.getRofThetaBlue() * 10, g, dt, profile.getRofIterationsBlue(), 3), executor);
-            CompletableFuture.allOf(futures).get();
+        try {
+            // Run every stack in a seperate thread to increase performance.
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                CompletableFuture<?>[] futures = new CompletableFuture[3];
+                futures[0] = CompletableFuture.runAsync(() ->
+                        applyToChannel(stack, profile.getRofTheta() * 10, g, dt, profile.getRofIterations(), 1), executor);
+                futures[1] = CompletableFuture.runAsync(() ->
+                        applyToChannel(stack, profile.getRofThetaGreen() * 10, g, dt, profile.getRofIterationsGreen(), 2), executor);
+                futures[2] = CompletableFuture.runAsync(() ->
+                        applyToChannel(stack, profile.getRofThetaBlue() * 10, g, dt, profile.getRofIterationsBlue(), 3), executor);
+                CompletableFuture.allOf(futures).get();
+            }
+        } catch (InterruptedException | ExecutionException e) {  // NOSONAR
+            throw new FilterException(e.getMessage());
         }
+
         return true;
     }
 

@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Component
 public class GammaFilter implements LSWFilter {
     @Override
-    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
         if (isApplied(profile,image)) {
             log.info("Applying gamma correction with value {} to image {}", profile.getGamma(), image.getID());
             for (int slice = 1; slice <= image.getStack().getSize(); slice++) {

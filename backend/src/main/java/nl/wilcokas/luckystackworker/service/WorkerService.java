@@ -4,18 +4,15 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
-import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import ij.ImagePlus;
-import ij.io.Opener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
@@ -31,7 +28,7 @@ import static java.util.Collections.*;
 @Service
 public class WorkerService {
 
-    private final OperationService operationService;
+    private final FilterService operationService;
     private final SettingsService settingsService;
     private final ProfileService profileService;
     private final LuckyStackWorkerContext luckyStackWorkerContext;
@@ -157,7 +154,7 @@ public class WorkerService {
                         imp = LswFileUtil.fixNonTiffOpeningSettings(imp);
                     }
                     operationService.correctExposure(imp);
-                    operationService.applyAllOperations(imp, null, profile, emptyList(), isMono);
+                    operationService.applyAllFilters(imp, null, profile, emptyList(), isMono);
                     imp.updateAndDraw();
                     if (luckyStackWorkerContext.isRoiActive()) {
                         imp.setRoi(luckyStackWorkerContext.getSelectedRoi());

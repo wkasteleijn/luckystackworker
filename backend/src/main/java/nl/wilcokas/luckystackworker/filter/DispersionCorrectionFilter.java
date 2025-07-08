@@ -17,7 +17,7 @@ import nl.wilcokas.luckystackworker.model.Profile;
 public class DispersionCorrectionFilter implements LSWFilter {
 
     @Override
-    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
         if (isApplied(profile, image)) {
             log.info("Applying dispersion correction");
             apply(image, profile);

@@ -18,7 +18,7 @@ import java.io.IOException;
 public class SaturationFilter implements LSWFilter {
 
     @Override
-    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
         if (isApplied(profile,image)) {
             log.info("Applying saturation increase with factor {} to image {}", profile.getSaturation(),
                     image.getID());

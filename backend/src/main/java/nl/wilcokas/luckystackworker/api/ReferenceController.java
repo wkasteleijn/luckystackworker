@@ -42,7 +42,7 @@ public class ReferenceController {
     private final LuckyStackWorkerContext luckyStackWorkerContext;
 
     @GetMapping("/open")
-    public ResponseDTO openReferenceImage(@RequestParam double scale, @RequestParam String openImageMode) throws Exception {
+    public ResponseDTO openReferenceImage(@RequestParam double scale, @RequestParam String openImageMode) throws IOException {
         return referenceImageService.selectReferenceImage(settingsService.getSettings().getRootFolder(), scale, openImageMode);
     }
 
@@ -64,7 +64,7 @@ public class ReferenceController {
     }
 
     @PutMapping("/save")
-    public void saveReferenceImage(@RequestBody ProfileDTO profile) throws Exception {
+    public void saveReferenceImage(@RequestBody ProfileDTO profile) throws IOException {
         JFrame frame = referenceImageService.getParentFrame();
         JFileChooser jfc = referenceImageService.getJFileChooser(settingsService.getRootFolder());
         jfc.setFileFilter(new FileNameExtensionFilter("TIFF, JPG", "tif", "tiff", "jpg", "jpeg"));
@@ -137,7 +137,7 @@ public class ReferenceController {
     }
 
     @PutMapping("/channel")
-    public void channelChanged(@RequestBody String channel) throws Exception {
+    public void channelChanged(@RequestBody String channel) {
         referenceImageService.showChannel(ChannelEnum.valueOf(channel));
     }
 
@@ -157,7 +157,7 @@ public class ReferenceController {
     }
 
     @PutMapping("/blink-clipped")
-    public void blinkClippedAreas() throws Exception {
+    public void blinkClippedAreas() {
         referenceImageService.blinkClippedAreas();
     }
 

@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import nl.wilcokas.luckystackworker.exceptions.FilterException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import org.springframework.stereotype.Component;
 
@@ -68,16 +69,6 @@ public class SavitzkyGolayFilter implements LSWFilter {
             -63, -41, 154, 371, 444, 371, 154, -41, -63, //
             -5, -96, -41, 71, 105, 71, -41, -96, -5, //
             0, -5, -63, -106, -120, -106, -63, -5, 0
-
-            //            0, -2, -32, -54, -62, -54, -32, -2, 0, //
-            //            -2, -49, -22, 35, 54, 35, -22, -49, -2, //
-            //            -32, -22, 80, 194, 230, 194, 80, -22, -32, //
-            //            -54, 35, 194, 446, 631, 446, 194, 35, -54, //
-            //            -62, 54, 230, 631, 2981, 631, 230, 54, -62, //
-            //            -54, 35, 194, 446, 631, 446, 194, 35, -54, //
-            //            -32, -22, 80, 194, 230, 194, 80, -22, -32, //
-            //            -2, -49, -22, 35, 54, 35, -22, -49, -2, //
-            //            0, -2, -32, -54, -62, -54, -32, -2, 0 //
     };
 
     private static final int[][] RADIUS_81_OFFSETS = { //
@@ -173,7 +164,7 @@ public class SavitzkyGolayFilter implements LSWFilter {
     private static final int RADIUS_169_ROWLENGTH = 13;
 
     @Override
-    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws Exception {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
         if (isApplied(profile, image)) {
             log.info("Applying SavitzkyGolayDenoise filter");
             apply(image, profile);
@@ -192,39 +183,43 @@ public class SavitzkyGolayFilter implements LSWFilter {
         return Constants.DENOISE_ALGORITHM_SAVGOLAY.equals(profile.getDenoiseAlgorithm2());
     }
 
-    private void apply(ImagePlus image, Profile profile) throws ExecutionException, InterruptedException {
+    private void apply(ImagePlus image, Profile profile) {
         ImageStack stack = image.getStack();
-        // Run every stack in a seperate thread to increase performance.
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            CompletableFuture<?>[] futures = new CompletableFuture[3];
-            // Red
-            futures[0] = CompletableFuture.runAsync(() -> {
-                ImageProcessor layerProcessor = stack.getProcessor(1);
-                int iterations = profile.getSavitzkyGolayIterations() == 0 ? 1 : profile.getSavitzkyGolayIterations();
-                SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySize(), profile.getSavitzkyGolayAmount(), iterations);
-                if (parameters.radiusFactors != null) {
-                    applySavitzkyGolayToLayer(image, layerProcessor, parameters);
-                }
-            }, executor);
-            // Green
-            futures[1] = CompletableFuture.runAsync(() -> {
-                ImageProcessor layerProcessor = stack.getProcessor(2);
-                int iterations = profile.getSavitzkyGolayIterationsGreen() == 0 ? 1 : profile.getSavitzkyGolayIterationsGreen();
-                SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySizeGreen(), profile.getSavitzkyGolayAmountGreen(), iterations);
-                if (parameters.radiusFactors != null) {
-                    applySavitzkyGolayToLayer(image, layerProcessor, parameters);
-                }
-            }, executor);
-            // Blue
-            futures[2] = CompletableFuture.runAsync(() -> {
-                ImageProcessor layerProcessor = stack.getProcessor(3);
-                int iterations = profile.getSavitzkyGolayIterationsBlue() == 0 ? 1 : profile.getSavitzkyGolayIterationsBlue();
-                SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySizeBlue(), profile.getSavitzkyGolayAmountBlue(), iterations);
-                if (parameters.radiusFactors != null) {
-                    applySavitzkyGolayToLayer(image, layerProcessor, parameters);
-                }
-            }, executor);
-            CompletableFuture.allOf(futures).get();
+        try {
+            // Run every stack in a seperate thread to increase performance.
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                CompletableFuture<?>[] futures = new CompletableFuture[3];
+                // Red
+                futures[0] = CompletableFuture.runAsync(() -> {
+                    ImageProcessor layerProcessor = stack.getProcessor(1);
+                    int iterations = profile.getSavitzkyGolayIterations() == 0 ? 1 : profile.getSavitzkyGolayIterations();
+                    SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySize(), profile.getSavitzkyGolayAmount(), iterations);
+                    if (parameters.radiusFactors != null) {
+                        applySavitzkyGolayToLayer(image, layerProcessor, parameters);
+                    }
+                }, executor);
+                // Green
+                futures[1] = CompletableFuture.runAsync(() -> {
+                    ImageProcessor layerProcessor = stack.getProcessor(2);
+                    int iterations = profile.getSavitzkyGolayIterationsGreen() == 0 ? 1 : profile.getSavitzkyGolayIterationsGreen();
+                    SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySizeGreen(), profile.getSavitzkyGolayAmountGreen(), iterations);
+                    if (parameters.radiusFactors != null) {
+                        applySavitzkyGolayToLayer(image, layerProcessor, parameters);
+                    }
+                }, executor);
+                // Blue
+                futures[2] = CompletableFuture.runAsync(() -> {
+                    ImageProcessor layerProcessor = stack.getProcessor(3);
+                    int iterations = profile.getSavitzkyGolayIterationsBlue() == 0 ? 1 : profile.getSavitzkyGolayIterationsBlue();
+                    SavitzkyGolayParameters parameters = getSavitzkyGolayParameters(profile.getSavitzkyGolaySizeBlue(), profile.getSavitzkyGolayAmountBlue(), iterations);
+                    if (parameters.radiusFactors != null) {
+                        applySavitzkyGolayToLayer(image, layerProcessor, parameters);
+                    }
+                }, executor);
+                CompletableFuture.allOf(futures).get();
+            }
+        } catch (InterruptedException | ExecutionException e) {  // NOSONAR
+            throw new FilterException(e.getMessage());
         }
     }
 

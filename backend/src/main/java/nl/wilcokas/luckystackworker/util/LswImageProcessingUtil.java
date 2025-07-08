@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 import ij.CompositeImage;
 import ij.ImageStack;
 import ij.plugin.filter.GaussianBlur;
+import nl.wilcokas.luckystackworker.exceptions.FilterException;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import org.apache.commons.lang3.tuple.Pair;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -275,68 +277,78 @@ public class LswImageProcessingUtil {
         processor.setPixels(rgbPixels);
     }
 
-    public static LswImageLayersDto getImageLayers(ImagePlus image) throws Exception {
+    public static LswImageLayersDto getImageLayers(ImagePlus image) {
         ImageStack stack = image.getStack();
         short[][] newPixels = new short[3][stack.getProcessor(1).getPixelCount()];
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            CompletableFuture<?>[] futures = new CompletableFuture[3];
-            for (int layer = 1; layer <= 3; layer++) {
-                int finalLayer = layer;
-                futures[layer - 1] = CompletableFuture.runAsync(() -> {
-                    ImageProcessor p = stack.getProcessor(Math.min(stack.size(), finalLayer));
-                    short[] pixels = (short[]) p.getPixels();
-                    for (int i = 0; i < pixels.length; i++) {
-                        newPixels[finalLayer - 1][i] = pixels[i];
-                    }
-                }, executor);
+        try {
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                CompletableFuture<?>[] futures = new CompletableFuture[3];
+                for (int layer = 1; layer <= 3; layer++) {
+                    int finalLayer = layer;
+                    futures[layer - 1] = CompletableFuture.runAsync(() -> {
+                        ImageProcessor p = stack.getProcessor(Math.min(stack.size(), finalLayer));
+                        short[] pixels = (short[]) p.getPixels();
+                        for (int i = 0; i < pixels.length; i++) {
+                            newPixels[finalLayer - 1][i] = pixels[i];
+                        }
+                    }, executor);
+                }
+                CompletableFuture.allOf(futures).get();
             }
-            CompletableFuture.allOf(futures).get();
+        } catch (InterruptedException | ExecutionException e) {  // NOSONAR
+            throw new FilterException(e.getMessage());
         }
+
         return LswImageLayersDto.builder().layers(newPixels).build();
     }
 
-    public static void copyLayers(LswImageLayersDto layersDto, ImagePlus image, boolean includeRed, boolean includeGreen, boolean includeBlue) throws Exception {
+    public static void copyLayers(LswImageLayersDto layersDto, ImagePlus image, boolean includeRed, boolean includeGreen, boolean includeBlue) {
         short[][] layers = layersDto.getLayers();
         if (image.getProcessor() instanceof ColorProcessor) {
             convertLayersToColorImage(layers, image, includeRed, includeGreen, includeBlue);
         } else {
             ImageStack stack = image.getStack();
-            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-                List<CompletableFuture<?>> futures = new ArrayList<>();
-                if (includeRed) {
-                    // Red
-                    futures.add(CompletableFuture.runAsync(() -> {
-                        ImageProcessor p = stack.getProcessor(1);
-                        short[] pixels = (short[]) p.getPixels();
-                        for (int i = 0; i < pixels.length; i++) {
-                            pixels[i] = layers[0][i];
-                        }
-                    }, executor));
-                }
+            try {
+                try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                    List<CompletableFuture<?>> futures = new ArrayList<>();
+                    if (includeRed) {
+                        // Red
+                        futures.add(CompletableFuture.runAsync(() -> {
+                            ImageProcessor p = stack.getProcessor(1);
+                            short[] pixels = (short[]) p.getPixels();
+                            for (int i = 0; i < pixels.length; i++) {
+                                pixels[i] = layers[0][i];
+                            }
+                        }, executor));
+                    }
 
-                if (includeGreen) {
-                    // Green
-                    futures.add(CompletableFuture.runAsync(() -> {
-                        ImageProcessor p = stack.getProcessor(2);
-                        short[] pixels = (short[]) p.getPixels();
-                        for (int i = 0; i < pixels.length; i++) {
-                            pixels[i] = layers[1][i];
-                        }
-                    }, executor));
-                }
+                    if (includeGreen) {
+                        // Green
+                        futures.add(CompletableFuture.runAsync(() -> {
+                            ImageProcessor p = stack.getProcessor(2);
+                            short[] pixels = (short[]) p.getPixels();
+                            for (int i = 0; i < pixels.length; i++) {
+                                pixels[i] = layers[1][i];
+                            }
+                        }, executor));
+                    }
 
-                if (includeBlue) {
-                    // Blue
-                    futures.add(CompletableFuture.runAsync(() -> {
-                        ImageProcessor p = stack.getProcessor(3);
-                        short[] pixels = (short[]) p.getPixels();
-                        for (int i = 0; i < pixels.length; i++) {
-                            pixels[i] = layers[2][i];
-                        }
-                    }, executor));
+                    if (includeBlue) {
+                        // Blue
+                        futures.add(CompletableFuture.runAsync(() -> {
+                            ImageProcessor p = stack.getProcessor(3);
+                            short[] pixels = (short[]) p.getPixels();
+                            for (int i = 0; i < pixels.length; i++) {
+                                pixels[i] = layers[2][i];
+                            }
+                        }, executor));
+                    }
+                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
                 }
-                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
+            } catch (InterruptedException | ExecutionException e) {  // NOSONAR
+                throw new FilterException(e.getMessage());
             }
+
         }
     }
 
@@ -424,7 +436,7 @@ public class LswImageProcessingUtil {
         return create16BitRGBImage("psf", layersDto, width, height, true, true, true);
     }
 
-    public static ImagePlus crop(ImagePlus image, Roi roi, String filepath) throws Exception {
+    public static ImagePlus crop(ImagePlus image, Roi roi, String filepath) {
         int xPos = (int) roi.getXBase();
         int yPos = (int) roi.getYBase();
         int width = (int) roi.getFloatWidth();
@@ -435,30 +447,35 @@ public class LswImageProcessingUtil {
         int imageHeight = stack.getHeight();
         short[][] newPixels = new short[3][width * height];
 
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            CompletableFuture<?>[] futures = new CompletableFuture[3];
-            for (int layer = 1; layer <= 3; layer++) {
-                int finalLayer = layer;
-                futures[layer - 1] = CompletableFuture.runAsync(() -> {
-                    ImageProcessor p = stack.getProcessor(finalLayer);
-                    short[] shortPixels = (short[]) p.getPixels();
-                    for (int y = 0; y < height; y++) {
-                        for (int x = 0; x < width; x++) {
-                            int srcX = x + xPos;
-                            int srcY = y + yPos;
-                            if (srcX >= imageWidth || srcY >= imageHeight) {
-                                continue; // Skip out-of-bounds pixels
+        try {
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                CompletableFuture<?>[] futures = new CompletableFuture[3];
+                for (int layer = 1; layer <= 3; layer++) {
+                    int finalLayer = layer;
+                    futures[layer - 1] = CompletableFuture.runAsync(() -> {
+                        ImageProcessor p = stack.getProcessor(finalLayer);
+                        short[] shortPixels = (short[]) p.getPixels();
+                        for (int y = 0; y < height; y++) {
+                            for (int x = 0; x < width; x++) {
+                                int srcX = x + xPos;
+                                int srcY = y + yPos;
+                                if (srcX >= imageWidth || srcY >= imageHeight) {
+                                    continue; // Skip out-of-bounds pixels
+                                }
+                                int srcPos = srcY * imageWidth + srcX;
+                                int destPos = y * width + x;
+                                newPixels[finalLayer - 1][destPos] = shortPixels[srcPos];
                             }
-                            int srcPos = srcY * imageWidth + srcX;
-                            int destPos = y * width + x;
-                            newPixels[finalLayer - 1][destPos] = shortPixels[srcPos];
                         }
-                    }
-                }, executor);
+                    }, executor);
 
+                }
+                CompletableFuture.allOf(futures).get();
             }
-            CompletableFuture.allOf(futures).get();
+        } catch (InterruptedException | ExecutionException e) {  // NOSONAR
+            throw new FilterException(e.getMessage());
         }
+
         return create16BitRGBImage(filepath, LswImageLayersDto.builder().layers(newPixels).build(), width, height, true, true, true);
     }
 

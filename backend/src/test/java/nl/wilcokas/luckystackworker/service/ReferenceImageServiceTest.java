@@ -41,7 +41,7 @@ class ReferenceImageServiceTest {
     @Mock
     private ProfileService profileService;
     @Mock
-    private OperationService operationService;
+    private FilterService operationService;
     @Mock
     private LuckyStackWorkerContext luckyStackWorkerContext;
 

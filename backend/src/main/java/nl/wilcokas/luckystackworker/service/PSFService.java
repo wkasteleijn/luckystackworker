@@ -33,7 +33,7 @@ public class PSFService {
     private final ProfileService profileService;
     private final LuckyStackWorkerContext luckyStackWorkerContext;
 
-    public SettingsDTO loadCustomPSF() throws Exception {
+    public SettingsDTO loadCustomPSF() throws IOException {
         JFrame frame = referenceImageService.getParentFrame();
         JFileChooser jfc = referenceImageService
                 .getJFileChooser(settingsService.getRootFolder());
@@ -69,6 +69,5 @@ public class PSFService {
             }
         }
         return null;
-
     }
 }

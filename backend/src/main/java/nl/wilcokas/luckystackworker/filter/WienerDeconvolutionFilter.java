@@ -11,6 +11,7 @@ import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
+import nl.wilcokas.luckystackworker.exceptions.FilterException;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.filter.settings.WienerDeconvolutionParameters;
 import nl.wilcokas.luckystackworker.filter.wpl.LswWPLFloatIterativeDeconvolver2D;
@@ -39,7 +40,7 @@ public class WienerDeconvolutionFilter implements LSWFilter {
     private int numberOfVirtualThreads;
 
     @Override
-    public boolean apply(final ImagePlus image, Profile profile, boolean isMono) throws Exception {
+    public boolean apply(final ImagePlus image, Profile profile, boolean isMono) {
         if (isApplied(profile, image)) {
             log.info("Applying Wiener deconvolution filter");
             float deringStrength = profile.getDeringStrength() / 100f;
@@ -93,7 +94,11 @@ public class WienerDeconvolutionFilter implements LSWFilter {
             if (psfImage == null) {
                 PSF psf = profile.getPsf();
                 psf.setType(PSFType.SYNTHETIC);
-                psfImage = PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profile.getName(), isMono);
+                try {
+                    psfImage = PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profile.getName(), isMono);
+                } catch (IOException e) {
+                    throw new FilterException(e.getMessage());
+                }
             }
             apply(image, psfImage, parameters);
             return true;
@@ -115,19 +120,23 @@ public class WienerDeconvolutionFilter implements LSWFilter {
         return parameters.isIncludeRed() || parameters.isIncludeGreen() || parameters.isIncludeBlue();
     }
 
-    private void apply(ImagePlus image, ImagePlus psf, WienerDeconvolutionParameters parameters) throws ExecutionException, InterruptedException {
+    private void apply(ImagePlus image, ImagePlus psf, WienerDeconvolutionParameters parameters) {
         ImagePlus[] psfPerChannel = getPsfPerChannel(psf);
         ImageStack stack = image.getStack();
         if (parameters.getMode() == LSWSharpenMode.RGB) {
-            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-                CompletableFuture<?>[] futures = new CompletableFuture[3];
-                futures[0] = CompletableFuture.runAsync(() ->
-                        applyToChannel(stack.getProcessor(1), psfPerChannel[0], parameters.getIterationsRed(), parameters.getDeringStrengthRed(), parameters.getDeringRadiusRed(), parameters.getBlendRawRed()), executor);
-                futures[1] = CompletableFuture.runAsync(() ->
-                        applyToChannel(stack.getProcessor(2), psfPerChannel[1], parameters.getIterationsGreen(), parameters.getDeringStrengthGreen(), parameters.getDeringRadiusGreen(), parameters.getBlendRawGreen()), executor);
-                futures[2] = CompletableFuture.runAsync(() ->
-                        applyToChannel(stack.getProcessor(3), psfPerChannel[2], parameters.getIterationsBlue(), parameters.getDeringStrengthBlue(), parameters.getDeringRadiusBlue(), parameters.getBlendRawBlue()), executor);
-                CompletableFuture.allOf(futures).get();
+            try {
+                try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                    CompletableFuture<?>[] futures = new CompletableFuture[3];
+                    futures[0] = CompletableFuture.runAsync(() ->
+                            applyToChannel(stack.getProcessor(1), psfPerChannel[0], parameters.getIterationsRed(), parameters.getDeringStrengthRed(), parameters.getDeringRadiusRed(), parameters.getBlendRawRed()), executor);
+                    futures[1] = CompletableFuture.runAsync(() ->
+                            applyToChannel(stack.getProcessor(2), psfPerChannel[1], parameters.getIterationsGreen(), parameters.getDeringStrengthGreen(), parameters.getDeringRadiusGreen(), parameters.getBlendRawGreen()), executor);
+                    futures[2] = CompletableFuture.runAsync(() ->
+                            applyToChannel(stack.getProcessor(3), psfPerChannel[2], parameters.getIterationsBlue(), parameters.getDeringStrengthBlue(), parameters.getDeringRadiusBlue(), parameters.getBlendRawBlue()), executor);
+                    CompletableFuture.allOf(futures).get();
+                }
+            } catch (InterruptedException | ExecutionException e) {  // NOSONAR
+                throw new FilterException(e.getMessage());
             }
         } else {
             applyLuminance(image, psf, parameters);

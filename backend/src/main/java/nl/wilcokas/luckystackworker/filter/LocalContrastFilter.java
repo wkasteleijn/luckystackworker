@@ -16,12 +16,12 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 @Slf4j
 @Component
-public class LocalContrastFilter implements  LSWFilter {
+public class LocalContrastFilter implements LSWFilter {
 
     private final LSWSharpenFilter sharpenFilter;
 
     @Override
-    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws Exception {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
         LSWSharpenMode mode = (profile.getLocalContrastMode() == null) ? LSWSharpenMode.LUMINANCE
                 : LSWSharpenMode.valueOf(profile.getLocalContrastMode());
         boolean filterApplied = false;
@@ -47,10 +47,10 @@ public class LocalContrastFilter implements  LSWFilter {
 
     @Override
     public boolean isApplied(Profile profile, ImagePlus image) {
-        return profile.getLocalContrastFine() != 0 || profile.getLocalContrastMedium() != 0 || profile.getLocalContrastLarge()!= 0;
+        return profile.getLocalContrastFine() != 0 || profile.getLocalContrastMedium() != 0 || profile.getLocalContrastLarge() != 0;
     }
 
-    private void applyLocalContrast(final ImagePlus image, int amount, BigDecimal radius, LSWSharpenMode localContrastMode) throws Exception {
+    private void applyLocalContrast(final ImagePlus image, int amount, BigDecimal radius, LSWSharpenMode localContrastMode) {
         log.info("Applying local contrast with mode {}, radius {} amount {} to image {}", localContrastMode, radius, amount, image.getID());
         float famount = (amount) / 100f;
         UnsharpMaskParameters usParams = UnsharpMaskParameters.builder()

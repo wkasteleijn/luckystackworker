@@ -38,7 +38,7 @@ import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.ij.LswImageWindow;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
-import nl.wilcokas.luckystackworker.model.OperationEnum;
+import nl.wilcokas.luckystackworker.model.FilterEnum;
 import nl.wilcokas.luckystackworker.service.dto.GithubReleaseDto;
 import nl.wilcokas.luckystackworker.util.*;
 import org.apache.commons.lang3.tuple.Pair;
@@ -116,11 +116,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private final SettingsService settingsService;
     private final HttpService httpService;
     private final ProfileService profileService;
-    private final OperationService operationService;
+    private final FilterService operationService;
     private final LuckyStackWorkerContext luckyStackWorkerContext;
     private final ObjectMapper snakeCaseObjectMapper;
 
-    public ResponseDTO scale(Profile profile) throws Exception {
+    public ResponseDTO scale(Profile profile) throws IOException {
         this.isLargeImage = openReferenceImage(this.imageMetadata.getFilePath(), profile, LswFileUtil.getObjectDateTime(this.imageMetadata.getFilePath()));
         SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
         settingsDTO.setLargeImage(this.isLargeImage);
@@ -128,7 +128,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
     }
 
-    public ResponseDTO selectReferenceImage(String filePath, double scale, String openImageMode) throws Exception {
+    public ResponseDTO selectReferenceImage(String filePath, double scale, String openImageMode) throws IOException {
         JFrame frame = getParentFrame();
         JFileChooser jfc = getJFileChooser(filePath);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
@@ -171,17 +171,17 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return null;
     }
 
-    public byte[] updateProcessing(Profile profile, List<String> operationValues) throws Exception {
+    public byte[] updateProcessing(Profile profile, List<String> operationValues) {
         boolean includeRed = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.R;
         boolean includeGreen = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G;
         boolean includeBlue = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B;
         LswImageProcessingUtil.copyLayers(unprocessedImageLayers, finalResultImage, true, true, true);
-        List<OperationEnum> operations = operationValues == null ? emptyList() : operationValues.stream().map(operationValue -> operationValue == null ? null : OperationEnum.valueOf(operationValue.toUpperCase())).toList();
+        List<FilterEnum> operations = operationValues == null ? emptyList() : operationValues.stream().map(operationValue -> operationValue == null ? null : FilterEnum.valueOf(operationValue.toUpperCase())).toList();
         if (roiSwitched) {
             operations = emptyList();
             roiSwitched = false;
         }
-        byte[] psf = operationService.applyAllOperations(finalResultImage, displayedImage, profile, operations, isMono);
+        byte[] psf = operationService.applyAllFilters(finalResultImage, displayedImage, profile, operations, isMono);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(LswImageProcessingUtil.getImageLayers(finalResultImage), displayedImage, includeRed, includeGreen, includeBlue);
         updateHistogramMetadata(profile);
@@ -190,7 +190,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return psf;
     }
 
-    public void saveReferenceImage(String path, boolean asJpg, Profile profile) throws Exception {
+    public void saveReferenceImage(String path, boolean asJpg, Profile profile) throws IOException {
         String pathNoExt = LswFileUtil.getPathWithoutExtension(path);
         String savePath = pathNoExt + "." + (asJpg ? "jpg" : Constants.DEFAULT_OUTPUT_FORMAT);
         log.info("Saving image to  {}", savePath);
@@ -327,10 +327,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         Settings settings = settingsService.getSettings();
         LswVersionNumber latestKnowVersion = LswVersionNumber.fromString(settings.getLatestKnownVersion())
                 .orElse(LswVersionNumber.fromString(currentVersion) // the first time the app is opened
-                        .orElse(LswVersionNumber.fromString("0.0.0").get()));
-
-        latestKnowVersion.setMajor(1); // TODO: remove after testing
-        // should only happen in dev mode
+                        .orElse(LswVersionNumber.fromString("0.0.0").get())); // should only happen in dev mode
         VersionDTO result = VersionDTO.builder().latestVersion(latestKnowVersion.toString()).isNewVersion(false).build();
         if (settings.getLatestKnownVersionChecked() == null || currentDate.isAfter(settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
             LswVersionNumber latestVersionFromGithub = requestLatestVersion().orElse(null);
@@ -473,7 +470,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         displayedImage.getImageWindow().nightMode(on);
     }
 
-    public void showChannel(ChannelEnum channel) throws Exception {
+    public void showChannel(ChannelEnum channel) {
         boolean includeRed = channel == ChannelEnum.RGB || channel == ChannelEnum.R;
         boolean includeGreen = channel == ChannelEnum.RGB || channel == ChannelEnum.G;
         boolean includeBlue = channel == ChannelEnum.RGB || channel == ChannelEnum.B;
@@ -485,7 +482,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         displayedImage.updateAndDraw();
     }
 
-    public void blinkClippedAreas() throws Exception {
+    public void blinkClippedAreas() {
         if (blinkClippedAreasTimer == null) {
             log.info("Enabling blinking on clipped areas");
             blinkClippedAreasTimer = new Timer();
@@ -586,7 +583,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         try {
             if (result != null) {
                 GithubReleaseDto releaseDto = snakeCaseObjectMapper.readValue(result, GithubReleaseDto.class);
-                return LswVersionNumber.fromString(releaseDto.getTagName(),releaseDto.getBody());
+                return LswVersionNumber.fromString(releaseDto.getTagName(), releaseDto.getBody());
             }
         } catch (JsonProcessingException e) {
             log.warn("Unable to parse version string from tag: ", e);
@@ -594,7 +591,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return Optional.empty();
     }
 
-    private boolean openReferenceImage(String filePath, Profile profile, LocalDateTime dateTime) throws Exception {
+    private boolean openReferenceImage(String filePath, Profile profile, LocalDateTime dateTime) {
         if (displayedImage != null) {
             // Can only have 1 image open at a time.
             displayedImage.hide();
@@ -630,9 +627,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
             log.info("Opened reference image image with id {}", displayedImage.getID());
 
-            if (profile != null) {
-                updateProcessing(profile, emptyList());
-            }
+            updateProcessing(profile, emptyList());
         }
         return largeImage;
     }

@@ -5,6 +5,7 @@ import ij.ImageStack;
 import ij.process.ShortProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.exceptions.FilterException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
@@ -14,15 +15,17 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.logging.Filter;
 
 @Slf4j
 @Component
 public class BilateralDenoiseFilter implements LSWFilter {
 
     @Override
-    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws Exception {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
         if (isApplied(profile, image)) {
             log.info("Applying bilateral denoise filter to image: {}", image.getTitle());
             for (int i = 1; i <= profile.getBilateralIterations(); i++) {
@@ -43,21 +46,21 @@ public class BilateralDenoiseFilter implements LSWFilter {
         return Constants.DENOISE_ALGORITHM_BILATERAL.equals(profile.getDenoiseAlgorithm1());
     }
 
-    private void doApply(ImagePlus image, Profile profile) throws Exception {
-        // profile.getBilateralRadius(), profile.getBilateralSigmaColor() * 10D, 1)
-
+    private void doApply(ImagePlus image, Profile profile) {
         ImageStack stack = image.getStack();
-
-        // Run every stack in a seperate thread to increase performance.
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            CompletableFuture<?>[] futures = new CompletableFuture[3];
-            futures[0] = CompletableFuture.runAsync(() -> applyToChannel((ShortProcessor) stack.getProcessor(1), profile.getBilateralRadius(), profile.getBilateralSigmaColor() * 10D, 1), executor);
-            futures[1] = CompletableFuture.runAsync(() -> applyToChannel((ShortProcessor) stack.getProcessor(2), profile.getBilateralRadiusGreen(), profile.getBilateralSigmaColorGreen() * 10D, 1), executor);
-            futures[2] = CompletableFuture.runAsync(() -> applyToChannel((ShortProcessor) stack.getProcessor(3), profile.getBilateralRadiusBlue(), profile.getBilateralSigmaColorBlue() * 10D, 1), executor);
-            CompletableFuture.allOf(futures).get();
+        try {
+            // Run every stack in a seperate thread to increase performance.
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                CompletableFuture<?>[] futures = new CompletableFuture[3];
+                futures[0] = CompletableFuture.runAsync(() -> applyToChannel((ShortProcessor) stack.getProcessor(1), profile.getBilateralRadius(), profile.getBilateralSigmaColor() * 10D, 1), executor);
+                futures[1] = CompletableFuture.runAsync(() -> applyToChannel((ShortProcessor) stack.getProcessor(2), profile.getBilateralRadiusGreen(), profile.getBilateralSigmaColorGreen() * 10D, 1), executor);
+                futures[2] = CompletableFuture.runAsync(() -> applyToChannel((ShortProcessor) stack.getProcessor(3), profile.getBilateralRadiusBlue(), profile.getBilateralSigmaColorBlue() * 10D, 1), executor);
+                CompletableFuture.allOf(futures).get();
+            }
+        } catch (InterruptedException | ExecutionException e) {  // NOSONAR
+            throw new FilterException(e.getMessage());
         }
     }
-
 
     private void applyToChannel(ShortProcessor ip, int radius, double sigmaColor, double sigmaSpace) {
         short[] newPixels = new short[ip.getPixelCount()];

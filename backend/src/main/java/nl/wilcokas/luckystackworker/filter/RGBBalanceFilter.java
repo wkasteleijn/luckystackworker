@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import nl.wilcokas.luckystackworker.exceptions.FilterException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +25,7 @@ public class RGBBalanceFilter implements LSWFilter {
     private static final int STEP_SIZE = 64;
 
     @Override
-    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws Exception {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
         if (isApplied(profile, image)) {
             log.info("Applying RGB balance correction to image {} with values R {}, G {}, B {}", image.getID(), profile.getRed(), profile.getGreen(),
                     profile.getBlue());
@@ -47,7 +48,7 @@ public class RGBBalanceFilter implements LSWFilter {
                 || (profile.getBlue() != null && (!profile.getBlue().equals(BigDecimal.ZERO))));
     }
 
-    public void apply(ImagePlus image, int amountRed, int amountGreen, int amountBlue, double purpleReductionAmount, boolean preserveDarkBackground) throws ExecutionException, InterruptedException {
+    public void apply(ImagePlus image, int amountRed, int amountGreen, int amountBlue, double purpleReductionAmount, boolean preserveDarkBackground) {
         ImageStack stack = image.getStack();
         short[] redPixels = (short[]) stack.getProcessor(Constants.RED_LAYER_INDEX).getPixels();
         short[] greenPixels = (short[]) stack.getProcessor(Constants.GREEN_LAYER_INDEX).getPixels();
@@ -71,25 +72,31 @@ public class RGBBalanceFilter implements LSWFilter {
             greenPixelsResult[i] = getPixelResult(newGreenValue, desaturatedValue, purpleCorrectionFactor, purpleReductionAmount);
             bluePixelsResult[i] = getPixelResult(newBlueValue, desaturatedValue, purpleCorrectionFactor, purpleReductionAmount);
         }
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            CompletableFuture<?>[] futures = new CompletableFuture[3];
-            futures[0] = CompletableFuture.runAsync(() -> {
-                for (int i = 0; i < redPixels.length; i++) {
-                    redPixels[i] = redPixelsResult[i];
-                }
-            }, executor);
-            futures[1] = CompletableFuture.runAsync(() -> {
-                for (int i = 0; i < greenPixels.length; i++) {
-                    greenPixels[i] = greenPixelsResult[i];
-                }
-            }, executor);
-            futures[2] = CompletableFuture.runAsync(() -> {
-                for (int i = 0; i < bluePixels.length; i++) {
-                    bluePixels[i] = bluePixelsResult[i];
-                }
-            }, executor);
-            CompletableFuture.allOf(futures).get();
+
+        try {
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                CompletableFuture<?>[] futures = new CompletableFuture[3];
+                futures[0] = CompletableFuture.runAsync(() -> {
+                    for (int i = 0; i < redPixels.length; i++) {
+                        redPixels[i] = redPixelsResult[i];
+                    }
+                }, executor);
+                futures[1] = CompletableFuture.runAsync(() -> {
+                    for (int i = 0; i < greenPixels.length; i++) {
+                        greenPixels[i] = greenPixelsResult[i];
+                    }
+                }, executor);
+                futures[2] = CompletableFuture.runAsync(() -> {
+                    for (int i = 0; i < bluePixels.length; i++) {
+                        bluePixels[i] = bluePixelsResult[i];
+                    }
+                }, executor);
+                CompletableFuture.allOf(futures).get();
+            }
+        } catch (InterruptedException | ExecutionException e) {  // NOSONAR
+            throw new FilterException(e.getMessage());
         }
+
     }
 
     private short getPixelResult(int newValueUnsignedInt, int desaturatedValue, double purpleCorrectionFactor,

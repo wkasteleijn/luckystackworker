@@ -78,7 +78,7 @@ public class ProfileController {
     }
 
     @GetMapping("/load")
-    public ResponseDTO loadProfile() throws Exception {
+    public ResponseDTO loadProfile() {
         log.info("loadProfile called");
         JFrame frame = referenceImageService.getParentFrame();
         JFileChooser jfc = referenceImageService
@@ -105,8 +105,7 @@ public class ProfileController {
     }
 
     @PutMapping
-    public ResponseEntity<PSFImageDto> updateProfile(@RequestBody ProfileDTO profileDTO, @RequestParam(required = false) List<String> operations)
-            throws Exception {
+    public ResponseEntity<PSFImageDto> updateProfile(@RequestBody ProfileDTO profileDTO, @RequestParam(required = false) List<String> operations) {
         // Rate limiting added to prevent overloading whenever scroll keys are held down
         // or pressed very quickly.
         LocalDateTime activeOperationTime = luckyStackWorkerContext.getActiveOperationTime();
@@ -154,7 +153,7 @@ public class ProfileController {
     }
 
     @PutMapping("/scale")
-    public ResponseDTO scale(@RequestBody ProfileDTO profileDTO) throws Exception {
+    public ResponseDTO scale(@RequestBody ProfileDTO profileDTO) throws IOException {
         Profile profile = profileService.updateProfile(profileDTO);
         return referenceImageService.scale(profile);
     }
@@ -171,7 +170,7 @@ public class ProfileController {
     }
 
     @GetMapping("/custom-psf")
-    public SettingsDTO loadCustomPSF() throws Exception {
+    public SettingsDTO loadCustomPSF() throws IOException {
         log.info("loadCustomPSF called");
         return psfService.loadCustomPSF();
     }

@@ -17,7 +17,7 @@ import static nl.wilcokas.luckystackworker.constants.Constants.MINIMUK_DARK_TRES
 public class HistogramStretchFilter implements LSWFilter {
 
     @Override
-    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
         if (isApplied(profile, image)) {
             log.info("Applying contrast increase with factor {} to image {}", profile.getContrast(),
                     image.getID());

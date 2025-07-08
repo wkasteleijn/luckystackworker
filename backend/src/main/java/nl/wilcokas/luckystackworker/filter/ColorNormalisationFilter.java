@@ -15,7 +15,7 @@ import java.io.IOException;
 public class ColorNormalisationFilter implements LSWFilter {
 
     @Override
-    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
         if (isApplied(profile,image)) {
             log.info("Applying color balance normalization to image {}", image.getID());
             apply(image);

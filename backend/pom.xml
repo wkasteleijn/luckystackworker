@@ -5,17 +5,17 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<java.version>21</java.version>
-		<commons-io.version>2.18.0</commons-io.version>
+		<java.version>24</java.version>
+		<commons-io.version>2.19.0</commons-io.version>
 		<velocity.version>2.4.1</velocity.version>
-		<commons-text.version>1.13.0</commons-text.version>
-		<imagej.version>1.54k</imagej.version>
+		<commons-text.version>1.13.1</commons-text.version>
+		<imagej.version>1.54p</imagej.version>
 		<ParallelIterativeDeconvolution.version>1.13</ParallelIterativeDeconvolution.version>
 	</properties>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.2</version>
+		<version>3.5.3</version>
 		<relativePath />
 	</parent>
 
@@ -96,9 +96,14 @@
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</path>
+					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

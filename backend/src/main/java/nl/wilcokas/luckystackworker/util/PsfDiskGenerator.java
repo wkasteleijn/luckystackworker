@@ -4,6 +4,7 @@ import ij.ImagePlus;
 import ij.plugin.filter.GaussianBlur;
 import ij.process.FloatProcessor;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.exceptions.FilterException;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -26,7 +27,7 @@ public class PsfDiskGenerator {
         generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity, "jup", false);
     }
 
-    public static ImagePlus generate16BitRGB(double airyDiskRadius, double seeingIndex, double diffractionIntensity, String profileName, boolean isMono) throws Exception {
+    public static ImagePlus generate16BitRGB(double airyDiskRadius, double seeingIndex, double diffractionIntensity, String profileName, boolean isMono) throws IOException {
 
         short[] redPixels = new short[(int) Math.pow(PSF_SIZE, 2)];
         short[] greenPixels = new short[(int) Math.pow(PSF_SIZE, 2)];
@@ -34,12 +35,16 @@ public class PsfDiskGenerator {
 
         double seeingIndexConverted = (4.0 - (seeingIndex - 1.0)) / 8.0;
 
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            CompletableFuture<?>[] futures = new CompletableFuture[3];
-            futures[0] = CompletableFuture.runAsync(() -> generate16BitForChannel(redPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, isMono ? WAVELENGTH_NM_GREEN : WAVELENGTH_NM_RED), executor);
-            futures[1] = CompletableFuture.runAsync(() -> generate16BitForChannel(greenPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, WAVELENGTH_NM_GREEN), executor);
-            futures[2] = CompletableFuture.runAsync(() -> generate16BitForChannel(bluePixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, isMono ? WAVELENGTH_NM_GREEN : WAVELENGTH_NM_BLUE), executor);
-            CompletableFuture.allOf(futures).get();
+        try {
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                CompletableFuture<?>[] futures = new CompletableFuture[3];
+                futures[0] = CompletableFuture.runAsync(() -> generate16BitForChannel(redPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, isMono ? WAVELENGTH_NM_GREEN : WAVELENGTH_NM_RED), executor);
+                futures[1] = CompletableFuture.runAsync(() -> generate16BitForChannel(greenPixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, WAVELENGTH_NM_GREEN), executor);
+                futures[2] = CompletableFuture.runAsync(() -> generate16BitForChannel(bluePixels, airyDiskRadius, seeingIndexConverted, diffractionIntensity, PSF_SIZE, isMono ? WAVELENGTH_NM_GREEN : WAVELENGTH_NM_BLUE), executor);
+                CompletableFuture.allOf(futures).get();
+            }
+        } catch (InterruptedException | ExecutionException e) {  // NOSONAR
+            throw new FilterException(e.getMessage());
         }
 
         LswImageLayersDto layers = LswImageLayersDto.builder().layers(new short[][]{redPixels, greenPixels, bluePixels}).build();

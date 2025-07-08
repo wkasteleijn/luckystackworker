@@ -7,9 +7,10 @@ import ij.ImageStack;
 import ij.gui.Roi;
 import jakarta.annotation.PostConstruct;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
+import nl.wilcokas.luckystackworker.exceptions.FilterException;
 import nl.wilcokas.luckystackworker.filter.*;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
-import nl.wilcokas.luckystackworker.model.OperationEnum;
+import nl.wilcokas.luckystackworker.model.FilterEnum;
 import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
@@ -29,7 +30,7 @@ import nl.wilcokas.luckystackworker.util.LswFileUtil;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class OperationService {
+public class FilterService {
 
     private final LSWSharpenFilter lswSharpenFilter;
     private final RGBBalanceFilter rgbBalanceFilter;
@@ -53,31 +54,31 @@ public class OperationService {
     private int displayedProgress = 0;
     private Timer timer = new Timer();
 
-    private final List<Pair<OperationEnum, LSWFilter>> filters = new ArrayList<>();
-    private Map<OperationEnum, LswImageLayersDto> cache = new HashMap<>();
+    private final List<Pair<FilterEnum, LSWFilter>> filters = new ArrayList<>();
+    private Map<FilterEnum, LswImageLayersDto> cache = new HashMap<>();
 
     @PostConstruct
     void init() {
-        filters.add(Pair.of(OperationEnum.CLIPPING_SUPPRESSION, clippingSuppressionFilter));
-        filters.add(Pair.of(OperationEnum.WIENER_DECONV, wienerDeconvolutionFilter));
-        filters.add(Pair.of(OperationEnum.SHARPEN, lswSharpenFilter));
-        filters.add(Pair.of(OperationEnum.ROTATE, rotationFilter));
-        filters.add(Pair.of(OperationEnum.SIGMA_DENOISE_1, sigmaDenoise1Filter));
-        filters.add(Pair.of(OperationEnum.IANS_NR, iansNoiseReductionFilter));
-        filters.add(Pair.of(OperationEnum.BILATERAL_DENOISE, bilateralDenoiseFilter));
-        filters.add(Pair.of(OperationEnum.SIGMA_DENOISE_2, sigmaDenoise2Filter));
-        filters.add(Pair.of(OperationEnum.SAVITSKY_GOLAY, savitzkyGolayFilter));
-        filters.add(Pair.of(OperationEnum.EQUALIZE_LOCALLY, equalizeLocalHistogramsFilter));
-        filters.add(Pair.of(OperationEnum.LOCAL_CONTRAST, localContrastFilter));
-        filters.add(Pair.of(OperationEnum.GAMMA, gammaFilter));
-        filters.add(Pair.of(OperationEnum.COLOR_NORMALIZE, colorNormalisationFilter));
-        filters.add(Pair.of(OperationEnum.RGB_BALANCE, rgbBalanceFilter));
-        filters.add(Pair.of(OperationEnum.SATURATION, saturationFilter));
-        filters.add(Pair.of(OperationEnum.DISPERSION, dispersionCorrectionFilter));
-        filters.add(Pair.of(OperationEnum.HISTOGRAM_STRETCH, histogramStretchFilter));
+        filters.add(Pair.of(FilterEnum.CLIPPING_SUPPRESSION, clippingSuppressionFilter));
+        filters.add(Pair.of(FilterEnum.WIENER_DECONV, wienerDeconvolutionFilter));
+        filters.add(Pair.of(FilterEnum.SHARPEN, lswSharpenFilter));
+        filters.add(Pair.of(FilterEnum.ROTATE, rotationFilter));
+        filters.add(Pair.of(FilterEnum.SIGMA_DENOISE_1, sigmaDenoise1Filter));
+        filters.add(Pair.of(FilterEnum.IANS_NR, iansNoiseReductionFilter));
+        filters.add(Pair.of(FilterEnum.BILATERAL_DENOISE, bilateralDenoiseFilter));
+        filters.add(Pair.of(FilterEnum.SIGMA_DENOISE_2, sigmaDenoise2Filter));
+        filters.add(Pair.of(FilterEnum.SAVITSKY_GOLAY, savitzkyGolayFilter));
+        filters.add(Pair.of(FilterEnum.EQUALIZE_LOCALLY, equalizeLocalHistogramsFilter));
+        filters.add(Pair.of(FilterEnum.LOCAL_CONTRAST, localContrastFilter));
+        filters.add(Pair.of(FilterEnum.GAMMA, gammaFilter));
+        filters.add(Pair.of(FilterEnum.COLOR_NORMALIZE, colorNormalisationFilter));
+        filters.add(Pair.of(FilterEnum.RGB_BALANCE, rgbBalanceFilter));
+        filters.add(Pair.of(FilterEnum.SATURATION, saturationFilter));
+        filters.add(Pair.of(FilterEnum.DISPERSION, dispersionCorrectionFilter));
+        filters.add(Pair.of(FilterEnum.HISTOGRAM_STRETCH, histogramStretchFilter));
     }
 
-    public void correctExposure(ImagePlus image) throws IOException {
+    public void correctExposure(ImagePlus image) {
         image.setDefault16bitRange(16);
         image.resetDisplayRange();
     }
@@ -86,19 +87,19 @@ public class OperationService {
         cache.clear();
     }
 
-    public byte[] applyAllOperations(ImagePlus image, LswImageViewer viewer, Profile profile, List<OperationEnum> operationParams, boolean isMono) throws Exception {
+    public byte[] applyAllFilters(ImagePlus image, LswImageViewer viewer, Profile profile, List<FilterEnum> filterParams, boolean isMono) {
         updateProgress(viewer, 0, false);
 
         // Sharpening filters
-        byte[] psfImage = updatePSF(profile.getPsf(), operationParams, profile.getName(), isMono);
-        List<OperationEnum> operations = new ArrayList<>(operationParams);
+        byte[] psfImage = updatePSF(profile.getPsf(), filterParams, profile.getName(), isMono);
+        List<FilterEnum> filters = new ArrayList<>(filterParams);
         if (psfImage != null) {
-            operations.add(OperationEnum.WIENER_DECONV);
+            filters.add(FilterEnum.WIENER_DECONV);
         }
-        int progressIncrease = 100 / filters.size();
+        int progressIncrease = 100 / this.filters.size();
         int progress = 0;
         boolean filterEncountered = false;
-        OperationEnum previousCachedOperation = getPreviousCachedOperation(profile, image, operations);
+        FilterEnum previousCachedOperation = getPreviousCachedOperation(profile, image, filters);
 
         ImageStack stack = image.getStack();
         ImagePlus workImage = image;
@@ -107,11 +108,11 @@ public class OperationService {
             workImage = createTempCroppedImage(roi, stack);
         }
 
-        for (int i = 0; i < filters.size(); i++) {
-            Pair<OperationEnum, LSWFilter> filterData = filters.get(i);
-            OperationEnum filterOperation = filterData.getLeft();
+        for (int i = 0; i < this.filters.size(); i++) {
+            Pair<FilterEnum, LSWFilter> filterData = this.filters.get(i);
+            FilterEnum filterOperation = filterData.getLeft();
             LswImageLayersDto cacheValue = cache.get(filterOperation);
-            if (operations.contains(filterOperation) || filterEncountered || operations.isEmpty()) {
+            if (filters.contains(filterOperation) || filterEncountered || filters.isEmpty()) {
                 LSWFilter filter = filterData.getRight();
                 if (filter.apply(workImage, profile, isMono)) {
                     cache.put(filterOperation, LswImageProcessingUtil.getImageLayers(workImage));
@@ -122,7 +123,7 @@ public class OperationService {
                 LswImageProcessingUtil.updateImageLayers(workImage, cacheValue);
             }
             progress += progressIncrease;
-            boolean nextOperationSlow = filters.get(i < filters.size() - 1 ? i + 1 : i).getRight().isSlow();
+            boolean nextOperationSlow = this.filters.get(i < this.filters.size() - 1 ? i + 1 : i).getRight().isSlow();
             updateProgress(viewer, progress, nextOperationSlow);
         }
 
@@ -141,7 +142,7 @@ public class OperationService {
                 }
             }
         }, Constants.ARTIFICIAL_PROGRESS_DELAY, Constants.ARTIFICIAL_PROGRESS_DELAY);
-        if (operations.contains(OperationEnum.WIENER_DECONV)) {
+        if (filters.contains(FilterEnum.WIENER_DECONV)) {
             psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
         }
         return psfImage;
@@ -200,11 +201,11 @@ public class OperationService {
         }
     }
 
-    private OperationEnum getPreviousCachedOperation(Profile profile, ImagePlus image, List<OperationEnum> operations) {
+    private FilterEnum getPreviousCachedOperation(Profile profile, ImagePlus image, List<FilterEnum> operations) {
         boolean operationFound = false;
         for (int i = filters.size() - 1; i >= 0; i--) {
-            Pair<OperationEnum, LSWFilter> filterData = filters.get(i);
-            OperationEnum currentFilterOperation = filterData.getLeft();
+            Pair<FilterEnum, LSWFilter> filterData = filters.get(i);
+            FilterEnum currentFilterOperation = filterData.getLeft();
             if (operations.contains(currentFilterOperation)) {
                 operationFound = true;
                 continue;
@@ -239,9 +240,13 @@ public class OperationService {
         }
     }
 
-    private byte[] updatePSF(PSF psf, List<OperationEnum> operations, String profileName, boolean isMono) throws Exception {
-        if (operations.contains(OperationEnum.PSF)) {
-            PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profileName, isMono);
+    private byte[] updatePSF(PSF psf, List<FilterEnum> operations, String profileName, boolean isMono) {
+        if (operations.contains(FilterEnum.PSF)) {
+            try {
+                PsfDiskGenerator.generate16BitRGB(psf.getAiryDiskRadius(), psf.getSeeingIndex(), psf.getDiffractionIntensity(), profileName, isMono);
+            } catch (IOException e) {
+                throw new FilterException(e.getMessage());
+            }
             psf.setType(PSFType.SYNTHETIC);
             return LswFileUtil.getWienerDeconvolutionPSFImage(profileName);
         }

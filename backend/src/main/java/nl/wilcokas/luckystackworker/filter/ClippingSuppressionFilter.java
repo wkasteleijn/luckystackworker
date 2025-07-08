@@ -18,7 +18,7 @@ import static nl.wilcokas.luckystackworker.constants.Constants.MAX_INT_VALUE;
 public class ClippingSuppressionFilter implements LSWFilter {
 
     @Override
-    public boolean apply(ImagePlus image, Profile profile, boolean isMono) throws IOException {
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
         if (isApplied(profile, image)) {
             log.info("Applying clipping suppression to image {}", image.getID());
             apply(image, profile.getClippingSuppression());
