@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.UnaryOperator;
 
-import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
+import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum;
 import org.springframework.stereotype.Service;
 
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.io.Opener;
 import ij.process.ImageProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

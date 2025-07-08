@@ -50,7 +50,7 @@ public class PSFService {
                 ImagePlus psf = new Opener().openImage(filePath);
                 if (psf.getStack().getSize() < 3) {
                     psf = LswImageProcessingUtil
-                            .create16BitRGBImage(filePath, LswImageProcessingUtil.getImageLayers(psf), psf.getWidth(), psf.getHeight(), true, true, true);
+                            .create16BitRGBImage(filePath, LswImageProcessingUtil.getImageLayers(psf), true, true, true);
                 }
                 if (psf.getWidth() > PSF_SIZE && psf.getHeight() > PSF_SIZE) {
                     log.warn("Uploaded PSF is too large ({} X {}), cropping to {} X {}", psf.getWidth(), psf.getHeight(), PSF_SIZE, PSF_SIZE);

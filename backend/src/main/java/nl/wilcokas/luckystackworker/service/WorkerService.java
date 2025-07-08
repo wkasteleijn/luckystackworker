@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
-import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
+import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.scheduling.annotation.Scheduled;

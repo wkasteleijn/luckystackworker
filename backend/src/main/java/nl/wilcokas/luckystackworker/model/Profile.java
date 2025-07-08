@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.wilcokas.luckystackworker.dto.PSFDTO;
 import nl.wilcokas.luckystackworker.dto.ProfileDTO;
-import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
+import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum;
 
 @Data
 @NoArgsConstructor

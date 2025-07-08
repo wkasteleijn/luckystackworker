@@ -7,8 +7,8 @@ import ij.CompositeImage;
 import ij.ImageStack;
 import ij.plugin.filter.GaussianBlur;
 import nl.wilcokas.luckystackworker.exceptions.FilterException;
-import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
-import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
+import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
+import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum;
 import org.apache.commons.lang3.tuple.Pair;
 
 import ij.IJ;
@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import static nl.wilcokas.luckystackworker.constants.Constants.MINIMUK_DARK_TRESHOLD;
@@ -277,7 +276,7 @@ public class LswImageProcessingUtil {
         processor.setPixels(rgbPixels);
     }
 
-    public static LswImageLayersDto getImageLayers(ImagePlus image) {
+    public static LswImageLayers getImageLayers(ImagePlus image) {
         ImageStack stack = image.getStack();
         short[][] newPixels = new short[3][stack.getProcessor(1).getPixelCount()];
         try {
@@ -299,10 +298,10 @@ public class LswImageProcessingUtil {
             throw new FilterException(e.getMessage());
         }
 
-        return LswImageLayersDto.builder().layers(newPixels).build();
+        return getLswImageLayers(newPixels, image.getWidth(), image.getHeight());
     }
 
-    public static void copyLayers(LswImageLayersDto layersDto, ImagePlus image, boolean includeRed, boolean includeGreen, boolean includeBlue) {
+    public static void copyLayers(LswImageLayers layersDto, ImagePlus image, boolean includeRed, boolean includeGreen, boolean includeBlue) {
         short[][] layers = layersDto.getLayers();
         if (image.getProcessor() instanceof ColorProcessor) {
             convertLayersToColorImage(layers, image, includeRed, includeGreen, includeBlue);
@@ -352,7 +351,7 @@ public class LswImageProcessingUtil {
         }
     }
 
-    public static void copyLayer(LswImageLayersDto layersDto, ImagePlus image, int layer) {
+    public static void copyLayer(LswImageLayers layersDto, ImagePlus image, int layer) {
         ImageStack stack = image.getStack();
         short[][] layers = layersDto.getLayers();
         int sourceLayer = layer - 1;
@@ -363,9 +362,9 @@ public class LswImageProcessingUtil {
         }
     }
 
-    public static ImagePlus create16BitRGBImage(String filepath, LswImageLayersDto unprocessedImageLayers, int width, int height, boolean includeRed, boolean includeGreen, boolean includeBlue) {
+    public static ImagePlus create16BitRGBImage(String filepath, LswImageLayers unprocessedImageLayers, boolean includeRed, boolean includeGreen, boolean includeBlue) {
         short[] redPixels;
-        short[] emptyPixels = new short[width * height];
+        short[] emptyPixels = new short[unprocessedImageLayers.getWidth() * unprocessedImageLayers.getHeight()];
         Arrays.fill(emptyPixels, (short) 0);
         if (includeRed) {
             redPixels = unprocessedImageLayers.getLayers()[0];
@@ -385,7 +384,7 @@ public class LswImageProcessingUtil {
             bluePixels = Arrays.copyOf(emptyPixels, emptyPixels.length);
         }
 
-        ImageStack stack = new ImageStack(width, height);
+        ImageStack stack = new ImageStack(unprocessedImageLayers.getWidth(), unprocessedImageLayers.getHeight());
         stack.addSlice("Red", redPixels);
         stack.addSlice("Green", greenPixels);
         stack.addSlice("Blue", bluePixels);
@@ -432,8 +431,8 @@ public class LswImageProcessingUtil {
                 }
             }
         }
-        LswImageLayersDto layersDto = LswImageLayersDto.builder().layers(pixels).build();
-        return create16BitRGBImage("psf", layersDto, width, height, true, true, true);
+        LswImageLayers layersDto = getLswImageLayers(pixels, width, height);
+        return create16BitRGBImage("psf", layersDto, true, true, true);
     }
 
     public static ImagePlus crop(ImagePlus image, Roi roi, String filepath) {
@@ -476,7 +475,15 @@ public class LswImageProcessingUtil {
             throw new FilterException(e.getMessage());
         }
 
-        return create16BitRGBImage(filepath, LswImageLayersDto.builder().layers(newPixels).build(), width, height, true, true, true);
+        return create16BitRGBImage(filepath, getLswImageLayers(newPixels, width, height), true, true, true);
+    }
+
+    public static LswImageLayers getLswImageLayers(short[][] pixels, int width, int height) {
+        return LswImageLayers.builder()
+                .layers(pixels)
+                .width(width)
+                .height(height)
+                .build();
     }
 
     public static ImageProcessor createDeringMaskProcessor(
@@ -521,7 +528,7 @@ public class LswImageProcessingUtil {
         return image.getStack().size() == 3;
     }
 
-    public static void updateImageLayers(ImagePlus image, LswImageLayersDto layers) {
+    public static void updateImageLayers(ImagePlus image, LswImageLayers layers) {
         ImageStack stack = image.getStack();
         for (int layer = 1; layer <= 3; layer++) {
             ImageProcessor ip = stack.getProcessor(layer);

@@ -5,16 +5,17 @@ import ij.plugin.filter.GaussianBlur;
 import ij.process.FloatProcessor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.exceptions.FilterException;
-import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
+import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import static nl.wilcokas.luckystackworker.constants.Constants.*;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getImageLayers;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getLswImageLayers;
 
 @Slf4j
 public class PsfDiskGenerator {
@@ -47,8 +48,8 @@ public class PsfDiskGenerator {
             throw new FilterException(e.getMessage());
         }
 
-        LswImageLayersDto layers = LswImageLayersDto.builder().layers(new short[][]{redPixels, greenPixels, bluePixels}).build();
-        ImagePlus image = LswImageProcessingUtil.create16BitRGBImage(null, layers, PSF_SIZE, PSF_SIZE, true, true, true);
+        LswImageLayers layers = getLswImageLayers(new short[][]{redPixels, greenPixels, bluePixels}, PSF_SIZE, PSF_SIZE);
+        ImagePlus image = LswImageProcessingUtil.create16BitRGBImage(null, layers, true, true, true);
         LswFileUtil.savePSF(image, profileName);
         return image;
     }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.model.Profile;
-import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
+import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum;
 
 @Data
 @NoArgsConstructor

@@ -17,6 +17,7 @@ public class LswVersionNumber {
     private int major;
     private int minor;
     private int patch;
+    private boolean isInBeta;
     private List<String> releaseNotes;
 
     public static Optional<LswVersionNumber> fromString(String version) {
@@ -42,13 +43,14 @@ public class LswVersionNumber {
                     .minor(minorVersion)
                     .patch(patchVersion)
                     .releaseNotes(releaseNotes)
+                    .isInBeta(versionString[2].contains("beta"))
                     .build());
         }
         return Optional.empty();
     }
 
     public int getConvertedVersion() {
-        return major * 10000 + minor * 100 + patch;
+        return major * 100000 + minor * 1000 + patch * 10 + (isInBeta? -1 : 0);
     }
 
     public String toString() {

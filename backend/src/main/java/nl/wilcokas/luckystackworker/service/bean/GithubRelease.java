@@ -1,9 +1,9 @@
-package nl.wilcokas.luckystackworker.service.dto;
+package nl.wilcokas.luckystackworker.service.bean;
 
 import lombok.Getter;
 
 @Getter
-public class GithubReleaseDto {
+public class GithubRelease {
     private String url;
     private String assetsUrl;
     private String uploadUrl;

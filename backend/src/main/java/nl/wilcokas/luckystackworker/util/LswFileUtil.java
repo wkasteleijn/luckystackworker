@@ -17,8 +17,8 @@ import ij.io.Opener;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.model.PSFType;
-import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
-import nl.wilcokas.luckystackworker.service.dto.OpenImageModeEnum;
+import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
+import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -473,12 +473,12 @@ public class LswFileUtil {
         return openImage(filepath, openImageMode, null, null, scale, scaler);
     }
 
-    public static Pair<ImagePlus, Boolean> openImage(String filepath, OpenImageModeEnum openImageMode, ImagePlus currentImage, LswImageLayersDto currentUnprocessedImageLayers, double scale, UnaryOperator<ImagePlus> scaler) {
+    public static Pair<ImagePlus, Boolean> openImage(String filepath, OpenImageModeEnum openImageMode, ImagePlus currentImage, LswImageLayers currentUnprocessedImageLayers, double scale, UnaryOperator<ImagePlus> scaler) {
         ImagePlus newImage = new Opener().openImage(LswFileUtil.getIJFileFormat(filepath));
         if (scale > 1.0) {
             newImage = scaler.apply(newImage);
         }
-        LswImageLayersDto unprocessedNewImageLayers = LswImageProcessingUtil.getImageLayers(newImage);
+        LswImageLayers unprocessedNewImageLayers = LswImageProcessingUtil.getImageLayers(newImage);
         boolean includeRed = openImageMode == OpenImageModeEnum.RED || openImageMode == OpenImageModeEnum.RGB;
         boolean includeGreen = openImageMode == OpenImageModeEnum.GREEN || openImageMode == OpenImageModeEnum.RGB;
         boolean includeBlue = openImageMode == OpenImageModeEnum.BLUE || openImageMode == OpenImageModeEnum.RGB;
@@ -487,7 +487,7 @@ public class LswFileUtil {
         }
 
         if (currentImage == null || currentImage.getWidth() != newImage.getWidth() || currentImage.getHeight() != newImage.getHeight()) {
-            return Pair.of(LswImageProcessingUtil.create16BitRGBImage(filepath, unprocessedNewImageLayers, newImage.getWidth(), newImage.getHeight(), includeRed, includeGreen, includeBlue),
+            return Pair.of(LswImageProcessingUtil.create16BitRGBImage(filepath, unprocessedNewImageLayers, includeRed, includeGreen, includeBlue),
                     newImage.getStackSize() != 3);
         } else {
             if (currentUnprocessedImageLayers != null) {

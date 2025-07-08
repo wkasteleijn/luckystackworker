@@ -39,7 +39,7 @@ import nl.wilcokas.luckystackworker.ij.LswImageWindow;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.model.FilterEnum;
-import nl.wilcokas.luckystackworker.service.dto.GithubReleaseDto;
+import nl.wilcokas.luckystackworker.service.bean.GithubRelease;
 import nl.wilcokas.luckystackworker.util.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,7 +58,7 @@ import nl.wilcokas.luckystackworker.dto.VersionDTO;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
-import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
+import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
 
 import static java.util.Collections.*;
 
@@ -93,7 +93,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     private int zoomFactor = 0;
 
-    private LswImageLayersDto unprocessedImageLayers;
+    private LswImageLayers unprocessedImageLayers;
 
     private int controllerLastKnownPositionX = -1;
     private int controllerLastKnownPositionY = -1;
@@ -582,7 +582,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
         try {
             if (result != null) {
-                GithubReleaseDto releaseDto = snakeCaseObjectMapper.readValue(result, GithubReleaseDto.class);
+                GithubRelease releaseDto = snakeCaseObjectMapper.readValue(result, GithubRelease.class);
                 return LswVersionNumber.fromString(releaseDto.getTagName(), releaseDto.getBody());
             }
         } catch (JsonProcessingException e) {
@@ -689,7 +689,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return true;
     }
 
-    private LswImageViewer createColorImageFrom(ImagePlus image, LswImageLayersDto layersDto, String title) {
+    private LswImageViewer createColorImageFrom(ImagePlus image, LswImageLayers layersDto, String title) {
         LswImageViewer singleLayerColorImage = new LswImageViewer(title, new ColorProcessor(image.getWidth(), image.getHeight()));
         LswImageProcessingUtil.convertLayersToColorImage(layersDto.getLayers(), singleLayerColorImage);
         return singleLayerColorImage;

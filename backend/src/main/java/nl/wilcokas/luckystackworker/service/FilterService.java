@@ -13,7 +13,7 @@ import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.model.FilterEnum;
 import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.model.PSFType;
-import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
+import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.PsfDiskGenerator;
 import org.apache.commons.lang3.tuple.Pair;
@@ -26,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
+
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getLswImageLayers;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -55,7 +57,7 @@ public class FilterService {
     private Timer timer = new Timer();
 
     private final List<Pair<FilterEnum, LSWFilter>> filters = new ArrayList<>();
-    private Map<FilterEnum, LswImageLayersDto> cache = new HashMap<>();
+    private Map<FilterEnum, LswImageLayers> cache = new HashMap<>();
 
     @PostConstruct
     void init() {
@@ -92,14 +94,14 @@ public class FilterService {
 
         // Sharpening filters
         byte[] psfImage = updatePSF(profile.getPsf(), filterParams, profile.getName(), isMono);
-        List<FilterEnum> filters = new ArrayList<>(filterParams);
+        List<FilterEnum> appliedFilters = new ArrayList<>(filterParams);
         if (psfImage != null) {
-            filters.add(FilterEnum.WIENER_DECONV);
+            appliedFilters.add(FilterEnum.WIENER_DECONV);
         }
         int progressIncrease = 100 / this.filters.size();
         int progress = 0;
         boolean filterEncountered = false;
-        FilterEnum previousCachedOperation = getPreviousCachedOperation(profile, image, filters);
+        FilterEnum previousCachedOperation = getPreviousCachedOperation(profile, image, appliedFilters);
 
         ImageStack stack = image.getStack();
         ImagePlus workImage = image;
@@ -108,17 +110,24 @@ public class FilterService {
             workImage = createTempCroppedImage(roi, stack);
         }
 
+        int cacheWidth = cache.isEmpty() ? 0 : cache.entrySet().stream().findFirst().get().getValue().getWidth();
+        int cacheHeight = cache.isEmpty() ? 0 : cache.entrySet().stream().findFirst().get().getValue().getHeight();
+        if (workImage.getHeight() != cacheHeight || workImage.getWidth() != cacheWidth) {
+            log.info("ROI has been modified, clearing the cache");
+            clearCache();
+        }
+
         for (int i = 0; i < this.filters.size(); i++) {
             Pair<FilterEnum, LSWFilter> filterData = this.filters.get(i);
             FilterEnum filterOperation = filterData.getLeft();
-            LswImageLayersDto cacheValue = cache.get(filterOperation);
-            if (filters.contains(filterOperation) || filterEncountered || filters.isEmpty()) {
+            LswImageLayers cacheValue = cache.get(filterOperation);
+            if (appliedFilters.contains(filterOperation) || filterEncountered || appliedFilters.isEmpty() || cacheValue == null) {
                 LSWFilter filter = filterData.getRight();
                 if (filter.apply(workImage, profile, isMono)) {
                     cache.put(filterOperation, LswImageProcessingUtil.getImageLayers(workImage));
                 }
                 filterEncountered = true;
-            } else if (previousCachedOperation == filterOperation && cacheValue != null) {
+            } else if (previousCachedOperation == filterOperation) {
                 log.info("Applying {} from cache", filterOperation);
                 LswImageProcessingUtil.updateImageLayers(workImage, cacheValue);
             }
@@ -142,7 +151,7 @@ public class FilterService {
                 }
             }
         }, Constants.ARTIFICIAL_PROGRESS_DELAY, Constants.ARTIFICIAL_PROGRESS_DELAY);
-        if (filters.contains(FilterEnum.WIENER_DECONV)) {
+        if (appliedFilters.contains(FilterEnum.WIENER_DECONV)) {
             psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
         }
         return psfImage;
@@ -175,7 +184,7 @@ public class FilterService {
             }
         }
         return LswImageProcessingUtil.create16BitRGBImage("crop",
-                LswImageLayersDto.builder().layers(newPixels).build(), roiWidth, roiHeight, true, true, true);
+                getLswImageLayers(newPixels, roiWidth, roiHeight), true, true, true);
     }
 
     private void copyPixelsBackToImage(Roi roi, ImageStack tempCroppedStack, ImageStack stack) {
@@ -210,7 +219,7 @@ public class FilterService {
                 operationFound = true;
                 continue;
             }
-            LswImageLayersDto cacheValue = cache.get(currentFilterOperation);
+            LswImageLayers cacheValue = cache.get(currentFilterOperation);
             if (operationFound && cacheValue != null && filterData.getRight().isApplied(profile, image)) {
                 return currentFilterOperation;
             }

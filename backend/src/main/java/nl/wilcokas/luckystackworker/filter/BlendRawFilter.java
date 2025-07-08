@@ -5,14 +5,12 @@ import ij.ImageStack;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.exceptions.FilterException;
-import nl.wilcokas.luckystackworker.service.dto.LswImageLayersDto;
+import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
-import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**
@@ -22,7 +20,7 @@ import java.util.concurrent.Executors;
 @Component
 public class BlendRawFilter {
 
-    public void apply(ImagePlus image, final LswImageLayersDto unprocessedImageLayers, double blendRawRedFactor, double blendRawGreenFactor, double blendRawBlueFactor) {
+    public void apply(ImagePlus image, final LswImageLayers unprocessedImageLayers, double blendRawRedFactor, double blendRawGreenFactor, double blendRawBlueFactor) {
         ImageStack stack = image.getStack();
         short[] redPixels = (short[]) stack.getProcessor(Constants.RED_LAYER_INDEX).getPixels();
         short[] greenPixels = (short[]) stack.getProcessor(Constants.GREEN_LAYER_INDEX).getPixels();
