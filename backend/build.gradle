@@ -19,9 +19,7 @@ java {
 repositories {
     mavenCentral()
     mavenLocal()
-    flatDir {
-        dirs 'libs'
-    }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -34,6 +32,7 @@ dependencies {
     implementation libs.org.yaml.snakeyaml
     implementation libs.com.fasterxml.jackson.datatype.jackson.datatype.jsr310
     implementation libs.io.github.stevenjwest.paralleliterativedeconvolution
+    implementation libs.net.sourceforge.parallelcolt
 
     // Lombok for main
     compileOnly libs.org.projectlombok.lombok
