@@ -1,9 +1,11 @@
 backend/target/
+backend/build
 backend/.settings/
 backend/.classpath
 backend/.project
 backend/.metadata
 backend/.idea
+backend/.gradle
 backend/gmic
 backend/gmic-3.4
 backend/LuckyStackWorker
