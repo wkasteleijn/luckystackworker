@@ -19,7 +19,9 @@ java {
 repositories {
     mavenCentral()
     mavenLocal()
-    // IMPORTANT: local maven repo still needed because of parallelIterativeDeconvolution which depends on a lib called parallelcolt:0.11.4 that is not available on Maven Central.
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
