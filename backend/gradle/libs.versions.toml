@@ -14,6 +14,7 @@ org-springframework-boot-spring-boot-starter-test = "3.5.3"
 org-springframework-boot-spring-boot-starter-tomcat = "3.5.3"
 org-springframework-boot-spring-boot-starter-web = "3.5.3"
 org-yaml-snakeyaml = "2.4"
+google-java-format = "1.27.0"
 
 [libraries]
 com-fasterxml-jackson-datatype-jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "com-fasterxml-jackson-datatype-jackson-datatype-jsr310" }
@@ -28,3 +29,4 @@ org-springframework-boot-spring-boot-starter-test = { module = "org.springframew
 org-springframework-boot-spring-boot-starter-tomcat = { module = "org.springframework.boot:spring-boot-starter-tomcat", version.ref = "org-springframework-boot-spring-boot-starter-tomcat" }
 org-springframework-boot-spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "org-springframework-boot-spring-boot-starter-web" }
 org-yaml-snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "org-yaml-snakeyaml" }
+google-java-format = { module = "com.google.googlejavaformat:google-java-format", version.ref = "google-java-format" }

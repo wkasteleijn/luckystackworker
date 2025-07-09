@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class PSFImageDto {
-    private String imageData;
+  private String imageData;
 }

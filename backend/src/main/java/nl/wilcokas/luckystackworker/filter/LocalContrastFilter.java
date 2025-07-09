@@ -1,6 +1,7 @@
 package nl.wilcokas.luckystackworker.filter;
 
 import ij.ImagePlus;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
@@ -10,57 +11,81 @@ import nl.wilcokas.luckystackworker.filter.settings.UnsharpMaskParameters;
 import nl.wilcokas.luckystackworker.model.Profile;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-
 @RequiredArgsConstructor
 @Slf4j
 @Component
 public class LocalContrastFilter implements LSWFilter {
 
-    private final LSWSharpenFilter sharpenFilter;
+  private final LSWSharpenFilter sharpenFilter;
 
-    @Override
-    public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
-        LSWSharpenMode mode = (profile.getLocalContrastMode() == null) ? LSWSharpenMode.LUMINANCE
-                : LSWSharpenMode.valueOf(profile.getLocalContrastMode());
-        boolean filterApplied = false;
-        if (profile.getLocalContrastFine() != 0) {
-            applyLocalContrast(image, profile.getLocalContrastFine(), Constants.LOCAL_CONTRAST_FINE_RADIUS, mode);
-            filterApplied = true;
-        }
-        if (profile.getLocalContrastMedium() != 0) {
-            applyLocalContrast(image, profile.getLocalContrastMedium(), Constants.LOCAL_CONTRAST_MEDIUM_RADIUS, mode);
-            filterApplied = true;
-        }
-        if (profile.getLocalContrastLarge() != 0) {
-            applyLocalContrast(image, profile.getLocalContrastLarge(), Constants.LOCAL_CONTRAST_LARGE_RADIUS, mode);
-            filterApplied = true;
-        }
-        return filterApplied;
+  @Override
+  public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
+    LSWSharpenMode mode =
+        (profile.getLocalContrastMode() == null)
+            ? LSWSharpenMode.LUMINANCE
+            : LSWSharpenMode.valueOf(profile.getLocalContrastMode());
+    boolean filterApplied = false;
+    if (profile.getLocalContrastFine() != 0) {
+      applyLocalContrast(
+          image, profile.getLocalContrastFine(), Constants.LOCAL_CONTRAST_FINE_RADIUS, mode);
+      filterApplied = true;
     }
-
-    @Override
-    public boolean isSlow() {
-        return false;
+    if (profile.getLocalContrastMedium() != 0) {
+      applyLocalContrast(
+          image, profile.getLocalContrastMedium(), Constants.LOCAL_CONTRAST_MEDIUM_RADIUS, mode);
+      filterApplied = true;
     }
-
-    @Override
-    public boolean isApplied(Profile profile, ImagePlus image) {
-        return profile.getLocalContrastFine() != 0 || profile.getLocalContrastMedium() != 0 || profile.getLocalContrastLarge() != 0;
+    if (profile.getLocalContrastLarge() != 0) {
+      applyLocalContrast(
+          image, profile.getLocalContrastLarge(), Constants.LOCAL_CONTRAST_LARGE_RADIUS, mode);
+      filterApplied = true;
     }
+    return filterApplied;
+  }
 
-    private void applyLocalContrast(final ImagePlus image, int amount, BigDecimal radius, LSWSharpenMode localContrastMode) {
-        log.info("Applying local contrast with mode {}, radius {} amount {} to image {}", localContrastMode, radius, amount, image.getID());
-        float famount = (amount) / 100f;
-        UnsharpMaskParameters usParams = UnsharpMaskParameters.builder()
-                .radiusRed(radius.doubleValue()).amountRed(famount).iterationsRed(1)
-                .radiusGreen(radius.doubleValue()).amountGreen(famount).iterationsGreen(1)
-                .radiusBlue(radius.doubleValue()).amountBlue(famount).iterationsBlue(1)
-                .build();
-        LSWSharpenParameters parameters = LSWSharpenParameters.builder().includeBlue(true).includeGreen(true).includeRed(true).individual(false)
-                .saturation(1f).unsharpMaskParameters(usParams).mode(localContrastMode).build();
-        sharpenFilter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
-    }
+  @Override
+  public boolean isSlow() {
+    return false;
+  }
 
+  @Override
+  public boolean isApplied(Profile profile, ImagePlus image) {
+    return profile.getLocalContrastFine() != 0
+        || profile.getLocalContrastMedium() != 0
+        || profile.getLocalContrastLarge() != 0;
+  }
+
+  private void applyLocalContrast(
+      final ImagePlus image, int amount, BigDecimal radius, LSWSharpenMode localContrastMode) {
+    log.info(
+        "Applying local contrast with mode {}, radius {} amount {} to image {}",
+        localContrastMode,
+        radius,
+        amount,
+        image.getID());
+    float famount = (amount) / 100f;
+    UnsharpMaskParameters usParams =
+        UnsharpMaskParameters.builder()
+            .radiusRed(radius.doubleValue())
+            .amountRed(famount)
+            .iterationsRed(1)
+            .radiusGreen(radius.doubleValue())
+            .amountGreen(famount)
+            .iterationsGreen(1)
+            .radiusBlue(radius.doubleValue())
+            .amountBlue(famount)
+            .iterationsBlue(1)
+            .build();
+    LSWSharpenParameters parameters =
+        LSWSharpenParameters.builder()
+            .includeBlue(true)
+            .includeGreen(true)
+            .includeRed(true)
+            .individual(false)
+            .saturation(1f)
+            .unsharpMaskParameters(usParams)
+            .mode(localContrastMode)
+            .build();
+    sharpenFilter.applyRGBMode(image, parameters.getUnsharpMaskParameters());
+  }
 }

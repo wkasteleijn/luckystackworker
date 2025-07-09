@@ -9,43 +9,43 @@ import lombok.Setter;
 @Builder
 public class UnsharpMaskParameters {
 
-    // luminance
-    private double radiusLuminance;
-    private float amountLuminance;
-    private int iterationsLuminance;
-    private float clippingStrengthLuminance;
-    private float clippingRangeLuminance;
-    private double deringRadiusLuminance;
-    private float deringStrengthLuminance;
-    private float blendRawLuminance;
+  // luminance
+  private double radiusLuminance;
+  private float amountLuminance;
+  private int iterationsLuminance;
+  private float clippingStrengthLuminance;
+  private float clippingRangeLuminance;
+  private double deringRadiusLuminance;
+  private float deringStrengthLuminance;
+  private float blendRawLuminance;
 
-    // red
-    private double radiusRed;
-    private float amountRed;
-    private int iterationsRed;
-    private float clippingStrengthRed;
-    private float clippingRangeRed;
-    private double deringRadiusRed;
-    private float deringStrengthRed;
-    private float blendRawRed;
+  // red
+  private double radiusRed;
+  private float amountRed;
+  private int iterationsRed;
+  private float clippingStrengthRed;
+  private float clippingRangeRed;
+  private double deringRadiusRed;
+  private float deringStrengthRed;
+  private float blendRawRed;
 
-    // green
-    private double radiusGreen;
-    private float amountGreen;
-    private int iterationsGreen;
-    private float clippingStrengthGreen;
-    private float clippingRangeGreen;
-    private double deringRadiusGreen;
-    private float deringStrengthGreen;
-    private float blendRawGreen;
+  // green
+  private double radiusGreen;
+  private float amountGreen;
+  private int iterationsGreen;
+  private float clippingStrengthGreen;
+  private float clippingRangeGreen;
+  private double deringRadiusGreen;
+  private float deringStrengthGreen;
+  private float blendRawGreen;
 
-    // blue
-    private double radiusBlue;
-    private float amountBlue;
-    private int iterationsBlue;
-    private float clippingStrengthBlue;
-    private float clippingRangeBlue;
-    private double deringRadiusBlue;
-    private float deringStrengthBlue;
-    private float blendRawBlue;
+  // blue
+  private double radiusBlue;
+  private float amountBlue;
+  private int iterationsBlue;
+  private float clippingStrengthBlue;
+  private float clippingRangeBlue;
+  private double deringRadiusBlue;
+  private float deringStrengthBlue;
+  private float blendRawBlue;
 }

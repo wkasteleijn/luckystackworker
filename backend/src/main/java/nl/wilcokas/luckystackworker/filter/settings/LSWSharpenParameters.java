@@ -9,19 +9,18 @@ import lombok.Setter;
 @Builder
 public class LSWSharpenParameters {
 
-    private LSWSharpenMode mode;
+  private LSWSharpenMode mode;
 
-    private boolean individual;
+  private boolean individual;
 
-    // Applies to non individual+luminance & RGB mode
-    private UnsharpMaskParameters unsharpMaskParameters;
+  // Applies to non individual+luminance & RGB mode
+  private UnsharpMaskParameters unsharpMaskParameters;
 
-    // Applies to non individual+luminance mode
-    private boolean includeRed;
-    private boolean includeGreen;
-    private boolean includeBlue;
-    private boolean includeColor;
+  // Applies to non individual+luminance mode
+  private boolean includeRed;
+  private boolean includeGreen;
+  private boolean includeBlue;
+  private boolean includeColor;
 
-    private float saturation;
-
+  private float saturation;
 }
