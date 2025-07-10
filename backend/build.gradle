@@ -1,9 +1,9 @@
 plugins {
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.spotless)
     id 'java'
-    id 'org.springframework.boot' version '3.5.3'
-    id 'io.spring.dependency-management' version '1.1.4'
     id 'maven-publish'
-    id 'com.diffplug.spotless' version '7.1.0'
     id 'application'
 }
 
@@ -22,9 +22,10 @@ java {
 }
 
 repositories {
+    flatDir {
+        dirs "${System.getProperty("user.home")}/Library/ParallelColt" // IMPORTANT: See README for more information
+    }
     mavenCentral()
-    mavenLocal()
-    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -36,8 +37,9 @@ dependencies {
     implementation libs.net.imagej.ij
     implementation libs.org.yaml.snakeyaml
     implementation libs.com.fasterxml.jackson.datatype.jackson.datatype.jsr310
-    implementation libs.io.github.stevenjwest.paralleliterativedeconvolution
+    implementation libs.org.apache.commons.math3
     implementation libs.net.sourceforge.parallelcolt
+    implementation libs.io.github.stevenjwest.paralleliterativedeconvolution
 
     // Lombok for main
     compileOnly libs.org.projectlombok.lombok
