@@ -1,4 +1,4 @@
-<div class="newVersionPanel">
+<div class="popup-container">
   <img class="icon" src="assets/images/luckystackworker_new.png" />
   <h2 class="subtitle">Version {{ version }} is out</h2>
   <p class="newVersionText">
@@ -9,19 +9,17 @@
     <li *ngFor="let note of releaseNotes">{{ note }}</li>
   </ul>
 
-  <button
-    mat-raised-button
-    class="button buttonNewVersionpanel activeColor"
-    (click)="onClose()"
-  >
-    &nbsp;&nbsp;Download now&nbsp;&nbsp;
-  </button>
-
-  <button
-    mat-raised-button
-    class="button buttonNewVersionpanel"
-    (click)="onClose()"
-  >
-    &nbsp;&nbsp;Remind me later&nbsp;&nbsp;
-  </button>
+  <div class="buttons">
+    <button
+      mat-raised-button
+      class="button activeColorPressed"
+      (click)="onClose()"
+    >
+      &nbsp;&nbsp;Get it now&nbsp;&nbsp;
+    </button>
+    &nbsp;&nbsp;
+    <button mat-raised-button class="button activeColor" (click)="onClose()">
+      &nbsp;&nbsp;Remind me later&nbsp;&nbsp;
+    </button>
+  </div>
 </div>

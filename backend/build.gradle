@@ -12,7 +12,7 @@ application {
 }
 
 group = 'nl.wilcokas'
-version = '6.13.0-beta'
+version = '6.20.0-beta'
 description = 'LuckyStackWorker'
 
 java {
@@ -40,6 +40,7 @@ dependencies {
     implementation libs.org.apache.commons.math3
     implementation libs.net.sourceforge.parallelcolt
     implementation libs.io.github.stevenjwest.paralleliterativedeconvolution
+    implementation libs.com.github.wendykierp.jtransforms
 
     // Lombok for main
     compileOnly libs.org.projectlombok.lombok
@@ -69,6 +70,10 @@ publishing {
             from(components.java)
         }
     }
+}
+
+springBoot {
+    buildInfo()
 }
 
 test {

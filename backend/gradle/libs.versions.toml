@@ -16,6 +16,7 @@ commons-math3 = "3.5"
 springBoot = "3.5.3"
 springDependencyManagement = "1.1.4"
 spotless = "7.1.0"
+jtransforms= "3.1"
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
@@ -34,5 +35,6 @@ org-springframework-boot-spring-boot-starter = { module = "org.springframework.b
 org-springframework-boot-spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "org-springframework-boot-spring-boot-starter-test" }
 org-springframework-boot-spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "org-springframework-boot-spring-boot-starter-web" }
 org-yaml-snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "org-yaml-snakeyaml" }
+com-github-wendykierp-jtransforms = { module = "com.github.wendykierp:JTransforms", version.ref = "jtransforms" }
 net-sourceforge-parallelcolt = { module = "net.sourceforge.parallelcolt:parallelcolt", version.ref = "parallelcolt" }
 org-apache-commons-math3 = { module = "org.apache.commons:commons-math3", version.ref = "commons-math3" }

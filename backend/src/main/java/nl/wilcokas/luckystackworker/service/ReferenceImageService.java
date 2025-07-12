@@ -1,6 +1,7 @@
 package nl.wilcokas.luckystackworker.service;
 
 import static java.util.Collections.*;
+import static nl.wilcokas.luckystackworker.constants.Constants.MAX_RELEASE_NOTES_SHOWN;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -56,6 +58,7 @@ import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
 import nl.wilcokas.luckystackworker.util.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -69,9 +72,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
   @Value("${github.api.url}")
   private String githubApiUrl;
-
-  @Value("${lsw.version}")
-  private String currentVersion;
 
   @Getter private LswImageViewer displayedImage;
 
@@ -113,6 +113,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
   private final FilterService operationService;
   private final LuckyStackWorkerContext luckyStackWorkerContext;
   private final ObjectMapper snakeCaseObjectMapper;
+  private final BuildProperties buildProperties;
 
   public ResponseDTO scale(Profile profile) throws IOException {
     this.isLargeImage =
@@ -359,16 +360,18 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
   public VersionDTO getLatestVersion(LocalDateTime currentDate) {
     Settings settings = settingsService.getSettings();
+    LswVersionNumber currentLswVersionNumber =
+        LswVersionNumber.fromString(buildProperties.getVersion())
+            .orElse(LswVersionNumber.fromString("0.0.0").get()); // should only happen in dev mode
     LswVersionNumber latestKnowVersion =
         LswVersionNumber.fromString(settings.getLatestKnownVersion())
-            .orElse(
-                LswVersionNumber.fromString(currentVersion) // the first time the app is opened
-                    .orElse(
-                        LswVersionNumber.fromString("0.0.0")
-                            .get())); // should only happen in dev mode
+            .orElse(currentLswVersionNumber);
     VersionDTO result =
         VersionDTO.builder()
             .latestVersion(latestKnowVersion.toString())
+            .latestVersionConverted(latestKnowVersion.getConvertedVersion())
+            .localVersion(currentLswVersionNumber.toString())
+            .localVersionConverted(currentLswVersionNumber.getConvertedVersion())
             .isNewVersion(false)
             .build();
     if (settings.getLatestKnownVersionChecked() == null
@@ -385,8 +388,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             VersionDTO.builder()
                 .latestVersion(latestVersionFromGithub.toString())
                 .latestVersionConverted(latestVersionFromGithub.getConvertedVersion())
+                .localVersion(currentLswVersionNumber.toString())
+                .localVersionConverted(currentLswVersionNumber.getConvertedVersion())
                 .isNewVersion(true)
-                .releaseNotes(latestVersionFromGithub.getReleaseNotes())
+                .releaseNotes(
+                    limitNotesList(
+                        latestVersionFromGithub.getReleaseNotes(), MAX_RELEASE_NOTES_SHOWN))
                 .build();
       }
       settings.setLatestKnownVersionChecked(currentDate);
@@ -648,7 +655,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
   private Optional<LswVersionNumber> requestLatestVersion() {
 
-    // TODO: replace httpService with spring WebClient
+    // TODO: replace httpService with spring RestClient
     String result =
         httpService.sendHttpGetRequest(
             HttpClient.Version.HTTP_1_1, githubApiUrl, Constants.VERSION_REQUEST_TIMEOUT);
@@ -793,6 +800,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         new LswImageViewer(title, new ColorProcessor(image.getWidth(), image.getHeight()));
     LswImageProcessingUtil.convertLayersToColorImage(layersDto.getLayers(), singleLayerColorImage);
     return singleLayerColorImage;
+  }
+
+  private List<String> limitNotesList(final List<String> notes, int limit) {
+    List<String> notesLimited = new ArrayList<>(notes.subList(0, Math.min(limit, notes.size())));
+    if (notes.size() > limit) {
+      notesLimited.add("And more...");
+    }
+    return notesLimited;
   }
 
   final class MyFileChooser extends JFileChooser {

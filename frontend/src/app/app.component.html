@@ -20,9 +20,9 @@
 <div *ngIf="isPsfPanelVisible || isRotationPanelVisible" class="backdrop"></div>
 <app-newversion
   *ngIf="showNewVersionPopup"
-  [version]="lswVersion"
+  [version]="versionInfo?.latestVersion"
   (close)="hideNewVersionPopup()"
-  [releaseNotes]="releaseNotes"
+  [releaseNotes]="versionInfo?.releaseNotes"
 ></app-newversion>
 
 <div *ngIf="shouldShowSpinner()">

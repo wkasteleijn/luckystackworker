@@ -54,4 +54,5 @@ public class Constants {
   public static final int WAVELENGTH_NM_RED = 630;
   public static final int WAVELENGTH_NM_GREEN = 532;
   public static final int WAVELENGTH_NM_BLUE = 465;
+  public static final int MAX_RELEASE_NOTES_SHOWN = 6;
 }

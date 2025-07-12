@@ -24,6 +24,21 @@
   color: lightblue;
 }
 
-.newVersionPanel {
-  margin-top: 24px;
+.popup-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgb(168, 168, 168);
+  background-color: #191919;
+  border: 1px solid rgb(168, 168, 168);
+  padding: 20px;
+  width: 492px;
+  height: 524px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.buttons {
+  text-align: center;
 }

@@ -1,6 +1,8 @@
 export class Version {
   latestVersion: string;
-  isNewVersion: boolean;
+  localVersion: string;
   latestVersionConverted: number;
+  localVersionConverted: number;
+  isNewVersion: boolean;
   releaseNotes: string[];
 }

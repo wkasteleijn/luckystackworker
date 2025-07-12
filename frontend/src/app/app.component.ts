@@ -3,7 +3,6 @@ import { ThemePalette } from '@angular/material/core';
 import { MatLegacyDialog } from '@angular/material/legacy-dialog';
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar';
 import { timeout } from 'rxjs/operators';
-import version from '../../package.json';
 import { AboutComponent } from './about/about.component';
 import {
   ConfirmationComponent,
@@ -13,6 +12,7 @@ import { LuckyStackWorkerService } from './luckystackworker.service';
 import { Profile } from './model/profile';
 import { PSF } from './model/psf';
 import { Settings } from './model/settings';
+import { Version } from './model/version';
 
 const SERVICE_POLL_DELAY_MS = 250;
 
@@ -137,7 +137,6 @@ export class AppComponent implements OnInit {
   roi: boolean = false;
   didChangesWhileRoiEnabled: boolean = false;
   _showSpinner = false;
-  latestKnownVersion = version.version;
   private slowProcessing: boolean = false;
   zoomFactor: number = 0;
   isMaximized: boolean = false;
@@ -157,9 +156,9 @@ export class AppComponent implements OnInit {
   isRotationPanelVisible: boolean = false;
   psfImage: string = '';
   sliderTextDisplayed: boolean = false;
+
+  versionInfo: Version;
   showNewVersionPopup: boolean = false;
-  lswVersion: string = '';
-  releaseNotes: string[] = [];
 
   resetToRawText = 'Are you sure you want to reset everything?';
 
@@ -1898,16 +1897,12 @@ export class AppComponent implements OnInit {
     return this._showSpinner;
   }
 
-  public getCurrentVersion() {
-    return version.version;
-  }
-
-  public getLatestKnownVersion() {
-    return this.latestKnownVersion;
-  }
-
   public showVersionButton(): boolean {
-    return version.version !== this.latestKnownVersion;
+    return (
+      this.versionInfo &&
+      this.versionInfo.localVersionConverted <
+        this.versionInfo.latestVersionConverted
+    );
   }
 
   gmicUnavailableMessage() {
@@ -2086,11 +2081,9 @@ export class AppComponent implements OnInit {
   private checkLatestVersion() {
     this.luckyStackWorkerService.getLatestVersion().subscribe(
       (data) => {
-        this.latestKnownVersion = data.latestVersion;
+        this.versionInfo = data;
         if (data.newVersion) {
           this.showNewVersionPopup = true;
-          this.lswVersion = data.latestVersion;
-          this.releaseNotes = data.releaseNotes;
         }
       },
       (error) => console.log(error)

@@ -1,6 +1,20 @@
 LuckyStackWorker - RELEASE NOTES
 ================================
-03/03/2024 revision release 6.2.1
+XX/08/2024 minor release 6.20.0
+- Added new Suppress clipping filter that reduces the clipped areas after applying deconvolution
+- Added new Highlight clipped areas that will make the clipped parts of the image blink
+- Transformed the clipping function into a more general purpose ROI selection function that can be used to crop or apply the filters only to the
+selected ROI, thereby improving the performance
+- Brightness and Lightness filters can now also be moved below 0 to reduce the value
+- ROI selection will be re-used now also when disabling the ROI and later re-enable it again, as long as the same image is being processed
+- When saving the image the app will now ask for confirmation when the specified filename already exists in the folder
+- Save button has been moved to the bottom right of the button panel, to prevent confusion in case the user accidentally pressed to Open reference image button instead of Save
+- Improved the new version check
+- Using java 24 non pinning virtualthreads to optimize multithreading
+- Migrated backend build to Gradle
+- Upgraded all dependencies to the latest versions.
+
+03/03/2024 revision release 6.12.1
 - Fixed bug when setting sharpen amount to 0 the next time you start the app it would not work anymore
 - Fixed bug in the windows startup that only happened for users with a space character in their username
 - Fixed bug in Bilateral Denoise not able to change values for green and blue channel individually.

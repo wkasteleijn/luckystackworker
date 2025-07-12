@@ -1,7 +1,7 @@
 {
   "name": "luckystackworker",
   "productName": "LuckyStackWorker",
-  "version": "6.13.0-beta",
+  "version": "6.20.0-beta",
   "main": "app.js",
   "scripts": {
     "ng": "ng",
