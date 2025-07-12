@@ -41,6 +41,7 @@ dependencies {
     implementation libs.net.sourceforge.parallelcolt
     implementation libs.io.github.stevenjwest.paralleliterativedeconvolution
     implementation libs.com.github.wendykierp.jtransforms
+    implementation libs.org.apache.httpcomponents.client5
 
     // Lombok for main
     compileOnly libs.org.projectlombok.lombok

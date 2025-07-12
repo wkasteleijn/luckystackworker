@@ -17,6 +17,7 @@ springBoot = "3.5.3"
 springDependencyManagement = "1.1.4"
 spotless = "7.1.0"
 jtransforms= "3.1"
+httpclient5 = "5.5"
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
@@ -38,3 +39,4 @@ org-yaml-snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "org-yaml-sn
 com-github-wendykierp-jtransforms = { module = "com.github.wendykierp:JTransforms", version.ref = "jtransforms" }
 net-sourceforge-parallelcolt = { module = "net.sourceforge.parallelcolt:parallelcolt", version.ref = "parallelcolt" }
 org-apache-commons-math3 = { module = "org.apache.commons:commons-math3", version.ref = "commons-math3" }
+org-apache-httpcomponents-client5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpclient5" }

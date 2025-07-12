@@ -11,10 +11,14 @@ export class NewVersionComponent implements OnInit {
   @Input() releaseNotes: string[];
 
   @Output() close = new EventEmitter<void>();
+  @Output() getItNow = new EventEmitter<void>();
 
   ngOnInit(): void {}
 
   onClose() {
     this.close.emit();
+  }
+  onGetItNow() {
+    this.getItNow.emit();
   }
 }

@@ -2,6 +2,7 @@ package nl.wilcokas.luckystackworker.service;
 
 import static java.util.Collections.*;
 import static nl.wilcokas.luckystackworker.constants.Constants.MAX_RELEASE_NOTES_SHOWN;
+import static nl.wilcokas.luckystackworker.constants.Constants.VERSION_REQUEST_TIMEOUT;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,7 +61,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 @Slf4j
 @Service
@@ -654,20 +658,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
   }
 
   private Optional<LswVersionNumber> requestLatestVersion() {
-
-    // TODO: replace httpService with spring RestClient
     String result =
-        httpService.sendHttpGetRequest(
-            HttpClient.Version.HTTP_1_1, githubApiUrl, Constants.VERSION_REQUEST_TIMEOUT);
-    if (result == null) {
-      log.warn("HTTP1.1 request for latest version failed, trying HTTP/2..");
-      result =
-          httpService.sendHttpGetRequest(
-              HttpClient.Version.HTTP_2, githubApiUrl, Constants.VERSION_REQUEST_TIMEOUT);
-      if (result == null) {
-        log.warn("HTTP/2 request for latest version failed as well");
-      }
-    }
+        RestClient.builder()
+            .requestFactory(getClientHttpRequestFactory())
+            .build()
+            .get()
+            .uri(githubApiUrl)
+            .retrieve()
+            .body(String.class);
     try {
       if (result != null) {
         GithubRelease releaseDto = snakeCaseObjectMapper.readValue(result, GithubRelease.class);
@@ -677,6 +675,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
       log.warn("Unable to parse version string from tag: ", e);
     }
     return Optional.empty();
+  }
+
+  private ClientHttpRequestFactory getClientHttpRequestFactory() {
+    HttpComponentsClientHttpRequestFactory clientHttpRequestFactory =
+        new HttpComponentsClientHttpRequestFactory();
+    clientHttpRequestFactory.setConnectTimeout(VERSION_REQUEST_TIMEOUT);
+    clientHttpRequestFactory.setConnectionRequestTimeout(VERSION_REQUEST_TIMEOUT);
+    return clientHttpRequestFactory;
   }
 
   private boolean openReferenceImage(String filePath, Profile profile, LocalDateTime dateTime) {

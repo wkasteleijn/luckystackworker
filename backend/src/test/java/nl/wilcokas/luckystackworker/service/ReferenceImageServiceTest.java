@@ -21,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,6 +38,7 @@ class ReferenceImageServiceTest {
   @Mock private ProfileService profileService;
   @Mock private FilterService operationService;
   @Mock private LuckyStackWorkerContext luckyStackWorkerContext;
+  @Mock private BuildProperties buildPropeties;
 
   @InjectMocks private ReferenceImageService referenceImageService;
   @Mock private ObjectMapper snakeCaseObjectMapper;
@@ -50,7 +52,8 @@ class ReferenceImageServiceTest {
             profileService,
             operationService,
             luckyStackWorkerContext,
-            snakeCaseObjectMapper);
+            snakeCaseObjectMapper,
+            buildPropeties);
     ReflectionTestUtils.setField(referenceImageService, "currentVersion", "0.0.0");
     ReflectionTestUtils.setField(
         referenceImageService,
