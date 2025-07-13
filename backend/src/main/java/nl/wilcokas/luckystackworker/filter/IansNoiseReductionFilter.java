@@ -19,7 +19,7 @@ public class IansNoiseReductionFilter implements LSWFilter {
   private final GmicService gmicService;
 
   @Override
-  public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
+  public boolean apply(ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
     if (isApplied(profile, image)) {
       log.info("Applying Ian's noise reduction to image {}", image.getID());
       IansNoiseReductionParameters parameters =

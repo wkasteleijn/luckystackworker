@@ -26,6 +26,10 @@ import nl.wilcokas.luckystackworker.util.PsfDiskGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import static java.lang.Double.parseDouble;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.convertToShort;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getAveragePixelValue;
+
 @Component
 @Slf4j
 public class WienerDeconvolutionFilter implements LSWFilter {
@@ -34,7 +38,8 @@ public class WienerDeconvolutionFilter implements LSWFilter {
   private int numberOfVirtualThreads;
 
   @Override
-  public boolean apply(final ImagePlus image, Profile profile, boolean isMono) {
+  public boolean apply(
+      final ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
     if (isApplied(profile, image)) {
       log.info("Applying Wiener deconvolution filter");
       float deringStrength = profile.getDeringStrength() / 100f;
@@ -244,7 +249,7 @@ public class WienerDeconvolutionFilter implements LSWFilter {
             (newValue * appliedMaskFactor) + (originalValue * (1d - appliedMaskFactor));
         double assignedValue =
             (1f - blendRawFactor) * assignedValueAfterMask + originalValue * blendRawFactor;
-        pixels[i] = LswImageProcessingUtil.convertToShort((int) (Math.min(assignedValue, 65535d)));
+        pixels[i] = convertToShort((int) (Math.min(assignedValue, 65535d)));
       }
     }
   }
@@ -326,13 +331,5 @@ public class WienerDeconvolutionFilter implements LSWFilter {
       log.error("Error during deconvolution: ", e);
       return (short[]) ipInput.getPixels();
     }
-  }
-
-  private double getAveragePixelValue(short[] pixels) {
-    double sum = 0;
-    for (short pixel : pixels) {
-      sum += LswImageProcessingUtil.convertToUnsignedInt(pixel);
-    }
-    return sum / pixels.length;
   }
 }

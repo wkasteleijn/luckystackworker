@@ -4,7 +4,7 @@ import ij.ImagePlus;
 import nl.wilcokas.luckystackworker.model.Profile;
 
 public interface LSWFilter {
-  boolean apply(ImagePlus image, Profile profile, boolean isMono);
+  boolean apply(ImagePlus image, Profile profile, boolean isMono, String... additionalArguments);
 
   boolean isSlow();
 

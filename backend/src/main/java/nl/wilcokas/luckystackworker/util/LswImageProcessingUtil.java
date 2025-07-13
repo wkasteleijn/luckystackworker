@@ -592,4 +592,23 @@ public class LswImageProcessingUtil {
       System.arraycopy(pixels, 0, ip.getPixels(), 0, pixels.length);
     }
   }
+
+  public static double getAveragePixelValue(ImagePlus image) {
+    ImageStack stack = image.getStack();
+    double averageRGB = 0;
+    for (int channel = 1; channel <= 3; channel++) {
+      ImageProcessor ip = stack.getProcessor(channel);
+      short[] pixels = (short[]) ip.getPixels();
+      averageRGB += getAveragePixelValue(pixels);
+    }
+    return averageRGB / 3D;
+  }
+
+  public static double getAveragePixelValue(short[] pixels) {
+    double sum = 0;
+    for (short pixel : pixels) {
+      sum += convertToUnsignedInt(pixel);
+    }
+    return sum / pixels.length;
+  }
 }

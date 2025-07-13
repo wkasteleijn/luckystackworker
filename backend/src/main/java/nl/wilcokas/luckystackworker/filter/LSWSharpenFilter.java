@@ -28,7 +28,7 @@ public class LSWSharpenFilter implements LSWFilter {
   private static final float FLOAT_MAX_SATURATED_VALUE = 65535f;
 
   @Override
-  public boolean apply(final ImagePlus image, Profile profile, boolean isMono) {
+  public boolean apply(final ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
     int iterations = profile.getIterations() == 0 ? 1 : profile.getIterations();
     if (isApplied(profile, image)) {
       log.info(

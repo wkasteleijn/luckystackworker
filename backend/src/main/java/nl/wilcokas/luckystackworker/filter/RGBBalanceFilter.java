@@ -20,7 +20,7 @@ public class RGBBalanceFilter implements LSWFilter {
   private static final int STEP_SIZE = 64;
 
   @Override
-  public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
+  public boolean apply(ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
     if (isApplied(profile, image)) {
       log.info(
           "Applying RGB balance correction to image {} with values R {}, G {}, B {}",

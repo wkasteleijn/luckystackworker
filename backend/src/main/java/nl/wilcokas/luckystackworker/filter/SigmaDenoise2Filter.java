@@ -16,7 +16,7 @@ public class SigmaDenoise2Filter implements LSWFilter {
   private final SigmaFilterPlus sigmaFilterPlus;
 
   @Override
-  public boolean apply(ImagePlus image, Profile profile, boolean isMono) {
+  public boolean apply(ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
     if (isApplied(profile, image)) {
       int iterations = profile.getDenoise2Iterations() == 0 ? 1 : profile.getDenoise2Iterations();
       log.info(

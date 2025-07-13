@@ -96,6 +96,8 @@ public class FilterService {
       boolean isMono) {
     updateProgress(viewer, 0, false);
 
+    String[] additionalArguments =  new String[] {Double.toString(LswImageProcessingUtil.getAveragePixelValue(image))};
+
     // Sharpening filters
     byte[] psfImage = updatePSF(profile.getPsf(), filterParams, profile.getName(), isMono);
     List<FilterEnum> appliedFilters = new ArrayList<>(filterParams);
@@ -123,26 +125,22 @@ public class FilterService {
       clearCache();
     }
 
-    for (int i = 0; i < this.filters.size(); i++) {
-      Pair<FilterEnum, LSWFilter> filterData = this.filters.get(i);
+    for (int i = 0; i < filters.size(); i++) {
+      Pair<FilterEnum, LSWFilter> filterData = filters.get(i);
       FilterEnum filterOperation = filterData.getLeft();
       LswImageLayers cacheValue = cache.get(filterOperation);
-      if (appliedFilters.contains(filterOperation)
-          || filterEncountered
-          || appliedFilters.isEmpty()
-          || cacheValue == null) {
+      if (appliedFilters.contains(filterOperation) || filterEncountered || appliedFilters.isEmpty()) {
         LSWFilter filter = filterData.getRight();
         if (filter.apply(workImage, profile, isMono)) {
           cache.put(filterOperation, LswImageProcessingUtil.getImageLayers(workImage));
         }
         filterEncountered = true;
-      } else if (previousCachedOperation == filterOperation) {
+      } else if (previousCachedOperation == filterOperation && cacheValue != null) {
         log.info("Applying {} from cache", filterOperation);
         LswImageProcessingUtil.updateImageLayers(workImage, cacheValue);
       }
       progress += progressIncrease;
-      boolean nextOperationSlow =
-          this.filters.get(i < this.filters.size() - 1 ? i + 1 : i).getRight().isSlow();
+      boolean nextOperationSlow = filters.get(i < filters.size() - 1 ? i + 1 : i).getRight().isSlow();
       updateProgress(viewer, progress, nextOperationSlow);
     }
 
