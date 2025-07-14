@@ -2,8 +2,6 @@ package nl.wilcokas.luckystackworker.ij;
 
 import ij.*;
 import ij.gui.*;
-import ij.measure.Measurements;
-import ij.process.ImageStatistics;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -17,7 +15,6 @@ import javax.swing.*;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
-import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ReflectionUtils;
@@ -34,7 +31,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
   private static final Color HISTOGRAM_COLOR_NIGHT = new Color(0x9f, 0x58, 0x00);
   private static final Color HISTOGRAM_COLOR_WARN = new Color(174, 80, 80);
   private static final Color BORDER_COLOR = new Color(64, 64, 64);
-  private static final Color BACKGROUND_COLOR = new Color(43, 43, 43);
+  private static final Color BACKGROUND_COLOR = new Color(25, 25, 25);
   private static final int OFFSET_TOP = 32;
   private static final int HISTOGRAM_MARGIN_LEFT = 8;
   private static final int HISTOGRAM_MARGIN_TOP = 8;
@@ -60,9 +57,9 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
   private double progressPercentage = 0;
   private int mouseX, mouseY;
   private LocalDateTime previousDragMoment = LocalDateTime.now();
-  private Color histogramColorRed = Color.RED;
-  private Color histogramColorGreen = Color.GREEN;
-  private Color histogramColorBlue = Color.BLUE;
+  private Color histogramColorRed = new Color(0x88,0x30,0x30);
+  private Color histogramColorGreen = new Color(0x60,0xDD,0x60);
+  private Color histogramColorBlue = new Color(0x60,0x60,0xAA);
   private Color histogramColor = HISTOGRAM_COLOR_DAY;
   private Color backgroundColor = BACKGROUND_COLOR;
   private boolean isMaximized = false;
@@ -230,7 +227,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     g.fillRect(0, 0, thickness, height);
     g.fillRect(width - thickness, 0, thickness, height);
     g.setColor(backgroundColor);
-    g.fillRect(0, 32, width, 72);
+    g.fillRect(1, 32, width-2, 72);
     int textWidth = g.getFontMetrics().stringWidth(image.getTitle());
     int x = (getWidth() - textWidth) / 2;
     g.setColor(TITLE_COLOR);
@@ -281,7 +278,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
               HISTOGRAM_HEIGHT - blackSpaceGreen);
     }
 
-    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f));
+    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
     for (int i = 0; i < histogram[2].length; i++) {
       int intValueBlue = (int) ((histogram[2][i] / maxBlueValue) * HISTOGRAM_HEIGHT);
       if (intValueBlue > HISTOGRAM_HEIGHT) intValueBlue = HISTOGRAM_HEIGHT;
