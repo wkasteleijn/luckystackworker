@@ -611,4 +611,46 @@ public class LswImageProcessingUtil {
     }
     return sum / pixels.length;
   }
+
+  public static int[][] get16BitRGBHistogram(ImagePlus imp, int size) {
+    int[][] histograms = new int[3][size];
+    final int maxValue = 65536; // 16-bit max value + 1
+
+    for (int channel = 0; channel < 3; channel++) {
+      ImageProcessor ip = imp.getStack().getProcessor(channel + 1);
+      short[] pixels = (short[]) ip.getPixels();
+      for (short s : pixels) {
+        int val = s & 0xffff;
+        int bin = (val * size) / maxValue;
+        if (bin >= size) bin = size - 1;
+        histograms[channel][bin]++;
+      }
+    }
+    return histograms;
+  }
+
+  public static int[][] get8BitColorHistogram(ImagePlus imp, int size) {
+    ImageProcessor ip = imp.getProcessor();
+    int[][] histograms = new int[3][size];
+    int[] pixels = (int[]) ip.getPixels();
+    final int scale = 256;
+    for (int rgb : pixels) {
+      int r = (rgb >> 16) & 0xff;
+      int g = (rgb >> 8) & 0xff;
+      int b = rgb & 0xff;
+
+      int rBin = (r * size) / scale;
+      int gBin = (g * size) / scale;
+      int bBin = (b * size) / scale;
+
+      if (rBin >= size) rBin = size - 1;
+      if (gBin >= size) gBin = size - 1;
+      if (bBin >= size) bBin = size - 1;
+
+      histograms[0][rBin]++;
+      histograms[1][gBin]++;
+      histograms[2][bBin]++;
+    }
+    return histograms;
+  }
 }

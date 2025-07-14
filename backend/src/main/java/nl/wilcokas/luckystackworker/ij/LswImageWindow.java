@@ -17,9 +17,12 @@ import javax.swing.*;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
+import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ReflectionUtils;
+
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.get8BitColorHistogram;
 
 @Slf4j
 public class LswImageWindow extends ImageWindow implements MouseMotionListener {
@@ -36,6 +39,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
   private static final int HISTOGRAM_MARGIN_LEFT = 8;
   private static final int HISTOGRAM_MARGIN_TOP = 8;
   private static final int HISTOGRAM_HEIGHT = 56;
+  private static final int HISTOGRAM_WIDTH = 50;
   private static final int textOffsetX = HISTOGRAM_HEIGHT * 2 + 12;
   private static final int textOffsetY = 49;
   private static final int textHeight = 12;
@@ -56,6 +60,9 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
   private double progressPercentage = 0;
   private int mouseX, mouseY;
   private LocalDateTime previousDragMoment = LocalDateTime.now();
+  private Color histogramColorRed = Color.RED;
+  private Color histogramColorGreen = Color.GREEN;
+  private Color histogramColorBlue = Color.BLUE;
   private Color histogramColor = HISTOGRAM_COLOR_DAY;
   private Color backgroundColor = BACKGROUND_COLOR;
   private boolean isMaximized = false;
@@ -231,39 +238,74 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
   }
 
   private void paintHistogram(Graphics g) {
-    ImageStatistics stats =
-        image.getStatistics(
-            Measurements.AREA + Measurements.MEAN + Measurements.MODE + Measurements.MIN_MAX,
-            HISTOGRAM_HEIGHT);
-    double[] luminanceHistogram = smoothen(stats.histogram());
-    double maxValue = 1;
-    for (int i = 8; i < luminanceHistogram.length - 8; i++) {
-      if (luminanceHistogram[i] > maxValue) {
-        maxValue = luminanceHistogram[i];
+    int[][] histogram = smoothen(get8BitColorHistogram(image, HISTOGRAM_WIDTH));
+    double maxRedValue = 1;
+    double maxGreenValue = 1;
+    double maxBlueValue = 1;
+    for (int i = 8; i < histogram[0].length - 8; i++) {
+      if (histogram[0][i] > maxRedValue) {
+        maxRedValue = histogram[0][i];
+        maxGreenValue = histogram[1][i];
+        maxBlueValue = histogram[2][i];
       }
     }
-    for (int i = 0; i < luminanceHistogram.length; i++) {
-      int intValue = (int) ((luminanceHistogram[i] / maxValue) * HISTOGRAM_HEIGHT);
-      if (intValue > HISTOGRAM_HEIGHT) intValue = HISTOGRAM_HEIGHT;
-      int blackSpace = HISTOGRAM_HEIGHT - intValue;
+    Graphics2D g2d = (Graphics2D) g;
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+    for (int i = 0; i < histogram[0].length; i++) {
+      int intValueRed = (int) ((histogram[0][i] / maxRedValue) * HISTOGRAM_HEIGHT);
+      if (intValueRed > HISTOGRAM_HEIGHT) intValueRed = HISTOGRAM_HEIGHT;
+      int blackSpaceRed = HISTOGRAM_HEIGHT - intValueRed;
       g.setColor(backgroundColor);
-      g.fillRect(HISTOGRAM_MARGIN_LEFT + i * 2, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 2, blackSpace);
-      g.setColor(histogramColor);
       g.fillRect(
+          HISTOGRAM_MARGIN_LEFT + i * 2, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 2, blackSpaceRed);
+
+      g2d.setColor(histogramColorRed);
+      g2d.fillRect(
           HISTOGRAM_MARGIN_LEFT + i * 2,
-          blackSpace + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1,
+              blackSpaceRed + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1,
           2,
-          HISTOGRAM_HEIGHT - blackSpace);
+          HISTOGRAM_HEIGHT - blackSpaceRed);
     }
-    g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, HISTOGRAM_HEIGHT * 2, 1);
+
+    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+    for (int i = 0; i < histogram[1].length; i++) {
+      int intValueGreen = (int) ((histogram[1][i] / maxGreenValue) * HISTOGRAM_HEIGHT);
+      if (intValueGreen > HISTOGRAM_HEIGHT) intValueGreen = HISTOGRAM_HEIGHT;
+      int blackSpaceGreen = HISTOGRAM_HEIGHT - intValueGreen;
+      g2d.setColor(histogramColorGreen);
+      g2d.fillRect(
+              HISTOGRAM_MARGIN_LEFT + i * 2,
+              blackSpaceGreen + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1,
+              2,
+              HISTOGRAM_HEIGHT - blackSpaceGreen);
+    }
+
+    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f));
+    for (int i = 0; i < histogram[2].length; i++) {
+      int intValueBlue = (int) ((histogram[2][i] / maxBlueValue) * HISTOGRAM_HEIGHT);
+      if (intValueBlue > HISTOGRAM_HEIGHT) intValueBlue = HISTOGRAM_HEIGHT;
+      int blackSpaceBlue = HISTOGRAM_HEIGHT - intValueBlue;
+      g2d.setColor(histogramColorBlue);
+      g2d.fillRect(
+              HISTOGRAM_MARGIN_LEFT + i * 2,
+              blackSpaceBlue + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1,
+              2,
+              HISTOGRAM_HEIGHT - blackSpaceBlue);
+    }
+
+    // Draw green box around histogram
+    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+    g.setColor(histogramColor);
+    g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, HISTOGRAM_WIDTH * 2, 1);
     g.fillRect(
         HISTOGRAM_MARGIN_LEFT,
         HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT,
-        HISTOGRAM_HEIGHT * 2,
+        HISTOGRAM_WIDTH * 2,
         1);
     g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 1, HISTOGRAM_HEIGHT);
     g.fillRect(
-        HISTOGRAM_HEIGHT * 2 - 1 + HISTOGRAM_MARGIN_LEFT,
+        HISTOGRAM_WIDTH * 2 - 1 + HISTOGRAM_MARGIN_LEFT,
         HISTOGRAM_MARGIN_TOP + OFFSET_TOP,
         1,
         HISTOGRAM_HEIGHT);
@@ -413,13 +455,17 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     }
   }
 
-  private double[] smoothen(double[] histogram) {
-    double[] newHistogram = new double[histogram.length];
-    for (int i = 0; i < histogram.length; i++) {
-      if (i == 0 || i == histogram.length - 1) {
-        newHistogram[i] = histogram[i];
+  private int[][] smoothen(int[][] histogram) {
+    int[][] newHistogram = new int[3][histogram[0].length];
+    for (int i = 0; i < histogram[0].length; i++) {
+      if (i == 0 || i == histogram[0].length - 1) {
+        newHistogram[0][i] = histogram[0][i];
+        newHistogram[1][i] = histogram[1][i];
+        newHistogram[2][i] = histogram[2][i];
       } else {
-        newHistogram[i] = (histogram[i] + histogram[i - 1] + histogram[i + 1]) / 3;
+        newHistogram[0][i] = (histogram[0][i] + histogram[0][i - 1] + histogram[0][i + 1]) / 3;
+        newHistogram[1][i] = (histogram[1][i] + histogram[1][i - 1] + histogram[1][i + 1]) / 3;
+        newHistogram[2][i] = (histogram[2][i] + histogram[2][i - 1] + histogram[2][i + 1]) / 3;
       }
     }
     return newHistogram;

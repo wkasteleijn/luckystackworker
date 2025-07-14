@@ -3,6 +3,7 @@ package nl.wilcokas.luckystackworker.service;
 import static java.util.Collections.*;
 import static nl.wilcokas.luckystackworker.constants.Constants.MAX_RELEASE_NOTES_SHOWN;
 import static nl.wilcokas.luckystackworker.constants.Constants.VERSION_REQUEST_TIMEOUT;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.get16BitRGBHistogram;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +24,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
-import java.net.http.HttpClient;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -481,29 +481,27 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
   public void componentHidden(ComponentEvent e) {}
 
   public void updateHistogramMetadata(Profile profile) {
-    int[] histogramValuesRed = finalResultImage.getStack().getProcessor(1).getHistogram(100);
-    int[] histogramValuesGreen = finalResultImage.getStack().getProcessor(2).getHistogram(100);
-    int[] histogramValuesBlue = finalResultImage.getStack().getProcessor(3).getHistogram(100);
+    int[][] rgbHistograms = get16BitRGBHistogram(finalResultImage,100);
     int redPercentage = 0;
     int greenPercentage = 0;
     int bluePercentage = 0;
-    int redMax = getHistogramMax(histogramValuesRed);
-    int greenMax = getHistogramMax(histogramValuesRed);
-    int blueMax = getHistogramMax(histogramValuesRed);
+    int redMax = getHistogramMax(rgbHistograms[0]);
+    int greenMax = getHistogramMax(rgbHistograms[1]);
+    int blueMax = getHistogramMax(rgbHistograms[2]);
     for (int i = 99; i >= 0; i--) {
-      if ((histogramValuesRed[i] * 100) / redMax > 0) {
+      if ((rgbHistograms[0][i] * 100) / redMax > 0) {
         redPercentage = i + 1;
         break;
       }
     }
     for (int i = 99; i >= 0; i--) {
-      if ((histogramValuesGreen[i] * 100) / greenMax > 0) {
+      if ((rgbHistograms[1][i] * 100) / greenMax > 0) {
         greenPercentage = i + 1;
         break;
       }
     }
     for (int i = 99; i >= 0; i--) {
-      if ((histogramValuesBlue[i] * 100) / blueMax > 0) {
+      if ((rgbHistograms[2][i] * 100) / blueMax > 0) {
         bluePercentage = i + 1;
         break;
       }

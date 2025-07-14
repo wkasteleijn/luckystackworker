@@ -96,8 +96,6 @@ public class FilterService {
       boolean isMono) {
     updateProgress(viewer, 0, false);
 
-    String[] additionalArguments =  new String[] {Double.toString(LswImageProcessingUtil.getAveragePixelValue(image))};
-
     // Sharpening filters
     byte[] psfImage = updatePSF(profile.getPsf(), filterParams, profile.getName(), isMono);
     List<FilterEnum> appliedFilters = new ArrayList<>(filterParams);
