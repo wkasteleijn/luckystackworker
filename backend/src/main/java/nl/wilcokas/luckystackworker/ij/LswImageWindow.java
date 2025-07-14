@@ -248,47 +248,53 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     }
     Graphics2D g2d = (Graphics2D) g;
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-    for (int i = 0; i < histogram[0].length; i++) {
-      int intValueRed = (int) ((histogram[0][i] / maxRedValue) * HISTOGRAM_HEIGHT);
-      if (intValueRed > HISTOGRAM_HEIGHT) intValueRed = HISTOGRAM_HEIGHT;
-      int blackSpaceRed = HISTOGRAM_HEIGHT - intValueRed;
-      g.setColor(backgroundColor);
-      g.fillRect(
-          HISTOGRAM_MARGIN_LEFT + i * 2, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 2, blackSpaceRed);
+    if (metadata.getChannel() == ChannelEnum.RGB || metadata.getChannel() == ChannelEnum.R) {
+      g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+      for (int i = 0; i < histogram[0].length; i++) {
+        int intValueRed = (int) ((histogram[0][i] / maxRedValue) * HISTOGRAM_HEIGHT);
+        if (intValueRed > HISTOGRAM_HEIGHT) intValueRed = HISTOGRAM_HEIGHT;
+        int blackSpaceRed = HISTOGRAM_HEIGHT - intValueRed;
+        g.setColor(backgroundColor);
+        g.fillRect(
+            HISTOGRAM_MARGIN_LEFT + i * 2, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 2, blackSpaceRed);
 
-      g2d.setColor(histogramColorRed);
-      g2d.fillRect(
-          HISTOGRAM_MARGIN_LEFT + i * 2,
-              blackSpaceRed + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1,
-          2,
-          HISTOGRAM_HEIGHT - blackSpaceRed);
+        g2d.setColor(histogramColorRed);
+        g2d.fillRect(
+            HISTOGRAM_MARGIN_LEFT + i * 2,
+            blackSpaceRed + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1,
+            2,
+            HISTOGRAM_HEIGHT - blackSpaceRed);
+      }
     }
 
-    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-    for (int i = 0; i < histogram[1].length; i++) {
-      int intValueGreen = (int) ((histogram[1][i] / maxGreenValue) * HISTOGRAM_HEIGHT);
-      if (intValueGreen > HISTOGRAM_HEIGHT) intValueGreen = HISTOGRAM_HEIGHT;
-      int blackSpaceGreen = HISTOGRAM_HEIGHT - intValueGreen;
-      g2d.setColor(histogramColorGreen);
-      g2d.fillRect(
-              HISTOGRAM_MARGIN_LEFT + i * 2,
-              blackSpaceGreen + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1,
-              2,
-              HISTOGRAM_HEIGHT - blackSpaceGreen);
+    if (metadata.getChannel() == ChannelEnum.RGB || metadata.getChannel() == ChannelEnum.G) {
+      g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+      for (int i = 0; i < histogram[1].length; i++) {
+        int intValueGreen = (int) ((histogram[1][i] / maxGreenValue) * HISTOGRAM_HEIGHT);
+        if (intValueGreen > HISTOGRAM_HEIGHT) intValueGreen = HISTOGRAM_HEIGHT;
+        int blackSpaceGreen = HISTOGRAM_HEIGHT - intValueGreen;
+        g2d.setColor(histogramColorGreen);
+        g2d.fillRect(
+            HISTOGRAM_MARGIN_LEFT + i * 2,
+            blackSpaceGreen + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1,
+            2,
+            HISTOGRAM_HEIGHT - blackSpaceGreen);
+      }
     }
 
-    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-    for (int i = 0; i < histogram[2].length; i++) {
-      int intValueBlue = (int) ((histogram[2][i] / maxBlueValue) * HISTOGRAM_HEIGHT);
-      if (intValueBlue > HISTOGRAM_HEIGHT) intValueBlue = HISTOGRAM_HEIGHT;
-      int blackSpaceBlue = HISTOGRAM_HEIGHT - intValueBlue;
-      g2d.setColor(histogramColorBlue);
-      g2d.fillRect(
-              HISTOGRAM_MARGIN_LEFT + i * 2,
-              blackSpaceBlue + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1,
-              2,
-              HISTOGRAM_HEIGHT - blackSpaceBlue);
+    if (metadata.getChannel() == ChannelEnum.RGB || metadata.getChannel() == ChannelEnum.B) {
+      g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+      for (int i = 0; i < histogram[2].length; i++) {
+        int intValueBlue = (int) ((histogram[2][i] / maxBlueValue) * HISTOGRAM_HEIGHT);
+        if (intValueBlue > HISTOGRAM_HEIGHT) intValueBlue = HISTOGRAM_HEIGHT;
+        int blackSpaceBlue = HISTOGRAM_HEIGHT - intValueBlue;
+        g2d.setColor(histogramColorBlue);
+        g2d.fillRect(
+            HISTOGRAM_MARGIN_LEFT + i * 2,
+            blackSpaceBlue + HISTOGRAM_MARGIN_TOP + OFFSET_TOP + 1,
+            2,
+            HISTOGRAM_HEIGHT - blackSpaceBlue);
+      }
     }
 
     // Draw green box around histogram
