@@ -673,6 +673,11 @@
             [color]="colorTheme()"
           ></mat-slider>
           <span class="sliderLabel">{{ clippingSuppression }}</span>
+          <span
+            *ngIf="refImageSelected"
+            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
+            >{{ clippingSuppression == 0 ? "Off" : "" }}</span
+          >
         </div>
       </div>
 

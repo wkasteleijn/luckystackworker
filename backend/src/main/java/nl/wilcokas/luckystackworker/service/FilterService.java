@@ -104,8 +104,6 @@ public class FilterService {
     }
     int progressIncrease = 100 / this.filters.size();
     int progress = 0;
-    boolean filterEncountered = false;
-    FilterEnum previousCachedOperation = getPreviousCachedOperation(profile, image, appliedFilters);
 
     ImageStack stack = image.getStack();
     ImagePlus workImage = image;
@@ -123,11 +121,51 @@ public class FilterService {
       clearCache();
     }
 
+    applyFilters(viewer, profile, isMono, appliedFilters, workImage, progress, progressIncrease);
+
+    if (luckyStackWorkerContext.isRoiActive()) {
+      copyPixelsBackToImage(roi, workImage.getStack(), stack);
+    }
+
+    resetProgress(viewer);
+
+    if (appliedFilters.contains(FilterEnum.WIENER_DECONV)) {
+      psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
+    }
+    return psfImage;
+  }
+
+  public ImagePlus scaleImage(final ImagePlus image, final double scale) {
+    int newWidth = (int) (image.getWidth() * scale);
+    int newHeight = (int) (image.getHeight() * scale);
+    int depth = image.getStack().size();
+    return Scaler.resize(
+            image,
+            newWidth,
+            newHeight,
+            depth,
+            "depth=%s interpolation=Bicubic create".formatted(depth));
+  }
+
+  private void applyFilters(
+      LswImageViewer viewer,
+      Profile profile,
+      boolean isMono,
+      List<FilterEnum> appliedFilters,
+      ImagePlus workImage,
+      int progress,
+      int progressIncrease) {
+
+    FilterEnum previousCachedOperation =
+        getPreviousCachedOperation(profile, workImage, appliedFilters);
+    boolean filterEncountered = false;
     for (int i = 0; i < filters.size(); i++) {
       Pair<FilterEnum, LSWFilter> filterData = filters.get(i);
       FilterEnum filterOperation = filterData.getLeft();
       LswImageLayers cacheValue = cache.get(filterOperation);
-      if (appliedFilters.contains(filterOperation) || filterEncountered || appliedFilters.isEmpty()) {
+      if (appliedFilters.contains(filterOperation)
+          || filterEncountered
+          || appliedFilters.isEmpty()) {
         LSWFilter filter = filterData.getRight();
         if (filter.apply(workImage, profile, isMono)) {
           cache.put(filterOperation, LswImageProcessingUtil.getImageLayers(workImage));
@@ -138,14 +176,13 @@ public class FilterService {
         LswImageProcessingUtil.updateImageLayers(workImage, cacheValue);
       }
       progress += progressIncrease;
-      boolean nextOperationSlow = filters.get(i < filters.size() - 1 ? i + 1 : i).getRight().isSlow();
+      boolean nextOperationSlow =
+          filters.get(i < filters.size() - 1 ? i + 1 : i).getRight().isSlow();
       updateProgress(viewer, progress, nextOperationSlow);
     }
+  }
 
-    if (luckyStackWorkerContext.isRoiActive()) {
-      copyPixelsBackToImage(roi, workImage.getStack(), stack);
-    }
-
+  private void resetProgress(LswImageViewer viewer) {
     Timer resetProgressTimer = new Timer();
     resetProgressTimer.schedule(
         new TimerTask() {
@@ -160,22 +197,6 @@ public class FilterService {
         },
         Constants.ARTIFICIAL_PROGRESS_DELAY,
         Constants.ARTIFICIAL_PROGRESS_DELAY);
-    if (appliedFilters.contains(FilterEnum.WIENER_DECONV)) {
-      psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
-    }
-    return psfImage;
-  }
-
-  public ImagePlus scaleImage(final ImagePlus image, final double scale) {
-    int newWidth = (int) (image.getWidth() * scale);
-    int newHeight = (int) (image.getHeight() * scale);
-    int depth = image.getStack().size();
-    return Scaler.resize(
-        image,
-        newWidth,
-        newHeight,
-        depth,
-        "depth=%s interpolation=Bicubic create".formatted(depth));
   }
 
   private ImagePlus createTempCroppedImage(Roi roi, ImageStack stack) {

@@ -439,11 +439,6 @@ public class LswFileUtil {
         profile.setApplyUnsharpMask(false);
       }
     }
-
-    // Added since 6.13.0, so older version written yaml needs to stay compatible.
-    if (profile.getClippingSuppression() == 0) {
-      profile.setClippingSuppression(1);
-    }
   }
 
   public static boolean validateImageFormat(ImagePlus image, JFrame parentFrame) {

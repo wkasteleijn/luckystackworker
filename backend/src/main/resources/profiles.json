@@ -260,7 +260,8 @@
     "denoise": null,
     "denoiseRadius": null,
     "denoiseIterations": 0,
-    "largeImage": false
+    "largeImage": false,
+    "clippingSuppression": 0
   },
   {
     "id": 0,
@@ -391,7 +392,8 @@
     "denoise": null,
     "denoiseRadius": null,
     "denoiseIterations": 0,
-    "largeImage": false
+    "largeImage": false,
+    "clippingSuppression": 0
   },
   {
     "id": 0,
@@ -522,7 +524,8 @@
     "denoise": null,
     "denoiseRadius": null,
     "denoiseIterations": 0,
-    "largeImage": false
+    "largeImage": false,
+    "clippingSuppression": 0
   },
   {
     "id": 0,
@@ -653,7 +656,8 @@
     "denoise": null,
     "denoiseRadius": null,
     "denoiseIterations": 0,
-    "largeImage": false
+    "largeImage": false,
+    "clippingSuppression": 0
   },
   {
     "id": 0,
@@ -784,7 +788,8 @@
     "denoise": null,
     "denoiseRadius": null,
     "denoiseIterations": 0,
-    "largeImage": false
+    "largeImage": false,
+    "clippingSuppression": 0
   },
   {
     "id": 0,
@@ -915,7 +920,8 @@
     "denoise": null,
     "denoiseRadius": null,
     "denoiseIterations": 0,
-    "largeImage": false
+    "largeImage": false,
+    "clippingSuppression": 0
   },
   {
     "id": 0,
@@ -1046,7 +1052,8 @@
     "denoise": null,
     "denoiseRadius": null,
     "denoiseIterations": 0,
-    "largeImage": false
+    "largeImage": false,
+    "clippingSuppression": 0
   },
   {
     "id": 0,
@@ -1177,6 +1184,7 @@
     "denoise": null,
     "denoiseRadius": null,
     "denoiseIterations": 0,
-    "largeImage": false
+    "largeImage": false,
+    "clippingSuppression": 0
   }
 ]
