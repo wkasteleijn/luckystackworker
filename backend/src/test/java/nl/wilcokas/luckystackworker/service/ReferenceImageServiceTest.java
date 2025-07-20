@@ -1,18 +1,15 @@
 package nl.wilcokas.luckystackworker.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.net.http.HttpClient;
 import java.time.LocalDateTime;
 import nl.wilcokas.luckystackworker.LswConfiguration;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
-import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.dto.VersionDTO;
 import nl.wilcokas.luckystackworker.model.Settings;
+import nl.wilcokas.luckystackworker.service.client.GithubClientService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,31 +31,26 @@ class ReferenceImageServiceTest {
   private static final LocalDateTime LESS_THAN_2_WEEKS_AGO = TODAY.minusDays(13);
 
   @Mock private SettingsService settingsService;
-  @Mock private HttpService httpService;
   @Mock private ProfileService profileService;
   @Mock private FilterService operationService;
   @Mock private LuckyStackWorkerContext luckyStackWorkerContext;
-  @Mock private BuildProperties buildPropeties;
+  @Mock private BuildProperties buildProperties;
+  @Mock private GithubClientService githubClientService;
+  @Mock private ObjectMapper snakeCaseObjectMapper;
 
   @InjectMocks private ReferenceImageService referenceImageService;
-  @Mock private ObjectMapper snakeCaseObjectMapper;
 
   @BeforeEach
   void setup() {
     referenceImageService =
         new ReferenceImageService(
             settingsService,
-            httpService,
             profileService,
             operationService,
             luckyStackWorkerContext,
             snakeCaseObjectMapper,
-            buildPropeties);
-    ReflectionTestUtils.setField(referenceImageService, "currentVersion", "0.0.0");
-    ReflectionTestUtils.setField(
-        referenceImageService,
-        "githubApiUrl",
-        "https://api.github.com/repos/wilcokas/luckystackworker/releases/latest");
+            buildProperties,
+            githubClientService);
     ReflectionTestUtils.setField(
         referenceImageService,
         "snakeCaseObjectMapper",
@@ -168,16 +160,13 @@ class ReferenceImageServiceTest {
     assertEquals(LESS_THAN_2_WEEKS_AGO, settings.getLatestKnownVersionChecked());
     assertEquals(LATESTVERSIONLOCAL, settings.getLatestKnownVersion());
     assertNull(result.getReleaseNotes());
-    Mockito.verifyNoInteractions(httpService);
+    Mockito.verifyNoInteractions(githubClientService);
   }
 
   @Test
   void testGetLatestVersion_receivedUnrecognizedResponseFromServer() {
 
     Settings settings = mockSettings(LATESTVERSIONLOCAL, MORE_THAN_2_WEEKS_AGO);
-    when(httpService.sendHttpGetRequest(
-            eq(HttpClient.Version.HTTP_1_1), anyString(), eq(Constants.VERSION_REQUEST_TIMEOUT)))
-        .thenReturn("<html><body>nothing</body></html>");
 
     VersionDTO result = referenceImageService.getLatestVersion(TODAY);
 
@@ -229,8 +218,7 @@ class ReferenceImageServiceTest {
   }
 
   private void mockServerResponse(String version) {
-    when(httpService.sendHttpGetRequest(
-            eq(HttpClient.Version.HTTP_1_1), anyString(), eq(Constants.VERSION_REQUEST_TIMEOUT)))
+    when(githubClientService.getAppInfo())
         .thenReturn(
             String.format(
                 """

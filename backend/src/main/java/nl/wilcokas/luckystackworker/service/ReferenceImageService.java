@@ -2,7 +2,6 @@ package nl.wilcokas.luckystackworker.service;
 
 import static java.util.Collections.*;
 import static nl.wilcokas.luckystackworker.constants.Constants.MAX_RELEASE_NOTES_SHOWN;
-import static nl.wilcokas.luckystackworker.constants.Constants.VERSION_REQUEST_TIMEOUT;
 import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.get16BitRGBHistogram;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -56,15 +55,13 @@ import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.service.bean.GithubRelease;
 import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
+import nl.wilcokas.luckystackworker.service.client.GithubClientService;
 import nl.wilcokas.luckystackworker.util.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
 @Slf4j
 @Service
@@ -73,9 +70,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
   @Value("${spring.profiles.active}")
   private String activeOSProfile;
-
-  @Value("${github.api.url}")
-  private String githubApiUrl;
 
   @Getter private LswImageViewer displayedImage;
 
@@ -112,12 +106,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
   }
 
   private final SettingsService settingsService;
-  private final HttpService httpService;
   private final ProfileService profileService;
   private final FilterService operationService;
   private final LuckyStackWorkerContext luckyStackWorkerContext;
   private final ObjectMapper snakeCaseObjectMapper;
   private final BuildProperties buildProperties;
+  private final GithubClientService githubClientService;
 
   public ResponseDTO scale(Profile profile) throws IOException {
     this.isLargeImage =
@@ -656,15 +650,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
   }
 
   private Optional<LswVersionNumber> requestLatestVersion() {
-    String result =
-        RestClient.builder()
-            .requestFactory(getClientHttpRequestFactory())
-            .build()
-            .get()
-            .uri(githubApiUrl)
-            .retrieve()
-            .body(String.class);
     try {
+      String result = githubClientService.getAppInfo();
       if (result != null) {
         GithubRelease releaseDto = snakeCaseObjectMapper.readValue(result, GithubRelease.class);
         return LswVersionNumber.fromString(releaseDto.getTagName(), releaseDto.getBody());
@@ -673,14 +660,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
       log.warn("Unable to parse version string from tag: ", e);
     }
     return Optional.empty();
-  }
-
-  private ClientHttpRequestFactory getClientHttpRequestFactory() {
-    HttpComponentsClientHttpRequestFactory clientHttpRequestFactory =
-        new HttpComponentsClientHttpRequestFactory();
-    clientHttpRequestFactory.setConnectTimeout(VERSION_REQUEST_TIMEOUT);
-    clientHttpRequestFactory.setConnectionRequestTimeout(VERSION_REQUEST_TIMEOUT);
-    return clientHttpRequestFactory;
   }
 
   private boolean openReferenceImage(String filePath, Profile profile, LocalDateTime dateTime) {
