@@ -61,6 +61,6 @@ public class LswVersionNumber {
   }
 
   public String toString() {
-    return major + "." + minor + "." + patch + (isInBeta ? "-beta":"");
+    return major + "." + minor + "." + patch + (isInBeta ? "-beta" : "");
   }
 }

@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class GammaFilter implements LSWFilter {
   @Override
-  public boolean apply(ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
+  public boolean apply(
+      ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
     if (isApplied(profile, image)) {
       log.info(
           "Applying gamma correction with value {} to image {}", profile.getGamma(), image.getID());

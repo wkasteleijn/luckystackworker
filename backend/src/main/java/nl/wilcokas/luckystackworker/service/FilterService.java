@@ -140,11 +140,11 @@ public class FilterService {
     int newHeight = (int) (image.getHeight() * scale);
     int depth = image.getStack().size();
     return Scaler.resize(
-            image,
-            newWidth,
-            newHeight,
-            depth,
-            "depth=%s interpolation=Bicubic create".formatted(depth));
+        image,
+        newWidth,
+        newHeight,
+        depth,
+        "depth=%s interpolation=Bicubic create".formatted(depth));
   }
 
   private void applyFilters(

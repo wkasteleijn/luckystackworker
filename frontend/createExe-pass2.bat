@@ -1,4 +1,4 @@
-COPY ..\backend\target\luckystackworker.jar .\LuckyStackWorker-win32-x64\luckystackworker.jar
+COPY ..\backend\build\libs\luckystackworker.jar .\LuckyStackWorker-win32-x64\luckystackworker.jar
 COPY .\LuckyStackWorker-win32-x64\\resources\app\LICENSE_LSW.txt .\LuckyStackWorker-win32-x64
 COPY .\LuckyStackWorker-win32-x64\\resources\app\release_notes.txt .\LuckyStackWorker-win32-x64
 COPY .\LuckyStackWorker-win32-x64\\resources\app\lsworker.bat .\LuckyStackWorker-win32-x64

@@ -19,7 +19,8 @@ public class LocalContrastFilter implements LSWFilter {
   private final LSWSharpenFilter sharpenFilter;
 
   @Override
-  public boolean apply(ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
+  public boolean apply(
+      ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
     LSWSharpenMode mode =
         (profile.getLocalContrastMode() == null)
             ? LSWSharpenMode.LUMINANCE

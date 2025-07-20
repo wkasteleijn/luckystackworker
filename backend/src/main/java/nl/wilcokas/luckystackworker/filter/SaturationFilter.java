@@ -15,7 +15,8 @@ import org.springframework.stereotype.Component;
 public class SaturationFilter implements LSWFilter {
 
   @Override
-  public boolean apply(ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
+  public boolean apply(
+      ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
     if (isApplied(profile, image)) {
       log.info(
           "Applying saturation increase with factor {} to image {}",

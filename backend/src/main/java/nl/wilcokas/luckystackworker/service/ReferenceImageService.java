@@ -481,7 +481,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
   public void componentHidden(ComponentEvent e) {}
 
   public void updateHistogramMetadata(Profile profile) {
-    int[][] rgbHistograms = get16BitRGBHistogram(finalResultImage,100);
+    int[][] rgbHistograms = get16BitRGBHistogram(finalResultImage, 100);
     int redPercentage = 0;
     int greenPercentage = 0;
     int bluePercentage = 0;
@@ -549,9 +549,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                   LswImageProcessingUtil.copyLayers(
                       LswImageProcessingUtil.getImageLayers(finalResultImage),
                       displayedImage,
-                          visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.R,
-                          visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G,
-                          visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B);
+                      visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.R,
+                      visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G,
+                      visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B);
                 } catch (Exception e) {
                   log.error("Error while restoring highlighted clipped areas", e);
                 }
@@ -575,9 +575,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
       LswImageProcessingUtil.copyLayers(
           LswImageProcessingUtil.getImageLayers(finalResultImage),
           displayedImage,
-              visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.R,
-              visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G,
-              visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B);
+          visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.R,
+          visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G,
+          visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B);
       displayedImage.repaintImage();
       blinkClippedAreasTimer.cancel();
       blinkClippedAreasTimer = null;

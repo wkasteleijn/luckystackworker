@@ -1,5 +1,8 @@
 package nl.wilcokas.luckystackworker.filter;
 
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.convertToShort;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getAveragePixelValue;
+
 import edu.emory.mathcs.restoretools.iterative.IterativeEnums;
 import edu.emory.mathcs.restoretools.iterative.wpl.WPLOptions;
 import ij.ImagePlus;
@@ -25,10 +28,6 @@ import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.PsfDiskGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import static java.lang.Double.parseDouble;
-import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.convertToShort;
-import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getAveragePixelValue;
 
 @Component
 @Slf4j

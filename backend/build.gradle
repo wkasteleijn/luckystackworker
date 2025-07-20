@@ -87,3 +87,5 @@ spotless {
         target 'src/**/*.java'
     }
 }
+
+jar.archiveFileName = "luckystackworker.jar"

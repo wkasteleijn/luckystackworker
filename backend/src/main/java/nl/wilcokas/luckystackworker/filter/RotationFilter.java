@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class RotationFilter implements LSWFilter {
   @Override
-  public boolean apply(ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
+  public boolean apply(
+      ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
     if (isApplied(profile, image)) {
       ImageStack stack = image.getStack();
       try {

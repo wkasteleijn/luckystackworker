@@ -1,5 +1,7 @@
 package nl.wilcokas.luckystackworker.ij;
 
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.get8BitColorHistogram;
+
 import ij.*;
 import ij.gui.*;
 import java.awt.*;
@@ -18,8 +20,6 @@ import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ReflectionUtils;
-
-import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.get8BitColorHistogram;
 
 @Slf4j
 public class LswImageWindow extends ImageWindow implements MouseMotionListener {
@@ -57,9 +57,9 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
   private double progressPercentage = 0;
   private int mouseX, mouseY;
   private LocalDateTime previousDragMoment = LocalDateTime.now();
-  private Color histogramColorRed = new Color(0x88,0x30,0x30);
-  private Color histogramColorGreen = new Color(0x60,0xDD,0x60);
-  private Color histogramColorBlue = new Color(0x60,0x60,0xAA);
+  private Color histogramColorRed = new Color(0x88, 0x30, 0x30);
+  private Color histogramColorGreen = new Color(0x60, 0xDD, 0x60);
+  private Color histogramColorBlue = new Color(0x60, 0x60, 0xAA);
   private Color histogramColor = HISTOGRAM_COLOR_DAY;
   private Color backgroundColor = BACKGROUND_COLOR;
   private boolean isMaximized = false;
@@ -227,7 +227,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     g.fillRect(0, 0, thickness, height);
     g.fillRect(width - thickness, 0, thickness, height);
     g.setColor(backgroundColor);
-    g.fillRect(1, 32, width-2, 72);
+    g.fillRect(1, 32, width - 2, 72);
     int textWidth = g.getFontMetrics().stringWidth(image.getTitle());
     int x = (getWidth() - textWidth) / 2;
     g.setColor(TITLE_COLOR);
