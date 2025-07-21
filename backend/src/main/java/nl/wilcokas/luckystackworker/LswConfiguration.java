@@ -25,6 +25,7 @@ public class LswConfiguration {
     return createSnakeCaseObjectMapper();
   }
 
+  @Bean
   public RestClient restClient() {
     return RestClient.builder().requestFactory(getClientHttpRequestFactory()).build();
   }

@@ -5,6 +5,7 @@
 #define MyAppPublisher "Wilco Kasteleijn"
 #define MyAppURL "https://www.wilcokas.com/luckystackworker"
 #define MyAppExeName "LuckyStackWorker.exe"
+#define MyAppVersion "6.21.0-beta" ; IMPORTANT: UPDATE FOR EVERY RELEASE !!
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -23,7 +24,7 @@ DisableProgramGroupPage=yes
 LicenseFile=C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\LICENSE_LSW.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputBaseFilename=LuckyStackWorker-setup
+OutputBaseFilename=LuckyStackWorker-{#MyAppVersion}-setup
 SetupIconFile=C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\resources\app\lsw_icon.ico
 Compression=lzma
 SolidCompression=yes

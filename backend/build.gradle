@@ -88,4 +88,7 @@ spotless {
     }
 }
 
-jar.archiveFileName = "luckystackworker.jar"
+bootJar {
+    archiveFileName = "luckystackworker.jar"
+    mainClass.set('nl.wilcokas.luckystackworker.LuckystackWorkerApplication')
+}
