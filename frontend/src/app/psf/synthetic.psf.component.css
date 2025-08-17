@@ -81,9 +81,14 @@ button {
   padding-top: 2px;
   padding-bottom: 0px;
 }
+button:hover {
+  color: rgb(226, 226, 226);
+  background-color: #505050;
+}
 
 .buttonImg {
   width: 20px;
+  transform: scale(1.4);
 }
 .type {
   height: 24px;

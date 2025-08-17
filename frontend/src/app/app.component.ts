@@ -15,6 +15,7 @@ import { Settings } from './model/settings';
 import { Version } from './model/version';
 
 const SERVICE_POLL_DELAY_MS = 250;
+const ROOT_FOLDER_MAX_LENGTH = 30;
 
 interface ProfileSelection {
   value: string;
@@ -210,7 +211,9 @@ export class AppComponent implements OnInit {
             this.profile = data.profile;
             this.settings = data.settings;
             this.selectedProfile = this.profile.name;
-            this.rootFolder = data.settings.rootFolder;
+            this.rootFolder = this.getRootFolderCapped(
+              data.settings.rootFolder
+            );
             this.zoomFactor = data.settings.zoomFactor;
             this.psfImage = data.settings.psfImage;
             this.checkLatestVersion();
@@ -274,7 +277,9 @@ export class AppComponent implements OnInit {
             this.profile = data.profile;
             this.settings = data.settings;
             this.selectedProfile = this.profile.name;
-            this.rootFolder = data.settings.rootFolder;
+            this.rootFolder = this.getRootFolderCapped(
+              data.settings.rootFolder
+            );
             this.updateProfileSettings();
           }
           this.hideSpinner();
@@ -1448,7 +1453,7 @@ export class AppComponent implements OnInit {
       (data) => {
         console.log(data);
         if (data) {
-          this.rootFolder = data.rootFolder;
+          this.rootFolder = this.getRootFolderCapped(data.rootFolder);
         }
         this.hideSpinner();
       },
@@ -2140,5 +2145,16 @@ export class AppComponent implements OnInit {
     this.profile.bilateralRadiusBlue = this.bilateralRadius;
     this.profile.bilateralSigmaColorBlue = this.bilateralSigmaColor;
     this.profile.bilateralSigmaSpaceBlue = this.bilateralSigmaSpace;
+  }
+
+  private getRootFolderCapped(rootFolder: string): string {
+    const rootFolderLength = rootFolder?.length;
+    return rootFolderLength > ROOT_FOLDER_MAX_LENGTH
+      ? '-' +
+          rootFolder?.substring(
+            rootFolderLength - ROOT_FOLDER_MAX_LENGTH,
+            rootFolderLength
+          )
+      : rootFolder;
   }
 }
