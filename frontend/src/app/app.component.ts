@@ -15,7 +15,7 @@ import { Settings } from './model/settings';
 import { Version } from './model/version';
 
 const SERVICE_POLL_DELAY_MS = 250;
-const ROOT_FOLDER_MAX_LENGTH = 30;
+const ROOT_FOLDER_MAX_LENGTH = 28;
 
 interface ProfileSelection {
   value: string;
