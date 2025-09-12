@@ -376,7 +376,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     g.drawString("Zoom :", textOffsetX + 228, textOffsetY + textHeight * 3);
     g.drawString(getZoomPercentage() + "%", textOffsetX + 318, textOffsetY + textHeight * 3);
 
-    g.drawString("Crop :", textOffsetX + 228, textOffsetY + textHeight * 4);
+    g.drawString("ROI :", textOffsetX + 228, textOffsetY + textHeight * 4);
     g.drawString(getCropString(), textOffsetX + 318, textOffsetY + textHeight * 4);
   }
 

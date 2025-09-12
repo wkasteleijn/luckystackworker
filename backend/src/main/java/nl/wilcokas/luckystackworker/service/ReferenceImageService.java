@@ -674,15 +674,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             finalResultImage,
             unprocessedImageLayers,
             profile.getScale(),
-            img -> operationService.scaleImage(img, profile.getScale()));
+            img -> operationService.scaleImage(img, profile.getScale()),
+            getParentFrame());
     finalResultImage = imageDetails.getLeft();
     isMono = imageDetails.getRight();
 
     boolean largeImage = false;
     if (finalResultImage != null) {
-      if (!LswFileUtil.validateImageFormat(finalResultImage, getParentFrame())) {
-        return false;
-      }
       setImageMetadata(filePath, profile, dateTime, finalResultImage, profile.getScale());
       operationService.correctExposure(finalResultImage);
       operationService.clearCache();

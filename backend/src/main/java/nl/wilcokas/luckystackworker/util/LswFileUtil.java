@@ -22,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.exceptions.NotARawImageException;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.model.PSF;
@@ -481,7 +482,7 @@ public class LswFileUtil {
       OpenImageModeEnum openImageMode,
       double scale,
       UnaryOperator<ImagePlus> scaler) {
-    return openImage(filepath, openImageMode, null, null, scale, scaler);
+    return openImage(filepath, openImageMode, null, null, scale, scaler, null);
   }
 
   public static Pair<ImagePlus, Boolean> openImage(
@@ -490,8 +491,13 @@ public class LswFileUtil {
       ImagePlus currentImage,
       LswImageLayers currentUnprocessedImageLayers,
       double scale,
-      UnaryOperator<ImagePlus> scaler) {
+      UnaryOperator<ImagePlus> scaler,
+      JFrame parentFrame) {
     ImagePlus newImage = new Opener().openImage(LswFileUtil.getIJFileFormat(filepath));
+    if (parentFrame != null && !LswFileUtil.validateImageFormat(newImage, parentFrame)) {
+      throw new NotARawImageException("Invalid image format");
+    }
+
     if (scale > 1.0) {
       newImage = scaler.apply(newImage);
     }

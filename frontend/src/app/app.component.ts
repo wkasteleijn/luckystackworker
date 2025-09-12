@@ -224,6 +224,8 @@ export class AppComponent implements OnInit {
         },
         error: (error) => {
           console.log('Opening the image failed: ' + error);
+          this.hideSpinner();
+          this.workerProgress = 0;
         },
         complete: () => {
           console.log('Request completed successfully');

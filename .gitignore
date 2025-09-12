@@ -23,6 +23,7 @@ frontend/lsw-gui-darwin-x64
 frontend/lsw-gui-darwin-arm64
 frontend/lsw-gui-linux-x64
 frontend/linux/jre
+Output/
 .DS_Store
 .idea/
 
