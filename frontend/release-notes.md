@@ -3,7 +3,9 @@
 ## 14/09/2025 revision release 6.21.1
 
 - Fixed bug when opening a non 16-bit image the app did not show a warning and the spinner stayed active
-- Renamed Crop to ROI in the metadata panel.
+- Renamed Crop to ROI in the metadata panel
+- Fixed issue with new version popup not showing the release notes
+- Fixed issue button tooltips no longer showing after version update is postponed.
 
 ## 24/08/2025 minor release 6.21.0
 
