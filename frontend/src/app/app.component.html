@@ -278,9 +278,9 @@
       }}"
       (click)="showVersionButton() ? openDownloadPage() : openAbout()"
       matTooltip="You are currently using an older version {{
-        getCurrentVersion()
+        versionInfo.localVersion
       }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
-        getLatestKnownVersion()
+        versionInfo.latestVersion
       }}."
     >
       <img
