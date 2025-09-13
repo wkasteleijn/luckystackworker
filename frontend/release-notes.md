@@ -1,6 +1,11 @@
 # LuckyStackWorker - RELEASE NOTES
 
-## 24/08/2024 minor release 6.21.0
+## 14/09/2025 revision release 6.21.1
+
+- Fixed bug when opening a non 16-bit image the app did not show a warning and the spinner stayed active
+- Renamed Crop to ROI in the metadata panel.
+
+## 24/08/2025 minor release 6.21.0
 
 - Added new Suppress clipping filter that reduces the clipped areas after applying deconvolution
 - Added new Highlight clipped areas that will make the clipped parts of the image blink
@@ -17,7 +22,7 @@
 - Migrated backend build to Gradle
 - Upgraded all dependencies to the latest versions.
 
-## 03/03/2024 revision release 6.12.1
+## 03/03/2025 revision release 6.12.1
 
 - Fixed bug when setting sharpen amount to 0 the next time you start the app it would not work anymore
 - Fixed bug in the windows startup that only happened for users with a space character in their username

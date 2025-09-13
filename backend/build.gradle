@@ -12,7 +12,7 @@ application {
 }
 
 group = 'nl.wilcokas'
-version = '6.21.0'
+version = '6.21.1'
 description = 'LuckyStackWorker'
 
 java {
