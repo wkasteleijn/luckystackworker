@@ -34,10 +34,9 @@ public class LswVersionNumber {
       int patchVersion = Integer.parseInt(versionString[2].replaceAll("[^0-9]", ""));
       List<String> releaseNotes = new ArrayList<>();
       if (body != null) {
+        int releaseNotesIndex = body.toLowerCase().indexOf("## release notes");
         String releaseNotesString =
-            body.contains("## Release notes")
-                ? body.substring(body.indexOf("## Release notes") + 16)
-                : StringUtils.EMPTY;
+            releaseNotesIndex >= 0 ? body.substring(releaseNotesIndex + 16) : StringUtils.EMPTY;
         releaseNotes =
             new ArrayList<>(
                     Arrays.asList(
