@@ -45,50 +45,60 @@ public class DeRotationService {
         List<String> sharpenedImagePaths = new ArrayList<>();
         createPreSharpendedLuminanceCopies(rootFolder, allImagesFilenames, radius, dataFolder, sharpenedImagePaths);
 
-        final Map<String, Pair<ImagePlus, String>> imagesWithTransformation = createTransformationFiles(referenceImageFilename, allImagesFilenames, sharpenedImagePaths, dataFolder, rootFolder);
+        final Map<String, String> imagesWithTransformation = createTransformationFiles(referenceImageFilename, allImagesFilenames, sharpenedImagePaths, dataFolder, rootFolder);
 
-        warpImages(referenceImageFilename, allImagesFilenames, referenceImage, dataFolder, imagesWithTransformation);
+        warpImages(referenceImageFilename, allImagesFilenames, referenceImage, dataFolder, rootFolder, imagesWithTransformation);
 
         stackImages(referenceImageFilename, allImagesFilenames, rootFolder, dataFolder, referenceImage.getWidth(), referenceImage.getHeight());
-
-        // Return resulting stack (ImagePlus or perhaps even better a LswImageLayers which will become
-        // the ReferenceImageService.unprocessedImageLayers
 
         return null;
     }
 
-    private void warpImages(final String referenceImageFilename, final List<String> allImagesFilenames, final ImagePlus referenceImage, final String dataFolder,
-                            final Map<String, Pair<ImagePlus, String>> imagesWithTransformation) throws IOException {
-        // 3. Unwarp the original image series using the produced transformation files from step 2 (call
-        // bUnwarpJ_.applyTransformToSource())
-        // Apply the same transformation for the R G and B channel
-        boolean referenceEncountered = false;
-        log.info("Create de-rotated images based on the transformation files");
+    private void warpImages(final String referenceImageFilename, final List<String> allImagesFilenames, final ImagePlus referenceImage, final String dataFolder, final String rootFolder,
+                            final Map<String, String> imagesWithTransformation) throws IOException {
+        log.info("Create warped images based on the transformation files");
+        boolean sourceReachedReference = false;
         for (int i = 0; i < allImagesFilenames.size(); i++) {
             String sourceImageFilename = allImagesFilenames.get(i);
+            ImagePlus sourceImage = new Opener().openImage(rootFolder + "/" + sourceImageFilename);
             if (referenceImageFilename.equals(sourceImageFilename)) {
-                referenceEncountered = true;
+                sourceReachedReference = true;
             } else {
-                String targetImageFilename = referenceEncountered ? allImagesFilenames.get(i - 1) : allImagesFilenames.get(i + 1);
-                Pair<ImagePlus, String> imageWithTransformation = imagesWithTransformation.get(sourceImageFilename);
-                ImagePlus sourceImage = imageWithTransformation.getLeft();
-                ImagePlus targetImage = targetImageFilename.equals(referenceImageFilename) ? referenceImage : imagesWithTransformation.get(targetImageFilename).getLeft();
-                for (int layer = 1; layer <= 3; layer++) {
-                    FloatProcessor sourceProcessor = sourceImage.getStack().getProcessor(layer).toFloat(1, null);
-                    FloatProcessor targetProcessor = targetImage.getStack().getProcessor(layer).toFloat(1, null);
-                    final ImagePlus sourceLayerImage = new ImagePlus("Layer " + layer, sourceProcessor);
-                    String transformationFile = imageWithTransformation.getRight();
-                    bUnwarpJ_.applyTransformToSource(transformationFile, new ImagePlus("Layer " + layer, targetProcessor), sourceLayerImage);
-                    copyPixelsFromTo(sourceLayerImage, sourceImage, layer);
+                boolean targetAtReference = false;
+                int offset = 1;
+                String transformationReferenceFile = sourceImageFilename;
+                // Iteratively warp source image towards the reference image by applying the transformation file of each consecutive image until the reference image is reached.
+                while (!targetAtReference) {
+                    String targetImageFilename = sourceReachedReference ? allImagesFilenames.get(i - offset) : allImagesFilenames.get(i + offset);
+                    if (referenceImageFilename.equals(targetImageFilename)) {
+                        targetAtReference = true;
+                    }
+                    String transformationFile = imagesWithTransformation.get(transformationReferenceFile);
+                    ImagePlus targetImage = targetImageFilename.equals(referenceImageFilename) ? referenceImage : new Opener().openImage(rootFolder + "/" + targetImageFilename);
+                    applyTransformation(sourceImage, targetImage, transformationFile);
+                    sourceImage.updateAndDraw();
+                    LswFileUtil.saveImage(sourceImage, null, dataFolder + "/D_" + sourceImageFilename, true, false, false, false);
+                    offset++;
+                    transformationReferenceFile = targetImageFilename;
                 }
-                sourceImage.updateAndDraw();
-                LswFileUtil.saveImage(sourceImage, null, dataFolder + "/D_" + sourceImageFilename, true, false, false, false);
             }
+            LswFileUtil.saveImage(sourceImage, null, dataFolder + "/D_" + sourceImageFilename, true, false, false, false);
         }
         log.info("Done");
     }
 
+    private void applyTransformation(ImagePlus sourceImage, ImagePlus targetImage, String transformationFile) {
+        for (int layer = 1; layer <= 3; layer++) {
+            FloatProcessor sourceProcessor = sourceImage.getStack().getProcessor(layer).toFloat(1, null);
+            FloatProcessor targetProcessor = targetImage.getStack().getProcessor(layer).toFloat(1, null);
+            final ImagePlus sourceLayerImage = new ImagePlus("Layer " + layer, sourceProcessor);
+            bUnwarpJ_.applyTransformToSource(transformationFile, new ImagePlus("Layer " + layer, targetProcessor), sourceLayerImage);
+            copyPixelsFromTo(sourceLayerImage, sourceImage, layer);
+        }
+    }
+
     private void stackImages(final String referenceImageFilename, final List<String> allImagesFilenames, final String rootFolder, final String dataFolder, int width, int height) throws IOException {
+        log.info("Stacking warped images");
         long[] redPixels = new long[width * height];
         long[] greenPixels = new long[width * height];
         long[] bluePixels = new long[width * height];
@@ -125,6 +135,7 @@ public class DeRotationService {
                 .build();
         ImagePlus stackedImage = LswImageProcessingUtil.create16BitRGBImage(dataFolder + "/STACK_" + referenceImageFilename, lswImageLayers, true, true, true);
         LswFileUtil.saveImage(stackedImage, null, dataFolder + "/STACK_" + referenceImageFilename, true, false, false, false);
+        log.info("Done");
     }
 
     private void copyPixelsFromTo(final ImagePlus fromImage, ImagePlus toImage, int layer) {
@@ -140,9 +151,9 @@ public class DeRotationService {
         }
     }
 
-    private Map<String, Pair<ImagePlus, String>> createTransformationFiles(final String referenceImageFilename, final List<String> allImagesFilenames, List<String> sharpenedImagePaths, String dataFolder, String rootFolder) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private Map<String, String> createTransformationFiles(final String referenceImageFilename, final List<String> allImagesFilenames, List<String> sharpenedImagePaths, String dataFolder, String rootFolder) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         boolean referenceEncountered = false;
-        Map<String, Pair<ImagePlus, String>> imagesWithTransformation = new HashMap<>();
+        Map<String, String> imagesWithTransformation = new HashMap<>();
         log.info("Create transformation files from copies");
         for (int i = 0; i < sharpenedImagePaths.size(); i++) {
             String sourceFullPath = sharpenedImagePaths.get(i);
@@ -154,8 +165,7 @@ public class DeRotationService {
                 String targetFullPath = referenceEncountered ? sharpenedImagePaths.get(i - 1) : sharpenedImagePaths.get(i + 1);
                 String target = LswFileUtil.getFilenameFromPath(targetFullPath);
                 String transformationFile = callBunwarpJAlignImages(dataFolder, source, target);
-                ImagePlus sourceImage = new Opener().openImage(rootFolder + "/" + originalSource);
-                imagesWithTransformation.put(allImagesFilenames.get(i), Pair.of(sourceImage, transformationFile));
+                imagesWithTransformation.put(allImagesFilenames.get(i), transformationFile);
             }
         }
         log.info("Done");
@@ -267,7 +277,7 @@ public class DeRotationService {
             }
 
             new DeRotationService(new LSWSharpenFilter())
-                    .derotate(arguments.get(0), arguments.get(1), arguments.subList(2, arguments.size()), 3);
+                    .derotate(arguments.get(0), arguments.get(1), arguments.subList(2, arguments.size()), 4);
         } catch (InvocationTargetException
                  | NoSuchMethodException
                  | IllegalAccessException
