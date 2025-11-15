@@ -35,7 +35,8 @@ public class DeRotationService {
             final String rootFolder,
             final String referenceImageFilename,
             final List<String> allImagesFilenames,
-            final double radius)
+            final double radius,
+            final int accurateness)
             throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, IOException {
 
         String referenceImagePath = rootFolder + "/" + referenceImageFilename;
@@ -45,7 +46,7 @@ public class DeRotationService {
         List<String> sharpenedImagePaths = new ArrayList<>();
         createPreSharpendedLuminanceCopies(rootFolder, allImagesFilenames, radius, dataFolder, sharpenedImagePaths);
 
-        final Map<String, String> imagesWithTransformation = createTransformationFiles(referenceImageFilename, allImagesFilenames, sharpenedImagePaths, dataFolder, rootFolder);
+        final Map<String, String> imagesWithTransformation = createTransformationFiles(referenceImageFilename, allImagesFilenames, sharpenedImagePaths, dataFolder, accurateness);
 
         warpImages(referenceImageFilename, allImagesFilenames, referenceImage, dataFolder, rootFolder, imagesWithTransformation);
 
@@ -151,7 +152,7 @@ public class DeRotationService {
         }
     }
 
-    private Map<String, String> createTransformationFiles(final String referenceImageFilename, final List<String> allImagesFilenames, List<String> sharpenedImagePaths, String dataFolder, String rootFolder) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private Map<String, String> createTransformationFiles(final String referenceImageFilename, final List<String> allImagesFilenames, List<String> sharpenedImagePaths, String dataFolder, int accurateness) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         boolean referenceEncountered = false;
         Map<String, String> imagesWithTransformation = new HashMap<>();
         log.info("Create transformation files from copies");
@@ -164,7 +165,7 @@ public class DeRotationService {
             } else {
                 String targetFullPath = referenceEncountered ? sharpenedImagePaths.get(i - 1) : sharpenedImagePaths.get(i + 1);
                 String target = LswFileUtil.getFilenameFromPath(targetFullPath);
-                String transformationFile = callBunwarpJAlignImages(dataFolder, source, target);
+                String transformationFile = callBunwarpJAlignImages(dataFolder, source, target, accurateness);
                 imagesWithTransformation.put(allImagesFilenames.get(i), transformationFile);
             }
         }
@@ -190,7 +191,7 @@ public class DeRotationService {
         log.info("Done");
     }
 
-    private String callBunwarpJAlignImages(String folder, String source, String target)
+    private String callBunwarpJAlignImages(String folder, String source, String target, int accurateness)
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         String[] args = new String[15];
         args[1] = folder + "/" + source;
@@ -198,7 +199,7 @@ public class DeRotationService {
         args[3] = folder + "/" + target;
         args[4] = "NULL";
         args[5] = "0"; // min_scale_deformation
-        args[6] = "4"; // max_scale_deformation
+        args[6] = Integer.toString(accurateness); // max_scale_deformation
         args[7] = "0"; // max_subsamp_fact
         args[8] = "0"; // divWeight
         args[9] = "0"; // curlWeight
@@ -277,7 +278,7 @@ public class DeRotationService {
             }
 
             new DeRotationService(new LSWSharpenFilter())
-                    .derotate(arguments.get(0), arguments.get(1), arguments.subList(2, arguments.size()), 4);
+                    .derotate(arguments.get(0), arguments.get(1), arguments.subList(2, arguments.size()), 1, 4);
         } catch (InvocationTargetException
                  | NoSuchMethodException
                  | IllegalAccessException
