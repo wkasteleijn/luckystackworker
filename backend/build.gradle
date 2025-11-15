@@ -23,7 +23,9 @@ java {
 
 repositories {
     flatDir {
-        dirs "${System.getProperty("user.home")}/Library/ParallelColt" // IMPORTANT: See README for more information
+        // IMPORTANT: See README for more information
+        dirs "${System.getProperty("user.home")}/Library/ParallelColt",
+             "${System.getProperty("user.home")}/Library"
     }
     mavenCentral()
 }
@@ -42,6 +44,7 @@ dependencies {
     implementation libs.io.github.stevenjwest.paralleliterativedeconvolution
     implementation libs.com.github.wendykierp.jtransforms
     implementation libs.org.apache.httpcomponents.client5
+    implementation libs.sc.fiji.bunwarpj
 
     // Lombok for main
     compileOnly libs.org.projectlombok.lombok

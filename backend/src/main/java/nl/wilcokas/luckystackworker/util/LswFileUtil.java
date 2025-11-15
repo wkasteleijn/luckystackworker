@@ -72,7 +72,7 @@ public class LswFileUtil {
     return path.indexOf(".") > 0 ? path.substring(0, path.lastIndexOf(".")) : path;
   }
 
-  private static String getFilenameFromPath(String path) {
+  public static String getFilenameFromPath(String path) {
     return path.indexOf("/") >= 0 ? path.substring(path.lastIndexOf("/") + 1) : path;
   }
 

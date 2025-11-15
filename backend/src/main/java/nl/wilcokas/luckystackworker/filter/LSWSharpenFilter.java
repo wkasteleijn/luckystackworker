@@ -513,6 +513,23 @@ public class LSWSharpenFilter implements LSWFilter {
     }
   }
 
+    /*
+     * Unsharp mask algorithm.
+     * */
+    public void doUnsharpMask(double radius, float amount, float blendRawFactor, FloatProcessor fp) {
+        GaussianBlur gb = new GaussianBlur();
+        gb.blurGaussian(fp, radius, radius, 0.01);
+        float[] pixels = (float[]) fp.getPixels();
+        float[] snapshotPixels = (float[]) fp.getSnapshotPixels();
+        int width = fp.getWidth();
+        Rectangle roi = fp.getRoi();
+        for (int y = roi.y; y < roi.y + roi.height; y++) {
+            for (int x = roi.x, p = width * y + x; x < roi.x + roi.width; x++, p++) {
+                pixels[p] = getUnsharpMaskValue(snapshotPixels[p], pixels[p], amount, blendRawFactor);
+            }
+        }
+    }
+
   private void applyRGBModeToChannel(
       ImageStack stack,
       double radius,
@@ -551,28 +568,6 @@ public class LSWSharpenFilter implements LSWFilter {
       fp.snapshot();
       doUnsharpMask(radius, amount, blendRawFactor, fp);
       ip.setPixels(channel, fp);
-    }
-  }
-
-  /*
-   * Unsharp mask algorithm.
-   * @param radius
-   * @param amount
-   * @param clippingStrength the factor of the clipping suppression, if set to 0 it means no clipping supression is being applied.
-   * @param clippingRange represents the histogram % value from where the clipping has to be suppressed by holding off the amount.
-   * @param fp
-   */
-  private void doUnsharpMask(double radius, float amount, float blendRawFactor, FloatProcessor fp) {
-    GaussianBlur gb = new GaussianBlur();
-    gb.blurGaussian(fp, radius, radius, 0.01);
-    float[] pixels = (float[]) fp.getPixels();
-    float[] snapshotPixels = (float[]) fp.getSnapshotPixels();
-    int width = fp.getWidth();
-    Rectangle roi = fp.getRoi();
-    for (int y = roi.y; y < roi.y + roi.height; y++) {
-      for (int x = roi.x, p = width * y + x; x < roi.x + roi.width; x++, p++) {
-        pixels[p] = getUnsharpMaskValue(snapshotPixels[p], pixels[p], amount, blendRawFactor);
-      }
     }
   }
 

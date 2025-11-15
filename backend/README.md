@@ -18,8 +18,10 @@ java {
 brew install gradle
 ```
 
-Next, since the app depends on a particular library version parallelcolt 0.11.4 that isn't available on any public repo
-you need to download and compile the sources from github the first time. Download the source from:
+Next, since the app depends on a few libraries that aren't available on any public repo
+you need perform the following steps:
+
+1. Download and compile the sources from github the first time. Download the source from:
 
 [https://github.com/rwl/ParallelColt/releases/tag/parallelcolt-0.11.4](https://github.com/rwl/ParallelColt/releases/tag/parallelcolt-0.11.4)
 
@@ -38,6 +40,8 @@ cp ./target/parallelcolt-0.11.4.jar ~/Library/ParallelColt
 ```bash
 gradle build
 ```
+
+2. Download the latest release of [bUnwarpJ](https://github.com/fiji/bUnwarpJ) from github. Copy the jar file into the newly created ~/Library folder.
 
 ## Run
 
