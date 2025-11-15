@@ -8,7 +8,7 @@ Go to [www.wilcokas.com/luckystackworker](https://www.wilcokas.com/luckystackwor
 
 ## User manual
 
-There is a user manual which is located on the following url: [www.wilcokas.com/luckystackworker/manual](https://www.wilcokas.com/luckystackworker/manual)
+[Here](https://github.com/wkasteleijn/luckystackworker/releases/download/Manual/LuckyStackWorker_User_Manual.pdf) you can find the downloadable user manual in PDF format.
 
 ## Screenshot
 
