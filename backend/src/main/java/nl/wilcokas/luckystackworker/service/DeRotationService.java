@@ -3,25 +3,27 @@ package nl.wilcokas.luckystackworker.service;
 import bunwarpj.bUnwarpJ_;
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.io.FileSaver;
 import ij.io.Opener;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter;
+import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
+import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Slf4j
@@ -30,6 +32,7 @@ import java.util.*;
 public class DeRotationService {
 
     private final LSWSharpenFilter lswSharpenFilter;
+    private final SavitzkyGolayFilter savitzkyGolayFilter;
 
     public ImagePlus derotate(
             final String rootFolder,
@@ -44,7 +47,7 @@ public class DeRotationService {
         String dataFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile());
 
         List<String> sharpenedImagePaths = new ArrayList<>();
-        createPreSharpendedLuminanceCopies(rootFolder, allImagesFilenames, radius, dataFolder, sharpenedImagePaths);
+        createPreSharpenedLuminanceCopies(rootFolder, allImagesFilenames, radius, dataFolder, sharpenedImagePaths);
 
         final Map<String, String> imagesWithTransformation = createTransformationFiles(referenceImageFilename, allImagesFilenames, sharpenedImagePaths, dataFolder, accurateness);
 
@@ -173,12 +176,26 @@ public class DeRotationService {
         return imagesWithTransformation;
     }
 
-    private void createPreSharpendedLuminanceCopies(String rootFolder, List<String> allImagesFilenames, double radius, String dataFolder, List<String> sharpenedImagePaths) throws IOException {
+    private void createPreSharpenedLuminanceCopies(String rootFolder, List<String> allImagesFilenames, double radius, String dataFolder, List<String> sharpenedImagePaths) throws IOException {
         log.info("Create pre-sharpened luminance copies...");
         for (String imageFilename : allImagesFilenames) {
             String imagePath = rootFolder + "/" + imageFilename;
             ImagePlus image = new Opener().openImage(imagePath);
             sharpenAsLuminanceImage(image, radius);
+            Profile profile = Profile.builder()
+                    .amount(new BigDecimal(100))
+                    .savitzkyGolayAmount(100)
+                    .savitzkyGolayIterations(2)
+                    .savitzkyGolaySize(3)
+                    .savitzkyGolayAmountGreen(100)
+                    .savitzkyGolayIterationsGreen(2)
+                    .savitzkyGolaySizeGreen(3)
+                    .savitzkyGolayAmountBlue(100)
+                    .savitzkyGolayIterationsBlue(2)
+                    .savitzkyGolaySizeBlue(3)
+                    .denoiseAlgorithm2(Constants.DENOISE_ALGORITHM_SAVGOLAY)
+                    .build();
+            savitzkyGolayFilter.apply(image, profile, false, null);
             String toBeDeRotatedImageFilenameNoExt = LswFileUtil.getFilename(imageFilename);
             String sharpenedImagePath =
                     saveToDataFolder(
@@ -277,8 +294,8 @@ public class DeRotationService {
                 return;
             }
 
-            new DeRotationService(new LSWSharpenFilter())
-                    .derotate(arguments.get(0), arguments.get(1), arguments.subList(2, arguments.size()), 1, 4);
+            new DeRotationService(new LSWSharpenFilter(), new SavitzkyGolayFilter())
+                    .derotate(arguments.get(0), arguments.get(1), arguments.subList(2, arguments.size()), 4, 4);
         } catch (InvocationTargetException
                  | NoSuchMethodException
                  | IllegalAccessException
