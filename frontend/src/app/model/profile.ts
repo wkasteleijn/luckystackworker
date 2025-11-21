@@ -19,6 +19,7 @@ export class Profile {
   luminanceIncludeBlue: boolean;
   luminanceIncludeColor: boolean;
   wienerIterations: number;
+  wienerRepetitions: number;
 
   // sharpen green
   radiusGreen: number;

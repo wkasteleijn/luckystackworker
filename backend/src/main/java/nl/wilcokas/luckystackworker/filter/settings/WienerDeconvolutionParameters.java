@@ -14,6 +14,7 @@ public class WienerDeconvolutionParameters {
   private boolean includeGreen;
   private boolean includeBlue;
   private boolean includeColor;
+  private int repetitions;
 
   // Luminance
   private int iterationsLuminance;

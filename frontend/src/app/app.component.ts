@@ -70,6 +70,7 @@ export class AppComponent implements OnInit {
   luminanceIncludeColor: boolean = true;
   applyUnsharpMask: boolean = true;
   applyWienerDeconvolution: boolean;
+  wienerDeconvolutionQuadratic: boolean = false;
   wienerIterations: number;
 
   // denoise 1
@@ -605,6 +606,12 @@ export class AppComponent implements OnInit {
   applyUnsharpMaskChanged() {
     this.profile.applyUnsharpMask = this.applyUnsharpMask;
     this.settings.operations = ['SHARPEN'];
+    this.updateProfile();
+  }
+
+  applyWienerDeconvolutionQuadraticChanged() {
+    this.profile.wienerRepetitions = this.wienerDeconvolutionQuadratic ? 2 : 1;
+    this.settings.operations = ['WIENER_DECONV'];
     this.updateProfile();
   }
 

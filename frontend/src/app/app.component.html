@@ -656,6 +656,16 @@
             [disabled]="shouldShowSpinner() || !refImageSelected"
             >Sharpen</mat-checkbox
           >
+
+          <mat-checkbox
+            *ngIf="applyWienerDeconvolution"
+            [(ngModel)]="wienerDeconvolutionQuadratic"
+            (change)="applyWienerDeconvolutionQuadraticChanged()"
+            [color]="colorTheme()"
+            class="applyUnsharpMaskCheckBox"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
+            >Quadratic Deconvolution</mat-checkbox
+          >
         </div>
       </div>
 

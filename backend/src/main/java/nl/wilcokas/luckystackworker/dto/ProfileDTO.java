@@ -31,6 +31,7 @@ public class ProfileDTO {
     this.deringStrength = profile.getDeringStrength();
     this.blendRaw = profile.getBlendRaw();
     this.wienerIterations = profile.getWienerIterations();
+    this.wienerRepetitions = profile.getWienerRepetitions();
 
     this.radiusGreen = profile.getRadiusGreen();
     this.amountGreen = profile.getAmountGreen();
@@ -168,6 +169,7 @@ public class ProfileDTO {
   private int deringStrength;
   private int blendRaw;
   private int wienerIterations;
+  private int wienerRepetitions;
   private double clippingSuppression;
 
   private BigDecimal radiusGreen;
