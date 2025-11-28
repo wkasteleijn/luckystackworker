@@ -18,6 +18,7 @@ import { MatLegacyTabsModule } from '@angular/material/legacy-tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DeRotationComponent } from './derotate/derotation.component';
 import { NewVersionComponent } from './new_version/newversion.component';
+import { NotificationComponent } from './notification/notification.component';
 import { ProgressPanelComponent } from './progresspanel/progresspanel.component';
 import { SyntheticPsfComponent } from './psf/synthetic.psf.component';
 import { RotationComponent } from './rotate/rotation.component';
@@ -43,6 +44,7 @@ import { ConfirmationComponent } from './confirmation/confirmation.component';
     DeRotationComponent,
     NewVersionComponent,
     SliderComponent,
+    NotificationComponent,
   ],
   imports: [
     BrowserModule,

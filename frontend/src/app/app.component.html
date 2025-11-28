@@ -32,6 +32,13 @@
   (close)="hideDeRotationPanel()"
   (angleChanged)="rotationAngleChanged($event)"
 ></app-derotation-panel>
+<app-notification
+  *ngIf="isNotificationVisible"
+  [notificationText]="notificationText"
+  [nightMode]="nightMode"
+  [spinnerShown]="shouldShowSpinner()"
+  (close)="hideNotification()"
+></app-notification>
 
 <div
   *ngIf="

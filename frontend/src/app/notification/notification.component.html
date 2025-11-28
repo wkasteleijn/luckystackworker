@@ -1,0 +1,22 @@
+<div class="popup-container">
+  <mat-progress-bar
+    [color]="colorTheme()"
+    [value]="timeoutProgress"
+    mode="determinate"
+    [bufferValue]="100"
+  >
+  </mat-progress-bar>
+
+  {{ notificationText }}
+
+  <p></p>
+
+  <button
+    class="button activeColor"
+    mat-raised-button
+    color="primary"
+    (click)="closePopup()"
+  >
+    OK
+  </button>
+</div>

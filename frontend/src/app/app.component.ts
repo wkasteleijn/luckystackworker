@@ -158,6 +158,8 @@ export class AppComponent implements OnInit {
   isRotationPanelVisible: boolean = false;
   isProgressPanelVisible: boolean = false;
   isDerotationPanelVisible: boolean = false;
+  isNotificationVisible: boolean = false;
+  notificationText: string;
   psfImage: string = '';
   sliderTextDisplayed: boolean = false;
 
@@ -264,6 +266,8 @@ export class AppComponent implements OnInit {
       (error) => {
         console.log(error);
         this.isProgressPanelVisible = false;
+        this.notificationText = 'The following error occured: ' + error;
+        this.isNotificationVisible = true;
       }
     );
   }
@@ -1684,6 +1688,8 @@ export class AppComponent implements OnInit {
       console.log('Worker is done!');
       this.workerProgress = 100;
       this.isProgressPanelVisible = false;
+      this.notificationText = 'Done';
+      this.isNotificationVisible = true;
     }
   }
 
@@ -1966,6 +1972,10 @@ export class AppComponent implements OnInit {
 
   hideDeRotationPanel() {
     this.isDerotationPanelVisible = false;
+  }
+
+  hideNotification() {
+    this.isNotificationVisible = false;
   }
 
   private setSharpenOperationForDeringing() {
