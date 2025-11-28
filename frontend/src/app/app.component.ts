@@ -156,6 +156,8 @@ export class AppComponent implements OnInit {
   applyDenoiseToChannel: string = 'RGB';
   isPsfPanelVisible: boolean = false;
   isRotationPanelVisible: boolean = false;
+  isProgressPanelVisible: boolean = false;
+  isDerotationPanelVisible: boolean = false;
   psfImage: string = '';
   sliderTextDisplayed: boolean = false;
 
@@ -251,7 +253,7 @@ export class AppComponent implements OnInit {
 
   applyProfile() {
     console.log('applyProfile called');
-    this.showSpinner();
+    this.isProgressPanelVisible = true;
     this.workerStatus = 'Working';
     this.workerProgress = 0;
     this.luckyStackWorkerService.applyProfile(this.profile).subscribe(
@@ -261,7 +263,7 @@ export class AppComponent implements OnInit {
       },
       (error) => {
         console.log(error);
-        this.hideSpinner();
+        this.isProgressPanelVisible = false;
       }
     );
   }
@@ -1681,7 +1683,7 @@ export class AppComponent implements OnInit {
     } else {
       console.log('Worker is done!');
       this.workerProgress = 100;
-      this.hideSpinner();
+      this.isProgressPanelVisible = false;
     }
   }
 
@@ -1857,12 +1859,6 @@ export class AppComponent implements OnInit {
     return this.nightMode ? this.componentColorNight : this.componentColor;
   }
 
-  getWorkerStatusDisplayText() {
-    return this.workerStatus.length > 40
-      ? this.workerStatus.substring(0, 40) + '...'
-      : this.workerStatus;
-  }
-
   dispersionIndicatorRedColor(): string {
     if (this.nightModeEnabled()) {
       if (
@@ -1962,6 +1958,14 @@ export class AppComponent implements OnInit {
 
   hideNewVersionPopup() {
     this.showNewVersionPopup = false;
+  }
+
+  derotate() {
+    this.isDerotationPanelVisible = true;
+  }
+
+  hideDeRotationPanel() {
+    this.isDerotationPanelVisible = false;
   }
 
   private setSharpenOperationForDeringing() {

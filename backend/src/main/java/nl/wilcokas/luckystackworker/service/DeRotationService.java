@@ -39,6 +39,7 @@ public class DeRotationService {
             final String referenceImageFilename,
             final List<String> allImagesFilenames,
             final double radius,
+            final int noiseRobustness,
             final int accurateness)
             throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, IOException {
 
@@ -47,7 +48,7 @@ public class DeRotationService {
         String dataFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile());
 
         List<String> sharpenedImagePaths = new ArrayList<>();
-        createPreSharpenedLuminanceCopies(rootFolder, allImagesFilenames, radius, dataFolder, sharpenedImagePaths);
+        createPreSharpenedLuminanceCopies(rootFolder, allImagesFilenames, radius, noiseRobustness, dataFolder, sharpenedImagePaths);
 
         final Map<String, String> imagesWithTransformation = createTransformationFiles(referenceImageFilename, allImagesFilenames, sharpenedImagePaths, dataFolder, accurateness);
 
@@ -176,22 +177,21 @@ public class DeRotationService {
         return imagesWithTransformation;
     }
 
-    private void createPreSharpenedLuminanceCopies(String rootFolder, List<String> allImagesFilenames, double radius, String dataFolder, List<String> sharpenedImagePaths) throws IOException {
+    private void createPreSharpenedLuminanceCopies(String rootFolder, List<String> allImagesFilenames, double radius, int noiseRobustness, String dataFolder, List<String> sharpenedImagePaths) throws IOException {
         log.info("Create pre-sharpened luminance copies...");
         for (String imageFilename : allImagesFilenames) {
             String imagePath = rootFolder + "/" + imageFilename;
             ImagePlus image = new Opener().openImage(imagePath);
             sharpenAsLuminanceImage(image, radius);
             Profile profile = Profile.builder()
-                    .amount(new BigDecimal(100))
                     .savitzkyGolayAmount(100)
-                    .savitzkyGolayIterations(2)
+                    .savitzkyGolayIterations(noiseRobustness)
                     .savitzkyGolaySize(3)
                     .savitzkyGolayAmountGreen(100)
-                    .savitzkyGolayIterationsGreen(2)
+                    .savitzkyGolayIterationsGreen(noiseRobustness)
                     .savitzkyGolaySizeGreen(3)
                     .savitzkyGolayAmountBlue(100)
-                    .savitzkyGolayIterationsBlue(2)
+                    .savitzkyGolayIterationsBlue(noiseRobustness)
                     .savitzkyGolaySizeBlue(3)
                     .denoiseAlgorithm2(Constants.DENOISE_ALGORITHM_SAVGOLAY)
                     .build();
@@ -295,7 +295,7 @@ public class DeRotationService {
             }
 
             new DeRotationService(new LSWSharpenFilter(), new SavitzkyGolayFilter())
-                    .derotate(arguments.get(0), arguments.get(1), arguments.subList(2, arguments.size()), 4, 4);
+                    .derotate(arguments.get(0), arguments.get(1), arguments.subList(2, arguments.size()), 4, 2,4);
         } catch (InvocationTargetException
                  | NoSuchMethodException
                  | IllegalAccessException

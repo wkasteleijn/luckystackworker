@@ -17,7 +17,31 @@
   (close)="hideRotationPanel()"
   (angleChanged)="rotationAngleChanged($event)"
 ></app-rotation-panel>
-<div *ngIf="isPsfPanelVisible || isRotationPanelVisible" class="backdrop"></div>
+<app-progress-panel
+  *ngIf="isProgressPanelVisible"
+  [workerProgress]="workerProgress"
+  [workerStatus]="workerStatus"
+  [nightMode]="nightMode"
+  [spinnerShown]="shouldShowSpinner()"
+></app-progress-panel>
+<app-derotation-panel
+  *ngIf="isDerotationPanelVisible"
+  [angle]="rotationAngle"
+  [nightMode]="nightMode"
+  [spinnerShown]="shouldShowSpinner()"
+  (close)="hideDeRotationPanel()"
+  (angleChanged)="rotationAngleChanged($event)"
+></app-derotation-panel>
+
+<div
+  *ngIf="
+    isPsfPanelVisible ||
+    isRotationPanelVisible ||
+    isProgressPanelVisible ||
+    isDerotationPanelVisible
+  "
+  class="backdrop"
+></div>
 <app-newversion
   *ngIf="showNewVersionPopup"
   [version]="versionInfo?.latestVersion"
@@ -2448,6 +2472,7 @@
         >
           <img src="assets/images/startbatch.png" class="startBatchButton" />
         </button>
+        <!--
         <button
           *ngIf="isWorkerBusy()"
           type="button"
@@ -2480,14 +2505,35 @@
           }}"
         >
           {{ workerProgress === 100 ? "Done" : getWorkerStatusDisplayText() }}
-        </div>
+        -->
+        <button
+          *ngIf="openRefImageEnabled() && refImageSelected"
+          type="button"
+          mat-button
+          (click)="derotate()"
+          class="relatedButtonsSpace button {{
+            nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+          }}"
+          matTooltip="Derotate a selected series of images"
+        >
+          <img src="assets/images/derotate.png" class="stopBatchButton" />
+        </button>
+        <button
+          *ngIf="!openRefImageEnabled() || !refImageSelected"
+          type="button"
+          mat-button
+          disabled
+          class="button_disabled"
+        >
+          <img src="assets/images/derotate.png" class="stopBatchButton" />
+        </button>
         <button
           *ngIf="openRefImageEnabled() && refImageSelected"
           type="button"
           mat-button
           (click)="realtimeEnabledChanged()"
           class="{{
-            'buttonZoom connectButton ' +
+            'relatedButtonsSpace buttonZoom connectButton ' +
               (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
               (realtimeEnabled ? 'Pressed' : '')
           }}"
@@ -2500,12 +2546,13 @@
           type="button"
           mat-button
           disabled
-          class="buttonDisabledZoom connectButton"
+          class="relatedButtonsSpace buttonDisabledZoom connectButton"
           matTooltip="Connect to stacking software"
         >
           <img src="assets/images/connect.png" class="genericButton" />
         </button>
       </div>
+      <!--
       <div class="sliderRow">
         <mat-progress-bar
           [color]="colorTheme()"
@@ -2518,6 +2565,7 @@
           >{{ workerProgress ? workerProgress : 0 }}%</span
         >
       </div>
+      -->
     </mat-card-content>
   </mat-card>
 </div>
