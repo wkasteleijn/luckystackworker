@@ -1,0 +1,45 @@
+<div class="popup-container">
+  <h2 class="{{ nightMode ? 'titleNight' : 'title' }}">Rotate</h2>
+  <button (click)="closePopup()" class="closeButton" matTooltip="Close panel">
+    <img src="assets/images/close.png" class="buttonImg" />
+  </button>
+
+  <p class="slidersStartMargin"></p>
+
+  <div class="sliderContainer">
+    <div class="sliderGroup">
+      <app-slider
+        [sliderLabel]="'Detail anchor strength'"
+        [sliderValue]="1"
+        [sliderStep]="1"
+        [sliderMinValue]="1"
+        [sliderMaxValue]="10"
+        [nightMode]="nightMode"
+        [spinnerShown="spinnerShown"
+        (sliderValueChanged)="onAnchorStrengthChanged()"
+      ></app-slider>
+
+      <app-slider
+        [sliderLabel]="'Noise robustness'"
+        [sliderValue]="1"
+        [sliderStep]="1"
+        [sliderMinValue]="1"
+        [sliderMaxValue]="5"
+        [nightMode]="nightMode"
+        [spinnerShown="spinnerShown"
+        (sliderValueChanged)="onNoiseRobustnessChanged()"
+      ></app-slider>
+
+      <app-slider
+        [sliderLabel]="'Accurateness'"
+        [sliderValue]="1"
+        [sliderStep]="1"
+        [sliderMinValue]="1"
+        [sliderMaxValue]="4"
+        [nightMode]="nightMode"
+        [spinnerShown="spinnerShown"
+        (sliderValueChanged)="onAccuratenessChanged()"
+      ></app-slider>
+    </div>
+  </div>
+</div>

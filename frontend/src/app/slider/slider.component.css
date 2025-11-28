@@ -1,0 +1,36 @@
+.sliderContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-left: 0px;
+  padding-right: 12px;
+}
+
+.sliderGroup {
+  display: grid;
+  grid-template-columns: 24px 264px 10px;
+  align-items: center;
+  height: 16px;
+  column-gap: 8px;
+}
+
+.sliderLabel {
+  white-space: nowrap;
+}
+
+.slider {
+  width: 100%;
+}
+
+.sliderValue {
+  text-align: left;
+}
+
+.image-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.slidersStartMargin {
+  margin-top: 40px;
+}

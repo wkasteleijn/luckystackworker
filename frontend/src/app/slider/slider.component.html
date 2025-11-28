@@ -1,0 +1,19 @@
+<label class="sliderLabel">{{ sliderLabel }}</label>
+<mat-slider
+  class="slider"
+  step="sliderStep"
+  min="sliderMinValue"
+  max="sliderMaxValue"
+  (input)="onSliderValueUpdated($event)"
+  (change)="onSliderValueChanged()"
+  [(ngModel)]="sliderValue"
+  [color]="colorTheme()"
+  [disabled]="spinnerShown"
+></mat-slider>
+<input
+  matInput
+  type="text"
+  (keypress)="onInputKeyPress($event)"
+  [(ngModel)]="sliderValue"
+  class="angleInput"
+/>

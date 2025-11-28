@@ -1,0 +1,18 @@
+<div class="popup-container">
+  <h2 class="{{ nightMode ? 'titleNight' : 'title' }}">Progress</h2>
+
+  <mat-progress-bar
+    [color]="colorTheme()"
+    [value]="workerProgress"
+    mode="determinate"
+    [bufferValue]="100"
+  >
+  </mat-progress-bar>
+  <span class="progressBarPercentage"
+    >{{ workerProgress ? workerProgress : 0 }}%</span
+  >
+
+  <p class="slidersStartMargin"></p>
+
+  {{ workerStatus }}
+</div>
