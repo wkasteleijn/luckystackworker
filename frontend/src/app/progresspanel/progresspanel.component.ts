@@ -13,16 +13,12 @@ export class ProgressPanelComponent {
   @Input() spinnerShown = false;
   @Input() workerProgress: number;
   @Input() workerStatus: string;
-  @Output() close = new EventEmitter<any>();
+  @Output() stop = new EventEmitter<any>();
 
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
 
   constructor(private confirmationDialog: MatLegacyDialog) {}
-
-  // closePopup() {
-  //   this.close.emit();
-  // }
 
   colorTheme() {
     return this.nightMode ? this.componentColorNight : this.componentColor;
@@ -32,5 +28,9 @@ export class ProgressPanelComponent {
     return this.workerStatus.length > 40
       ? this.workerStatus.substring(0, 40) + '...'
       : this.workerStatus;
+  }
+
+  stopWorker() {
+    this.stop.emit();
   }
 }

@@ -159,7 +159,7 @@ export class AppComponent implements OnInit {
   isProgressPanelVisible: boolean = false;
   isDerotationPanelVisible: boolean = false;
   isNotificationVisible: boolean = false;
-  notificationText: string;
+  notificationText: string = 'Done!';
   psfImage: string = '';
   sliderTextDisplayed: boolean = false;
 
@@ -1527,6 +1527,9 @@ export class AppComponent implements OnInit {
     this.luckyStackWorkerService.stop().subscribe(
       (data) => {
         console.log('Response');
+        this.notificationText = 'Batch process was stopped.';
+        this.isProgressPanelVisible = false;
+        this.isNotificationVisible = true;
       },
       (error) => console.log(error)
     );
@@ -1688,8 +1691,10 @@ export class AppComponent implements OnInit {
       console.log('Worker is done!');
       this.workerProgress = 100;
       this.isProgressPanelVisible = false;
-      this.notificationText = 'Done';
-      this.isNotificationVisible = true;
+      if (!this.isNotificationVisible) {
+        this.notificationText = 'Done!';
+        this.isNotificationVisible = true;
+      }
     }
   }
 

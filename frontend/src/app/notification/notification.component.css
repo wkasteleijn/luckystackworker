@@ -7,8 +7,8 @@
   background-color: #191919;
   border: 1px solid rgb(168, 168, 168);
   padding: 20px;
-  width: 350px;
-  height: 150px;
+  width: 200px;
+  height: 96px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
 }
@@ -22,4 +22,22 @@
 
 h2 {
   height: 20px;
+}
+
+.progressBar {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  width: 240px;
+}
+
+.notificationText {
+  text-align: center;
+  display: block;
+}
+
+.okButton {
+  position: fixed;
+  left: 40%;
+  top: 55%;
 }

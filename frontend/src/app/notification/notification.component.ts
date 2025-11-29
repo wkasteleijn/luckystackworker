@@ -37,7 +37,7 @@ export class NotificationComponent {
     if (this.timeoutProgress >= 100) {
       this.closePopup();
     } else {
-      this.timeoutProgress += 10;
+      this.timeoutProgress += 5;
       setTimeout(() => this.increaseTimerProgress(), 250);
     }
   }

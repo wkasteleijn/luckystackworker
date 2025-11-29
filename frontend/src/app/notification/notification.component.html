@@ -1,22 +1,26 @@
 <div class="popup-container">
-  <mat-progress-bar
-    [color]="colorTheme()"
-    [value]="timeoutProgress"
-    mode="determinate"
-    [bufferValue]="100"
+  <span
+    class="{{ nightMode ? 'titleNight' : 'title' + ' notificationText' }}"
+    >{{ notificationText }}</span
   >
-  </mat-progress-bar>
-
-  {{ notificationText }}
 
   <p></p>
 
   <button
-    class="button activeColor"
+    class="button activeColor okButton"
     mat-raised-button
     color="primary"
     (click)="closePopup()"
   >
     OK
   </button>
+
+  <mat-progress-bar
+    [color]="colorTheme()"
+    [value]="timeoutProgress"
+    mode="determinate"
+    [bufferValue]="100"
+    class="progressBar"
+  >
+  </mat-progress-bar>
 </div>

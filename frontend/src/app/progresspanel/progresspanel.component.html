@@ -1,5 +1,5 @@
 <div class="popup-container">
-  <h2 class="{{ nightMode ? 'titleNight' : 'title' }}">Progress</h2>
+  <span class="{{ nightMode ? 'titleNight' : 'title' }}">Progress</span>
 
   <mat-progress-bar
     [color]="colorTheme()"
@@ -8,6 +8,19 @@
     [bufferValue]="100"
   >
   </mat-progress-bar>
+
+  <button
+    type="button"
+    mat-button
+    (click)="stopWorker()"
+    class="relatedButtonsSpace button {{
+      nightMode ? 'activeColorNight' : 'activeColor'
+    }}"
+    matTooltip="Stop batch process when running."
+  >
+    <img src="assets/images/stopbatch.png" class="stopBatchButton" />
+  </button>
+
   <span class="progressBarPercentage"
     >{{ workerProgress ? workerProgress : 0 }}%</span
   >
