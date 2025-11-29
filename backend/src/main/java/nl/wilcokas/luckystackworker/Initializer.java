@@ -7,7 +7,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.model.Settings;
-import nl.wilcokas.luckystackworker.service.GmicService;
 import nl.wilcokas.luckystackworker.service.SettingsService;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.stereotype.Component;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class Initializer {
 
-  private final GmicService gmicService;
   private final SettingsService settingsService;
 
   @PostConstruct
@@ -36,7 +34,6 @@ public class Initializer {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
     Settings settings = settingsService.getSettings();
-    settings.setGmicAvailable(gmicService.isGmicAvailable(LswUtil.getActiveOSProfile()));
     settingsService.saveSettings(settings);
   }
 }

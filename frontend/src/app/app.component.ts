@@ -80,12 +80,6 @@ export class AppComponent implements OnInit {
   denoise1Radius: number;
   denoise1Iterations: number;
 
-  iansNrUnlocked: boolean = false;
-  iansAmount: number;
-  iansAmountMid: number;
-  iansRecovery: number;
-  iansIterations: number;
-
   rofTheta: number = 1;
   rofIterations: number = 2;
 
@@ -115,8 +109,6 @@ export class AppComponent implements OnInit {
   localContrastFine: number;
   localContrastMedium: number;
   localContrastLarge: number;
-  equalizeLocallyUnlocked: boolean = false;
-  equalizeLocalHistograms: number;
   preserveDarkBackground: boolean = true;
 
   // color
@@ -751,8 +743,6 @@ export class AppComponent implements OnInit {
         this.denoise1Amount = this.profile.denoise1Amount;
         this.denoise1Radius = this.profile.denoise1Radius;
         this.denoise1Iterations = this.profile.denoise1Iterations;
-        this.iansAmount = this.profile.iansAmount;
-        this.iansRecovery = this.profile.iansRecovery;
         this.denoiseAlgorithm2 = this.profile.denoiseAlgorithm2;
         this.savitzkyGolaySize = this.profile.savitzkyGolaySize
           ? this.profile.savitzkyGolaySize.toString()
@@ -936,46 +926,6 @@ export class AppComponent implements OnInit {
     }
   }
 
-  iansAmountChanged(event: any, update: boolean) {
-    this.profile.iansAmount = event.value;
-    this.iansAmount = event.value;
-    this.settings.operations = ['IANS_NR'];
-    console.log('iansAmount called: ' + this.profile.iansAmount);
-    if (update) {
-      this.updateProfile();
-    }
-  }
-
-  iansAmountMidChanged(event: any, update: boolean) {
-    this.profile.iansAmountMid = event.value;
-    this.iansAmountMid = event.value;
-    this.settings.operations = ['IANS_NR'];
-    console.log('iansAmountMid called: ' + this.profile.iansAmountMid);
-    if (update) {
-      this.updateProfile();
-    }
-  }
-
-  iansRecoveryChanged(event: any, update: boolean) {
-    this.profile.iansRecovery = event.value;
-    this.iansRecovery = event.value;
-    this.settings.operations = ['IANS_NR'];
-    console.log('iansRecovery called: ' + this.profile.iansRecovery);
-    if (update) {
-      this.updateProfile();
-    }
-  }
-
-  iansIterationsChanged(event: any, update: boolean) {
-    this.profile.iansIterations = event.value;
-    this.iansIterations = event.value;
-    this.settings.operations = ['IANS_NR'];
-    console.log('iansIterations called: ' + this.profile.iansIterations);
-    if (update) {
-      this.updateProfile();
-    }
-  }
-
   denoise2RadiusChanged(event: any, update: boolean) {
     this.denoise2Radius = event.value;
     this.settings.operations = ['SIGMA_DENOISE_2'];
@@ -1076,19 +1026,6 @@ export class AppComponent implements OnInit {
     this.settings.operations = ['LOCAL_CONTRAST'];
     console.log(
       'localContrastLarge called: ' + this.profile.localContrastLarge
-    );
-    if (update) {
-      this.updateProfile();
-    }
-  }
-
-  equalizeLocalHistogramsChanged(event: any, update: boolean) {
-    this.profile.equalizeLocalHistogramsStrength = event.value;
-    this.equalizeLocalHistograms = event.value;
-    this.settings.operations = ['EQUALIZE_LOCALLY'];
-    console.log(
-      'equalizeLocalHistograms called: ' +
-        this.profile.equalizeLocalHistogramsStrength
     );
     if (update) {
       this.updateProfile();
@@ -1276,15 +1213,6 @@ export class AppComponent implements OnInit {
     } else if (event.value === 'BILATERAL') {
       this.settings.operations = ['BILATERAL_DENOISE'];
       this.profile.denoiseAlgorithm1 = 'BILATERAL';
-    } else if (event.value === 'IAN') {
-      this.settings.operations = ['IANS_NR'];
-      this.profile.denoiseAlgorithm1 = 'IAN';
-      this.applyDenoiseToChannel = 'RGB';
-      this.profile.applyDenoiseToChannel = 'RGB';
-      this.visibleChannel = this.applyDenoiseToChannel;
-      this.luckyStackWorkerService
-        .channelChanged(this.visibleChannel)
-        .subscribe((error) => console.log(error));
     } else {
       this.settings.operations = ['SIGMA_DENOISE_1'];
       this.profile.denoiseAlgorithm1 = 'OFF';
@@ -1567,10 +1495,6 @@ export class AppComponent implements OnInit {
     this.denoise1Amount = this.profile.denoise1Amount;
     this.denoise1Radius = this.profile.denoise1Radius;
     this.denoise1Iterations = this.profile.denoise1Iterations;
-    this.iansAmount = this.profile.iansAmount;
-    this.iansAmountMid = this.profile.iansAmountMid;
-    this.iansRecovery = this.profile.iansRecovery;
-    this.iansIterations = this.profile.iansIterations;
     this.rofTheta = this.profile.rofTheta;
     this.rofIterations = this.profile.rofIterations;
     this.bilateralIterations = this.profile.bilateralIterations;
@@ -1622,7 +1546,6 @@ export class AppComponent implements OnInit {
       this.profile,
       this.settings.largeImage
     );
-    this.equalizeLocalHistograms = this.profile.equalizeLocalHistogramsStrength;
     this.normalizeColorBalance = this.profile.normalizeColorBalance;
     this.preserveDarkBackground = this.profile.preserveDarkBackground;
     this.applyUnsharpMask = this.profile.applyUnsharpMask;
@@ -1636,11 +1559,7 @@ export class AppComponent implements OnInit {
     profile: Profile,
     largeImage: boolean
   ): boolean {
-    return (
-      largeImage ||
-      profile.denoiseAlgorithm1 === 'IAN' ||
-      profile.equalizeLocalHistogramsStrength > 0
-    );
+    return largeImage;
   }
 
   private setNonPersistentSettings() {
@@ -2050,12 +1969,6 @@ export class AppComponent implements OnInit {
     this.profile.denoise1IterationsBlue = 1;
     this.profile.denoise1IterationsGreen = 1;
 
-    // Ian's
-    this.profile.iansAmount = 1;
-    this.profile.iansIterations = 1;
-    this.profile.iansAmountMid = 0;
-    this.profile.iansRecovery = 0;
-
     this.profile.denoiseAlgorithm2 = 'OFF';
 
     // SG
@@ -2081,7 +1994,6 @@ export class AppComponent implements OnInit {
     this.profile.localContrastFine = 0;
     this.profile.localContrastMedium = 0;
     this.profile.localContrastLarge = 0;
-    this.profile.equalizeLocalHistogramsStrength = 0;
     this.profile.gamma = 1;
     this.profile.contrast = 0;
     this.profile.brightness = 0;

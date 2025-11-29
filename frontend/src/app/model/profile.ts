@@ -55,10 +55,6 @@ export class Profile {
   denoise1Amount: number;
   denoise1Radius: number;
   denoise1Iterations: number;
-  iansAmount: number;
-  iansAmountMid: number;
-  iansRecovery: number;
-  iansIterations: number;
   rofTheta: number;
   rofIterations: number;
   bilateralSigmaColor: number;
@@ -122,7 +118,6 @@ export class Profile {
   localContrastFine: number;
   localContrastMedium: number;
   localContrastLarge: number;
-  equalizeLocalHistogramsStrength: number;
   preserveDarkBackground: boolean;
 
   // color

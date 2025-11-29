@@ -23,6 +23,7 @@
   [workerStatus]="workerStatus"
   [nightMode]="nightMode"
   [spinnerShown]="shouldShowSpinner()"
+  (stop)="stopWorker()"
 ></app-progress-panel>
 <app-derotation-panel
   *ngIf="isDerotationPanelVisible"
@@ -45,7 +46,8 @@
     isPsfPanelVisible ||
     isRotationPanelVisible ||
     isProgressPanelVisible ||
-    isDerotationPanelVisible
+    isDerotationPanelVisible ||
+    isNotificationVisible
   "
   class="backdrop"
 ></div>
@@ -963,158 +965,10 @@
           <mat-radio-button value="BILATERAL" class="denoiseMode"
             >Bilateral</mat-radio-button
           >
-          <!--
-          <mat-radio-button value="ROF" class="denoiseMode"
-            >ROF</mat-radio-button
-          >
-          -->
           <mat-radio-button value="SIGMA1" class="denoiseMode"
             >Sigma 1</mat-radio-button
           >
-          <mat-radio-button
-            value="IAN"
-            class="denoiseMode"
-            disabled="{{ !settings?.gmicAvailable }}"
-            matTooltip="Warning: Not recommended. It slows down processing and can only be applied equally to all channels. Use Bilateral instead."
-            ><span class="deprecatedColor">Ian's NR</span></mat-radio-button
-          >
-          <mat-checkbox
-            [(ngModel)]="iansNrUnlocked"
-            [color]="colorTheme()"
-            class="iansNrLockCheckbox"
-            [disabled]="shouldShowSpinner() || !refImageSelected"
-            matTooltip="Unlock"
-          ></mat-checkbox>
         </mat-radio-group>
-      </div>
-      <div *ngIf="denoiseAlgorithm1 === 'IAN'">
-        <div class="sliderRow">
-          <div class="sliderLabel">Fine details</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="
-                !iansNrUnlocked ||
-                shouldShowSpinner() ||
-                !refImageSelected ||
-                !settings?.gmicAvailable
-              "
-              step="0.1"
-              min="0"
-              max="15"
-              (input)="iansAmountChanged($event, false)"
-              (change)="iansAmountChanged($event, true)"
-              [(ngModel)]="iansAmount"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <span
-              class="{{
-                iansAmount === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-              }}"
-              >{{ iansAmount }}</span
-            >
-            <span
-              *ngIf="refImageSelected"
-              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-              >{{ iansAmount == 0 ? "Off" : "" }}</span
-            >
-          </div>
-        </div>
-
-        <div class="sliderRow">
-          <div class="sliderLabel">Medium details</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="
-                !iansNrUnlocked ||
-                shouldShowSpinner() ||
-                !refImageSelected ||
-                !settings?.gmicAvailable
-              "
-              step="0.1"
-              min="0"
-              max="15"
-              (input)="iansAmountMidChanged($event, false)"
-              (change)="iansAmountMidChanged($event, true)"
-              [(ngModel)]="iansAmountMid"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <span
-              class="{{
-                iansAmountMid === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-              }}"
-              >{{ iansAmountMid }}</span
-            >
-            <span
-              *ngIf="refImageSelected"
-              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-              >{{ iansAmountMid == 0 ? "Off" : "" }}</span
-            >
-          </div>
-        </div>
-
-        <div class="sliderRow">
-          <div class="sliderLabel">Recovery</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="
-                !iansNrUnlocked ||
-                shouldShowSpinner() ||
-                !refImageSelected ||
-                !settings?.gmicAvailable
-              "
-              step="0.01"
-              min="0"
-              max="2"
-              (input)="iansRecoveryChanged($event, false)"
-              (change)="iansRecoveryChanged($event, true)"
-              [(ngModel)]="iansRecovery"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <span
-              class="{{
-                iansRecovery === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-              }}"
-              >{{ iansRecovery }}</span
-            >
-            <span
-              *ngIf="refImageSelected"
-              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-              >{{ iansRecovery == 0 ? "Off" : "" }}</span
-            >
-          </div>
-        </div>
-
-        <div class="sliderRow">
-          <div class="sliderLabel">Iterations</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="
-                !iansNrUnlocked ||
-                shouldShowSpinner() ||
-                !refImageSelected ||
-                !settings?.gmicAvailable
-              "
-              step="1"
-              min="1"
-              max="5"
-              (input)="iansIterationsChanged($event, false)"
-              (change)="iansIterationsChanged($event, true)"
-              [(ngModel)]="iansIterations"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <span
-              class="{{
-                iansIterations === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-              }}"
-              >{{ iansIterations }}</span
-            >
-            <span
-              *ngIf="refImageSelected"
-              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-              >{{ iansIterations == 0 ? "Off" : "" }}</span
-            >
-          </div>
-        </div>
       </div>
 
       <div *ngIf="denoiseAlgorithm1 === 'SIGMA1'">
@@ -1562,43 +1416,6 @@
             *ngIf="refImageSelected"
             class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
             >{{ localContrastLarge == 0 ? "Off" : "" }}</span
-          >
-        </div>
-      </div>
-      <div
-        class="sliderRow"
-        matTooltip="Warning: Not recommended. Slows down processing."
-      >
-        <div class="deprecatedColor sliderLabel sliderLabelEL">
-          Equalize locally
-        </div>
-        <mat-checkbox
-          [(ngModel)]="equalizeLocallyUnlocked"
-          [color]="colorTheme()"
-          [disabled]="shouldShowSpinner() || !refImageSelected"
-          matTooltip="Unlock"
-        ></mat-checkbox>
-        <div>
-          <mat-slider
-            [disabled]="
-              !equalizeLocallyUnlocked ||
-              shouldShowSpinner() ||
-              !refImageSelected ||
-              !settings?.gmicAvailable
-            "
-            step="1"
-            min="0"
-            max="100"
-            (input)="equalizeLocalHistogramsChanged($event, false)"
-            (change)="equalizeLocalHistogramsChanged($event, true)"
-            [(ngModel)]="equalizeLocalHistograms"
-            [color]="colorTheme()"
-          ></mat-slider>
-          <span class="sliderLabel">{{ equalizeLocalHistograms }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ equalizeLocalHistograms == 0 ? "Off" : "" }}</span
           >
         </div>
       </div>
@@ -2479,40 +2296,6 @@
         >
           <img src="assets/images/startbatch.png" class="startBatchButton" />
         </button>
-        <!--
-        <button
-          *ngIf="isWorkerBusy()"
-          type="button"
-          mat-button
-          (click)="stopWorker()"
-          class="relatedButtonsSpace button {{
-            nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-          }}"
-          matTooltip="Stop batch process when running."
-        >
-          <img src="assets/images/stopbatch.png" class="stopBatchButton" />
-        </button>
-        <button
-          *ngIf="!isWorkerBusy()"
-          type="button"
-          mat-button
-          disabled
-          class="relatedButtonsSpace button_disabled"
-          matTooltip="Stop batch process when running."
-        >
-          <img src="assets/images/stopbatch.png" class="stopBatchButton" />
-        </button>
-        <div
-          class="relatedButtonsSpace workerLabelStatus {{
-            !isWorkerBusy()
-              ? ''
-              : nightModeEnabled()
-              ? 'sliderRowCategoryTitleColorNight'
-              : 'sliderRowCategoryTitleColor'
-          }}"
-        >
-          {{ workerProgress === 100 ? "Done" : getWorkerStatusDisplayText() }}
-        -->
         <button
           *ngIf="openRefImageEnabled() && refImageSelected"
           type="button"

@@ -20,7 +20,6 @@ public class SettingsService {
   private static final String SETTINGS_FILE = "/settings.json";
 
   private final ObjectMapper objectMapper;
-  private final GmicService gmicService;
   private Settings settings;
 
   public void saveSettings(Settings settings) {
@@ -74,7 +73,6 @@ public class SettingsService {
     return Settings.builder()
         .defaultProfile("moon")
         .extensions("tif,png,tiff")
-        .gmicAvailable(gmicService.isGmicAvailable(activeOs))
         .latestKnownVersion(null)
         .latestKnownVersionChecked(null)
         .outputFormat("tif")

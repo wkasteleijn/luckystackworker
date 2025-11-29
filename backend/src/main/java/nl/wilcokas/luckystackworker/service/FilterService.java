@@ -39,8 +39,6 @@ public class FilterService {
   private final SigmaDenoise1Filter sigmaDenoise1Filter;
   private final SigmaDenoise2Filter sigmaDenoise2Filter;
   private final DispersionCorrectionFilter dispersionCorrectionFilter;
-  private final IansNoiseReductionFilter iansNoiseReductionFilter;
-  private final EqualizeLocalHistogramsFilter equalizeLocalHistogramsFilter;
   private final ColorNormalisationFilter colorNormalisationFilter;
   private final HistogramStretchFilter histogramStretchFilter;
   private final WienerDeconvolutionFilter wienerDeconvolutionFilter;
@@ -65,11 +63,9 @@ public class FilterService {
     filters.add(Pair.of(FilterEnum.SHARPEN, lswSharpenFilter));
     filters.add(Pair.of(FilterEnum.ROTATE, rotationFilter));
     filters.add(Pair.of(FilterEnum.SIGMA_DENOISE_1, sigmaDenoise1Filter));
-    filters.add(Pair.of(FilterEnum.IANS_NR, iansNoiseReductionFilter));
     filters.add(Pair.of(FilterEnum.BILATERAL_DENOISE, bilateralDenoiseFilter));
     filters.add(Pair.of(FilterEnum.SIGMA_DENOISE_2, sigmaDenoise2Filter));
     filters.add(Pair.of(FilterEnum.SAVITSKY_GOLAY, savitzkyGolayFilter));
-    filters.add(Pair.of(FilterEnum.EQUALIZE_LOCALLY, equalizeLocalHistogramsFilter));
     filters.add(Pair.of(FilterEnum.LOCAL_CONTRAST, localContrastFilter));
     filters.add(Pair.of(FilterEnum.GAMMA, gammaFilter));
     filters.add(Pair.of(FilterEnum.COLOR_NORMALIZE, colorNormalisationFilter));
