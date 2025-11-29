@@ -51,7 +51,7 @@
 
 button {
   height: 40px;
-  width: 40px;
+  width: 42px;
   font-size: 12px;
   border: 0px;
   color: rgb(226, 226, 226);
@@ -90,6 +90,7 @@ h2 {
   width: 13px;
   transform: scale(2.5);
   margin-top: 2px;
+  margin-right: 2px;
 }
 
 .buttonMargin {

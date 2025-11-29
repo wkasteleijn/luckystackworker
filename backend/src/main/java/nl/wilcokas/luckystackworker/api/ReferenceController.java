@@ -9,11 +9,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.dto.DeRotationDTO;
 import nl.wilcokas.luckystackworker.dto.ProfileDTO;
 import nl.wilcokas.luckystackworker.dto.ResponseDTO;
 import nl.wilcokas.luckystackworker.dto.SettingsDTO;
 import nl.wilcokas.luckystackworker.exceptions.LswNotReadyException;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
+import nl.wilcokas.luckystackworker.model.DeRotation;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
@@ -151,6 +153,11 @@ public class ReferenceController {
     }
     return new SettingsDTO(settings);
   }
+
+    @GetMapping("/open-for-derotation")
+    public DeRotationDTO openDeRotationImages() throws IOException {
+        return new DeRotationDTO(referenceImageService.selectDerotationImages());
+    }
 
   private boolean asJpeg(File selectedFile) {
     String fileExtension = LswFileUtil.getFilenameExtension(selectedFile).toLowerCase();

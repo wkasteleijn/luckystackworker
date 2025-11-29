@@ -50,6 +50,7 @@ import nl.wilcokas.luckystackworker.ij.LswImageViewer;
 import nl.wilcokas.luckystackworker.ij.LswImageWindow;
 import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
+import nl.wilcokas.luckystackworker.model.DeRotation;
 import nl.wilcokas.luckystackworker.model.FilterEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
@@ -577,6 +578,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
       blinkClippedAreasTimer = null;
       isClippedAreasHighlighted = false;
     }
+  }
+
+  public DeRotation selectDerotationImages() {
+    // TODO: implement this method
+      return null;
   }
 
   private boolean confirmOverwrite() {

@@ -150,6 +150,8 @@ public class Profile {
 
     private PSF psf;
 
+    private DeRotation derotation;
+
     // Not used any longer, needed for historical reasons. Removing this would now
     // break the profile loading of old yaml files.
 
