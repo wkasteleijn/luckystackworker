@@ -68,12 +68,6 @@ public class ProfileDTO {
     this.denoise1Amount = profile.getDenoise1Amount();
     this.denoise1Radius = profile.getDenoise1Radius();
     this.denoise1Iterations = profile.getDenoise1Iterations();
-    this.iansAmount = profile.getIansAmount();
-    this.iansAmountMid = profile.getIansAmountMid();
-    this.iansRecovery = profile.getIansRecovery();
-    this.iansIterations = profile.getIansIterations();
-    this.rofTheta = profile.getRofTheta();
-    this.rofIterations = profile.getRofIterations();
     this.denoiseAlgorithm2 = profile.getDenoiseAlgorithm2();
     this.denoise2Radius = profile.getDenoise2Radius();
     this.denoise2Iterations = profile.getDenoise2Iterations();
@@ -143,7 +137,6 @@ public class ProfileDTO {
 
     this.scale = profile.getScale();
     this.rotationAngle = profile.getRotationAngle();
-    this.equalizeLocalHistogramsStrength = profile.getEqualizeLocalHistogramsStrength();
     this.openImageMode = profile.getOpenImageMode();
     PSF profilePsf = profile.getPsf();
     this.psf =
@@ -204,12 +197,6 @@ public class ProfileDTO {
   private BigDecimal denoise1Amount;
   private BigDecimal denoise1Radius;
   private int denoise1Iterations;
-  private BigDecimal iansAmount;
-  private BigDecimal iansAmountMid;
-  private BigDecimal iansRecovery;
-  private int iansIterations;
-  private int rofTheta;
-  private int rofIterations;
   private String denoiseAlgorithm2;
   private int savitzkyGolaySize;
   private int savitzkyGolayAmount;
@@ -287,7 +274,6 @@ public class ProfileDTO {
 
   private double scale;
   private double rotationAngle;
-  private int equalizeLocalHistogramsStrength;
   private OpenImageModeEnum openImageMode;
   private PSFDTO psf;
 }
