@@ -154,6 +154,7 @@ export class AppComponent implements OnInit {
   notificationText: string = 'Done!';
   psfImage: string = '';
   sliderTextDisplayed: boolean = false;
+  toBeDeRotatedImages: string[] = ['test1.tif', 'test2.tif'];
 
   versionInfo: Version;
   showNewVersionPopup: boolean = false;
@@ -1362,6 +1363,16 @@ export class AppComponent implements OnInit {
       }
     }
     this.updateProfile();
+  }
+
+  derotationAnchorStrengthChanged(event: any) {
+    console.log('derotationAnchorStrengthChanged called');
+  }
+  derotationNoiseRobustnessChanged(event: any) {
+    console.log('derotationNoiseRobustnessChanged called');
+  }
+  derotationAccuratenessChanged(event: any) {
+    console.log('derotationAccuratenessChanged called');
   }
 
   get savitzkyGolaySizeDisplayValue(): number {

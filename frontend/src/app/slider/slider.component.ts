@@ -15,7 +15,6 @@ export class SliderComponent {
   @Input() sliderMinValue: number;
   @Input() sliderMaxValue: number;
   @Input() nightMode: boolean = false;
-  @Input() spinnerShown = false;
   @Output() sliderValueChanged = new EventEmitter<any>();
 
   componentColor: ThemePalette = 'primary';

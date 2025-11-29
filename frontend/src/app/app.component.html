@@ -27,11 +27,16 @@
 ></app-progress-panel>
 <app-derotation-panel
   *ngIf="isDerotationPanelVisible"
-  [angle]="rotationAngle"
+  [anchorStrength]="derotationAnchorStrength"
+  [noiseRobustness]="noiseRobustness"
+  [accurateness]="accurateness"
   [nightMode]="nightMode"
   [spinnerShown]="shouldShowSpinner()"
+  [images]="toBeDeRotatedImages"
   (close)="hideDeRotationPanel()"
-  (angleChanged)="rotationAngleChanged($event)"
+  (anchorStrengthChanged)="derotationAnchorStrengthChanged($event)"
+  (noiseRobustnessChanged)="derotationNoiseRobustnessChanged($event)"
+  (accuratenessChanged)="derotationAccuratenessChanged($event)"
 ></app-derotation-panel>
 <app-notification
   *ngIf="isNotificationVisible"
@@ -2342,20 +2347,6 @@
           <img src="assets/images/connect.png" class="genericButton" />
         </button>
       </div>
-      <!--
-      <div class="sliderRow">
-        <mat-progress-bar
-          [color]="colorTheme()"
-          [value]="workerProgress"
-          mode="determinate"
-          [bufferValue]="100"
-        >
-        </mat-progress-bar>
-        <span class="progressBarPercentage"
-          >{{ workerProgress ? workerProgress : 0 }}%</span
-        >
-      </div>
-      -->
     </mat-card-content>
   </mat-card>
 </div>

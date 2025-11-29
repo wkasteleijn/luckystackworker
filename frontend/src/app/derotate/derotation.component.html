@@ -1,45 +1,72 @@
 <div class="popup-container">
-  <h2 class="{{ nightMode ? 'titleNight' : 'title' }}">Rotate</h2>
+  <h2 class="{{ nightMode ? 'titleNight' : 'title' }}">De-rotate</h2>
   <button (click)="closePopup()" class="closeButton" matTooltip="Close panel">
     <img src="assets/images/close.png" class="buttonImg" />
   </button>
 
-  <p class="slidersStartMargin"></p>
+  <div
+    *ngIf="showWarning()"
+    class="warning {{ nightMode ? 'titleNight' : 'title' }}"
+  >
+    You must select a reference image first!
+  </div>
+  <div *ngIf="!showWarning()" class="slidersStartMargin"></div>
 
   <div class="sliderContainer">
     <div class="sliderGroup">
-      <app-slider
-        [sliderLabel]="'Detail anchor strength'"
-        [sliderValue]="1"
-        [sliderStep]="1"
-        [sliderMinValue]="1"
-        [sliderMaxValue]="10"
-        [nightMode]="nightMode"
-        [spinnerShown="spinnerShown"
-        (sliderValueChanged)="onAnchorStrengthChanged()"
-      ></app-slider>
-
-      <app-slider
-        [sliderLabel]="'Noise robustness'"
-        [sliderValue]="1"
-        [sliderStep]="1"
-        [sliderMinValue]="1"
-        [sliderMaxValue]="5"
-        [nightMode]="nightMode"
-        [spinnerShown="spinnerShown"
-        (sliderValueChanged)="onNoiseRobustnessChanged()"
-      ></app-slider>
-
-      <app-slider
-        [sliderLabel]="'Accurateness'"
-        [sliderValue]="1"
-        [sliderStep]="1"
-        [sliderMinValue]="1"
-        [sliderMaxValue]="4"
-        [nightMode]="nightMode"
-        [spinnerShown="spinnerShown"
-        (sliderValueChanged)="onAccuratenessChanged()"
-      ></app-slider>
+      <label class="sliderLabel">Reference image</label>
+      <select
+        matNativeControl
+        [(ngModel)]="referenceImage"
+        matTooltip="Select the reference image to which the other images will be de-rotated to"
+        class="{{
+          nightMode ? 'dropdown activeColorNight' : 'dropdown activeColor'
+        }}"
+        (change)="onRefImageChanged()"
+      >
+        <option *ngFor="let image of images" [value]="image">
+          {{ image }}
+        </option>
+      </select>
     </div>
+    <app-slider
+      [sliderLabel]="'Detail anchor strength'"
+      [sliderValue]="1"
+      [sliderStep]="1"
+      [sliderMinValue]="1"
+      [sliderMaxValue]="10"
+      [nightMode]="nightMode"
+      (sliderValueChanged)="onAnchorStrengthChanged()"
+    ></app-slider>
+    <app-slider
+      [sliderLabel]="'Noise robustness'"
+      [sliderValue]="1"
+      [sliderStep]="1"
+      [sliderMinValue]="1"
+      [sliderMaxValue]="5"
+      [nightMode]="nightMode"
+      (sliderValueChanged)="onNoiseRobustnessChanged()"
+    ></app-slider>
+    <app-slider
+      [sliderLabel]="'Accurateness'"
+      [sliderValue]="1"
+      [sliderStep]="1"
+      [sliderMinValue]="1"
+      [sliderMaxValue]="4"
+      [nightMode]="nightMode"
+      (sliderValueChanged)="onAccuratenessChanged()"
+    ></app-slider>
   </div>
+
+  <div class="buttonMargin"></div>
+
+  <button
+    type="button"
+    mat-button
+    (click)="onStart()"
+    class="button {{ nightMode ? 'activeColorNight' : 'activeColor' }}"
+    matTooltip="Start de-rotating the selected images."
+  >
+    <img src="assets/images/startbatch.png" class="startButton" />
+  </button>
 </div>

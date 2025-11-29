@@ -7,8 +7,8 @@
   background-color: #191919;
   border: 1px solid rgb(168, 168, 168);
   padding: 20px;
-  width: 350px;
-  height: 150px;
+  width: 400px;
+  height: 250px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
 }
@@ -23,7 +23,7 @@
 
 .sliderGroup {
   display: grid;
-  grid-template-columns: 24px 264px 10px;
+  grid-template-columns: 128px 208px 10px;
   align-items: center;
   height: 16px;
   column-gap: 8px;
@@ -33,28 +33,13 @@
   white-space: nowrap;
 }
 
-.slider {
-  width: 100%;
-}
-
-.sliderValue {
-  text-align: left;
-}
-
 .image-container {
   text-align: center;
   margin-top: 20px;
 }
 
-.psfImage {
-  width: 128px;
-  border: 1px solid rgb(168, 168, 168);
-  position: fixed;
-  top: 24px;
-  left: 151px;
-}
 .slidersStartMargin {
-  margin-top: 40px;
+  margin-top: 48px;
 }
 
 .closeButton {
@@ -66,6 +51,7 @@
 
 button {
   height: 40px;
+  width: 40px;
   font-size: 12px;
   border: 0px;
   color: rgb(226, 226, 226);
@@ -100,32 +86,17 @@ h2 {
   height: 20px;
 }
 
-.loadCustomPsfButton {
-  margin-top: 8px;
-}
-.toggle {
-  background-color: #191919 !important; /* Black background */
-  color: rgb(168, 168, 168) !important; /* Light gray text */
-  border-radius: 0; /* Remove rounded corners */
+.startButton {
+  width: 13px;
+  transform: scale(2.5);
+  margin-top: 2px;
 }
 
-/* Style each button */
-mat-button-toggle {
-  background-color: #191919 !important; /* Ensure the button background is black */
-  color: rgb(168, 168, 168) !important; /* Text color */
-  border: 1px solid gray !important; /* Optional: Adds a border */
-  border-radius: 0px;
+.buttonMargin {
+  margin-top: 24px;
 }
 
-/* Change background of selected button */
-mat-button-toggle.mat-button-toggle-checked {
-  background-color: darkgray !important; /* Dark gray when selected */
-  color: black !important; /* Black text when selected */
-}
-
-.angleInput {
-  width: 38px;
-  color: rgb(168, 168, 168);
-  border: 1px solid rgb(168, 168, 168);
-  background-color: #191919;
+.warning {
+  margin-top: 12px;
+  margin-bottom: 12px;
 }

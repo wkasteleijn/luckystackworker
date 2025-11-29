@@ -13,11 +13,16 @@ export class DeRotationComponent {
   @Input() noiseRobustness;
   @Input() accurateness;
   @Input() nightMode: boolean = false;
-  @Input() spinnerShown = false;
+  @Input() images: string[];
   @Output() anchorStrengthChanged = new EventEmitter<any>();
   @Output() noiseRobustnessChanged = new EventEmitter<any>();
   @Output() accuratenessChanged = new EventEmitter<any>();
+  @Output() derotationRefImageChanged = new EventEmitter<any>();
   @Output() close = new EventEmitter<any>();
+  @Output() start = new EventEmitter<any>();
+
+  referenceImage: string;
+  startPressed: boolean = false;
 
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
@@ -43,7 +48,24 @@ export class DeRotationComponent {
     this.accuratenessChanged.emit(this.accurateness);
   }
 
+  onRefImageChanged() {
+    console.log('onRefImageChanged called');
+    this.derotationRefImageChanged.emit(this.referenceImage);
+  }
+
+  onStart() {
+    console.log('onStart called');
+    this.startPressed = true;
+    if (this.referenceImage !== undefined) {
+      this.start.emit();
+    }
+  }
+
   colorTheme() {
     return this.nightMode ? this.componentColorNight : this.componentColor;
+  }
+
+  showWarning(): boolean {
+    return this.startPressed && this.referenceImage === undefined;
   }
 }

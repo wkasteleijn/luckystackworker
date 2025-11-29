@@ -1,14 +1,6 @@
-.sliderContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding-left: 0px;
-  padding-right: 12px;
-}
-
 .sliderGroup {
   display: grid;
-  grid-template-columns: 24px 264px 10px;
+  grid-template-columns: 128px 208px 10px;
   align-items: center;
   height: 16px;
   column-gap: 8px;
@@ -26,11 +18,9 @@
   text-align: left;
 }
 
-.image-container {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.slidersStartMargin {
-  margin-top: 40px;
+.sliderInput {
+  width: 38px;
+  color: rgb(168, 168, 168);
+  border: 1px solid rgb(168, 168, 168);
+  background-color: #191919;
 }

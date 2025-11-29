@@ -1,29 +1,30 @@
 <div class="popup-container">
   <span class="{{ nightMode ? 'titleNight' : 'title' }}">Progress</span>
 
-  <mat-progress-bar
-    [color]="colorTheme()"
-    [value]="workerProgress"
-    mode="determinate"
-    [bufferValue]="100"
-  >
-  </mat-progress-bar>
+  <div class="progressContainer">
+    <div class="progressGroup">
+      <mat-progress-bar
+        [color]="colorTheme()"
+        [value]="workerProgress"
+        mode="determinate"
+        [bufferValue]="100"
+      >
+      </mat-progress-bar>
+      <button
+        type="button"
+        mat-button
+        (click)="stopWorker()"
+        class="button {{ nightMode ? 'activeColorNight' : 'activeColor' }}"
+        matTooltip="Stop batch process when running."
+      >
+        <img src="assets/images/stopbatch.png" class="stopButton" />
+      </button>
+    </div>
+  </div>
 
-  <button
-    type="button"
-    mat-button
-    (click)="stopWorker()"
-    class="relatedButtonsSpace button {{
-      nightMode ? 'activeColorNight' : 'activeColor'
-    }}"
-    matTooltip="Stop batch process when running."
-  >
-    <img src="assets/images/stopbatch.png" class="stopBatchButton" />
-  </button>
-
-  <span class="progressBarPercentage"
-    >{{ workerProgress ? workerProgress : 0 }}%</span
-  >
+  <div class="progressBarPercentage">
+    {{ workerProgress ? workerProgress : 0 }}%
+  </div>
 
   <p class="slidersStartMargin"></p>
 
