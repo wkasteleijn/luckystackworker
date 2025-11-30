@@ -13,14 +13,15 @@
   <div *ngIf="!showWarning()" class="slidersStartMargin"></div>
 
   <div class="sliderContainer">
-    <div class="sliderGroup">
+    <div class="sliderGroupFileSelector">
       <label class="sliderLabel">Reference image</label>
       <select
         matNativeControl
         [(ngModel)]="referenceImage"
         matTooltip="Select the reference image to which the other images will be de-rotated to"
         class="{{
-          nightMode ? 'dropdown activeColorNight' : 'dropdown activeColor'
+          'derotationDropdown dropdown ' +
+            (nightMode ? 'activeColorNight' : 'activeColor')
         }}"
         (change)="onRefImageChanged()"
       >

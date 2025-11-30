@@ -9,6 +9,7 @@ import {
   ConfirmationModel,
 } from './confirmation/confirmation.component';
 import { LuckyStackWorkerService } from './luckystackworker.service';
+import { DeRotation } from './model/derotation';
 import { Profile } from './model/profile';
 import { PSF } from './model/psf';
 import { Settings } from './model/settings';
@@ -154,7 +155,7 @@ export class AppComponent implements OnInit {
   notificationText: string = 'Done!';
   psfImage: string = '';
   sliderTextDisplayed: boolean = false;
-  toBeDeRotatedImages: string[] = ['test1.tif', 'test2.tif'];
+  deRotation: DeRotation;
 
   versionInfo: Version;
   showNewVersionPopup: boolean = false;
@@ -246,12 +247,12 @@ export class AppComponent implements OnInit {
     );
   }
 
-  applyProfile() {
-    console.log('applyProfile called');
+  applyProfileBatch() {
+    console.log('applyProfileBatch called');
     this.isProgressPanelVisible = true;
     this.workerStatus = 'Working';
     this.workerProgress = 0;
-    this.luckyStackWorkerService.applyProfile(this.profile).subscribe(
+    this.luckyStackWorkerService.applyProfileBatch(this.profile).subscribe(
       (data) => {
         console.log(data);
         this.waitForWorker();
@@ -1367,12 +1368,20 @@ export class AppComponent implements OnInit {
 
   derotationAnchorStrengthChanged(event: any) {
     console.log('derotationAnchorStrengthChanged called');
+    this.deRotation.anchorStrength = event.value;
   }
   derotationNoiseRobustnessChanged(event: any) {
     console.log('derotationNoiseRobustnessChanged called');
+    this.deRotation.noiseRobustness = event.value;
   }
   derotationAccuratenessChanged(event: any) {
     console.log('derotationAccuratenessChanged called');
+    this.deRotation.acurateness = event.value;
+  }
+
+  derotationRefImageChanged(event: any) {
+    console.log('derotationAccuratenessChanged called');
+    this.deRotation.referenceImage = event.value;
   }
 
   get savitzkyGolaySizeDisplayValue(): number {
@@ -1901,8 +1910,38 @@ export class AppComponent implements OnInit {
     this.showNewVersionPopup = false;
   }
 
-  derotate() {
-    this.isDerotationPanelVisible = true;
+  loadFilesForDerotation() {
+    this.showSpinner();
+    this.luckyStackWorkerService.getFilesForDerotation().subscribe(
+      (data) => {
+        if (data && data.images && data.images.length > 0) {
+          console.log(data);
+          this.deRotation = data;
+          this.isDerotationPanelVisible = true;
+        }
+        this.hideSpinner();
+      },
+      (error) => console.log(error)
+    );
+  }
+
+  startDeRotation() {
+    this.isDerotationPanelVisible = false;
+    this.isProgressPanelVisible = true;
+    this.workerStatus = 'Working';
+    this.workerProgress = 0;
+    this.luckyStackWorkerService.startDeRotation().subscribe(
+      (data) => {
+        console.log(data);
+        this.waitForWorker();
+      },
+      (error) => {
+        console.log(error);
+        this.isProgressPanelVisible = false;
+        this.notificationText = 'The following error occured: ' + error;
+        this.isNotificationVisible = true;
+      }
+    );
   }
 
   hideDeRotationPanel() {

@@ -38,8 +38,12 @@ export class LuckyStackWorkerService {
     return this.http.put(url, profile);
   }
 
-  applyProfile(profile: Profile): Observable<Object> {
+  applyProfileBatch(profile: Profile): Observable<Object> {
     return this.http.put(`${this.baseUrl}/profiles/apply`, profile);
+  }
+
+  startDeRotation(): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/reference/derotate`, null);
   }
 
   exit(): Observable<Object> {
@@ -121,5 +125,9 @@ export class LuckyStackWorkerService {
 
   loadCustomPSF(): Observable<any> {
     return this.http.get(`${this.baseUrl}/profiles/custom-psf`);
+  }
+
+  getFilesForDerotation(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/reference/open-for-derotation`);
   }
 }

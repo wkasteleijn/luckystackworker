@@ -32,11 +32,13 @@
   [accurateness]="accurateness"
   [nightMode]="nightMode"
   [spinnerShown]="shouldShowSpinner()"
-  [images]="toBeDeRotatedImages"
+  [images]="deRotation.images"
   (close)="hideDeRotationPanel()"
   (anchorStrengthChanged)="derotationAnchorStrengthChanged($event)"
   (noiseRobustnessChanged)="derotationNoiseRobustnessChanged($event)"
   (accuratenessChanged)="derotationAccuratenessChanged($event)"
+  (derotationRefImageChanged)="derotationRefImageChanged($event)"
+  (start)="startDeRotation()"
 ></app-derotation-panel>
 <app-notification
   *ngIf="isNotificationVisible"
@@ -2266,7 +2268,7 @@
     </mat-tab>
   </mat-tab-group>
 
-  <!-- Worker panel -->
+  <!-- Batch functions panel -->
   <mat-card class="card cardColor">
     <mat-card-content class="batchBar">
       <div class="sliderRow">
@@ -2282,7 +2284,7 @@
           *ngIf="openRefImageEnabled() && refImageSelected"
           type="button"
           mat-button
-          (click)="applyProfile()"
+          (click)="applyProfileBatch()"
           class="button {{
             nightModeEnabled() ? 'activeColorNight' : 'activeColor'
           }}"
@@ -2301,11 +2303,12 @@
         >
           <img src="assets/images/startbatch.png" class="startBatchButton" />
         </button>
+
         <button
           *ngIf="openRefImageEnabled() && refImageSelected"
           type="button"
           mat-button
-          (click)="derotate()"
+          (click)="loadFilesForDerotation()"
           class="relatedButtonsSpace button {{
             nightModeEnabled() ? 'activeColorNight' : 'activeColor'
           }}"
@@ -2322,6 +2325,7 @@
         >
           <img src="assets/images/derotate.png" class="stopBatchButton" />
         </button>
+
         <button
           *ngIf="openRefImageEnabled() && refImageSelected"
           type="button"

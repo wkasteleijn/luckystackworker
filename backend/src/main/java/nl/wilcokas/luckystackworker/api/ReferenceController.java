@@ -2,6 +2,7 @@ package nl.wilcokas.luckystackworker.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -155,8 +156,13 @@ public class ReferenceController {
   }
 
     @GetMapping("/open-for-derotation")
-    public DeRotationDTO openDeRotationImages() throws IOException {
+    public DeRotationDTO openDeRotationImages() {
         return new DeRotationDTO(referenceImageService.selectDerotationImages());
+    }
+
+    @PutMapping("/derotate")
+    public void deRotate(@RequestBody DeRotationDTO deRotationDTO) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        referenceImageService.derotate(new DeRotation(deRotationDTO));
     }
 
   private boolean asJpeg(File selectedFile) {
