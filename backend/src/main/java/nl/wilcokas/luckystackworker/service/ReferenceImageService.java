@@ -25,6 +25,8 @@ import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -34,6 +36,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -43,6 +46,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
@@ -617,24 +621,32 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 }
             }
         }
-        return DeRotation.builder().images(selectedImages).build();
+        return DeRotation.builder().images(selectedImages)
+                .accurateness(Constants.DEFAULT_DEROTATION_ACCURATENESS)
+                .noiseRobustness(Constants.DEFAULT_DEROTATION_NOISE_ROBUSTNESS)
+                .anchorStrength(Constants.DEFAULT_DEROTATION_ANCHOR_STRENGTH)
+                .build();
     }
 
+    @SneakyThrows
     public void derotate(DeRotation deRotation) {
         luckyStackWorkerContext.setStatus(Constants.STATUS_WORKING);
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            CompletableFuture.runAsync(
-                    () -> {
-                        try {
-                            deRotationService.derotate(settingsService.getRootFolder(), deRotation.getReferenceImage(), deRotation.getImages(), deRotation.getAnchorStrength(),
-                                    deRotation.getNoiseRobustness(), deRotation.getAccurateness());
-                        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException |
-                                 IOException e) {
-                            log.error("Error starting the de-rotation process :", e);
-                        }
-                    },
-                    executor);
-        }
+        var executor = Executors.newVirtualThreadPerTaskExecutor();
+        CompletableFuture.runAsync(
+                () -> {
+                    try {
+                        deRotationService.derotate(settingsService.getRootFolder(), deRotation.getReferenceImage(), deRotation.getImages(), deRotation.getAnchorStrength(),
+                                deRotation.getNoiseRobustness(), deRotation.getAccurateness());
+                        String deRotatedImagePath = deRotationService.getDerotatedImagePath();
+                        String profileName = LswFileUtil.deriveProfileFromImageName(deRotatedImagePath);
+                        Profile profile = profileService.findByName(profileName).orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
+                        openReferenceImage(deRotatedImagePath, profile, LocalDateTime.now());
+                    } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException |
+                             IOException e) {
+                        log.error("Error starting the de-rotation process :", e);
+                    }
+                },
+                executor);
     }
 
     private boolean confirmOverwrite() {

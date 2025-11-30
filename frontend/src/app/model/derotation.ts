@@ -3,5 +3,5 @@ export class DeRotation {
   referenceImage: string;
   noiseRobustness: number;
   anchorStrength: number;
-  acurateness: number;
+  accurateness: number;
 }

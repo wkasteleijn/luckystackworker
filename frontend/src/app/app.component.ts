@@ -1368,20 +1368,20 @@ export class AppComponent implements OnInit {
 
   derotationAnchorStrengthChanged(event: any) {
     console.log('derotationAnchorStrengthChanged called');
-    this.deRotation.anchorStrength = event.value;
+    this.deRotation.anchorStrength = event;
   }
   derotationNoiseRobustnessChanged(event: any) {
     console.log('derotationNoiseRobustnessChanged called');
-    this.deRotation.noiseRobustness = event.value;
+    this.deRotation.noiseRobustness = event;
   }
   derotationAccuratenessChanged(event: any) {
     console.log('derotationAccuratenessChanged called');
-    this.deRotation.acurateness = event.value;
+    this.deRotation.accurateness = event;
   }
 
   derotationRefImageChanged(event: any) {
     console.log('derotationAccuratenessChanged called');
-    this.deRotation.referenceImage = event.value;
+    this.deRotation.referenceImage = event;
   }
 
   get savitzkyGolaySizeDisplayValue(): number {
@@ -1930,7 +1930,7 @@ export class AppComponent implements OnInit {
     this.isProgressPanelVisible = true;
     this.workerStatus = 'Working';
     this.workerProgress = 0;
-    this.luckyStackWorkerService.startDeRotation().subscribe(
+    this.luckyStackWorkerService.startDeRotation(this.deRotation).subscribe(
       (data) => {
         console.log(data);
         this.waitForWorker();

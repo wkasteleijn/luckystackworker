@@ -83,6 +83,10 @@ public class DeRotationService {
         return null;
     }
 
+    public String getDerotatedImagePath() {
+        return LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/STACK_" + referenceImageFilename;
+    }
+
     private void warpImages(final ImagePlus referenceImage, final String dataFolder, final String rootFolder,
                             final Map<String, String> imagesWithTransformation) throws IOException {
         log.info("Create warped images based on the transformation files");
@@ -237,6 +241,7 @@ public class DeRotationService {
     }
 
     private void increaseProgressCounter(String statusMessage) {
+        log.info(statusMessage);
         luckyStackWorkerContext.setFilesProcessedCount(luckyStackWorkerContext.getFilesProcessedCount() + 1);
         luckyStackWorkerContext.setStatus(statusMessage);
         if (luckyStackWorkerContext.isWorkerStopped()) {

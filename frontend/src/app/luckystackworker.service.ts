@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { DeRotation } from './model/derotation';
 import { Profile } from './model/profile';
 
 @Injectable({
@@ -42,8 +43,8 @@ export class LuckyStackWorkerService {
     return this.http.put(`${this.baseUrl}/profiles/apply`, profile);
   }
 
-  startDeRotation(): Observable<Object> {
-    return this.http.put(`${this.baseUrl}/reference/derotate`, null);
+  startDeRotation(derotation: DeRotation): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/reference/derotate`, derotation);
   }
 
   exit(): Observable<Object> {

@@ -9,9 +9,9 @@ import { MatLegacyDialog } from '@angular/material/legacy-dialog';
   standalone: false,
 })
 export class DeRotationComponent {
-  @Input() anchorStrength;
-  @Input() noiseRobustness;
-  @Input() accurateness;
+  @Input() anchorStrength = 2;
+  @Input() noiseRobustness = 2;
+  @Input() accurateness = 3;
   @Input() nightMode: boolean = false;
   @Input() images: string[];
   @Output() anchorStrengthChanged = new EventEmitter<any>();
