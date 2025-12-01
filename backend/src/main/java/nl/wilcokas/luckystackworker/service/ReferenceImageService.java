@@ -622,9 +622,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             }
         }
         return DeRotation.builder().images(selectedImages)
-                .accurateness(Constants.DEFAULT_DEROTATION_ACCURATENESS)
-                .noiseRobustness(Constants.DEFAULT_DEROTATION_NOISE_ROBUSTNESS)
-                .anchorStrength(Constants.DEFAULT_DEROTATION_ANCHOR_STRENGTH)
+                .accurateness(deRotationService.getAccurateness() == 0 ? Constants.DEFAULT_DEROTATION_ACCURATENESS : deRotationService.getAccurateness())
+                .noiseRobustness(deRotationService.getNoiseRobustness() == 0 ? Constants.DEFAULT_DEROTATION_NOISE_ROBUSTNESS : deRotationService.getNoiseRobustness())
+                .anchorStrength(deRotationService.getAnchorStrength() == 0 ? Constants.DEFAULT_DEROTATION_ANCHOR_STRENGTH : deRotationService.getAnchorStrength())
                 .build();
     }
 

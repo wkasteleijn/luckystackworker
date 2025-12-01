@@ -27,18 +27,12 @@
 ></app-progress-panel>
 <app-derotation-panel
   *ngIf="isDerotationPanelVisible"
-  [anchorStrength]="derotationAnchorStrength"
-  [noiseRobustness]="noiseRobustness"
-  [accurateness]="accurateness"
+  [deRotation]="deRotation"
   [nightMode]="nightMode"
   [spinnerShown]="shouldShowSpinner()"
   [images]="deRotation.images"
   (close)="hideDeRotationPanel()"
-  (anchorStrengthChanged)="derotationAnchorStrengthChanged($event)"
-  (noiseRobustnessChanged)="derotationNoiseRobustnessChanged($event)"
-  (accuratenessChanged)="derotationAccuratenessChanged($event)"
-  (derotationRefImageChanged)="derotationRefImageChanged($event)"
-  (start)="startDeRotation()"
+  (start)="startDeRotation($event)"
 ></app-derotation-panel>
 <app-notification
   *ngIf="isNotificationVisible"

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { MatLegacyDialog } from '@angular/material/legacy-dialog';
+import { DeRotation } from '../model/derotation';
 
 @Component({
   selector: 'app-derotation-panel',
@@ -9,15 +10,8 @@ import { MatLegacyDialog } from '@angular/material/legacy-dialog';
   standalone: false,
 })
 export class DeRotationComponent {
-  @Input() anchorStrength = 2;
-  @Input() noiseRobustness = 2;
-  @Input() accurateness = 3;
+  @Input() deRotation: DeRotation;
   @Input() nightMode: boolean = false;
-  @Input() images: string[];
-  @Output() anchorStrengthChanged = new EventEmitter<any>();
-  @Output() noiseRobustnessChanged = new EventEmitter<any>();
-  @Output() accuratenessChanged = new EventEmitter<any>();
-  @Output() derotationRefImageChanged = new EventEmitter<any>();
   @Output() close = new EventEmitter<any>();
   @Output() start = new EventEmitter<any>();
 
@@ -33,31 +27,11 @@ export class DeRotationComponent {
     this.close.emit();
   }
 
-  onAnchorStrengthChanged() {
-    console.log('onAnchorStrengthChanged called');
-    this.anchorStrengthChanged.emit(this.anchorStrength);
-  }
-
-  onNoiseRobustnessChanged() {
-    console.log('onNoiseRobustnessChanged called');
-    this.noiseRobustnessChanged.emit(this.noiseRobustness);
-  }
-
-  onAccuratenessChanged() {
-    console.log('onAccuratenessChanged called');
-    this.accuratenessChanged.emit(this.accurateness);
-  }
-
-  onRefImageChanged() {
-    console.log('onRefImageChanged called');
-    this.derotationRefImageChanged.emit(this.referenceImage);
-  }
-
   onStart() {
     console.log('onStart called');
     this.startPressed = true;
     if (this.referenceImage !== undefined) {
-      this.start.emit();
+      this.start.emit(this.deRotation);
     }
   }
 
@@ -67,5 +41,21 @@ export class DeRotationComponent {
 
   showWarning(): boolean {
     return this.startPressed && this.referenceImage === undefined;
+  }
+
+  onRefImageChanged() {
+    this.deRotation.referenceImage = this.referenceImage;
+  }
+
+  onNoiseRobustnessChanged(event: any) {
+    this.deRotation.noiseRobustness = event;
+  }
+
+  onAnchorStrengthChanged(event: any) {
+    this.deRotation.anchorStrength = event;
+  }
+
+  onAccuratenessChanged(event: any) {
+    this.deRotation.accurateness = event;
   }
 }

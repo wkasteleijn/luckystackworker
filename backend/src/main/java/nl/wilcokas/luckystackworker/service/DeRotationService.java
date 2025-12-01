@@ -43,17 +43,30 @@ public class DeRotationService {
     @Getter
     private String referenceImageFilename;
 
+    @Getter
+    private int anchorStrength;
+
+    @Getter
+    private int noiseRobustness;
+
+    @Getter
+    private int accurateness;
+
     public ImagePlus derotate(
             final String rootFolder,
             final String referenceImageFilename,
             final List<String> allImagesFilenames,
-            final double radius,
+            final int anchorStrength,
             final int noiseRobustness,
             final int accurateness)
             throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, IOException {
 
         this.allImagesFilenames = allImagesFilenames;
         this.referenceImageFilename = referenceImageFilename;
+        this.anchorStrength = anchorStrength;
+        this.noiseRobustness = noiseRobustness;
+        this.accurateness = accurateness;
+
         luckyStackWorkerContext.setTotalFilesCount(allImagesFilenames.size() * 4); // 4 steps * nr of files (pre-sharpening, create transformation files, warp images, stack images)
         luckyStackWorkerContext.setFilesProcessedCount(0);
 
@@ -64,7 +77,7 @@ public class DeRotationService {
         List<String> sharpenedImagePaths = new ArrayList<>();
 
         try {
-            createPreSharpenedLuminanceCopies(rootFolder, radius, noiseRobustness, dataFolder, sharpenedImagePaths);
+            createPreSharpenedLuminanceCopies(rootFolder, dataFolder, sharpenedImagePaths);
 
             final Map<String, String> imagesWithTransformation = createTransformationFiles(sharpenedImagePaths, dataFolder, accurateness);
 
@@ -208,12 +221,12 @@ public class DeRotationService {
         return imagesWithTransformation;
     }
 
-    private void createPreSharpenedLuminanceCopies(String rootFolder, double radius, int noiseRobustness, String dataFolder, List<String> sharpenedImagePaths) throws IOException {
+    private void createPreSharpenedLuminanceCopies(String rootFolder, String dataFolder, List<String> sharpenedImagePaths) throws IOException {
         log.info("Create pre-sharpened luminance copies...");
         for (String imageFilename : allImagesFilenames) {
             String imagePath = rootFolder + "/" + imageFilename;
             ImagePlus image = new Opener().openImage(imagePath);
-            sharpenAsLuminanceImage(image, radius);
+            sharpenAsLuminanceImage(image, anchorStrength);
             Profile profile = Profile.builder()
                     .savitzkyGolayAmount(100)
                     .savitzkyGolayIterations(noiseRobustness)

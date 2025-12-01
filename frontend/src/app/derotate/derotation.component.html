@@ -25,37 +25,37 @@
         }}"
         (change)="onRefImageChanged()"
       >
-        <option *ngFor="let image of images" [value]="image">
+        <option *ngFor="let image of deRotation.images" [value]="image">
           {{ image }}
         </option>
       </select>
     </div>
     <app-slider
       [sliderLabel]="'Detail anchor strength'"
-      [sliderValue]="1"
+      [sliderValue]="deRotation.anchorStrength"
       [sliderStep]="1"
       [sliderMinValue]="1"
       [sliderMaxValue]="10"
       [nightMode]="nightMode"
-      (sliderValueChanged)="onAnchorStrengthChanged()"
+      (sliderValueChanged)="onAnchorStrengthChanged($event)"
     ></app-slider>
     <app-slider
       [sliderLabel]="'Noise robustness'"
-      [sliderValue]="1"
+      [sliderValue]="deRotation.noiseRobustness"
       [sliderStep]="1"
       [sliderMinValue]="1"
       [sliderMaxValue]="5"
       [nightMode]="nightMode"
-      (sliderValueChanged)="onNoiseRobustnessChanged()"
+      (sliderValueChanged)="onNoiseRobustnessChanged($event)"
     ></app-slider>
     <app-slider
       [sliderLabel]="'Accurateness'"
-      [sliderValue]="1"
+      [sliderValue]="deRotation.accurateness"
       [sliderStep]="1"
       [sliderMinValue]="1"
       [sliderMaxValue]="4"
       [nightMode]="nightMode"
-      (sliderValueChanged)="onAccuratenessChanged()"
+      (sliderValueChanged)="onAccuratenessChanged($event)"
     ></app-slider>
   </div>
 
