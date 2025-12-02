@@ -25,8 +25,6 @@ import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -36,7 +34,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -636,11 +633,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 () -> {
                     try {
                         deRotationService.derotate(settingsService.getRootFolder(), deRotation.getReferenceImage(), deRotation.getImages(), deRotation.getAnchorStrength(),
-                                deRotation.getNoiseRobustness(), deRotation.getAccurateness());
-                        String deRotatedImagePath = deRotationService.getDerotatedImagePath();
-                        String profileName = LswFileUtil.deriveProfileFromImageName(deRotatedImagePath);
-                        Profile profile = profileService.findByName(profileName).orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
-                        openReferenceImage(deRotatedImagePath, profile, LocalDateTime.now());
+                                deRotation.getNoiseRobustness(), deRotation.getAccurateness()).ifPresent(deRotatedImagePath -> {
+                            String profileName = LswFileUtil.deriveProfileFromImageName(deRotatedImagePath);
+                            Profile profile = profileService.findByName(profileName).orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
+                            openReferenceImage(deRotatedImagePath, profile, LocalDateTime.now());
+                        });
+                        deRotationService.removeDerotationWorkFolder();
                     } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException |
                              IOException e) {
                         log.error("Error starting the de-rotation process :", e);

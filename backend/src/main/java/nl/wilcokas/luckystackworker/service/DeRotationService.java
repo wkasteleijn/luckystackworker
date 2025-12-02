@@ -21,11 +21,16 @@ import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Slf4j
@@ -52,7 +57,7 @@ public class DeRotationService {
     @Getter
     private int accurateness;
 
-    public ImagePlus derotate(
+    public Optional<String> derotate(
             final String rootFolder,
             final String referenceImageFilename,
             final List<String> allImagesFilenames,
@@ -72,35 +77,43 @@ public class DeRotationService {
 
         String referenceImagePath = rootFolder + "/" + referenceImageFilename;
         ImagePlus referenceImage = new Opener().openImage(referenceImagePath);
-        String dataFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile());
+        String derotationWorkFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation";
+        try {
+            Files.createDirectory(Paths.get(derotationWorkFolder));
+        } catch (FileAlreadyExistsException e) {
+            log.warn("Derotation work folder already existed!");
+        }
 
         List<String> sharpenedImagePaths = new ArrayList<>();
 
         try {
-            createPreSharpenedLuminanceCopies(rootFolder, dataFolder, sharpenedImagePaths);
+            createPreSharpenedLuminanceCopies(rootFolder, derotationWorkFolder, sharpenedImagePaths);
 
-            final Map<String, String> imagesWithTransformation = createTransformationFiles(sharpenedImagePaths, dataFolder, accurateness);
+            final Map<String, String> imagesWithTransformation = createTransformationFiles(sharpenedImagePaths, derotationWorkFolder, accurateness);
 
-            warpImages(referenceImage, dataFolder, rootFolder, imagesWithTransformation);
+            warpImages(referenceImage, derotationWorkFolder, rootFolder, imagesWithTransformation);
 
-            stackImages(rootFolder, dataFolder, referenceImage.getWidth(), referenceImage.getHeight());
+            stackImages(rootFolder, derotationWorkFolder, referenceImage.getWidth(), referenceImage.getHeight());
+
+            return Optional.of(derotationWorkFolder + "/STACK_" + referenceImageFilename);
 
         } catch (DeRotationStoppedException e) {
             log.info("DeRotation was stopped: " + e.getMessage());
+            return Optional.empty();
         } finally {
             luckyStackWorkerContext.setStatus(Constants.STATUS_IDLE);
             luckyStackWorkerContext.setFilesProcessedCount(0);
             luckyStackWorkerContext.setTotalFilesCount(0);
             luckyStackWorkerContext.setProfileBeingApplied(false);
         }
-        return null;
     }
 
-    public String getDerotatedImagePath() {
-        return LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/STACK_" + referenceImageFilename;
+    public void removeDerotationWorkFolder() throws IOException {
+        String derotationWorkFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation";
+        FileUtils.deleteDirectory(new File(derotationWorkFolder));
     }
 
-    private void warpImages(final ImagePlus referenceImage, final String dataFolder, final String rootFolder,
+    private void warpImages(final ImagePlus referenceImage, final String derotationWorkFolder, final String rootFolder,
                             final Map<String, String> imagesWithTransformation) throws IOException {
         log.info("Create warped images based on the transformation files");
         boolean sourceReachedReference = false;
@@ -123,12 +136,12 @@ public class DeRotationService {
                     ImagePlus targetImage = targetImageFilename.equals(referenceImageFilename) ? referenceImage : new Opener().openImage(rootFolder + "/" + targetImageFilename);
                     applyTransformation(sourceImage, targetImage, transformationFile);
                     sourceImage.updateAndDraw();
-                    LswFileUtil.saveImage(sourceImage, null, dataFolder + "/D_" + sourceImageFilename, true, false, false, false);
+                    LswFileUtil.saveImage(sourceImage, null, derotationWorkFolder + "/D_" + sourceImageFilename, true, false, false, false);
                     offset++;
                     transformationReferenceFile = targetImageFilename;
                 }
             }
-            LswFileUtil.saveImage(sourceImage, null, dataFolder + "/D_" + sourceImageFilename, true, false, false, false);
+            LswFileUtil.saveImage(sourceImage, null, derotationWorkFolder + "/D_" + sourceImageFilename, true, false, false, false);
             increaseProgressCounter("Warping image %s".formatted(sourceImageFilename));
         }
         log.info("Done");
@@ -144,7 +157,7 @@ public class DeRotationService {
         }
     }
 
-    private void stackImages(final String rootFolder, final String dataFolder, int width, int height) throws IOException {
+    private void stackImages(final String rootFolder, final String derotationWorkFolder, int width, int height) throws IOException {
         log.info("Stacking warped images");
         long[] redPixels = new long[width * height];
         long[] greenPixels = new long[width * height];
@@ -155,7 +168,7 @@ public class DeRotationService {
             if (imageFilename.equals(referenceImageFilename)) {
                 image = new Opener().openImage(rootFolder + "/" + referenceImageFilename);
             } else {
-                image = new Opener().openImage(dataFolder + "/D_" + imageFilename);
+                image = new Opener().openImage(derotationWorkFolder + "/D_" + imageFilename);
             }
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
@@ -181,8 +194,8 @@ public class DeRotationService {
                 .height(height)
                 .layers(layers)
                 .build();
-        ImagePlus stackedImage = LswImageProcessingUtil.create16BitRGBImage(dataFolder + "/STACK_" + referenceImageFilename, lswImageLayers, true, true, true);
-        LswFileUtil.saveImage(stackedImage, null, dataFolder + "/STACK_" + referenceImageFilename, true, false, false, false);
+        ImagePlus stackedImage = LswImageProcessingUtil.create16BitRGBImage(derotationWorkFolder + "/STACK_" + referenceImageFilename, lswImageLayers, true, true, true);
+        LswFileUtil.saveImage(stackedImage, null, derotationWorkFolder + "/STACK_" + referenceImageFilename, true, false, false, false);
         log.info("Done");
     }
 
@@ -199,7 +212,7 @@ public class DeRotationService {
         }
     }
 
-    private Map<String, String> createTransformationFiles(List<String> sharpenedImagePaths, String dataFolder, int accurateness) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private Map<String, String> createTransformationFiles(List<String> sharpenedImagePaths, String derotationWorkFolder, int accurateness) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         boolean referenceEncountered = false;
         Map<String, String> imagesWithTransformation = new HashMap<>();
         log.info("Create transformation files from copies");
@@ -212,7 +225,7 @@ public class DeRotationService {
             } else {
                 String targetFullPath = referenceEncountered ? sharpenedImagePaths.get(i - 1) : sharpenedImagePaths.get(i + 1);
                 String target = LswFileUtil.getFilenameFromPath(targetFullPath);
-                String transformationFile = callBunwarpJAlignImages(dataFolder, source, target, accurateness);
+                String transformationFile = callBunwarpJAlignImages(derotationWorkFolder, source, target, accurateness);
                 imagesWithTransformation.put(allImagesFilenames.get(i), transformationFile);
             }
             increaseProgressCounter("Creating transformation file for image %s".formatted(originalSource));
@@ -221,7 +234,7 @@ public class DeRotationService {
         return imagesWithTransformation;
     }
 
-    private void createPreSharpenedLuminanceCopies(String rootFolder, String dataFolder, List<String> sharpenedImagePaths) throws IOException {
+    private void createPreSharpenedLuminanceCopies(String rootFolder, String derotationWorkFolder, List<String> sharpenedImagePaths) throws IOException {
         log.info("Create pre-sharpened luminance copies...");
         for (String imageFilename : allImagesFilenames) {
             String imagePath = rootFolder + "/" + imageFilename;
@@ -245,7 +258,7 @@ public class DeRotationService {
                     saveToDataFolder(
                             toBeDeRotatedImageFilenameNoExt,
                             image,
-                            dataFolder,
+                            derotationWorkFolder,
                             imagePath);
             sharpenedImagePaths.add(sharpenedImagePath);
             increaseProgressCounter("Creating pre-sharpened luminance copy for image %s".formatted(imageFilename));
