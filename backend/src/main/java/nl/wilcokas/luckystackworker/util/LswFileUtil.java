@@ -12,6 +12,7 @@ import ij.process.ShortProcessor;
 import java.awt.image.ColorModel;
 import java.io.*;
 import java.math.BigDecimal;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
@@ -575,6 +576,14 @@ public class LswFileUtil {
         String dataFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile());
         saveImage(image, null, dataFolder + "/psf_%s.tif".formatted(profileName), false, false, false, false);
         saveImage(image, null, dataFolder + "/psf_%s.jpg".formatted(profileName), false, false, true, false);
+    }
+
+    public static void createDirectory(String path) throws IOException {
+        try {
+            Files.createDirectory(Paths.get(path));
+        } catch (FileAlreadyExistsException e) {
+            log.warn("Directory {} already existed!", path);
+        }
     }
 
     private static void hackIncorrectPngFileInfo(LSWFileSaver saver) {

@@ -32,6 +32,8 @@ import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.copyPixelsFromFloatToShortProcessor;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -79,11 +81,7 @@ public class DeRotationService {
         String referenceImagePath = rootFolder + "/" + referenceImageFilename;
         ImagePlus referenceImage = new Opener().openImage(referenceImagePath);
         String derotationWorkFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation";
-        try {
-            Files.createDirectory(Paths.get(derotationWorkFolder));
-        } catch (FileAlreadyExistsException e) {
-            log.warn("Derotation work folder already existed!");
-        }
+        LswFileUtil.createDirectory(derotationWorkFolder);
 
         List<String> sharpenedImagePaths = new ArrayList<>();
 
@@ -233,14 +231,7 @@ public class DeRotationService {
     private void copyPixelsFromTo(final ImagePlus fromImage, ImagePlus toImage, int layer) {
         FloatProcessor fromProcessor = (FloatProcessor) fromImage.getProcessor();
         ShortProcessor toProcessor = (ShortProcessor) toImage.getStack().getProcessor(layer);
-        float[] fromPixels = (float[]) fromProcessor.getPixels();
-        short[] toPixels = (short[]) toProcessor.getPixels();
-        for (int i = 0; i < fromPixels.length; i++) {
-            float value = fromPixels[i] + 0.5f;
-            if (value < 0f) value = 0f;
-            if (value > 65535f) value = 65535f;
-            toPixels[i] = (short) value;
-        }
+        copyPixelsFromFloatToShortProcessor(fromProcessor, toProcessor);
     }
 
     private Map<String, String> createTransformationFiles(

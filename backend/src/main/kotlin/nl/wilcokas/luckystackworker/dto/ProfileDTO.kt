@@ -128,6 +128,7 @@ data class ProfileDTO(
     var luminanceIncludeBlue: Boolean = false,
     var luminanceIncludeColor: Boolean = false,
     var normalizeColorBalance: Boolean = false,
+    var automaticDispersionCorrection: Boolean = false,
 
     var scale: Double = 0.0,
     var rotationAngle: Double = 0.0,
@@ -255,6 +256,7 @@ data class ProfileDTO(
         this.dispersionCorrectionBlueX = profile.dispersionCorrectionBlueX
         this.dispersionCorrectionRedY = profile.dispersionCorrectionRedY
         this.dispersionCorrectionBlueY = profile.dispersionCorrectionBlueY
+        this.automaticDispersionCorrection = profile.automaticDispersionCorrection
         this.preserveDarkBackground = profile.preserveDarkBackground
         this.clippingSuppression = profile.clippingSuppression
 

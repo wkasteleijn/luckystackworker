@@ -132,6 +132,7 @@ data class Profile(
     var dispersionCorrectionRedY: Int = 0,
     var dispersionCorrectionBlueY: Int = 0,
     var normalizeColorBalance: Boolean = false,
+    var automaticDispersionCorrection: Boolean = false,
 
     var scale: Double = 0.0,
     var rotationAngle: Double = 0.0,
@@ -345,6 +346,7 @@ data class Profile(
         this.dispersionCorrectionRedY = profile.dispersionCorrectionRedY
         this.dispersionCorrectionBlueY = profile.dispersionCorrectionBlueY
         this.normalizeColorBalance = profile.normalizeColorBalance
+        this.automaticDispersionCorrection = profile.automaticDispersionCorrection
 
         this.scale = profile.scale
         this.rotationAngle = profile.rotationAngle

@@ -623,4 +623,16 @@ public class LswImageProcessingUtil {
         }
         return histograms;
     }
+
+    public static void copyPixelsFromFloatToShortProcessor(ImageProcessor fromProcessor, ImageProcessor toProcessor) {
+        float[] fromPixels = (float[]) fromProcessor.getPixels();
+        short[] toPixels = (short[]) toProcessor.getPixels();
+        for (int i = 0; i < fromPixels.length; i++) {
+            float value = fromPixels[i] + 0.5f;
+            if (value < 0f) value = 0f;
+            if (value > 65535f) value = 65535f;
+            toPixels[i] = (short) value;
+        }
+    }
+
 }
