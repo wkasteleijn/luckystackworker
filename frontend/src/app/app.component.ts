@@ -126,6 +126,7 @@ export class AppComponent implements OnInit {
   rootFolder: string = 'C:\\';
   workerStatus: string = 'Idle';
   workerProgress: number;
+  workerBusy: boolean = false;
   refImageSelected: boolean = true; // TODO: set to false by default!
   nightMode: boolean = false;
   blinkClippedAreas: boolean = false;
@@ -252,6 +253,7 @@ export class AppComponent implements OnInit {
     this.isProgressPanelVisible = true;
     this.workerStatus = 'Working';
     this.workerProgress = 0;
+    this.workerBusy = true;
     this.luckyStackWorkerService.applyProfileBatch(this.profile).subscribe(
       (data) => {
         console.log(data);
@@ -259,6 +261,7 @@ export class AppComponent implements OnInit {
       },
       (error) => {
         console.log(error);
+        this.workerBusy = false;
         this.isProgressPanelVisible = false;
         this.notificationText = 'The following error occured: ' + error;
         this.isNotificationVisible = true;
@@ -1478,6 +1481,7 @@ export class AppComponent implements OnInit {
         this.notificationText = 'Batch process was stopped.';
         this.isProgressPanelVisible = false;
         this.isNotificationVisible = true;
+        this.workerBusy = false;
       },
       (error) => console.log(error)
     );
@@ -1623,12 +1627,13 @@ export class AppComponent implements OnInit {
 
   private waitForWorker() {
     this.getStatusUpdate();
-    if ('Idle' !== this.workerStatus) {
+    if (this.workerBusy && 'Idle' !== this.workerStatus) {
       console.log(this.workerStatus);
       setTimeout(() => this.waitForWorker(), SERVICE_POLL_DELAY_MS);
     } else {
       console.log('Worker is done!');
       this.workerProgress = 100;
+      this.workerBusy = false;
       this.isProgressPanelVisible = false;
       if (!this.isNotificationVisible) {
         this.notificationText = 'Done!';
@@ -1653,15 +1658,15 @@ export class AppComponent implements OnInit {
   }
 
   buttonBarEnabled() {
-    return 'Idle' === this.workerStatus && !this._showSpinner;
+    return this.workerBusy && !this._showSpinner;
   }
 
   openRefImageEnabled() {
-    return 'Idle' === this.workerStatus && !this._showSpinner;
+    return !this.workerBusy && !this._showSpinner;
   }
 
   isWorkerBusy() {
-    return 'Idle' !== this.workerStatus;
+    return this.workerBusy;
   }
 
   zoomIn() {
@@ -1930,6 +1935,7 @@ export class AppComponent implements OnInit {
     this.isProgressPanelVisible = true;
     this.workerStatus = 'Working';
     this.workerProgress = 0;
+    this.workerBusy = true;
     this.luckyStackWorkerService.startDeRotation(this.deRotation).subscribe(
       (data) => {
         console.log(data);
@@ -1940,6 +1946,7 @@ export class AppComponent implements OnInit {
         this.isProgressPanelVisible = false;
         this.notificationText = 'The following error occured: ' + error;
         this.isNotificationVisible = true;
+        this.workerBusy = false;
       }
     );
   }

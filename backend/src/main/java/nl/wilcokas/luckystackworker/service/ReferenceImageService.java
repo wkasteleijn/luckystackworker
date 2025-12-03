@@ -605,23 +605,15 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         CompletableFuture.runAsync(
                 () -> {
                     try {
-                        deRotationService.derotate(
-                                settingsService.getRootFolder(),
-                                deRotation.getReferenceImage(),
-                                deRotation.getImages(),
-                                deRotation.getAnchorStrength(),
-                                deRotation.getNoiseRobustness(),
-                                deRotation.getAccurateness());
-                        String deRotatedImagePath = deRotationService.getDerotatedImagePath();
-                        String profileName = LswFileUtil.deriveProfileFromImageName(deRotatedImagePath);
-                        Profile profile = profileService
-                                .findByName(profileName)
-                                .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
-                        openReferenceImage(deRotatedImagePath, profile, LocalDateTime.now());
-                    } catch (InvocationTargetException
-                            | NoSuchMethodException
-                            | IllegalAccessException
-                            | IOException e) {
+                        deRotationService.derotate(settingsService.getRootFolder(), deRotation.getReferenceImage(), deRotation.getImages(), deRotation.getAnchorStrength(),
+                                deRotation.getNoiseRobustness(), deRotation.getAccurateness()).ifPresent(deRotatedImagePath -> {
+                            String profileName = LswFileUtil.deriveProfileFromImageName(deRotatedImagePath);
+                            Profile profile = profileService.findByName(profileName).orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
+                            openReferenceImage(deRotatedImagePath, profile, LocalDateTime.now());
+                        });
+                        deRotationService.removeDerotationWorkFolder();
+                    } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException |
+                             IOException e) {
                         log.error("Error starting the de-rotation process :", e);
                     }
                 },
