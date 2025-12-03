@@ -34,7 +34,7 @@ public class RGBBalanceFilter implements LSWFilter {
                     profile.getGreen().intValue(),
                     profile.getBlue().intValue(),
                     profile.getPurple().intValue() / 255D,
-                    profile.isPreserveDarkBackground());
+                    profile.getPreserveDarkBackground());
             return true;
         }
         return false;

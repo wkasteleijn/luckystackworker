@@ -29,7 +29,7 @@ public class ColorNormalisationFilter implements LSWFilter {
 
     @Override
     public boolean isApplied(Profile profile, ImagePlus image) {
-        return profile.isNormalizeColorBalance();
+        return profile.getNormalizeColorBalance();
     }
 
     private void apply(ImagePlus image) {

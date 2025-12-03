@@ -420,12 +420,11 @@ public class LswFileUtil {
             profile.setBilateralRadiusBlue(1);
         }
         if (profile.getPsf() == null) {
-            PSF psf = PSF.builder()
-                    .airyDiskRadius(20)
-                    .diffractionIntensity(60)
-                    .seeingIndex(4)
-                    .type(PSFType.SYNTHETIC)
-                    .build();
+            PSF psf = new PSF();
+            psf.setAiryDiskRadius(20);
+            psf.setDiffractionIntensity(60);
+            psf.setSeeingIndex(4);
+            psf.setType(PSFType.SYNTHETIC);
             profile.setPsf(psf);
         }
         if (profile.getApplyUnsharpMask() == null) {

@@ -30,7 +30,7 @@ public class HistogramStretchFilter implements LSWFilter {
                     newMax,
                     profile.getLightness(),
                     profile.getBackground(),
-                    profile.isPreserveDarkBackground());
+                    profile.getPreserveDarkBackground());
             return true;
         }
         return false;

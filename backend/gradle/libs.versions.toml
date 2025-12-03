@@ -19,6 +19,7 @@ spotless = "7.1.0"
 jtransforms = "3.1"
 httpclient5 = "5.5"
 bunwarpj = "2.6.12"
+turboreg = "2.0.1-SNAPSHOT"
 kotlin = "2.2.21"
 ktfmt = "0.59"
 
@@ -46,5 +47,6 @@ net-sourceforge-parallelcolt = { module = "net.sourceforge.parallelcolt:parallel
 org-apache-commons-math3 = { module = "org.apache.commons:commons-math3", version.ref = "commons-math3" }
 org-apache-httpcomponents-client5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpclient5" }
 sc-fiji-bunwarpj = { module = "sc.fiji:bUnwarpJ_", version.ref = "bunwarpj" }
+sc-fiji-turboreg = { module = "sc.fiji:TurboReg_", version.ref = "turboreg" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }

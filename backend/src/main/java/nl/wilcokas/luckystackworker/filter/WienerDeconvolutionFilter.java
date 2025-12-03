@@ -55,10 +55,10 @@ public class WienerDeconvolutionFilter implements LSWFilter {
                         .blendRawLuminance(blendRaw)
                         .repetitions(profile.getWienerRepetitions())
                         .mode(LSWSharpenMode.LUMINANCE)
-                        .includeRed(profile.isLuminanceIncludeRed())
-                        .includeGreen(profile.isLuminanceIncludeGreen())
-                        .includeBlue(profile.isLuminanceIncludeBlue())
-                        .includeColor(profile.isLuminanceIncludeColor())
+                        .includeRed(profile.getLuminanceIncludeRed())
+                        .includeGreen(profile.getLuminanceIncludeGreen())
+                        .includeBlue(profile.getLuminanceIncludeBlue())
+                        .includeColor(profile.getLuminanceIncludeColor())
                         .build();
             } else {
                 int iterationsGreen = profile.getWienerIterationsGreen() == 0 ? 1 : profile.getWienerIterationsGreen();

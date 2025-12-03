@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.com.github.wendykierp.jtransforms)
     implementation(libs.org.apache.httpcomponents.client5)
     implementation(libs.sc.fiji.bunwarpj)
+    implementation(libs.sc.fiji.turboreg)
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.reflect)
 

@@ -275,18 +275,17 @@ public class DeRotationService {
             String imagePath = rootFolder + "/" + imageFilename;
             ImagePlus image = new Opener().openImage(imagePath);
             sharpenAsLuminanceImage(image, anchorStrength);
-            Profile profile = Profile.builder()
-                    .savitzkyGolayAmount(100)
-                    .savitzkyGolayIterations(noiseRobustness)
-                    .savitzkyGolaySize(3)
-                    .savitzkyGolayAmountGreen(100)
-                    .savitzkyGolayIterationsGreen(noiseRobustness)
-                    .savitzkyGolaySizeGreen(3)
-                    .savitzkyGolayAmountBlue(100)
-                    .savitzkyGolayIterationsBlue(noiseRobustness)
-                    .savitzkyGolaySizeBlue(3)
-                    .denoiseAlgorithm2(Constants.DENOISE_ALGORITHM_SAVGOLAY)
-                    .build();
+            Profile profile = new Profile();
+            profile.setSavitzkyGolayAmount(100);
+            profile.setSavitzkyGolayIterations(noiseRobustness);
+            profile.setSavitzkyGolaySize(3);
+            profile.setSavitzkyGolayAmountGreen(100);
+            profile.setSavitzkyGolayIterationsGreen(noiseRobustness);
+            profile.setSavitzkyGolaySizeGreen(3);
+            profile.setSavitzkyGolayAmountBlue(100);
+            profile.setSavitzkyGolayIterationsBlue(noiseRobustness);
+            profile.setSavitzkyGolaySizeBlue(3);
+            profile.setDenoiseAlgorithm2(Constants.DENOISE_ALGORITHM_SAVGOLAY);
             savitzkyGolayFilter.apply(image, profile, false, null);
             String toBeDeRotatedImageFilenameNoExt = LswFileUtil.getFilename(imageFilename);
             String sharpenedImagePath =

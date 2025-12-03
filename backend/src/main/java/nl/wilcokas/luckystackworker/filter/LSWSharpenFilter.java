@@ -98,10 +98,10 @@ public class LSWSharpenFilter implements LSWFilter {
             }
 
             LSWSharpenParameters parameters = LSWSharpenParameters.builder()
-                    .includeBlue(profile.isLuminanceIncludeBlue())
-                    .includeGreen(profile.isLuminanceIncludeGreen()) //
-                    .includeRed(profile.isLuminanceIncludeRed())
-                    .includeColor(profile.isLuminanceIncludeColor())
+                    .includeBlue(profile.getLuminanceIncludeBlue())
+                    .includeGreen(profile.getLuminanceIncludeGreen()) //
+                    .includeRed(profile.getLuminanceIncludeRed())
+                    .includeColor(profile.getLuminanceIncludeColor())
                     .saturation(1f)
                     .unsharpMaskParameters(usParams)
                     .mode(mode)

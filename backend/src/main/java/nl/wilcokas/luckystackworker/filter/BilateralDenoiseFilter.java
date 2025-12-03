@@ -135,12 +135,11 @@ public class BilateralDenoiseFilter implements LSWFilter {
         image.resetDisplayRange();
 
         BilateralDenoiseFilter filter = new BilateralDenoiseFilter();
-        Profile profile = Profile.builder()
-                .bilateralRadius(2)
-                .bilateralIterations(1)
-                .bilateralSigmaColor(25000)
-                .bilateralSigmaSpace(40000)
-                .build();
+        Profile profile = new Profile();
+                profile.setBilateralRadius(2);
+        profile.setBilateralIterations(1);
+        profile.setBilateralSigmaColor(25000);
+        profile.setBilateralSigmaSpace(40000);
         filter.doApply(image, profile);
         image.updateAndDraw();
 

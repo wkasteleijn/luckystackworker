@@ -64,7 +64,7 @@ public class SaturationFilter implements LSWFilter {
                     true,
                     true,
                     true,
-                    mode == LSWSharpenMode.RGB || profile.isLuminanceIncludeColor(),
+                    mode == LSWSharpenMode.RGB || profile.getLuminanceIncludeColor(),
                     mode);
             pixelsHue[i] = hsl[0];
             pixelsSat[i] = hsl[1] * profile.getSaturation().floatValue();
