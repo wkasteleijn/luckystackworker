@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class PSF {
-  private double airyDiskRadius;
-  private double seeingIndex;
-  private double diffractionIntensity;
-  private PSFType type;
+    private double airyDiskRadius;
+    private double seeingIndex;
+    private double diffractionIntensity;
+    private PSFType type;
 }

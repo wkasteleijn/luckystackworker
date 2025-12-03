@@ -6,16 +6,16 @@ import java.awt.*;
 
 public class LswImageCanvas extends ImageCanvas {
 
-  public LswImageCanvas(ImagePlus imp) {
-    super(imp);
-  }
+    public LswImageCanvas(ImagePlus imp) {
+        super(imp);
+    }
 
-  @Override
-  public void paint(Graphics g) {
-    super.paint(g);
-  }
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+    }
 
-  public double getMagnification() {
-    return super.magnification;
-  }
+    public double getMagnification() {
+        return super.magnification;
+    }
 }

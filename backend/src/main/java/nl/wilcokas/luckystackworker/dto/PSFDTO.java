@@ -11,8 +11,8 @@ import nl.wilcokas.luckystackworker.model.PSFType;
 @AllArgsConstructor
 @Builder
 public class PSFDTO {
-  private double airyDiskRadius;
-  private double seeingIndex;
-  private double diffractionIntensity;
-  private PSFType type;
+    private double airyDiskRadius;
+    private double seeingIndex;
+    private double diffractionIntensity;
+    private PSFType type;
 }

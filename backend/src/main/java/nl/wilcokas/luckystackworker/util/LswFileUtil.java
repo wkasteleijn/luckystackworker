@@ -9,7 +9,6 @@ import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
-
 import java.awt.image.ColorModel;
 import java.io.*;
 import java.math.BigDecimal;
@@ -21,7 +20,6 @@ import java.time.ZoneOffset;
 import java.util.function.UnaryOperator;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.exceptions.NotARawImageException;
@@ -44,8 +42,7 @@ import org.yaml.snakeyaml.inspector.TagInspector;
 @Slf4j
 public class LswFileUtil {
 
-    private LswFileUtil() {
-    }
+    private LswFileUtil() {}
 
     public static boolean fileExists(String path) {
         return Files.exists(Paths.get(path));
@@ -158,8 +155,7 @@ public class LswFileUtil {
         }
         if (asJpg) {
             LswImageViewer singleLayerColorImage =
-                    new LswImageViewer(
-                            StringUtils.EMPTY, new ColorProcessor(image.getWidth(), image.getHeight()));
+                    new LswImageViewer(StringUtils.EMPTY, new ColorProcessor(image.getWidth(), image.getHeight()));
             LswImageProcessingUtil.convertLayersToColorImage(
                     LswImageProcessingUtil.getImageLayers(image).getLayers(), singleLayerColorImage);
             LSWFileSaver saver = new LSWFileSaver(singleLayerColorImage);
@@ -262,15 +258,13 @@ public class LswFileUtil {
             profile.setClippingStrength(0);
             profile.setClippingRange(50);
         }
-        BigDecimal oldDenoiseSigma =
-                profile.getDenoiseSigma() == null ? BigDecimal.ZERO : profile.getDenoiseSigma();
+        BigDecimal oldDenoiseSigma = profile.getDenoiseSigma() == null ? BigDecimal.ZERO : profile.getDenoiseSigma();
         if (profile.getSavitzkyGolaySize() == 0) {
             // if prior to 3.0.0 no denoise was set, prefer the defaults for savitzky-golay
             profile.setSavitzkyGolaySize(3);
             profile.setSavitzkyGolayAmount(100);
             profile.setSavitzkyGolayIterations(1);
-        } else if (profile.getSavitzkyGolaySize() > 0
-                && BigDecimal.ZERO.compareTo(oldDenoiseSigma) < 0) {
+        } else if (profile.getSavitzkyGolaySize() > 0 && BigDecimal.ZERO.compareTo(oldDenoiseSigma) < 0) {
             // Prevent both being set, prefer savitzky-golay in that case.
             profile.setDenoiseSigma(BigDecimal.ZERO);
         }
@@ -306,8 +300,7 @@ public class LswFileUtil {
         if (profile.getDenoiseAlgorithm1() == null) {
             if (BigDecimal.valueOf(2).compareTo(oldDenoiseSigma) >= 0) {
                 profile.setDenoiseAlgorithm1(Constants.DENOISE_ALGORITHM_SIGMA1);
-                profile.setDenoise1Amount(
-                        profile.getDenoise() == null ? BigDecimal.ZERO : profile.getDenoise());
+                profile.setDenoise1Amount(profile.getDenoise() == null ? BigDecimal.ZERO : profile.getDenoise());
                 profile.setDenoise1Radius(
                         profile.getDenoiseRadius() == null ? BigDecimal.ONE : profile.getDenoiseRadius());
                 profile.setDenoise1Iterations(profile.getDenoiseIterations());
@@ -427,13 +420,12 @@ public class LswFileUtil {
             profile.setBilateralRadiusBlue(1);
         }
         if (profile.getPsf() == null) {
-            PSF psf =
-                    PSF.builder()
-                            .airyDiskRadius(20)
-                            .diffractionIntensity(60)
-                            .seeingIndex(4)
-                            .type(PSFType.SYNTHETIC)
-                            .build();
+            PSF psf = PSF.builder()
+                    .airyDiskRadius(20)
+                    .diffractionIntensity(60)
+                    .seeingIndex(4)
+                    .type(PSFType.SYNTHETIC)
+                    .build();
             profile.setPsf(psf);
         }
         if (profile.getApplyUnsharpMask() == null) {
@@ -476,8 +468,7 @@ public class LswFileUtil {
 
     public static String getDataFolder(String osProfile) {
         String dataFolder = System.getProperty("user.home");
-        if (Constants.SYSTEM_PROFILE_MAC.equals(osProfile)
-                || Constants.SYSTEM_PROFILE_LINUX.equals(osProfile)) {
+        if (Constants.SYSTEM_PROFILE_MAC.equals(osProfile) || Constants.SYSTEM_PROFILE_LINUX.equals(osProfile)) {
             dataFolder += "/.lsw";
         } else if (Constants.SYSTEM_PROFILE_WINDOWS.equals(osProfile)) {
             dataFolder += "/AppData/Local/LuckyStackWorker";
@@ -486,10 +477,7 @@ public class LswFileUtil {
     }
 
     public static Pair<ImagePlus, Boolean> openImage(
-            String filepath,
-            OpenImageModeEnum openImageMode,
-            double scale,
-            UnaryOperator<ImagePlus> scaler) {
+            String filepath, OpenImageModeEnum openImageMode, double scale, UnaryOperator<ImagePlus> scaler) {
         return openImage(filepath, openImageMode, null, null, scale, scaler, null);
     }
 
@@ -510,12 +498,9 @@ public class LswFileUtil {
             newImage = scaler.apply(newImage);
         }
         LswImageLayers unprocessedNewImageLayers = LswImageProcessingUtil.getImageLayers(newImage);
-        boolean includeRed =
-                openImageMode == OpenImageModeEnum.RED || openImageMode == OpenImageModeEnum.RGB;
-        boolean includeGreen =
-                openImageMode == OpenImageModeEnum.GREEN || openImageMode == OpenImageModeEnum.RGB;
-        boolean includeBlue =
-                openImageMode == OpenImageModeEnum.BLUE || openImageMode == OpenImageModeEnum.RGB;
+        boolean includeRed = openImageMode == OpenImageModeEnum.RED || openImageMode == OpenImageModeEnum.RGB;
+        boolean includeGreen = openImageMode == OpenImageModeEnum.GREEN || openImageMode == OpenImageModeEnum.RGB;
+        boolean includeBlue = openImageMode == OpenImageModeEnum.BLUE || openImageMode == OpenImageModeEnum.RGB;
         if (newImage.getStackSize() == 3 && includeRed && includeGreen && includeBlue) {
             return Pair.of(newImage, false);
         }
@@ -529,8 +514,7 @@ public class LswFileUtil {
                     newImage.getStackSize() != 3);
         } else {
             if (currentUnprocessedImageLayers != null) {
-                LswImageProcessingUtil.copyLayers(
-                        currentUnprocessedImageLayers, currentImage, true, true, true);
+                LswImageProcessingUtil.copyLayers(currentUnprocessedImageLayers, currentImage, true, true, true);
             }
             if (includeRed) {
                 LswImageProcessingUtil.copyLayer(unprocessedNewImageLayers, currentImage, 1);
@@ -548,8 +532,7 @@ public class LswFileUtil {
     public static LocalDateTime getObjectDateTime(final String filePath) throws IOException {
         // Attempt to derive from filename hopefully winjupos formatted (e.g. 2024-04-16-1857_6_...)
         String filename =
-                LswFileUtil.getFilenameFromPath(
-                        LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(filePath)));
+                LswFileUtil.getFilenameFromPath(LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(filePath)));
         String[] parts = filename.split("-");
         if (parts[0].length() == 4
                 && NumberUtils.isCreatable(parts[0])
@@ -570,19 +553,16 @@ public class LswFileUtil {
         }
         // Use file date as a fallback
         return LocalDateTime.ofInstant(
-                ((FileTime) Files.getAttribute(Paths.get(filePath), "creationTime")).toInstant(),
-                ZoneOffset.UTC);
+                ((FileTime) Files.getAttribute(Paths.get(filePath), "creationTime")).toInstant(), ZoneOffset.UTC);
     }
 
     public static ImagePlus getWienerDeconvolutionPSF(String profileName) {
         return new Opener()
-                .openImage(
-                        getDataFolder(LswUtil.getActiveOSProfile()) + "/psf_%s.tif".formatted(profileName));
+                .openImage(getDataFolder(LswUtil.getActiveOSProfile()) + "/psf_%s.tif".formatted(profileName));
     }
 
     public static byte[] getWienerDeconvolutionPSFImage(String profileName) {
-        String path =
-                getDataFolder(LswUtil.getActiveOSProfile()) + "/psf_%s.jpg".formatted(profileName);
+        String path = getDataFolder(LswUtil.getActiveOSProfile()) + "/psf_%s.jpg".formatted(profileName);
         // Read the image from file
         try (InputStream in = new FileInputStream(path)) {
             return IOUtils.toByteArray(in);
@@ -594,10 +574,8 @@ public class LswFileUtil {
 
     public static void savePSF(ImagePlus image, String profileName) throws IOException {
         String dataFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile());
-        saveImage(
-                image, null, dataFolder + "/psf_%s.tif".formatted(profileName), false, false, false, false);
-        saveImage(
-                image, null, dataFolder + "/psf_%s.jpg".formatted(profileName), false, false, true, false);
+        saveImage(image, null, dataFolder + "/psf_%s.tif".formatted(profileName), false, false, false, false);
+        saveImage(image, null, dataFolder + "/psf_%s.jpg".formatted(profileName), false, false, true, false);
     }
 
     private static void hackIncorrectPngFileInfo(LSWFileSaver saver) {

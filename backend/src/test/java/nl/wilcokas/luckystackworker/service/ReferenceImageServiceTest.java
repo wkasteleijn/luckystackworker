@@ -4,9 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.time.LocalDateTime;
-
 import nl.wilcokas.luckystackworker.LswConfiguration;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.dto.VersionDTO;
@@ -34,18 +32,25 @@ class ReferenceImageServiceTest {
 
     @Mock
     private SettingsService settingsService;
+
     @Mock
     private ProfileService profileService;
+
     @Mock
     private FilterService operationService;
+
     @Mock
     private LuckyStackWorkerContext luckyStackWorkerContext;
+
     @Mock
     private BuildProperties buildProperties;
+
     @Mock
     private GithubClientService githubClientService;
+
     @Mock
     private DeRotationService deRotationService;
+
     @Mock
     private ObjectMapper snakeCaseObjectMapper;
 
@@ -54,21 +59,17 @@ class ReferenceImageServiceTest {
 
     @BeforeEach
     void setup() {
-        referenceImageService =
-                new ReferenceImageService(
-                        settingsService,
-                        profileService,
-                        operationService,
-                        luckyStackWorkerContext,
-                        snakeCaseObjectMapper,
-                        buildProperties,
-                        githubClientService,
-                        deRotationService
-                        );
+        referenceImageService = new ReferenceImageService(
+                settingsService,
+                profileService,
+                operationService,
+                luckyStackWorkerContext,
+                snakeCaseObjectMapper,
+                buildProperties,
+                githubClientService,
+                deRotationService);
         ReflectionTestUtils.setField(
-                referenceImageService,
-                "snakeCaseObjectMapper",
-                LswConfiguration.createSnakeCaseObjectMapper());
+                referenceImageService, "snakeCaseObjectMapper", LswConfiguration.createSnakeCaseObjectMapper());
     }
 
     @Test
@@ -222,24 +223,19 @@ class ReferenceImageServiceTest {
     }
 
     private Settings mockSettings(String version, LocalDateTime lastChecked) {
-        Settings settings =
-                Settings.builder()
-                        .latestKnownVersion(version)
-                        .latestKnownVersionChecked(lastChecked)
-                        .build();
+        Settings settings = Settings.builder()
+                .latestKnownVersion(version)
+                .latestKnownVersionChecked(lastChecked)
+                .build();
         when(settingsService.getSettings()).thenReturn(settings);
         return settings;
     }
 
     private void mockServerResponse(String version) {
-        when(githubClientService.getAppInfo())
-                .thenReturn(
-                        String.format(
-                                """
+        when(githubClientService.getAppInfo()).thenReturn(String.format("""
                                         {
                                             "tag_name": "v%s",
                                             "body": "Some random text. ## Release notes\\r\\n- Fixed bug when setting sharpen amount to 0 the next time you start the app it would not work anymore\\r\\n- Fixed bug in the windows startup that only happened for users with a space character in their username\\r\\n- Fixed bug in Bilateral Denoise not able to change values for green and blue channel individually."
-                                        }""",
-                                version));
+                                        }""", version));
     }
 }

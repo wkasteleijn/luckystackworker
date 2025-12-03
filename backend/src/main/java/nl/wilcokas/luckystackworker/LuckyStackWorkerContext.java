@@ -12,30 +12,30 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 public class LuckyStackWorkerContext {
-  private String status = Constants.STATUS_WORKING;
-  private int filesProcessedCount = 0;
-  private int totalFilesCount = 0;
+    private String status = Constants.STATUS_WORKING;
+    private int filesProcessedCount = 0;
+    private int totalFilesCount = 0;
 
-  private boolean realTimeEnabled = false;
+    private boolean realTimeEnabled = false;
 
-  private boolean rootFolderSelected = false;
+    private boolean rootFolderSelected = false;
 
-  private boolean profileBeingApplied = false;
+    private boolean profileBeingApplied = false;
 
-  private boolean workerStopped = false;
+    private boolean workerStopped = false;
 
-  private String selectedProfile;
+    private String selectedProfile;
 
-  private LocalDateTime activeOperationTime = null;
+    private LocalDateTime activeOperationTime = null;
 
-  private boolean roiActive = false;
-  private Roi selectedRoi = null;
+    private boolean roiActive = false;
+    private Roi selectedRoi = null;
 
-  public StatusUpdateDTO getStatusUpdateDTO() {
-    return StatusUpdateDTO.builder()
-        .message(status)
-        .filesProcessedCount(filesProcessedCount)
-        .totalFilesCount(totalFilesCount)
-        .build();
-  }
+    public StatusUpdateDTO getStatusUpdateDTO() {
+        return StatusUpdateDTO.builder()
+                .message(status)
+                .filesProcessedCount(filesProcessedCount)
+                .totalFilesCount(totalFilesCount)
+                .build();
+    }
 }

@@ -8,6 +8,6 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class ResponseDTO {
-  private ProfileDTO profile;
-  private SettingsDTO settings;
+    private ProfileDTO profile;
+    private SettingsDTO settings;
 }

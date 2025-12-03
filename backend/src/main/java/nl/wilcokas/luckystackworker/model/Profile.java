@@ -1,7 +1,6 @@
 package nl.wilcokas.luckystackworker.model;
 
 import java.math.BigDecimal;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -359,12 +358,11 @@ public class Profile {
         this.rotationAngle = profile.getRotationAngle();
         this.openImageMode = profile.getOpenImageMode();
         PSFDTO psfDTO = profile.getPsf();
-        this.psf =
-                PSF.builder()
-                        .airyDiskRadius(psfDTO.getAiryDiskRadius())
-                        .diffractionIntensity(psfDTO.getDiffractionIntensity())
-                        .seeingIndex(psfDTO.getSeeingIndex())
-                        .type(psfDTO.getType())
-                        .build();
+        this.psf = PSF.builder()
+                .airyDiskRadius(psfDTO.getAiryDiskRadius())
+                .diffractionIntensity(psfDTO.getDiffractionIntensity())
+                .seeingIndex(psfDTO.getSeeingIndex())
+                .type(psfDTO.getType())
+                .build();
     }
 }

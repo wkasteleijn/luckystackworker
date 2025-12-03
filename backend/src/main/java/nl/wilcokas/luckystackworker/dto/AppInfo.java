@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AppInfo {
-  private String installationDate;
-  private String lastExecutionTime;
+    private String installationDate;
+    private String lastExecutionTime;
 }

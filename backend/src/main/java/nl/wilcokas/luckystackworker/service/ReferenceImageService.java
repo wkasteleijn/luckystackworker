@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ij.ImagePlus;
 import ij.gui.*;
 import ij.process.ColorProcessor;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -25,8 +24,6 @@ import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -36,14 +33,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -128,19 +123,17 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private final DeRotationService deRotationService;
 
     public ResponseDTO scale(Profile profile) throws IOException {
-        this.isLargeImage =
-                openReferenceImage(
-                        this.imageMetadata.getFilePath(),
-                        profile,
-                        LswFileUtil.getObjectDateTime(this.imageMetadata.getFilePath()));
+        this.isLargeImage = openReferenceImage(
+                this.imageMetadata.getFilePath(),
+                profile,
+                LswFileUtil.getObjectDateTime(this.imageMetadata.getFilePath()));
         SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
         settingsDTO.setLargeImage(this.isLargeImage);
         luckyStackWorkerContext.setSelectedProfile(profile.getName());
         return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
     }
 
-    public ResponseDTO selectReferenceImage(String filePath, double scale, String openImageMode)
-            throws IOException {
+    public ResponseDTO selectReferenceImage(String filePath, double scale, String openImageMode) throws IOException {
         JFrame frame = getParentFrame();
         JFileChooser jfc = getJFileChooser(filePath);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
@@ -159,10 +152,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                         log.info("Profile not found for reference image, taking the default, {}", profileName);
                         profileName = settingsService.getDefaultProfile();
                     }
-                    profile =
-                            profileService
-                                    .findByName(profileName)
-                                    .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
+                    profile = profileService
+                            .findByName(profileName)
+                            .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
                 } else {
                     log.info("Profile file found, profile was loaded from there.");
                 }
@@ -170,8 +162,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 profileService.updateProfile(new ProfileDTO(profile));
 
                 isLargeImage =
-                        openReferenceImage(
-                                selectedFilePath, profile, LswFileUtil.getObjectDateTime(selectedFilePath));
+                        openReferenceImage(selectedFilePath, profile, LswFileUtil.getObjectDateTime(selectedFilePath));
 
                 final String rootFolder = LswFileUtil.getFileDirectory(selectedFilePath);
                 SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
@@ -193,23 +184,17 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         boolean includeGreen = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.G;
         boolean includeBlue = visibleChannel == ChannelEnum.RGB || visibleChannel == ChannelEnum.B;
         LswImageProcessingUtil.copyLayers(unprocessedImageLayers, finalResultImage, true, true, true);
-        List<FilterEnum> operations =
-                operationValues == null
-                        ? emptyList()
-                        : operationValues.stream()
-                        .map(
-                                operationValue ->
-                                        operationValue == null
-                                                ? null
-                                                : FilterEnum.valueOf(operationValue.toUpperCase()))
+        List<FilterEnum> operations = operationValues == null
+                ? emptyList()
+                : operationValues.stream()
+                        .map(operationValue ->
+                                operationValue == null ? null : FilterEnum.valueOf(operationValue.toUpperCase()))
                         .toList();
         if (roiSwitched) {
             operations = emptyList();
             roiSwitched = false;
         }
-        byte[] psf =
-                operationService.applyAllFilters(
-                        finalResultImage, displayedImage, profile, operations, isMono);
+        byte[] psf = operationService.applyAllFilters(finalResultImage, displayedImage, profile, operations, isMono);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(
                 LswImageProcessingUtil.getImageLayers(finalResultImage),
@@ -236,8 +221,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 savedImage,
                 null,
                 savePath,
-                LswFileUtil.isPngRgbStack(savedImage, imageMetadata.getFilePath())
-                        || profile.getScale() > 1.0,
+                LswFileUtil.isPngRgbStack(savedImage, imageMetadata.getFilePath()) || profile.getScale() > 1.0,
                 luckyStackWorkerContext.isRoiActive(),
                 asJpg,
                 false);
@@ -353,13 +337,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     public void writeProfile(String pathNoExt) throws IOException {
         String profileName = luckyStackWorkerContext.getSelectedProfile();
         if (profileName != null) {
-            Profile profile =
-                    profileService
-                            .findByName(profileName)
-                            .orElseThrow(
-                                    () ->
-                                            new ProfileNotFoundException(
-                                                    String.format("Unknown profile %s", profileName)));
+            Profile profile = profileService
+                    .findByName(profileName)
+                    .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName)));
             LswFileUtil.writeProfile(profile, pathNoExt);
         } else {
             log.warn("Profile not saved, could not find the selected profile for file {}", pathNoExt);
@@ -372,41 +352,33 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     public VersionDTO getLatestVersion(LocalDateTime currentDate) {
         Settings settings = settingsService.getSettings();
-        LswVersionNumber currentLswVersionNumber =
-                LswVersionNumber.fromString(buildProperties.getVersion())
-                        .orElse(LswVersionNumber.fromString("0.0.0").get()); // should only happen in dev mode
+        LswVersionNumber currentLswVersionNumber = LswVersionNumber.fromString(buildProperties.getVersion())
+                .orElse(LswVersionNumber.fromString("0.0.0").get()); // should only happen in dev mode
         LswVersionNumber latestKnowVersion =
-                LswVersionNumber.fromString(settings.getLatestKnownVersion())
-                        .orElse(currentLswVersionNumber);
-        VersionDTO result =
-                VersionDTO.builder()
-                        .latestVersion(latestKnowVersion.toString())
-                        .latestVersionConverted(latestKnowVersion.getConvertedVersion())
-                        .localVersion(currentLswVersionNumber.toString())
-                        .localVersionConverted(currentLswVersionNumber.getConvertedVersion())
-                        .isNewVersion(false)
-                        .build();
+                LswVersionNumber.fromString(settings.getLatestKnownVersion()).orElse(currentLswVersionNumber);
+        VersionDTO result = VersionDTO.builder()
+                .latestVersion(latestKnowVersion.toString())
+                .latestVersionConverted(latestKnowVersion.getConvertedVersion())
+                .localVersion(currentLswVersionNumber.toString())
+                .localVersionConverted(currentLswVersionNumber.getConvertedVersion())
+                .isNewVersion(false)
+                .build();
         if (settings.getLatestKnownVersionChecked() == null
                 || currentDate.isAfter(
-                settings
-                        .getLatestKnownVersionChecked()
-                        .plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
+                        settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
             LswVersionNumber latestVersionFromGithub = requestLatestVersion().orElse(null);
             if (latestVersionFromGithub != null
-                    && (latestVersionFromGithub.getConvertedVersion()
-                    > latestKnowVersion.getConvertedVersion())) {
+                    && (latestVersionFromGithub.getConvertedVersion() > latestKnowVersion.getConvertedVersion())) {
                 settings.setLatestKnownVersion(latestVersionFromGithub.toString());
-                result =
-                        VersionDTO.builder()
-                                .latestVersion(latestVersionFromGithub.toString())
-                                .latestVersionConverted(latestVersionFromGithub.getConvertedVersion())
-                                .localVersion(currentLswVersionNumber.toString())
-                                .localVersionConverted(currentLswVersionNumber.getConvertedVersion())
-                                .isNewVersion(true)
-                                .releaseNotes(
-                                        limitNotesList(
-                                                latestVersionFromGithub.getReleaseNotes(), MAX_RELEASE_NOTES_SHOWN))
-                                .build();
+                result = VersionDTO.builder()
+                        .latestVersion(latestVersionFromGithub.toString())
+                        .latestVersionConverted(latestVersionFromGithub.getConvertedVersion())
+                        .localVersion(currentLswVersionNumber.toString())
+                        .localVersionConverted(currentLswVersionNumber.getConvertedVersion())
+                        .isNewVersion(true)
+                        .releaseNotes(
+                                limitNotesList(latestVersionFromGithub.getReleaseNotes(), MAX_RELEASE_NOTES_SHOWN))
+                        .build();
             }
             settings.setLatestKnownVersionChecked(currentDate);
             settingsService.saveSettings(settings);
@@ -414,13 +386,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return result;
     }
 
-    public int getFilenameFromDialog(
-            final JFrame frame, final JFileChooser jfc, boolean isSaveDialog) {
+    public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, boolean isSaveDialog) {
         return getFilenameFromDialog(frame, jfc, null, isSaveDialog);
     }
 
-    public int getFilenameFromDialog(
-            final JFrame frame, final JFileChooser jfc, String title, boolean isSaveDialog) {
+    public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, String title, boolean isSaveDialog) {
         LswUtil.delayMacOS();
         int returnValue = 0;
         if (isSaveDialog) {
@@ -456,48 +426,37 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     @Override
-    public void windowOpened(WindowEvent e) {
-    }
+    public void windowOpened(WindowEvent e) {}
 
     @Override
-    public void windowClosing(WindowEvent e) {
-    }
+    public void windowClosing(WindowEvent e) {}
 
     @Override
-    public void windowClosed(WindowEvent e) {
-    }
+    public void windowClosed(WindowEvent e) {}
 
     @Override
-    public void windowIconified(WindowEvent e) {
-    }
+    public void windowIconified(WindowEvent e) {}
 
     @Override
-    public void windowDeiconified(WindowEvent e) {
-    }
+    public void windowDeiconified(WindowEvent e) {}
 
     @Override
-    public void windowActivated(WindowEvent e) {
-    }
+    public void windowActivated(WindowEvent e) {}
 
     @Override
-    public void windowDeactivated(WindowEvent e) {
-    }
+    public void windowDeactivated(WindowEvent e) {}
 
     @Override
-    public void componentResized(ComponentEvent e) {
-    }
+    public void componentResized(ComponentEvent e) {}
 
     @Override
-    public void componentMoved(ComponentEvent e) {
-    }
+    public void componentMoved(ComponentEvent e) {}
 
     @Override
-    public void componentShown(ComponentEvent e) {
-    }
+    public void componentShown(ComponentEvent e) {}
 
     @Override
-    public void componentHidden(ComponentEvent e) {
-    }
+    public void componentHidden(ComponentEvent e) {}
 
     public void updateHistogramMetadata(Profile profile) {
         int[][] rgbHistograms = get16BitRGBHistogram(finalResultImage, 100);
@@ -576,7 +535,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 }
                                 isClippedAreasHighlighted = false;
                             } else {
-                                int[] rgbPixels = (int[]) displayedImage.getProcessor().getPixels();
+                                int[] rgbPixels =
+                                        (int[]) displayedImage.getProcessor().getPixels();
                                 for (int i = 0; i < rgbPixels.length; i++) {
                                     if (rgbPixels[i] == 0xFFFFFF) {
                                         rgbPixels[i] = 0xFF0000;
@@ -621,10 +581,20 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 }
             }
         }
-        return DeRotation.builder().images(selectedImages)
-                .accurateness(deRotationService.getAccurateness() == 0 ? Constants.DEFAULT_DEROTATION_ACCURATENESS : deRotationService.getAccurateness())
-                .noiseRobustness(deRotationService.getNoiseRobustness() == 0 ? Constants.DEFAULT_DEROTATION_NOISE_ROBUSTNESS : deRotationService.getNoiseRobustness())
-                .anchorStrength(deRotationService.getAnchorStrength() == 0 ? Constants.DEFAULT_DEROTATION_ANCHOR_STRENGTH : deRotationService.getAnchorStrength())
+        return DeRotation.builder()
+                .images(selectedImages)
+                .accurateness(
+                        deRotationService.getAccurateness() == 0
+                                ? Constants.DEFAULT_DEROTATION_ACCURATENESS
+                                : deRotationService.getAccurateness())
+                .noiseRobustness(
+                        deRotationService.getNoiseRobustness() == 0
+                                ? Constants.DEFAULT_DEROTATION_NOISE_ROBUSTNESS
+                                : deRotationService.getNoiseRobustness())
+                .anchorStrength(
+                        deRotationService.getAnchorStrength() == 0
+                                ? Constants.DEFAULT_DEROTATION_ANCHOR_STRENGTH
+                                : deRotationService.getAnchorStrength())
                 .build();
     }
 
@@ -635,14 +605,23 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         CompletableFuture.runAsync(
                 () -> {
                     try {
-                        deRotationService.derotate(settingsService.getRootFolder(), deRotation.getReferenceImage(), deRotation.getImages(), deRotation.getAnchorStrength(),
-                                deRotation.getNoiseRobustness(), deRotation.getAccurateness());
+                        deRotationService.derotate(
+                                settingsService.getRootFolder(),
+                                deRotation.getReferenceImage(),
+                                deRotation.getImages(),
+                                deRotation.getAnchorStrength(),
+                                deRotation.getNoiseRobustness(),
+                                deRotation.getAccurateness());
                         String deRotatedImagePath = deRotationService.getDerotatedImagePath();
                         String profileName = LswFileUtil.deriveProfileFromImageName(deRotatedImagePath);
-                        Profile profile = profileService.findByName(profileName).orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
+                        Profile profile = profileService
+                                .findByName(profileName)
+                                .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
                         openReferenceImage(deRotatedImagePath, profile, LocalDateTime.now());
-                    } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException |
-                             IOException e) {
+                    } catch (InvocationTargetException
+                            | NoSuchMethodException
+                            | IllegalAccessException
+                            | IOException e) {
                         log.error("Error starting the de-rotation process :", e);
                     }
                 },
@@ -650,11 +629,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     private boolean confirmOverwrite() {
-        JOptionPane confirmation =
-                new JOptionPane(
-                        "The file already exists.\nDo you want to replace it?",
-                        JOptionPane.WARNING_MESSAGE,
-                        JOptionPane.YES_NO_OPTION);
+        JOptionPane confirmation = new JOptionPane(
+                "The file already exists.\nDo you want to replace it?",
+                JOptionPane.WARNING_MESSAGE,
+                JOptionPane.YES_NO_OPTION);
         JDialog dialog = confirmation.createDialog(null, "Confirm Overwrite");
         dialog.setLocation(controllerLastKnownPositionX + 160, controllerLastKnownPositionY + 256);
         dialog.setVisible(true);
@@ -676,18 +654,17 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         int originalWidth = (int) (finalResultImage.getWidth() / scale);
         int originalHeight = (int) (finalResultImage.getHeight() / scale);
 
-        this.imageMetadata =
-                LswImageMetadata.builder()
-                        .filePath(filePath)
-                        .name(LswUtil.getFullObjectName(profile.getName()))
-                        .currentWidth(currentWidth)
-                        .currentHeight(currentHeight)
-                        .originalWidth(originalWidth)
-                        .originalHeight(originalHeight)
-                        .time(dateTime)
-                        .channel(visibleChannel)
-                        .angle((int) profile.getRotationAngle())
-                        .build();
+        this.imageMetadata = LswImageMetadata.builder()
+                .filePath(filePath)
+                .name(LswUtil.getFullObjectName(profile.getName()))
+                .currentWidth(currentWidth)
+                .currentHeight(currentHeight)
+                .originalWidth(originalWidth)
+                .originalHeight(originalHeight)
+                .time(dateTime)
+                .channel(visibleChannel)
+                .angle((int) profile.getRotationAngle())
+                .build();
     }
 
     private int getHistogramMax(int[] histogramValues) {
@@ -737,15 +714,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             // Can only have 1 image open at a time.
             displayedImage.hide();
         }
-        Pair<ImagePlus, Boolean> imageDetails =
-                LswFileUtil.openImage(
-                        filePath,
-                        profile.getOpenImageMode(),
-                        finalResultImage,
-                        unprocessedImageLayers,
-                        profile.getScale(),
-                        img -> operationService.scaleImage(img, profile.getScale()),
-                        getParentFrame());
+        Pair<ImagePlus, Boolean> imageDetails = LswFileUtil.openImage(
+                filePath,
+                profile.getOpenImageMode(),
+                finalResultImage,
+                unprocessedImageLayers,
+                profile.getScale(),
+                img -> operationService.scaleImage(img, profile.getScale()),
+                getParentFrame());
         finalResultImage = imageDetails.getLeft();
         isMono = imageDetails.getRight();
 
@@ -759,17 +735,15 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             log.info("Opened final result image image with id {}", finalResultImage.getID());
 
             // Display the image in a seperate color image window (8-bit RGB color).
-            displayedImage =
-                    createColorImageFrom(
-                            finalResultImage,
-                            unprocessedImageLayers,
-                            LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(imageMetadata.getFilePath())));
+            displayedImage = createColorImageFrom(
+                    finalResultImage,
+                    unprocessedImageLayers,
+                    LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(imageMetadata.getFilePath())));
             if (LswFileUtil.isPng(finalResultImage, imageMetadata.getFilePath())) {
                 finalResultImage = LswFileUtil.fixNonTiffOpeningSettings(finalResultImage);
             }
             operationService.correctExposure(displayedImage);
-            largeImage =
-                    displayedImage.getWidth() * displayedImage.getHeight() > Constants.LARGE_WINDOW_SIZE;
+            largeImage = displayedImage.getWidth() * displayedImage.getHeight() > Constants.LARGE_WINDOW_SIZE;
 
             zoomFactor = setDefaultLayoutSettings(displayedImage);
 
@@ -845,8 +819,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return true;
     }
 
-    private LswImageViewer createColorImageFrom(
-            ImagePlus image, LswImageLayers layersDto, String title) {
+    private LswImageViewer createColorImageFrom(ImagePlus image, LswImageLayers layersDto, String title) {
         LswImageViewer singleLayerColorImage =
                 new LswImageViewer(title, new ColorProcessor(image.getWidth(), image.getHeight()));
         LswImageProcessingUtil.convertLayersToColorImage(layersDto.getLayers(), singleLayerColorImage);

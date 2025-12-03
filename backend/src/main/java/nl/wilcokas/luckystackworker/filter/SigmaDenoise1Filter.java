@@ -13,29 +13,28 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SigmaDenoise1Filter implements LSWFilter {
 
-  private final SigmaFilterPlus sigmaFilterPlus;
+    private final SigmaFilterPlus sigmaFilterPlus;
 
-  @Override
-  public boolean apply(
-      ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
-    if (isApplied(profile, image)) {
-      log.info(
-          "Applying Sigma denoise mode 1 with value {} to image {}",
-          profile.getDenoise1Amount(),
-          image.getID());
-      sigmaFilterPlus.applyDenoise1(image, profile);
-      return true;
+    @Override
+    public boolean apply(ImagePlus image, Profile profile, boolean isMono, String... additionalArguments) {
+        if (isApplied(profile, image)) {
+            log.info(
+                    "Applying Sigma denoise mode 1 with value {} to image {}",
+                    profile.getDenoise1Amount(),
+                    image.getID());
+            sigmaFilterPlus.applyDenoise1(image, profile);
+            return true;
+        }
+        return false;
     }
-    return false;
-  }
 
-  @Override
-  public boolean isSlow() {
-    return false;
-  }
+    @Override
+    public boolean isSlow() {
+        return false;
+    }
 
-  @Override
-  public boolean isApplied(Profile profile, ImagePlus image) {
-    return Constants.DENOISE_ALGORITHM_SIGMA1.equals(profile.getDenoiseAlgorithm1());
-  }
+    @Override
+    public boolean isApplied(Profile profile, ImagePlus image) {
+        return Constants.DENOISE_ALGORITHM_SIGMA1.equals(profile.getDenoiseAlgorithm1());
+    }
 }

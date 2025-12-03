@@ -27,72 +27,70 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class ProfileService {
-  private final ObjectMapper objectMapper;
-  private static final String PROFILES_FILE = "/profiles.json";
-  private static String defaultProfilesJson;
+    private final ObjectMapper objectMapper;
+    private static final String PROFILES_FILE = "/profiles.json";
+    private static String defaultProfilesJson;
 
-  static {
-    try {
-      defaultProfilesJson =
-          LswFileUtil.readFromInputStream(new ClassPathResource(PROFILES_FILE).getInputStream());
-    } catch (IOException e) {
-      log.error("Error loading profiles.json", e);
+    static {
+        try {
+            defaultProfilesJson =
+                    LswFileUtil.readFromInputStream(new ClassPathResource(PROFILES_FILE).getInputStream());
+        } catch (IOException e) {
+            log.error("Error loading profiles.json", e);
+        }
     }
-  }
 
-  private Map<String, Profile> profiles;
+    private Map<String, Profile> profiles;
 
-  public Profile updateProfile(ProfileDTO profileDTO) {
-    log.info("updateProfile called with profile {}", profileDTO);
-    if (profiles == null) {
-      readProfiles();
+    public Profile updateProfile(ProfileDTO profileDTO) {
+        log.info("updateProfile called with profile {}", profileDTO);
+        if (profiles == null) {
+            readProfiles();
+        }
+        Profile profile = new Profile(profileDTO);
+        profiles.put(profile.getName(), profile);
+        try {
+            objectMapper.writeValue(
+                    new File(LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + PROFILES_FILE),
+                    profiles.values());
+        } catch (Exception e) {
+            log.error("Error writing profiles: ", e);
+        }
+        return profile;
     }
-    Profile profile = new Profile(profileDTO);
-    profiles.put(profile.getName(), profile);
-    try {
-      objectMapper.writeValue(
-          new File(LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + PROFILES_FILE),
-          profiles.values());
-    } catch (Exception e) {
-      log.error("Error writing profiles: ", e);
-    }
-    return profile;
-  }
 
-  public Optional<Profile> findByName(String profileName) {
-    if (profiles == null) {
-      readProfiles();
+    public Optional<Profile> findByName(String profileName) {
+        if (profiles == null) {
+            readProfiles();
+        }
+        return Optional.ofNullable(profiles.get(profileName));
     }
-    return Optional.ofNullable(profiles.get(profileName));
-  }
 
-  public Collection<Profile> getAllProfiles() {
-    if (profiles == null) {
-      readProfiles();
+    public Collection<Profile> getAllProfiles() {
+        if (profiles == null) {
+            readProfiles();
+        }
+        return profiles.values();
     }
-    return profiles.values();
-  }
 
-  private void readProfiles() {
-    String json = null;
-    try {
-      json =
-          Files.readString(
-              Paths.get(LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + PROFILES_FILE));
-    } catch (Exception e) {
-      log.warn("Profiles file not found");
+    private void readProfiles() {
+        String json = null;
+        try {
+            json = Files.readString(Paths.get(LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + PROFILES_FILE));
+        } catch (Exception e) {
+            log.warn("Profiles file not found");
+        }
+        if (json == null) {
+            log.info("Reverting to the default profiles");
+            json = defaultProfilesJson;
+        }
+        try {
+            List<Profile> list = objectMapper.readValue(json, new TypeReference<>() {});
+            list.forEach(LswFileUtil::correctProfileForBackwardCompatability);
+            profiles = list.stream().collect(Collectors.toMap(Profile::getName, Function.identity()));
+        } catch (JsonProcessingException e) {
+            log.error("Error reading profiles: ", e);
+            throw new ProfileNotFoundException(e.getMessage());
+        }
     }
-    if (json == null) {
-      log.info("Reverting to the default profiles");
-      json = defaultProfilesJson;
-    }
-    try {
-      List<Profile> list = objectMapper.readValue(json, new TypeReference<>() {});
-      list.forEach(LswFileUtil::correctProfileForBackwardCompatability);
-      profiles = list.stream().collect(Collectors.toMap(Profile::getName, Function.identity()));
-    } catch (JsonProcessingException e) {
-      log.error("Error reading profiles: ", e);
-      throw new ProfileNotFoundException(e.getMessage());
-    }
-  }
 }

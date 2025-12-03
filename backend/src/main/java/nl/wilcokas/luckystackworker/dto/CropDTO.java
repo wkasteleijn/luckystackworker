@@ -8,8 +8,8 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class CropDTO {
-  private int x;
-  private int y;
-  private int width;
-  private int height;
+    private int x;
+    private int y;
+    private int width;
+    private int height;
 }

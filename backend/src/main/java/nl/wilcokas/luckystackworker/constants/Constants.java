@@ -4,8 +4,7 @@ import java.math.BigDecimal;
 
 public class Constants {
 
-    private Constants() {
-    }
+    private Constants() {}
 
     public static final String OUTPUT_POSTFIX = "_LSW";
     public static final String OUTPUT_POSTFIX_SAVE = "_REF";

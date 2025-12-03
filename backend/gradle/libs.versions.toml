@@ -10,7 +10,7 @@ org-springframework-boot-spring-boot-starter = "3.5.3"
 org-springframework-boot-spring-boot-starter-test = "3.5.3"
 org-springframework-boot-spring-boot-starter-web = "3.5.3"
 org-yaml-snakeyaml = "2.4"
-google-java-format = "1.27.0"
+palantir-java-format = "2.83.0"
 parallelcolt = "0.11.4"
 commons-math3 = "3.5"
 springBoot = "3.5.3"
@@ -19,11 +19,15 @@ spotless = "7.1.0"
 jtransforms = "3.1"
 httpclient5 = "5.5"
 bunwarpj = "2.6.12"
+kotlin = "2.2.21"
+ktfmt = "0.59"
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
 
 [libraries]
 com-fasterxml-jackson-datatype-jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "com-fasterxml-jackson-datatype-jackson-datatype-jsr310" }
@@ -42,3 +46,5 @@ net-sourceforge-parallelcolt = { module = "net.sourceforge.parallelcolt:parallel
 org-apache-commons-math3 = { module = "org.apache.commons:commons-math3", version.ref = "commons-math3" }
 org-apache-httpcomponents-client5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpclient5" }
 sc-fiji-bunwarpj = { module = "sc.fiji:bUnwarpJ_", version.ref = "bunwarpj" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }

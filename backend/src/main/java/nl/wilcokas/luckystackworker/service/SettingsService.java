@@ -17,66 +17,63 @@ import org.springframework.stereotype.Service;
 @Service
 public class SettingsService {
 
-  private static final String SETTINGS_FILE = "/settings.json";
+    private static final String SETTINGS_FILE = "/settings.json";
 
-  private final ObjectMapper objectMapper;
-  private Settings settings;
+    private final ObjectMapper objectMapper;
+    private Settings settings;
 
-  public void saveSettings(Settings settings) {
-    try {
-      objectMapper.writeValue(
-          new File(LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + SETTINGS_FILE),
-          settings);
-    } catch (Exception e) {
-      log.error("Error writing settings: ", e);
+    public void saveSettings(Settings settings) {
+        try {
+            objectMapper.writeValue(
+                    new File(LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + SETTINGS_FILE), settings);
+        } catch (Exception e) {
+            log.error("Error writing settings: ", e);
+        }
     }
-  }
 
-  public String getRootFolder() {
-    return getSettings().getRootFolder();
-  }
-
-  public String[] getExtensions() {
-    return getSettings().getExtensions().split(",");
-  }
-
-  public String getDefaultProfile() {
-    return getSettings().getDefaultProfile();
-  }
-
-  public Settings getSettings() {
-    if (settings == null) {
-      readSettings();
+    public String getRootFolder() {
+        return getSettings().getRootFolder();
     }
-    return settings;
-  }
 
-  private void readSettings() {
-    try {
-      settings =
-          objectMapper.readValue(
-              Files.readString(
-                  Paths.get(
-                      LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + SETTINGS_FILE)),
-              Settings.class);
-    } catch (Exception e) {
-      log.warn("Settings file not found");
+    public String[] getExtensions() {
+        return getSettings().getExtensions().split(",");
     }
-    if (settings == null) {
-      log.info("Reverting to the default settings");
-      settings = getDefaultSettings();
-    }
-  }
 
-  private Settings getDefaultSettings() {
-    String activeOs = LswUtil.getActiveOSProfile();
-    return Settings.builder()
-        .defaultProfile("moon")
-        .extensions("tif,png,tiff")
-        .latestKnownVersion(null)
-        .latestKnownVersionChecked(null)
-        .outputFormat("tif")
-        .rootFolder(Constants.SYSTEM_PROFILE_WINDOWS.equals(activeOs) ? "C:/" : "~")
-        .build();
-  }
+    public String getDefaultProfile() {
+        return getSettings().getDefaultProfile();
+    }
+
+    public Settings getSettings() {
+        if (settings == null) {
+            readSettings();
+        }
+        return settings;
+    }
+
+    private void readSettings() {
+        try {
+            settings = objectMapper.readValue(
+                    Files.readString(
+                            Paths.get(LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + SETTINGS_FILE)),
+                    Settings.class);
+        } catch (Exception e) {
+            log.warn("Settings file not found");
+        }
+        if (settings == null) {
+            log.info("Reverting to the default settings");
+            settings = getDefaultSettings();
+        }
+    }
+
+    private Settings getDefaultSettings() {
+        String activeOs = LswUtil.getActiveOSProfile();
+        return Settings.builder()
+                .defaultProfile("moon")
+                .extensions("tif,png,tiff")
+                .latestKnownVersion(null)
+                .latestKnownVersionChecked(null)
+                .outputFormat("tif")
+                .rootFolder(Constants.SYSTEM_PROFILE_WINDOWS.equals(activeOs) ? "C:/" : "~")
+                .build();
+    }
 }

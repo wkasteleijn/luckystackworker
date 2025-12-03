@@ -5,12 +5,12 @@ import ij.io.FileSaver;
 
 public class LSWFileSaver extends FileSaver {
 
-  public LSWFileSaver(ImagePlus imp) {
-    super(imp);
-  }
+    public LSWFileSaver(ImagePlus imp) {
+        super(imp);
+    }
 
-  @Override
-  public String getDescriptionString() {
-    return "Created with LuckyStackWorker";
-  }
+    @Override
+    public String getDescriptionString() {
+        return "Created with LuckyStackWorker";
+    }
 }

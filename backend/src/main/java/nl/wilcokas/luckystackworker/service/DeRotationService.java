@@ -7,6 +7,10 @@ import ij.io.Opener;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +26,6 @@ import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -67,7 +66,9 @@ public class DeRotationService {
         this.noiseRobustness = noiseRobustness;
         this.accurateness = accurateness;
 
-        luckyStackWorkerContext.setTotalFilesCount(allImagesFilenames.size() * 4); // 4 steps * nr of files (pre-sharpening, create transformation files, warp images, stack images)
+        luckyStackWorkerContext.setTotalFilesCount(allImagesFilenames.size()
+                * 4); // 4 steps * nr of files (pre-sharpening, create transformation files, warp
+        // images, stack images)
         luckyStackWorkerContext.setFilesProcessedCount(0);
 
         String referenceImagePath = rootFolder + "/" + referenceImageFilename;
@@ -79,7 +80,8 @@ public class DeRotationService {
         try {
             createPreSharpenedLuminanceCopies(rootFolder, dataFolder, sharpenedImagePaths);
 
-            final Map<String, String> imagesWithTransformation = createTransformationFiles(sharpenedImagePaths, dataFolder, accurateness);
+            final Map<String, String> imagesWithTransformation =
+                    createTransformationFiles(sharpenedImagePaths, dataFolder, accurateness);
 
             warpImages(referenceImage, dataFolder, rootFolder, imagesWithTransformation);
 
@@ -100,8 +102,12 @@ public class DeRotationService {
         return LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/STACK_" + referenceImageFilename;
     }
 
-    private void warpImages(final ImagePlus referenceImage, final String dataFolder, final String rootFolder,
-                            final Map<String, String> imagesWithTransformation) throws IOException {
+    private void warpImages(
+            final ImagePlus referenceImage,
+            final String dataFolder,
+            final String rootFolder,
+            final Map<String, String> imagesWithTransformation)
+            throws IOException {
         log.info("Create warped images based on the transformation files");
         boolean sourceReachedReference = false;
         for (int i = 0; i < allImagesFilenames.size(); i++) {
@@ -113,22 +119,29 @@ public class DeRotationService {
                 boolean targetAtReference = false;
                 int offset = 1;
                 String transformationReferenceFile = sourceImageFilename;
-                // Iteratively warp source image towards the reference image by applying the transformation file of each consecutive image until the reference image is reached.
+                // Iteratively warp source image towards the reference image by applying the transformation
+                // file of each consecutive image until the reference image is reached.
                 while (!targetAtReference) {
-                    String targetImageFilename = sourceReachedReference ? allImagesFilenames.get(i - offset) : allImagesFilenames.get(i + offset);
+                    String targetImageFilename = sourceReachedReference
+                            ? allImagesFilenames.get(i - offset)
+                            : allImagesFilenames.get(i + offset);
                     if (referenceImageFilename.equals(targetImageFilename)) {
                         targetAtReference = true;
                     }
                     String transformationFile = imagesWithTransformation.get(transformationReferenceFile);
-                    ImagePlus targetImage = targetImageFilename.equals(referenceImageFilename) ? referenceImage : new Opener().openImage(rootFolder + "/" + targetImageFilename);
+                    ImagePlus targetImage = targetImageFilename.equals(referenceImageFilename)
+                            ? referenceImage
+                            : new Opener().openImage(rootFolder + "/" + targetImageFilename);
                     applyTransformation(sourceImage, targetImage, transformationFile);
                     sourceImage.updateAndDraw();
-                    LswFileUtil.saveImage(sourceImage, null, dataFolder + "/D_" + sourceImageFilename, true, false, false, false);
+                    LswFileUtil.saveImage(
+                            sourceImage, null, dataFolder + "/D_" + sourceImageFilename, true, false, false, false);
                     offset++;
                     transformationReferenceFile = targetImageFilename;
                 }
             }
-            LswFileUtil.saveImage(sourceImage, null, dataFolder + "/D_" + sourceImageFilename, true, false, false, false);
+            LswFileUtil.saveImage(
+                    sourceImage, null, dataFolder + "/D_" + sourceImageFilename, true, false, false, false);
             increaseProgressCounter("Warping image %s".formatted(sourceImageFilename));
         }
         log.info("Done");
@@ -136,15 +149,19 @@ public class DeRotationService {
 
     private void applyTransformation(ImagePlus sourceImage, ImagePlus targetImage, String transformationFile) {
         for (int layer = 1; layer <= 3; layer++) {
-            FloatProcessor sourceProcessor = sourceImage.getStack().getProcessor(layer).toFloat(1, null);
-            FloatProcessor targetProcessor = targetImage.getStack().getProcessor(layer).toFloat(1, null);
+            FloatProcessor sourceProcessor =
+                    sourceImage.getStack().getProcessor(layer).toFloat(1, null);
+            FloatProcessor targetProcessor =
+                    targetImage.getStack().getProcessor(layer).toFloat(1, null);
             final ImagePlus sourceLayerImage = new ImagePlus("Layer " + layer, sourceProcessor);
-            bUnwarpJ_.applyTransformToSource(transformationFile, new ImagePlus("Layer " + layer, targetProcessor), sourceLayerImage);
+            bUnwarpJ_.applyTransformToSource(
+                    transformationFile, new ImagePlus("Layer " + layer, targetProcessor), sourceLayerImage);
             copyPixelsFromTo(sourceLayerImage, sourceImage, layer);
         }
     }
 
-    private void stackImages(final String rootFolder, final String dataFolder, int width, int height) throws IOException {
+    private void stackImages(final String rootFolder, final String dataFolder, int width, int height)
+            throws IOException {
         log.info("Stacking warped images");
         long[] redPixels = new long[width * height];
         long[] greenPixels = new long[width * height];
@@ -175,14 +192,16 @@ public class DeRotationService {
             greenPixelsAverages[i] = (short) (greenPixels[i] / allImagesFilenames.size());
             bluePixelsAverages[i] = (short) (bluePixels[i] / allImagesFilenames.size());
         }
-        short[][] layers = new short[][]{redPixelsAverages, greenPixelsAverages, bluePixelsAverages};
+        short[][] layers = new short[][] {redPixelsAverages, greenPixelsAverages, bluePixelsAverages};
         LswImageLayers lswImageLayers = LswImageLayers.builder()
                 .width(width)
                 .height(height)
                 .layers(layers)
                 .build();
-        ImagePlus stackedImage = LswImageProcessingUtil.create16BitRGBImage(dataFolder + "/STACK_" + referenceImageFilename, lswImageLayers, true, true, true);
-        LswFileUtil.saveImage(stackedImage, null, dataFolder + "/STACK_" + referenceImageFilename, true, false, false, false);
+        ImagePlus stackedImage = LswImageProcessingUtil.create16BitRGBImage(
+                dataFolder + "/STACK_" + referenceImageFilename, lswImageLayers, true, true, true);
+        LswFileUtil.saveImage(
+                stackedImage, null, dataFolder + "/STACK_" + referenceImageFilename, true, false, false, false);
         log.info("Done");
     }
 
@@ -199,7 +218,9 @@ public class DeRotationService {
         }
     }
 
-    private Map<String, String> createTransformationFiles(List<String> sharpenedImagePaths, String dataFolder, int accurateness) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private Map<String, String> createTransformationFiles(
+            List<String> sharpenedImagePaths, String dataFolder, int accurateness)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         boolean referenceEncountered = false;
         Map<String, String> imagesWithTransformation = new HashMap<>();
         log.info("Create transformation files from copies");
@@ -210,7 +231,8 @@ public class DeRotationService {
             if (referenceImageFilename.equals(originalSource)) {
                 referenceEncountered = true;
             } else {
-                String targetFullPath = referenceEncountered ? sharpenedImagePaths.get(i - 1) : sharpenedImagePaths.get(i + 1);
+                String targetFullPath =
+                        referenceEncountered ? sharpenedImagePaths.get(i - 1) : sharpenedImagePaths.get(i + 1);
                 String target = LswFileUtil.getFilenameFromPath(targetFullPath);
                 String transformationFile = callBunwarpJAlignImages(dataFolder, source, target, accurateness);
                 imagesWithTransformation.put(allImagesFilenames.get(i), transformationFile);
@@ -221,7 +243,8 @@ public class DeRotationService {
         return imagesWithTransformation;
     }
 
-    private void createPreSharpenedLuminanceCopies(String rootFolder, String dataFolder, List<String> sharpenedImagePaths) throws IOException {
+    private void createPreSharpenedLuminanceCopies(
+            String rootFolder, String dataFolder, List<String> sharpenedImagePaths) throws IOException {
         log.info("Create pre-sharpened luminance copies...");
         for (String imageFilename : allImagesFilenames) {
             String imagePath = rootFolder + "/" + imageFilename;
@@ -241,12 +264,7 @@ public class DeRotationService {
                     .build();
             savitzkyGolayFilter.apply(image, profile, false, null);
             String toBeDeRotatedImageFilenameNoExt = LswFileUtil.getFilename(imageFilename);
-            String sharpenedImagePath =
-                    saveToDataFolder(
-                            toBeDeRotatedImageFilenameNoExt,
-                            image,
-                            dataFolder,
-                            imagePath);
+            String sharpenedImagePath = saveToDataFolder(toBeDeRotatedImageFilenameNoExt, image, dataFolder, imagePath);
             sharpenedImagePaths.add(sharpenedImagePath);
             increaseProgressCounter("Creating pre-sharpened luminance copy for image %s".formatted(imageFilename));
         }
@@ -283,22 +301,15 @@ public class DeRotationService {
 
         Method method = bUnwarpJ_.class.getDeclaredMethod("alignImagesCommandLine", String[].class);
         method.setAccessible(true);
-        method.invoke(null, new Object[]{args});
+        method.invoke(null, new Object[] {args});
         return folder + "/D2_" + LswFileUtil.getFilename(source) + "_transf.txt";
     }
 
-    private String saveToDataFolder(
-            String fileNameNoExt, ImagePlus image, String dataFolder, String imagePath)
+    private String saveToDataFolder(String fileNameNoExt, ImagePlus image, String dataFolder, String imagePath)
             throws IOException {
         String savedFilePath = dataFolder + "/" + fileNameNoExt + "_sharpened.tif";
         LswFileUtil.saveImage(
-                image,
-                null,
-                savedFilePath,
-                LswFileUtil.isPngRgbStack(image, imagePath),
-                false,
-                false,
-                false);
+                image, null, savedFilePath, LswFileUtil.isPngRgbStack(image, imagePath), false, false, false);
         return savedFilePath;
     }
 
@@ -318,16 +329,8 @@ public class DeRotationService {
 
         float[] pixelsLum = new float[pixelsRed.length];
         for (int i = 0; i < pixelsRed.length; i++) {
-            float[] hsl =
-                    LswImageProcessingUtil.rgbToHsl(
-                            pixelsRed[i],
-                            pixelsGreen[i],
-                            pixelsBlue[i],
-                            true,
-                            true,
-                            true,
-                            true,
-                            LSWSharpenMode.LUMINANCE);
+            float[] hsl = LswImageProcessingUtil.rgbToHsl(
+                    pixelsRed[i], pixelsGreen[i], pixelsBlue[i], true, true, true, true, LSWSharpenMode.LUMINANCE);
             pixelsLum[i] = hsl[2];
         }
         FloatProcessor fpLum = new FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum);
@@ -351,10 +354,7 @@ public class DeRotationService {
 
             new DeRotationService(new LSWSharpenFilter(), new SavitzkyGolayFilter(), new LuckyStackWorkerContext())
                     .derotate(arguments.get(0), arguments.get(1), arguments.subList(2, arguments.size()), 4, 2, 4);
-        } catch (InvocationTargetException
-                 | NoSuchMethodException
-                 | IllegalAccessException
-                 | IOException e) {
+        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException | IOException e) {
             log.error("Error:", e);
         }
     }

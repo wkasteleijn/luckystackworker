@@ -1,12 +1,11 @@
 package nl.wilcokas.luckystackworker.dto;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.wilcokas.luckystackworker.model.DeRotation;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -19,7 +18,7 @@ public class DeRotationDTO {
     private int anchorStrength;
     private int accurateness;
 
-    public DeRotationDTO (DeRotation deRotation) {
+    public DeRotationDTO(DeRotation deRotation) {
         this.images = deRotation.getImages();
         this.anchorStrength = deRotation.getAnchorStrength();
         this.noiseRobustness = deRotation.getNoiseRobustness();

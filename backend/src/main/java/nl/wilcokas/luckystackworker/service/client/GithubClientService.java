@@ -9,12 +9,12 @@ import org.springframework.web.client.RestClient;
 @Service
 public class GithubClientService {
 
-  private final RestClient restClient;
+    private final RestClient restClient;
 
-  @Value("${github.api.url}")
-  private String githubApiUrl;
+    @Value("${github.api.url}")
+    private String githubApiUrl;
 
-  public String getAppInfo() {
-    return restClient.get().uri(githubApiUrl).retrieve().body(String.class);
-  }
+    public String getAppInfo() {
+        return restClient.get().uri(githubApiUrl).retrieve().body(String.class);
+    }
 }
