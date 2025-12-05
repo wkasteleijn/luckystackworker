@@ -505,11 +505,7 @@ public class LswImageProcessingUtil {
     }
 
     public static LswImageLayers getLswImageLayers(short[][] pixels, int width, int height) {
-        return LswImageLayers.builder()
-                .layers(pixels)
-                .width(width)
-                .height(height)
-                .build();
+        return new LswImageLayers(width,height,pixels);
     }
 
     public static ImageProcessor createDeringMaskProcessor(

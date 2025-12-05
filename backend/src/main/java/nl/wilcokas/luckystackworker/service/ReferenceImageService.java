@@ -604,29 +604,21 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         var executor = Executors.newVirtualThreadPerTaskExecutor();
         CompletableFuture.runAsync(
                 () -> {
-                    try {
-                        deRotationService
-                                .derotate(
-                                        settingsService.getRootFolder(),
-                                        deRotation.getReferenceImage(),
-                                        deRotation.getImages(),
-                                        deRotation.getAnchorStrength(),
-                                        deRotation.getNoiseRobustness(),
-                                        deRotation.getAccurateness())
-                                .ifPresent(deRotatedImagePath -> {
-                                    String profileName = LswFileUtil.deriveProfileFromImageName(deRotatedImagePath);
-                                    Profile profile = profileService
-                                            .findByName(profileName)
-                                            .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
-                                    openReferenceImage(deRotatedImagePath, profile, LocalDateTime.now());
-                                });
-                        deRotationService.removeDerotationWorkFolder();
-                    } catch (InvocationTargetException
-                            | NoSuchMethodException
-                            | IllegalAccessException
-                            | IOException e) {
-                        log.error("Error starting the de-rotation process :", e);
+                    String deRotatedImagePath = deRotationService.derotate(
+                            settingsService.getRootFolder(),
+                            deRotation.getReferenceImage(),
+                            deRotation.getImages(),
+                            deRotation.getAnchorStrength(),
+                            deRotation.getNoiseRobustness(),
+                            deRotation.getAccurateness());
+                    if (deRotatedImagePath != null) {
+                        String profileName = LswFileUtil.deriveProfileFromImageName(deRotatedImagePath);
+                        Profile profile = profileService
+                                .findByName(profileName)
+                                .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
+                        openReferenceImage(deRotatedImagePath, profile, LocalDateTime.now());
                     }
+                    deRotationService.removeDerotationWorkFolder();
                 },
                 executor);
     }
@@ -815,7 +807,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             JOptionPane.showMessageDialog(
                     getParentFrame(),
                     String.format(
-                            "The selected file with extension %s is not supported. %nYou can only open 16-bit RGB and Gray PNG and TIFF images.",
+                            "The selected file with extension %s is not supported. %nYou can only open 16-bit RGB and"
+                                    + " Gray PNG and TIFF images.",
                             extension));
             return false;
         }

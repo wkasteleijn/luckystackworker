@@ -10,6 +10,7 @@ import nl.wilcokas.luckystackworker.util.LswFileUtil
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.copyPixelsFromFloatToShortProcessor
 import nl.wilcokas.luckystackworker.util.LswUtil
+import nl.wilcokas.luckystackworker.util.logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import sc.fiji.TurboReg_
@@ -18,7 +19,7 @@ import java.util.function.UnaryOperator
 @Component
 class DispersionCorrectionFilter : LSWFilter {
 
-    private val log = LoggerFactory.getLogger(DispersionCorrectionFilter::class.java)
+    private val log by logger()
 
     override fun apply(
         image: ImagePlus,
@@ -43,14 +44,12 @@ class DispersionCorrectionFilter : LSWFilter {
     }
 
     fun apply(image: ImagePlus, profile: Profile) {
-        val stack = image.stack
-        val ipRed = stack.getProcessor(1)
-        val ipBlue = stack.getProcessor(3)
-
         if (profile.automaticDispersionCorrection) {
-            val ipGreen = stack.getProcessor(2)
-            automaticallyCorrect(ipRed, ipGreen, ipBlue, image.width, image.height);
+            automaticallyCorrect(image);
         } else {
+            val stack = image.stack
+            val ipRed = stack.getProcessor(1)
+            val ipBlue = stack.getProcessor(3)
             correctLayer(ipRed, profile.dispersionCorrectionRedX, profile.dispersionCorrectionRedY)
             correctLayer(ipBlue, profile.dispersionCorrectionBlueX, profile.dispersionCorrectionBlueY)
         }
@@ -83,13 +82,14 @@ class DispersionCorrectionFilter : LSWFilter {
         pixelsNew.copyInto(pixels)
     }
 
-    internal fun automaticallyCorrect(
-        ipRed: ImageProcessor,
-        ipGreen: ImageProcessor,
-        ipBlue: ImageProcessor,
-        width: Int,
-        height: Int
-    ) {
+    internal fun automaticallyCorrect(image: ImagePlus) {
+        val stack = image.stack
+        val ipRed = stack.getProcessor(1)
+        val ipGreen = stack.getProcessor(2)
+        val ipBlue = stack.getProcessor(3)
+        val width = image.width
+        val height = image.height
+
         // Write R, G and B slices to separate temporary files
         val alignmentWorkFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/alignment"
         LswFileUtil.createDirectory(alignmentWorkFolder)
@@ -100,13 +100,26 @@ class DispersionCorrectionFilter : LSWFilter {
 
         // Align the red and blue to green
         val turboReg = TurboReg_()
-        val coordinates = "0 0 0 0"
-        turboReg.run("-align -file ${sourceImagePathRed} ${coordinates} -file ${sourceImagePathGreen} ${coordinates} -translation 0 0 ${width} ${height} -hideOutput")
+        var command = getCommand(width, height, sourceImagePathRed, sourceImagePathGreen)
+        log.info("Running TurboReg command: $command")
+        turboReg.run(command)
         val transformedImageRed = turboReg.transformedImage
-        turboReg.run("-align -file ${sourceImagePathBlue} ${coordinates} -file ${sourceImagePathGreen} ${coordinates} -translation 0 0 ${width} ${height} -hideOutput")
+        command = getCommand(width, height, sourceImagePathBlue, sourceImagePathGreen)
+        log.info("Running TurboReg command: $command")
+        turboReg.run(command)
         val transformedImageBlue = turboReg.transformedImage
         copyPixelsFromFloatToShortProcessor(transformedImageRed.processor, ipRed)
         copyPixelsFromFloatToShortProcessor(transformedImageBlue.processor, ipBlue)
+    }
+
+    private fun getCommand(
+        width: Int,
+        height: Int,
+        sourceImagePath: String,
+        imagePathTarget: String
+    ): String {
+        val coordinates = "0 0 ${width} ${height}"
+        return "-align -file ${sourceImagePath} ${coordinates} -file ${imagePathTarget} ${coordinates} -translation ${width / 2} ${height / 2} ${width / 2} ${height / 2} -hideOutput"
     }
 
     private fun createTemporaryImageFile(
@@ -134,12 +147,8 @@ fun main(args: Array<String>) {
             1.0,
             UnaryOperator { img: ImagePlus? -> img })
             .getLeft()
-        val stack = image.stack
-        val ipRed = stack.getProcessor(1)
-        val ipGreen = stack.getProcessor(2)
-        val ipBlue = stack.getProcessor(3)
 
-        DispersionCorrectionFilter().automaticallyCorrect(ipRed, ipGreen, ipBlue, image.width, image.height)
+        DispersionCorrectionFilter().automaticallyCorrect(image)
 
         LswFileUtil.saveImage(
             image, null, args[1], false, false, false, false
