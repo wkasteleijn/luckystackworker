@@ -105,7 +105,7 @@ class DeRotationService(
                 referenceImageFilename
             )
 
-            return "${derotationWorkFolder}/STACK_$referenceImageFilename{}"
+            return "${derotationWorkFolder}/STACK_$referenceImageFilename"
         } catch (e: DeRotationStoppedException) {
             log.info("DeRotation was stopped: " + e.message)
             return null
