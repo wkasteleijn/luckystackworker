@@ -1305,64 +1305,64 @@ export class AppComponent implements OnInit {
     if (color === 'RED') {
       switch (direction) {
         case 'LEFT-UP':
-          this.profile.dispersionCorrectionRedX -= 1;
-          this.profile.dispersionCorrectionRedY -= 1;
+          this.profile.dispersionCorrectionRedX -= 0.5;
+          this.profile.dispersionCorrectionRedY -= 0.5;
           break;
         case 'UP':
-          this.profile.dispersionCorrectionRedY -= 1;
+          this.profile.dispersionCorrectionRedY -= 0.5;
           break;
         case 'RIGHT-UP':
-          this.profile.dispersionCorrectionRedX += 1;
-          this.profile.dispersionCorrectionRedY -= 1;
+          this.profile.dispersionCorrectionRedX += 0.5;
+          this.profile.dispersionCorrectionRedY -= 0.5;
           break;
         case 'LEFT':
-          this.profile.dispersionCorrectionRedX -= 1;
+          this.profile.dispersionCorrectionRedX -= 0.5;
           break;
         case 'RIGHT':
-          this.profile.dispersionCorrectionRedX += 1;
+          this.profile.dispersionCorrectionRedX += 0.5;
           break;
         case 'LEFT-DOWN':
-          this.profile.dispersionCorrectionRedX -= 1;
-          this.profile.dispersionCorrectionRedY += 1;
+          this.profile.dispersionCorrectionRedX -= 0.5;
+          this.profile.dispersionCorrectionRedY += 0.5;
           break;
         case 'DOWN':
-          this.profile.dispersionCorrectionRedY += 1;
+          this.profile.dispersionCorrectionRedY += 0.5;
           break;
         case 'RIGHT-DOWN':
-          this.profile.dispersionCorrectionRedX += 1;
-          this.profile.dispersionCorrectionRedY += 1;
+          this.profile.dispersionCorrectionRedX += 0.5;
+          this.profile.dispersionCorrectionRedY += 0.5;
           break;
       }
       this.profile.dispersionCorrectionRedX;
     } else if (color === 'BLUE') {
       switch (direction) {
         case 'LEFT-UP':
-          this.profile.dispersionCorrectionBlueX -= 1;
-          this.profile.dispersionCorrectionBlueY -= 1;
+          this.profile.dispersionCorrectionBlueX -= 0.5;
+          this.profile.dispersionCorrectionBlueY -= 0.5;
           break;
         case 'UP':
-          this.profile.dispersionCorrectionBlueY -= 1;
+          this.profile.dispersionCorrectionBlueY -= 0.5;
           break;
         case 'RIGHT-UP':
-          this.profile.dispersionCorrectionBlueX += 1;
-          this.profile.dispersionCorrectionBlueY -= 1;
+          this.profile.dispersionCorrectionBlueX += 0.5;
+          this.profile.dispersionCorrectionBlueY -= 0.5;
           break;
         case 'LEFT':
-          this.profile.dispersionCorrectionBlueX -= 1;
+          this.profile.dispersionCorrectionBlueX -= 0.5;
           break;
         case 'RIGHT':
-          this.profile.dispersionCorrectionBlueX += 1;
+          this.profile.dispersionCorrectionBlueX += 0.5;
           break;
         case 'LEFT-DOWN':
-          this.profile.dispersionCorrectionBlueX -= 1;
-          this.profile.dispersionCorrectionBlueY += 1;
+          this.profile.dispersionCorrectionBlueX -= 0.5;
+          this.profile.dispersionCorrectionBlueY += 0.5;
           break;
         case 'DOWN':
-          this.profile.dispersionCorrectionBlueY += 1;
+          this.profile.dispersionCorrectionBlueY += 0.5;
           break;
         case 'RIGHT-DOWN':
-          this.profile.dispersionCorrectionBlueX += 1;
-          this.profile.dispersionCorrectionBlueY += 1;
+          this.profile.dispersionCorrectionBlueX += 0.5;
+          this.profile.dispersionCorrectionBlueY += 0.5;
           break;
       }
     }
@@ -1402,14 +1402,6 @@ export class AppComponent implements OnInit {
       return 169;
     }
     return 0;
-  }
-
-  get dispersionCorrectorTitle() {
-    return (
-      'You should always use a atmospheric dispersion corrector (ADC) with an OSC camera. This dispersion correction function is only meant for minimal corrections,' +
-      ' in case you have any left over dispersion in your recordings. The dispersion correction is not persisted with the object profile' +
-      ' since it will be different each time.'
-    );
   }
 
   selectRootFolder() {
@@ -1610,7 +1602,8 @@ export class AppComponent implements OnInit {
       .subscribe(
         (data) => {
           if (data) {
-            this.psfImage = data.imageData;
+            this.psfImage = data.psfImage?.imageData;
+            this.profile = data.profile;
           }
           if (this.slowProcessing) {
             this.hideSpinner();

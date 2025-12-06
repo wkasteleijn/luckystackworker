@@ -8,6 +8,7 @@ import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
@@ -103,28 +104,28 @@ public class ProfileController {
     }
 
     @PutMapping
-    public ResponseEntity<PSFImageDto> updateProfile(
+    public ResponseEntity<UpdateProfileResponseDto> updateProfile(
             @RequestBody ProfileDTO profileDTO, @RequestParam(required = false) List<String> operations) {
         // Rate limiting added to prevent overloading whenever scroll keys are held down
         // or pressed very quickly.
         LocalDateTime activeOperationTime = luckyStackWorkerContext.getActiveOperationTime();
         byte[] psfImage = null;
+        Profile profile = null;
         if (activeOperationTime == null
                 || LocalDateTime.now()
-                        .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
+                .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
             luckyStackWorkerContext.setActiveOperationTime(LocalDateTime.now());
-
-            Profile profile = profileService.updateProfile(profileDTO);
+            profile = profileService.updateProfile(profileDTO);
             psfImage = referenceImageService.updateProcessing(profile, operations);
             luckyStackWorkerContext.setActiveOperationTime(null);
         } else {
             log.warn("Attempt to update image while another operation was in progress");
         }
-        return psfImage == null
-                ? new ResponseEntity<>(HttpStatus.OK)
-                : ResponseEntity.ok(PSFImageDto.builder()
-                        .imageData(Base64.getEncoder().encodeToString(psfImage))
-                        .build());
+        PSFImageDto psfImageDto = psfImage == null ? null : PSFImageDto.builder().imageData(Base64.getEncoder().encodeToString(psfImage)).build();
+        return ResponseEntity.ok(UpdateProfileResponseDto.builder()
+                .psfImage(psfImageDto)
+                .profile(profile == null ? null : new ProfileDTO(profile))
+                .build());
     }
 
     @PutMapping("/apply")

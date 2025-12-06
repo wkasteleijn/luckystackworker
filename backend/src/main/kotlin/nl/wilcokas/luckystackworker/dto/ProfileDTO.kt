@@ -119,16 +119,15 @@ data class ProfileDTO(
     var purple: BigDecimal? = null,
     var saturation: BigDecimal? = null,
     var dispersionCorrectionEnabled: Boolean = false,
-    var dispersionCorrectionRedX: Int = 0,
-    var dispersionCorrectionBlueX: Int = 0,
-    var dispersionCorrectionRedY: Int = 0,
-    var dispersionCorrectionBlueY: Int = 0,
+    var dispersionCorrectionRedX: Double = 0.0,
+    var dispersionCorrectionBlueX: Double = 0.0,
+    var dispersionCorrectionRedY: Double = 0.0,
+    var dispersionCorrectionBlueY: Double = 0.0,
     var luminanceIncludeRed: Boolean = false,
     var luminanceIncludeGreen: Boolean = false,
     var luminanceIncludeBlue: Boolean = false,
     var luminanceIncludeColor: Boolean = false,
     var normalizeColorBalance: Boolean = false,
-    var automaticDispersionCorrection: Boolean = false,
 
     var scale: Double = 0.0,
     var rotationAngle: Double = 0.0,
@@ -256,7 +255,6 @@ data class ProfileDTO(
         this.dispersionCorrectionBlueX = profile.dispersionCorrectionBlueX
         this.dispersionCorrectionRedY = profile.dispersionCorrectionRedY
         this.dispersionCorrectionBlueY = profile.dispersionCorrectionBlueY
-        this.automaticDispersionCorrection = profile.automaticDispersionCorrection
         this.preserveDarkBackground = profile.preserveDarkBackground
         this.clippingSuppression = profile.clippingSuppression
 

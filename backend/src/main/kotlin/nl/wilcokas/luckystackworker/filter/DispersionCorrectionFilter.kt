@@ -8,13 +8,12 @@ import nl.wilcokas.luckystackworker.model.Profile
 import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum
 import nl.wilcokas.luckystackworker.util.LswFileUtil
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil
-import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.copyPixelsFromFloatToShortProcessor
 import nl.wilcokas.luckystackworker.util.LswUtil
 import nl.wilcokas.luckystackworker.util.logger
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import sc.fiji.TurboReg_
 import java.util.function.UnaryOperator
+import kotlin.math.roundToInt
 
 @Component
 class DispersionCorrectionFilter : LSWFilter {
@@ -43,19 +42,23 @@ class DispersionCorrectionFilter : LSWFilter {
         return profile.dispersionCorrectionEnabled && LswImageProcessingUtil.validateRGBStack(image)
     }
 
-    fun apply(image: ImagePlus, profile: Profile) {
-        if (profile.automaticDispersionCorrection) {
-            automaticallyCorrect(image);
-        } else {
-            val stack = image.stack
-            val ipRed = stack.getProcessor(1)
-            val ipBlue = stack.getProcessor(3)
-            correctLayer(ipRed, profile.dispersionCorrectionRedX, profile.dispersionCorrectionRedY)
-            correctLayer(ipBlue, profile.dispersionCorrectionBlueX, profile.dispersionCorrectionBlueY)
+    private fun apply(image: ImagePlus, profile: Profile) {
+        val stack = image.stack
+        val ipRed = stack.getProcessor(1)
+        val ipBlue = stack.getProcessor(3)
+        if (!isManuallyCorrected(profile)) {
+            determineCorrectionAutomatically(image, profile)
         }
+        correctLayer(ipRed, profile.dispersionCorrectionRedX, profile.dispersionCorrectionRedY)
+        correctLayer(ipBlue, profile.dispersionCorrectionBlueX, profile.dispersionCorrectionBlueY)
     }
 
-    private fun correctLayer(ip: ImageProcessor, dx: Int, dy: Int) {
+    private fun isManuallyCorrected(profile: Profile): Boolean {
+        return profile.dispersionCorrectionRedX!= 0.0 || profile.dispersionCorrectionRedY!= 0.0 ||
+                profile.dispersionCorrectionBlueX!= 0.0 || profile.dispersionCorrectionBlueY!= 0.0
+    }
+
+    private fun correctLayer(ip: ImageProcessor, dx: Double, dy: Double) {
         val pixels = ip.pixels as ShortArray
         val pixelsNew = ShortArray(pixels.size)
         val width = ip.width
@@ -68,21 +71,35 @@ class DispersionCorrectionFilter : LSWFilter {
                 val xOrg = x - dx
                 val yOrg = y - dy
 
-                if (xOrg < 0 || yOrg < 0 || xOrg >= width || yOrg >= height) {
+                val x1 = xOrg.toInt()
+                val y1 = yOrg.toInt()
+                val x2 = x1 + 1
+                val y2 = y1 + 1
+
+                if (x1 < 0 || y1 < 0 || x2 >= width || y2 >= height) {
                     pixelsNew[p] = 0
                 } else {
-                    val pOrg = width * yOrg + xOrg
-                    pixelsNew[p] = pixels[pOrg]
+                    val xFraction = xOrg - x1
+                    val yFraction = yOrg - y1
+
+                    val p1 = pixels[width * y1 + x1].toInt() and 0xFFFF
+                    val p2 = pixels[width * y1 + x2].toInt() and 0xFFFF
+                    val p3 = pixels[width * y2 + x1].toInt() and 0xFFFF
+                    val p4 = pixels[width * y2 + x2].toInt() and 0xFFFF
+
+                    val z1 = p1 * (1 - xFraction) + p2 * xFraction
+                    val z2 = p3 * (1 - xFraction) + p4 * xFraction
+                    val interpolatedValue = z1 * (1 - yFraction) + z2 * yFraction
+
+                    pixelsNew[p] = interpolatedValue.toInt().toShort()
                 }
                 p++
             }
         }
-
-        // Efficiently copy the new array back into the original reference
         pixelsNew.copyInto(pixels)
     }
 
-    internal fun automaticallyCorrect(image: ImagePlus) {
+    internal fun determineCorrectionAutomatically(image: ImagePlus, profile: Profile) {
         val stack = image.stack
         val ipRed = stack.getProcessor(1)
         val ipGreen = stack.getProcessor(2)
@@ -103,13 +120,27 @@ class DispersionCorrectionFilter : LSWFilter {
         var command = getCommand(width, height, sourceImagePathRed, sourceImagePathGreen)
         log.info("Running TurboReg command: $command")
         turboReg.run(command)
-        val transformedImageRed = turboReg.transformedImage
+        updateDispersionCorrection(turboReg, profile, R)
         command = getCommand(width, height, sourceImagePathBlue, sourceImagePathGreen)
         log.info("Running TurboReg command: $command")
         turboReg.run(command)
-        val transformedImageBlue = turboReg.transformedImage
-        copyPixelsFromFloatToShortProcessor(transformedImageRed.processor, ipRed)
-        copyPixelsFromFloatToShortProcessor(transformedImageBlue.processor, ipBlue)
+        updateDispersionCorrection(turboReg, profile, B)
+    }
+
+    private fun updateDispersionCorrection(turboReg: TurboReg_, profile: Profile, channel: ChannelEnum) {
+        val dx = ((turboReg.sourcePoints[0][0] - turboReg.targetPoints[0][0]) * 10).roundToInt() / 10.0
+        val dy = ((turboReg.sourcePoints[0][1] - turboReg.targetPoints[0][1]) * 10).roundToInt() / 10.0
+        when (channel) {
+            R -> {
+                profile.dispersionCorrectionRedX -= dx
+                profile.dispersionCorrectionRedY -= dy
+            }
+            B -> {
+                profile.dispersionCorrectionBlueX -= dx
+                profile.dispersionCorrectionBlueY -= dy
+            }
+            else -> throw IllegalArgumentException("Unsupported channel: $channel")
+        }
     }
 
     private fun getCommand(
@@ -148,7 +179,7 @@ fun main(args: Array<String>) {
             UnaryOperator { img: ImagePlus? -> img })
             .getLeft()
 
-        DispersionCorrectionFilter().automaticallyCorrect(image)
+        DispersionCorrectionFilter().determineCorrectionAutomatically(image, Profile())
 
         LswFileUtil.saveImage(
             image, null, args[1], false, false, false, false
