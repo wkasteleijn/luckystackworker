@@ -14,6 +14,8 @@ import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.Profile;
+import nl.wilcokas.luckystackworker.repository.ProfileRepository;
+import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import org.apache.commons.io.FileUtils;
@@ -27,8 +29,8 @@ import org.springframework.stereotype.Service;
 public class WorkerService {
 
     private final FilterService operationService;
-    private final SettingsService settingsService;
-    private final ProfileService profileService;
+    private final SettingsRepository settingsService;
+    private final ProfileRepository profileService;
     private final LuckyStackWorkerContext luckyStackWorkerContext;
 
     private static final int WAIT_DELAY = 4000;

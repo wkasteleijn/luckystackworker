@@ -23,7 +23,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -58,6 +57,8 @@ import nl.wilcokas.luckystackworker.model.DeRotation;
 import nl.wilcokas.luckystackworker.model.FilterEnum;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
+import nl.wilcokas.luckystackworker.repository.ProfileRepository;
+import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 import nl.wilcokas.luckystackworker.service.bean.GithubRelease;
 import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
 import nl.wilcokas.luckystackworker.service.client.GithubClientService;
@@ -113,8 +114,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
     }
 
-    private final SettingsService settingsService;
-    private final ProfileService profileService;
+    private final SettingsRepository settingsService;
+    private final ProfileRepository profileService;
     private final FilterService operationService;
     private final LuckyStackWorkerContext luckyStackWorkerContext;
     private final ObjectMapper snakeCaseObjectMapper;

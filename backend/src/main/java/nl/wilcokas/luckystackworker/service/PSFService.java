@@ -17,6 +17,8 @@ import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.dto.SettingsDTO;
 import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.model.Profile;
+import nl.wilcokas.luckystackworker.repository.ProfileRepository;
+import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import org.springframework.stereotype.Service;
@@ -27,8 +29,8 @@ import org.springframework.stereotype.Service;
 public class PSFService {
 
     private final ReferenceImageService referenceImageService;
-    private final SettingsService settingsService;
-    private final ProfileService profileService;
+    private final SettingsRepository settingsService;
+    private final ProfileRepository profileService;
     private final LuckyStackWorkerContext luckyStackWorkerContext;
 
     public SettingsDTO loadCustomPSF() throws IOException {

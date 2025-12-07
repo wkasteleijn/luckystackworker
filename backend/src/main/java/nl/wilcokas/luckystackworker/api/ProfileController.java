@@ -17,13 +17,12 @@ import nl.wilcokas.luckystackworker.dto.*;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.service.PSFService;
-import nl.wilcokas.luckystackworker.service.ProfileService;
+import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
-import nl.wilcokas.luckystackworker.service.SettingsService;
+import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import org.apache.velocity.exception.ResourceNotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,9 +40,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class ProfileController {
 
-    private final ProfileService profileService;
+    private final ProfileRepository profileService;
     private final ReferenceImageService referenceImageService;
-    private final SettingsService settingsService;
+    private final SettingsRepository settingsService;
     private final PSFService psfService;
     private final LuckyStackWorkerContext luckyStackWorkerContext;
 

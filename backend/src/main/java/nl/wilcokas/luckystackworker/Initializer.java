@@ -7,7 +7,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.model.Settings;
-import nl.wilcokas.luckystackworker.service.SettingsService;
+import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Initializer {
 
-    private final SettingsService settingsService;
+    private final SettingsRepository settingsService;
 
     @PostConstruct
     public void init()

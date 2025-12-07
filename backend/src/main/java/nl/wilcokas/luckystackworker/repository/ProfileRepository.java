@@ -1,4 +1,4 @@
-package nl.wilcokas.luckystackworker.service;
+package nl.wilcokas.luckystackworker.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -21,12 +21,12 @@ import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
-@Service
+@Repository
 @Slf4j
-public class ProfileService {
+public class ProfileRepository {
     private final ObjectMapper objectMapper;
     private static final String PROFILES_FILE = "/profiles.json";
     private static String defaultProfilesJson;

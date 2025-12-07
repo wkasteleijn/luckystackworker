@@ -9,6 +9,8 @@ import nl.wilcokas.luckystackworker.LswConfiguration;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.dto.VersionDTO;
 import nl.wilcokas.luckystackworker.model.Settings;
+import nl.wilcokas.luckystackworker.repository.ProfileRepository;
+import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 import nl.wilcokas.luckystackworker.service.client.GithubClientService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,10 +33,10 @@ class ReferenceImageServiceTest {
     private static final LocalDateTime LESS_THAN_2_WEEKS_AGO = TODAY.minusDays(13);
 
     @Mock
-    private SettingsService settingsService;
+    private SettingsRepository settingsService;
 
     @Mock
-    private ProfileService profileService;
+    private ProfileRepository profileService;
 
     @Mock
     private FilterService operationService;

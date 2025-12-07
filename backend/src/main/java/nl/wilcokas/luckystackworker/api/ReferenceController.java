@@ -20,7 +20,7 @@ import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.DeRotation;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
-import nl.wilcokas.luckystackworker.service.SettingsService;
+import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class ReferenceController {
 
-    private final SettingsService settingsService;
+    private final SettingsRepository settingsService;
     private final ReferenceImageService referenceImageService;
     private final LuckyStackWorkerContext luckyStackWorkerContext;
 

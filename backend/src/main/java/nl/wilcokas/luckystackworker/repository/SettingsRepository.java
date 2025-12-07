@@ -1,4 +1,4 @@
-package nl.wilcokas.luckystackworker.service;
+package nl.wilcokas.luckystackworker.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
@@ -10,12 +10,12 @@ import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 @Slf4j
 @RequiredArgsConstructor
-@Service
-public class SettingsService {
+@Repository
+public class SettingsRepository {
 
     private static final String SETTINGS_FILE = "/settings.json";
 
