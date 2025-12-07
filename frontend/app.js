@@ -12,7 +12,7 @@ function createWindow() {
     resizable: false,
     autoHideMenuBar: true,
     width: process.platform !== "win32" ? 568 : 584,
-    height: process.platform !== "win32" ? 608 : 618,
+    height: process.platform !== "win32" ? 600 : 610,
     x: 64,
     y: 64,
   });

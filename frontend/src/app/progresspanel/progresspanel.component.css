@@ -25,7 +25,7 @@ button {
   width: 40px;
   font-size: 12px;
   border: 0px;
-  color: rgb(226, 226, 226);
+  color: rgb(168, 168, 168);
   background-color: #404040;
   border-radius: 24px;
   padding-left: 11px;
@@ -35,7 +35,7 @@ button {
   padding-bottom: 0px;
 }
 button:hover {
-  color: rgb(226, 226, 226);
+  color: rgb(168, 168, 168);
   background-color: #505050;
 }
 

@@ -33,11 +33,11 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     private static final Color BORDER_COLOR = new Color(64, 64, 64);
     private static final Color BACKGROUND_COLOR = new Color(25, 25, 25);
     private static final int OFFSET_TOP = 32;
-    private static final int HISTOGRAM_MARGIN_LEFT = 8;
-    private static final int HISTOGRAM_MARGIN_TOP = 8;
-    private static final int HISTOGRAM_HEIGHT = 56;
-    private static final int HISTOGRAM_WIDTH = 50;
-    private static final int textOffsetX = HISTOGRAM_HEIGHT * 2 + 12;
+    private static final int HISTOGRAM_MARGIN_LEFT = 0;
+    private static final int HISTOGRAM_MARGIN_TOP = 0;
+    private static final int HISTOGRAM_HEIGHT = 72;
+    private static final int HISTOGRAM_WIDTH = 100;
+    private static final int textOffsetX = HISTOGRAM_WIDTH * 2 + 12;
     private static final int textOffsetY = 49;
     private static final int textHeight = 12;
 
@@ -226,6 +226,9 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         g.fillRect(width - thickness, 0, thickness, height);
         g.setColor(backgroundColor);
         g.fillRect(1, 32, width - 2, 72);
+        g.setColor(BORDER_COLOR);
+        g.fillRect(1, 32, width, thickness);
+        g.fillRect(1, 104, width, thickness);
         int textWidth = g.getFontMetrics().stringWidth(image.getTitle());
         int x = (getWidth() - textWidth) / 2;
         g.setColor(TITLE_COLOR);
@@ -296,7 +299,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
 
         // Draw green box around histogram
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-        g.setColor(histogramColor);
+        g.setColor(BORDER_COLOR);
         g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, HISTOGRAM_WIDTH * 2, 1);
         g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT, HISTOGRAM_WIDTH * 2, 1);
         g.fillRect(HISTOGRAM_MARGIN_LEFT, HISTOGRAM_MARGIN_TOP + OFFSET_TOP, 1, HISTOGRAM_HEIGHT);
@@ -308,6 +311,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
     }
 
     private void paintHistogramDetails(Graphics g) {
+        g.setColor(histogramColor);
         g.drawString("Histogram", textOffsetX, textOffsetY);
 
         setHistogramColor(g, metadata.getRed());

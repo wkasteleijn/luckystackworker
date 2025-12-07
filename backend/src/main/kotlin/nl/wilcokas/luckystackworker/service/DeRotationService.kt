@@ -180,7 +180,7 @@ class DeRotationService(
     }
 
     private fun applyTransformation(sourceImage: ImagePlus, targetImage: ImagePlus, transformationFile: String) {
-        for (layer in 1..3) {
+        for (layer in 1..sourceImage.stack.size) {
             val sourceProcessor =
                 sourceImage.getStack().getProcessor(layer).toFloat(1, null)
             val targetProcessor =
@@ -365,33 +365,34 @@ class DeRotationService(
 
     private fun sharpenAsLuminanceImage(image: ImagePlus, radius: Double) {
         val stack = image.getStack()
-
         val ipRed = stack.getProcessor(1)
-        val ipGreen = stack.getProcessor(2)
-        val ipBlue = stack.getProcessor(3)
-
         val fpRed = ipRed.toFloat(1, null)
-        val fpGreen = ipGreen.toFloat(2, null)
-        val fpBlue = ipBlue.toFloat(3, null)
         val pixelsRed = fpRed.pixels as FloatArray
-        val pixelsGreen = fpGreen.pixels as FloatArray
-        val pixelsBlue = fpBlue.pixels as FloatArray
-
-        val pixelsLum = FloatArray(pixelsRed.size)
-        for (i in pixelsRed.indices) {
-            val hsl = LswImageProcessingUtil.rgbToHsl(
-                pixelsRed[i], pixelsGreen[i], pixelsBlue[i], true, true, true, true, LSWSharpenMode.LUMINANCE
-            )
-            pixelsLum[i] = hsl[2]
+        var fpLum: FloatProcessor
+        if (stack.size > 1) {
+            val ipGreen = stack.getProcessor(2)
+            val ipBlue = stack.getProcessor(3)
+            val fpGreen = ipGreen.toFloat(2, null)
+            val fpBlue = ipBlue.toFloat(3, null)
+            val pixelsGreen = fpGreen.pixels as FloatArray
+            val pixelsBlue = fpBlue.pixels as FloatArray
+            val pixelsLum = FloatArray(pixelsRed.size)
+            for (i in pixelsRed.indices) {
+                val hsl = LswImageProcessingUtil.rgbToHsl(
+                    pixelsRed[i], pixelsGreen[i], pixelsBlue[i], true, true, true, true, LSWSharpenMode.LUMINANCE
+                )
+                pixelsLum[i] = hsl[2]
+            }
+            fpLum = FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum)
+            fpLum.snapshot()
+            lswSharpenFilter.doUnsharpMask(radius, 0.990f, 0f, fpLum)
+            ipGreen.setPixels(2, fpLum)
+            ipBlue.setPixels(3, fpLum)
+        } else {
+            fpLum = FloatProcessor(image.getWidth(), image.getHeight(), pixelsRed)
+            lswSharpenFilter.doUnsharpMask(radius, 0.990f, 0f, fpLum)
         }
-        val fpLum = FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum)
-        fpLum.snapshot()
-
-        lswSharpenFilter.doUnsharpMask(radius, 0.990f, 0f, fpLum)
-
         ipRed.setPixels(1, fpLum)
-        ipGreen.setPixels(2, fpLum)
-        ipBlue.setPixels(3, fpLum)
     }
 }
 
