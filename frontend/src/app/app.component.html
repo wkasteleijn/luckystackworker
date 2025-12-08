@@ -220,31 +220,6 @@
       *ngIf="openRefImageEnabled() && refImageSelected"
       type="button"
       mat-button
-      (click)="roiSelectionChanged()"
-      class="{{
-        'buttonZoom buttonMargin ' +
-          (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-          (roiEnabled() ? 'Pressed' : '')
-      }}"
-      matTooltip="Select ROI"
-    >
-      <img src="assets/images/roi.png" class="genericButton" />
-    </button>
-    <button
-      *ngIf="!openRefImageEnabled() || !refImageSelected"
-      type="button"
-      mat-button
-      disabled
-      class="button_disabled buttonMargin"
-      matTooltip="Select ROI"
-    >
-      <img src="assets/images/roi.png" class="genericButton" />
-    </button>
-
-    <button
-      *ngIf="openRefImageEnabled() && refImageSelected"
-      type="button"
-      mat-button
       (click)="channelChanged()"
       class="{{
         'buttonChannelSwitcher buttonMargin ' +
@@ -304,71 +279,53 @@
     </button>
 
     <button
-      *ngIf="openRefImageEnabled() && showVersionButton()"
+      *ngIf="openRefImageEnabled() && refImageSelected"
       type="button"
       mat-button
-      class="newVersionButton infoButtonMargin {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      (click)="roiSelectionChanged()"
+      class="{{
+        'roiMargin buttonZoom ' +
+          (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+          (roiEnabled() ? 'Pressed' : '')
       }}"
-      (click)="showVersionButton() ? openDownloadPage() : openAbout()"
-      matTooltip="You are currently using an older version {{
-        versionInfo.localVersion
-      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
-        versionInfo.latestVersion
-      }}."
+      matTooltip="Select ROI"
     >
-      <img
-        src="assets/images/info.png"
-        class="infoButton zoomIcon buttonBottom"
-      />
+      <img src="assets/images/roi.png" class="genericButton" />
     </button>
     <button
-      *ngIf="!openRefImageEnabled() && showVersionButton()"
+      *ngIf="!openRefImageEnabled() || !refImageSelected"
       type="button"
       mat-button
       disabled
-      class="newVersionButton infoButtonMargin {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      matTooltip="You are currently using an older version {{
-        getCurrentVersion()
-      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
-        getLatestKnownVersion()
-      }}."
+      class="roiMargin button_disabled"
+      matTooltip="Select ROI"
     >
-      <img
-        src="assets/images/info.png"
-        class="infoButton zoomIcon buttonBottom"
-      />
+      <img src="assets/images/roi.png" class="genericButton" />
     </button>
 
     <button
-      *ngIf="openRefImageEnabled() && !showVersionButton()"
+      *ngIf="openRefImageEnabled() && refImageSelected"
       type="button"
       mat-button
-      class="button infoButtonMargin {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      (click)="maximize()"
+      class="{{
+        (nightModeEnabled()
+          ? 'buttonZoom relatedButtonsSpace activeColorNight'
+          : 'buttonZoom relatedButtonsSpace activeColor') +
+          (isMaximized ? 'Pressed' : '')
       }}"
-      (click)="openAbout()"
-      matTooltip="About"
+      matTooltip="Show image at 100% scale"
     >
-      <img
-        src="assets/images/info.png"
-        class="infoButton zoomIcon buttonBottom"
-      />
+      <img src="assets/images/maximize.png" class="genericButton" />
     </button>
     <button
-      *ngIf="!openRefImageEnabled() && !showVersionButton()"
+      *ngIf="!openRefImageEnabled() || !refImageSelected"
       type="button"
       mat-button
       disabled
-      class="button_disabled infoButtonMargin"
-      matTooltip="About"
+      class="buttonDisabledZoom relatedButtonsSpace"
     >
-      <img
-        src="assets/images/info.png"
-        class="infoButton zoomIcon buttonBottom"
-      />
+      <img src="assets/images/maximize.png" class="genericButton" />
     </button>
 
     <button
@@ -419,54 +376,7 @@
     >
       <img src="assets/images/zoomout.png" class="minZoomButton" />
     </button>
-
-    <button
-      *ngIf="openRefImageEnabled() && refImageSelected"
-      type="button"
-      mat-button
-      (click)="maximize()"
-      class="{{
-        (nightModeEnabled()
-          ? 'maximize buttonZoom relatedButtonsSpace activeColorNight'
-          : 'maximize buttonZoom relatedButtonsSpace activeColor') +
-          (isMaximized ? 'Pressed' : '')
-      }}"
-      matTooltip="Show image at 100% scale"
-    >
-      <img src="assets/images/maximize.png" class="genericButton" />
-    </button>
-    <button
-      *ngIf="!openRefImageEnabled() || !refImageSelected"
-      type="button"
-      mat-button
-      disabled
-      class="maximize buttonDisabledZoom relatedButtonsSpace"
-    >
-      <img src="assets/images/maximize.png" class="genericButton" />
-    </button>
   </div>
-
-  <button
-    type="button"
-    *ngIf="openRefImageEnabled() && refImageSelected"
-    mat-button
-    (click)="saveReferenceImage()"
-    class="save button {{
-      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-    }}"
-    matTooltip="This will save the currently open stack with all applied the post-processing. You can save it as a 16-bit TIFF or a 100% quality JPG. To do so add the applicable extension to the filename (filename.tif, filename.jpg)."
-  >
-    <img src="assets/images/save.png" class="saveButton zoomIcon" />
-  </button>
-  <button
-    *ngIf="!refImageSelected || !openRefImageEnabled()"
-    type="button"
-    mat-button
-    disabled
-    class="save button_disabled"
-  >
-    <img src="assets/images/save.png" class="saveButton zoomIcon" />
-  </button>
 
   <div class="button_container_top button_container">
     <button
@@ -509,6 +419,116 @@
         matTooltip="Select root folder"
       />
     </mat-form-field>
+  </div>
+
+  <div class="button_container_top button_container">
+    <!-- Batch functions panel -->
+    <mat-card class="card cardColor">
+      <mat-card-content class="batchBar">
+        <div class="sliderRow">
+          <span
+            class="workerLabel {{
+              nightModeEnabled()
+                ? 'sliderRowCategoryTitleColorNight'
+                : 'sliderRowCategoryTitleColor'
+            }}"
+            >Batch</span
+          >
+          <button
+            *ngIf="openRefImageEnabled() && refImageSelected"
+            type="button"
+            mat-button
+            (click)="applyProfileBatch()"
+            class="button {{
+              nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+            }}"
+            matTooltip="Start batch worker to process all {{
+              selectedProfile
+            }} stacks found in the root folder."
+          >
+            <img src="assets/images/startbatch.png" class="startBatchButton" />
+          </button>
+          <button
+            *ngIf="!openRefImageEnabled() || !refImageSelected"
+            type="button"
+            mat-button
+            disabled
+            class="button_disabled"
+          >
+            <img src="assets/images/startbatch.png" class="startBatchButton" />
+          </button>
+
+          <button
+            *ngIf="openRefImageEnabled() && refImageSelected"
+            type="button"
+            mat-button
+            (click)="realtimeEnabledChanged()"
+            class="{{
+              'relatedButtonsSpace buttonZoom connectButton ' +
+                (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+                (realtimeEnabled ? 'Pressed' : '')
+            }}"
+            matTooltip="Connect to stacking software"
+          >
+            <img src="assets/images/connect.png" class="genericButton" />
+          </button>
+          <button
+            *ngIf="!openRefImageEnabled() || !refImageSelected"
+            type="button"
+            mat-button
+            disabled
+            class="relatedButtonsSpace buttonDisabledZoom connectButton"
+            matTooltip="Connect to stacking software"
+          >
+            <img src="assets/images/connect.png" class="genericButton" />
+          </button>
+
+          <button
+            *ngIf="openRefImageEnabled() && refImageSelected"
+            type="button"
+            mat-button
+            (click)="loadFilesForDerotation()"
+            class="relatedButtonsSpace button {{
+              nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+            }}"
+            matTooltip="Derotate a selected series of images"
+          >
+            <img src="assets/images/derotate.png" class="stopBatchButton" />
+          </button>
+          <button
+            *ngIf="!openRefImageEnabled() || !refImageSelected"
+            type="button"
+            mat-button
+            disabled
+            class="button_disabled"
+          >
+            <img src="assets/images/derotate.png" class="stopBatchButton" />
+          </button>
+
+          <button
+            *ngIf="openRefImageEnabled() && refImageSelected"
+            type="button"
+            mat-button
+            (click)="stack()"
+            class="relatedButtonsSpace button {{
+              nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+            }}"
+            matTooltip="Stack a selected series of images"
+          >
+            <img src="assets/images/stack.png" class="stopBatchButton" />
+          </button>
+          <button
+            *ngIf="!openRefImageEnabled() || !refImageSelected"
+            type="button"
+            mat-button
+            disabled
+            class="button_disabled"
+          >
+            <img src="assets/images/stack.png" class="stopBatchButton" />
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
 
     <button
       *ngIf="openRefImageEnabled() && refImageSelected"
@@ -516,7 +536,7 @@
       mat-button
       (click)="blinkClippedAreasChanged()"
       class="{{
-        'buttonZoom buttonMargin ' +
+        'button3thRow buttonMargin ' +
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
           (blinkClippedAreas ? 'Pressed' : '')
       }}"
@@ -529,7 +549,7 @@
       type="button"
       mat-button
       disabled
-      class="button_disabled buttonMargin"
+      class="button3thRowDisabled buttonMargin"
     >
       <img src="assets/images/highlight-clipped.png" class="genericButton" />
     </button>
@@ -540,7 +560,7 @@
       mat-button
       (click)="nightModeChanged()"
       class="{{
-        'buttonZoom buttonMargin ' +
+        'button3thRow buttonMargin ' +
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
           (nightModeEnabled() ? 'Pressed' : '')
       }}"
@@ -557,115 +577,97 @@
     >
       <img src="assets/images/nightmode.png" class="genericButton" />
     </button>
+
+    <button
+      *ngIf="openRefImageEnabled() && showVersionButton()"
+      type="button"
+      mat-button
+      class="button3thRow infoButtonMargin {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      (click)="showVersionButton() ? openDownloadPage() : openAbout()"
+      matTooltip="You are currently using an older version {{
+        versionInfo.localVersion
+      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
+        versionInfo.latestVersion
+      }}."
+    >
+      <img
+        src="assets/images/info.png"
+        class="infoButton zoomIcon buttonBottom"
+      />
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled() && showVersionButton()"
+      type="button"
+      mat-button
+      disabled
+      class="button3thRowDisabled infoButtonMargin {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      matTooltip="You are currently using an older version {{
+        getCurrentVersion()
+      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
+        getLatestKnownVersion()
+      }}."
+    >
+      <img
+        src="assets/images/info.png"
+        class="infoButton zoomIcon buttonBottom"
+      />
+    </button>
+
+    <button
+      *ngIf="openRefImageEnabled() && !showVersionButton()"
+      type="button"
+      mat-button
+      class="button3thRow infoButtonMargin {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      (click)="openAbout()"
+      matTooltip="About"
+    >
+      <img
+        src="assets/images/info.png"
+        class="infoButton zoomIcon buttonBottom"
+      />
+    </button>
+    <button
+      *ngIf="!openRefImageEnabled() && !showVersionButton()"
+      type="button"
+      mat-button
+      disabled
+      class="button3thRowDisabled infoButtonMargin"
+      matTooltip="About"
+    >
+      <img
+        src="assets/images/info.png"
+        class="infoButton zoomIcon buttonBottom"
+      />
+    </button>
+
+    <button
+      type="button"
+      *ngIf="openRefImageEnabled() && refImageSelected"
+      mat-button
+      (click)="saveReferenceImage()"
+      class="button3thRow infoButtonMargin {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      matTooltip="This will save the currently open stack with all applied the post-processing. You can save it as a 16-bit TIFF or a 100% quality JPG. To do so add the applicable extension to the filename (filename.tif, filename.jpg)."
+    >
+      <img src="assets/images/save.png" class="saveButton zoomIcon" />
+    </button>
+    <button
+      *ngIf="!refImageSelected || !openRefImageEnabled()"
+      type="button"
+      mat-button
+      disabled
+      class="button3thRowDisabled infoButtonMargin"
+    >
+      <img src="assets/images/save.png" class="saveButton zoomIcon" />
+    </button>
   </div>
-
-  <!-- Batch functions panel -->
-  <mat-card class="card cardColor">
-    <mat-card-content class="batchBar">
-      <div class="sliderRow">
-        <span
-          class="workerLabel {{
-            nightModeEnabled()
-              ? 'sliderRowCategoryTitleColorNight'
-              : 'sliderRowCategoryTitleColor'
-          }}"
-          >Batch</span
-        >
-        <button
-          *ngIf="openRefImageEnabled() && refImageSelected"
-          type="button"
-          mat-button
-          (click)="applyProfileBatch()"
-          class="button {{
-            nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-          }}"
-          matTooltip="Start batch worker to process all {{
-            selectedProfile
-          }} stacks found in the root folder."
-        >
-          <img src="assets/images/startbatch.png" class="startBatchButton" />
-        </button>
-        <button
-          *ngIf="!openRefImageEnabled() || !refImageSelected"
-          type="button"
-          mat-button
-          disabled
-          class="button_disabled"
-        >
-          <img src="assets/images/startbatch.png" class="startBatchButton" />
-        </button>
-
-        <button
-          *ngIf="openRefImageEnabled() && refImageSelected"
-          type="button"
-          mat-button
-          (click)="realtimeEnabledChanged()"
-          class="{{
-            'relatedButtonsSpace buttonZoom connectButton ' +
-              (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-              (realtimeEnabled ? 'Pressed' : '')
-          }}"
-          matTooltip="Connect to stacking software"
-        >
-          <img src="assets/images/connect.png" class="genericButton" />
-        </button>
-        <button
-          *ngIf="!openRefImageEnabled() || !refImageSelected"
-          type="button"
-          mat-button
-          disabled
-          class="relatedButtonsSpace buttonDisabledZoom connectButton"
-          matTooltip="Connect to stacking software"
-        >
-          <img src="assets/images/connect.png" class="genericButton" />
-        </button>
-
-        <button
-          *ngIf="openRefImageEnabled() && refImageSelected"
-          type="button"
-          mat-button
-          (click)="loadFilesForDerotation()"
-          class="relatedButtonsSpace button {{
-            nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-          }}"
-          matTooltip="Derotate a selected series of images"
-        >
-          <img src="assets/images/derotate.png" class="stopBatchButton" />
-        </button>
-        <button
-          *ngIf="!openRefImageEnabled() || !refImageSelected"
-          type="button"
-          mat-button
-          disabled
-          class="button_disabled"
-        >
-          <img src="assets/images/derotate.png" class="stopBatchButton" />
-        </button>
-
-        <button
-          *ngIf="openRefImageEnabled() && refImageSelected"
-          type="button"
-          mat-button
-          (click)="stack()"
-          class="relatedButtonsSpace button {{
-            nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-          }}"
-          matTooltip="Stack a selected series of images"
-        >
-          <img src="assets/images/stack.png" class="stopBatchButton" />
-        </button>
-        <button
-          *ngIf="!openRefImageEnabled() || !refImageSelected"
-          type="button"
-          mat-button
-          disabled
-          class="button_disabled"
-        >
-          <img src="assets/images/stack.png" class="stopBatchButton" />
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
 
   <!-- Filter slider tabs -->
   <mat-tab-group class="sliderTabs" selectedIndex="0">
