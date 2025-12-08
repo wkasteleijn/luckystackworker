@@ -149,8 +149,8 @@ class DispersionCorrectionFilter : LSWFilter {
         sourceImagePath: String,
         imagePathTarget: String
     ): String {
-        val coordinates = "0 0 ${width} ${height}"
-        return "-align -file ${sourceImagePath} ${coordinates} -file ${imagePathTarget} ${coordinates} -translation ${width / 2} ${height / 2} ${width / 2} ${height / 2} -hideOutput"
+        val coordinates = "0 0 $width $height"
+        return "-align -file $sourceImagePath $coordinates -file $imagePathTarget $coordinates -translation ${width / 2} ${height / 2} ${width / 2} ${height / 2} -hideOutput"
     }
 
     private fun createTemporaryImageFile(

@@ -558,6 +558,116 @@
       <img src="assets/images/nightmode.png" class="genericButton" />
     </button>
   </div>
+
+  <!-- Batch functions panel -->
+  <mat-card class="card cardColor">
+    <mat-card-content class="batchBar">
+      <div class="sliderRow">
+        <span
+          class="workerLabel {{
+            nightModeEnabled()
+              ? 'sliderRowCategoryTitleColorNight'
+              : 'sliderRowCategoryTitleColor'
+          }}"
+          >Batch</span
+        >
+        <button
+          *ngIf="openRefImageEnabled() && refImageSelected"
+          type="button"
+          mat-button
+          (click)="applyProfileBatch()"
+          class="button {{
+            nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+          }}"
+          matTooltip="Start batch worker to process all {{
+            selectedProfile
+          }} stacks found in the root folder."
+        >
+          <img src="assets/images/startbatch.png" class="startBatchButton" />
+        </button>
+        <button
+          *ngIf="!openRefImageEnabled() || !refImageSelected"
+          type="button"
+          mat-button
+          disabled
+          class="button_disabled"
+        >
+          <img src="assets/images/startbatch.png" class="startBatchButton" />
+        </button>
+
+        <button
+          *ngIf="openRefImageEnabled() && refImageSelected"
+          type="button"
+          mat-button
+          (click)="realtimeEnabledChanged()"
+          class="{{
+            'relatedButtonsSpace buttonZoom connectButton ' +
+              (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+              (realtimeEnabled ? 'Pressed' : '')
+          }}"
+          matTooltip="Connect to stacking software"
+        >
+          <img src="assets/images/connect.png" class="genericButton" />
+        </button>
+        <button
+          *ngIf="!openRefImageEnabled() || !refImageSelected"
+          type="button"
+          mat-button
+          disabled
+          class="relatedButtonsSpace buttonDisabledZoom connectButton"
+          matTooltip="Connect to stacking software"
+        >
+          <img src="assets/images/connect.png" class="genericButton" />
+        </button>
+
+        <button
+          *ngIf="openRefImageEnabled() && refImageSelected"
+          type="button"
+          mat-button
+          (click)="loadFilesForDerotation()"
+          class="relatedButtonsSpace button {{
+            nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+          }}"
+          matTooltip="Derotate a selected series of images"
+        >
+          <img src="assets/images/derotate.png" class="stopBatchButton" />
+        </button>
+        <button
+          *ngIf="!openRefImageEnabled() || !refImageSelected"
+          type="button"
+          mat-button
+          disabled
+          class="button_disabled"
+        >
+          <img src="assets/images/derotate.png" class="stopBatchButton" />
+        </button>
+
+        <button
+          *ngIf="openRefImageEnabled() && refImageSelected"
+          type="button"
+          mat-button
+          (click)="stack()"
+          class="relatedButtonsSpace button {{
+            nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+          }}"
+          matTooltip="Stack a selected series of images"
+        >
+          <img src="assets/images/stack.png" class="stopBatchButton" />
+        </button>
+        <button
+          *ngIf="!openRefImageEnabled() || !refImageSelected"
+          type="button"
+          mat-button
+          disabled
+          class="button_disabled"
+        >
+          <img src="assets/images/stack.png" class="stopBatchButton" />
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Filter slider tabs -->
   <mat-tab-group class="sliderTabs" selectedIndex="0">
     <mat-tab label="Deconv. & Sharpen">
       <!-- Sharpen panel -->
@@ -2261,90 +2371,4 @@
       </div>
     </mat-tab>
   </mat-tab-group>
-
-  <!-- Batch functions panel -->
-  <mat-card class="card cardColor">
-    <mat-card-content class="batchBar">
-      <div class="sliderRow">
-        <span
-          class="workerLabel {{
-            nightModeEnabled()
-              ? 'sliderRowCategoryTitleColorNight'
-              : 'sliderRowCategoryTitleColor'
-          }}"
-          >Batch</span
-        >
-        <button
-          *ngIf="openRefImageEnabled() && refImageSelected"
-          type="button"
-          mat-button
-          (click)="applyProfileBatch()"
-          class="button {{
-            nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-          }}"
-          matTooltip="Start batch worker to process all {{
-            selectedProfile
-          }} stacks found in the root folder."
-        >
-          <img src="assets/images/startbatch.png" class="startBatchButton" />
-        </button>
-        <button
-          *ngIf="!openRefImageEnabled() || !refImageSelected"
-          type="button"
-          mat-button
-          disabled
-          class="button_disabled"
-        >
-          <img src="assets/images/startbatch.png" class="startBatchButton" />
-        </button>
-
-        <button
-          *ngIf="openRefImageEnabled() && refImageSelected"
-          type="button"
-          mat-button
-          (click)="loadFilesForDerotation()"
-          class="relatedButtonsSpace button {{
-            nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-          }}"
-          matTooltip="Derotate a selected series of images"
-        >
-          <img src="assets/images/derotate.png" class="stopBatchButton" />
-        </button>
-        <button
-          *ngIf="!openRefImageEnabled() || !refImageSelected"
-          type="button"
-          mat-button
-          disabled
-          class="button_disabled"
-        >
-          <img src="assets/images/derotate.png" class="stopBatchButton" />
-        </button>
-
-        <button
-          *ngIf="openRefImageEnabled() && refImageSelected"
-          type="button"
-          mat-button
-          (click)="realtimeEnabledChanged()"
-          class="{{
-            'relatedButtonsSpace buttonZoom connectButton ' +
-              (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-              (realtimeEnabled ? 'Pressed' : '')
-          }}"
-          matTooltip="Connect to stacking software"
-        >
-          <img src="assets/images/connect.png" class="genericButton" />
-        </button>
-        <button
-          *ngIf="!openRefImageEnabled() || !refImageSelected"
-          type="button"
-          mat-button
-          disabled
-          class="relatedButtonsSpace buttonDisabledZoom connectButton"
-          matTooltip="Connect to stacking software"
-        >
-          <img src="assets/images/connect.png" class="genericButton" />
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
 </div>
