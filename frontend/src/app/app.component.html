@@ -534,30 +534,6 @@
       *ngIf="openRefImageEnabled() && refImageSelected"
       type="button"
       mat-button
-      (click)="blinkClippedAreasChanged()"
-      class="{{
-        'button3thRow buttonMargin ' +
-          (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-          (blinkClippedAreas ? 'Pressed' : '')
-      }}"
-      matTooltip="Highlight clipped areas"
-    >
-      <img src="assets/images/highlight-clipped.png" class="genericButton" />
-    </button>
-    <button
-      *ngIf="!refImageSelected || !openRefImageEnabled()"
-      type="button"
-      mat-button
-      disabled
-      class="button3thRowDisabled buttonMargin"
-    >
-      <img src="assets/images/highlight-clipped.png" class="genericButton" />
-    </button>
-
-    <button
-      *ngIf="openRefImageEnabled() && refImageSelected"
-      type="button"
-      mat-button
       (click)="nightModeChanged()"
       class="{{
         'button3thRow buttonMargin ' +
@@ -666,6 +642,30 @@
       class="button3thRowDisabled infoButtonMargin"
     >
       <img src="assets/images/save.png" class="saveButton zoomIcon" />
+    </button>
+
+    <button
+      *ngIf="openRefImageEnabled() && refImageSelected"
+      type="button"
+      mat-button
+      (click)="blinkClippedAreasChanged()"
+      class="{{
+        'button3thRow buttonMarginHighlight ' +
+          (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+          (blinkClippedAreas ? 'Pressed' : '')
+      }}"
+      matTooltip="Highlight clipped areas"
+    >
+      <img src="assets/images/highlight-clipped.png" class="genericButton" />
+    </button>
+    <button
+      *ngIf="!refImageSelected || !openRefImageEnabled()"
+      type="button"
+      mat-button
+      disabled
+      class="button3thRowDisabled buttonMarginHighlight"
+    >
+      <img src="assets/images/highlight-clipped.png" class="genericButton" />
     </button>
   </div>
 
