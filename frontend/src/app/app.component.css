@@ -111,7 +111,7 @@
   margin-top: -8px !important;
 }
 .rootFolder {
-  width: 196px;
+  width: 345px;
   margin-left: 6px;
 }
 .dropdown_label {
@@ -127,7 +127,7 @@
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 .bottomButtonContainer {
   margin-top: 8px;
@@ -194,7 +194,7 @@
 }
 .minZoom {
   position: fixed;
-  top: 102px;
+  top: 104px;
   right: 12px;
   z-index: 150;
   height: 38px;
@@ -209,7 +209,7 @@
 }
 
 .roiMargin {
-  margin-left: 52px;
+  margin-left: 40px;
 }
 
 .buttonMargin {
@@ -217,7 +217,7 @@
 }
 
 .buttonMarginHighlight {
-  margin-left: 68px;
+  margin-left: 40px;
 }
 
 .infoButtonMargin {
@@ -493,8 +493,8 @@
   color: rgb(110, 110, 110);
 }
 .winScaleSelector {
-  width: 74px;
+  width: 84px;
 }
 .macScaleSelector {
-  width: 76px;
+  width: 86px;
 }

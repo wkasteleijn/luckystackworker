@@ -83,7 +83,7 @@ body {
   padding-bottom: 10px;
 }
 .button3thRow {
-  margin-top: 12px;
+  margin-top: 8px;
   font-size: 12px;
   border: 0px;
   color: rgb(168, 168, 168);
@@ -94,9 +94,10 @@ body {
   border-radius: 20px;
   padding-top: 10px;
   padding-bottom: 10px;
-  max-height: 42px;
+  max-height: 40px;
 }
 .button3thRowDisabled {
+  margin-top: 9px;
   border: 0px;
   font-size: 12px;
   color: rgb(168, 168, 168);
@@ -104,7 +105,7 @@ body {
   padding-left: 14px;
   padding-right: 14px;
   border-radius: 20px;
-  min-height: 38px;
+  max-height: 40px;
 }
 
 .newVersionButton {
@@ -175,6 +176,7 @@ body {
   border-radius: 20px;
   padding-top: 0px;
   padding-bottom: 0px;
+  min-height: 38px;
 }
 .buttonRevertDisabled {
   border: 0px;
@@ -242,8 +244,8 @@ select:hover {
 }
 
 .card {
-  max-width: 226px;
-  margin-top: 6px;
+  width: 254px;
+  margin-top: 0px;
   color: rgb(168, 168, 168);
 }
 
@@ -260,7 +262,8 @@ select:hover {
 }
 
 .cardColor {
-  background-color: #191919;
+  background-color: rgb(30, 30, 30);
+  border-color: rgb(168, 168, 168) !important ;
   color: rgb(168, 168, 168) !important;
 }
 
