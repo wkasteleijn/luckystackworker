@@ -3,6 +3,7 @@ package nl.wilcokas.luckystackworker.api;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -158,9 +159,13 @@ public class ReferenceController {
     }
 
     @PutMapping("/derotate")
-    public void deRotate(@RequestBody DeRotationDTO deRotationDTO)
-            throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    public void deRotate(@RequestBody DeRotationDTO deRotationDTO) {
         referenceImageService.derotate(new DeRotation(deRotationDTO));
+    }
+
+    @PutMapping("/stack")
+    public void stack(@RequestBody List<String> imageNames) {
+        referenceImageService.stackImages(imageNames);
     }
 
     private boolean asJpeg(File selectedFile) {

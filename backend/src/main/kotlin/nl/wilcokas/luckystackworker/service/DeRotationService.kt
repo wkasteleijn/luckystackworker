@@ -18,6 +18,7 @@ import nl.wilcokas.luckystackworker.util.LswFileUtil
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil
 import nl.wilcokas.luckystackworker.util.LswUtil
 import nl.wilcokas.luckystackworker.util.logger
+import nl.wilcokas.luckystackworker.util.stackImages
 import org.apache.commons.io.FileUtils
 import org.springframework.stereotype.Service
 import java.io.File
@@ -57,8 +58,7 @@ class DeRotationService(
         this._accurateness = accurateness
 
         luckyStackWorkerContext.totalFilesCount =
-            allImagesFilenames.size * 4 // 4 steps * nr of files (pre-sharpening, create transformation files, warp
-        // images, stack images)
+            allImagesFilenames.size * 3 + 1 // 4 steps * nr of files (pre-sharpening, create transformation files, warp. Stacking counts as a single step).
         luckyStackWorkerContext.filesProcessedCount = 0
 
         val referenceImagePath = "${rootFolder}/${referenceImageFilename}"
@@ -96,16 +96,19 @@ class DeRotationService(
                 referenceImageFilename
             )
 
+            log.info("Stacking images")
             stackImages(
-                rootFolder,
                 derotationWorkFolder,
                 referenceImage.getWidth(),
                 referenceImage.getHeight(),
-                allImagesFilenames,
-                referenceImageFilename
+                listOf("${rootFolder}/${referenceImageFilename}") + allImagesFilenames.stream().map { f -> "${derotationWorkFolder}/D_${f}" }
+                    .toList()
             )
+            log.info("Done")
+            increaseProgressCounter("Stacked images")
 
             return "${derotationWorkFolder}/STACK_$referenceImageFilename"
+
         } catch (e: DeRotationStoppedException) {
             log.info("DeRotation was stopped: " + e.message)
             return null
@@ -191,61 +194,6 @@ class DeRotationService(
             )
             copyPixelsFromTo(sourceLayerImage, sourceImage, layer)
         }
-    }
-
-    private fun stackImages(
-        rootFolder: String,
-        derotationWorkFolder: String,
-        width: Int,
-        height: Int,
-        allImagesFilenames: List<String>,
-        referenceImageFilename: String
-    ) {
-        log.info("Stacking warped images")
-        val redPixels = LongArray(width * height)
-        val greenPixels = LongArray(width * height)
-        val bluePixels = LongArray(width * height)
-        for (i in allImagesFilenames.indices) {
-            val imageFilename = allImagesFilenames[i]
-            val image: ImagePlus
-            if (imageFilename == referenceImageFilename) {
-                image = Opener().openImage("${rootFolder}/${referenceImageFilename}")
-            } else {
-                image = Opener().openImage("${derotationWorkFolder}/D_${imageFilename}")
-            }
-            for (y in 0..<height) {
-                for (x in 0..<width) {
-                    val index = y * width + x
-                    redPixels[index] += image.getStack().getProcessor(1).getPixel(x, y).toLong()
-                    greenPixels[index] += image.getStack().getProcessor(2).getPixel(x, y).toLong()
-                    bluePixels[index] += image.getStack().getProcessor(3).getPixel(x, y).toLong()
-                }
-            }
-            increaseProgressCounter("Stacking image ${allImagesFilenames[i]}")
-        }
-        val redPixelsAverages = ShortArray(redPixels.size)
-        val greenPixelsAverages = ShortArray(greenPixels.size)
-        val bluePixelsAverages = ShortArray(bluePixels.size)
-        for (i in redPixels.indices) {
-            redPixelsAverages[i] = (redPixels[i] / allImagesFilenames.size).toShort()
-            greenPixelsAverages[i] = (greenPixels[i] / allImagesFilenames.size).toShort()
-            bluePixelsAverages[i] = (bluePixels[i] / allImagesFilenames.size).toShort()
-        }
-        val layers = arrayOf(redPixelsAverages, greenPixelsAverages, bluePixelsAverages)
-        val lswImageLayers = LswImageLayers(width, height, layers)
-        val stackedImage = LswImageProcessingUtil.create16BitRGBImage(
-            "${derotationWorkFolder}/STACK_${referenceImageFilename}", lswImageLayers, true, true, true
-        )
-        LswFileUtil.saveImage(
-            stackedImage,
-            null,
-            "${derotationWorkFolder}/STACK_${referenceImageFilename}",
-            true,
-            false,
-            false,
-            false
-        )
-        log.info("Done")
     }
 
     private fun copyPixelsFromTo(fromImage: ImagePlus, toImage: ImagePlus, layer: Int) {

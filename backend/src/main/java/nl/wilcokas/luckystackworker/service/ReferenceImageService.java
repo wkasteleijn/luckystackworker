@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ij.ImagePlus;
 import ij.gui.*;
+import ij.io.Opener;
 import ij.process.ColorProcessor;
 import java.awt.Color;
 import java.awt.Component;
@@ -42,6 +43,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.dto.ProfileDTO;
@@ -622,6 +624,25 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                     deRotationService.removeDerotationWorkFolder();
                 },
                 executor);
+    }
+
+    public void stackImages(List<String> imageNames) {
+        if (!imageNames.isEmpty()) {
+            String stackFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "stacks";
+            ImagePlus image = new Opener().openImage(settingsService.getRootFolder() + "/" + imageNames.getFirst());
+            String stackedImagePath = LswKotlinUtilKt.stackImages(
+                    stackFolder,
+                    image.getWidth(),
+                    image.getHeight(),
+                    imageNames.stream()
+                            .map(s -> settingsService.getRootFolder() + "/" + s)
+                            .toList());
+            String profileName = LswFileUtil.deriveProfileFromImageName(stackedImagePath);
+            Profile profile = profileService
+                    .findByName(profileName)
+                    .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
+            openReferenceImage(stackedImagePath, profile, LocalDateTime.now());
+        }
     }
 
     private boolean confirmOverwrite() {
