@@ -20,9 +20,11 @@
 .buttonAboutpanel {
   position: absolute;
   left: 43%;
+  bottom: 16px;
 }
 
 .aboutText {
+  margin-top: -16px;
   margin-left: 32px;
 }
 

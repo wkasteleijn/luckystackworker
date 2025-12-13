@@ -12,8 +12,6 @@ public class Constants {
     public static final String STATUS_IDLE = "Idle";
     public static final String STATUS_WORKING = "Working";
     public static final String DEFAULT_OUTPUT_FORMAT = "tif";
-    public static final int MAX_ROI_X = 1024;
-    public static final int MAX_ROI_Y = 768;
     public static final int LARGE_WINDOW_SIZE = 250000;
     public static final BigDecimal DEFAULT_DENOISE_RADIUS = BigDecimal.valueOf(1);
     public static final BigDecimal DEFAULT_DENOISE_SIGMA = BigDecimal.valueOf(2);
@@ -46,7 +44,7 @@ public class Constants {
     public static final int MINIMUM_WINDOW_WIDTH = 610;
     public static final int ARTIFICIAL_PROGRESS_DELAY = 500;
     public static final int BLINK_CLIPPING_DELAY = 250;
-    public static final int CONTROL_PANEL_WIDTH = 568;
+    public static final int CONTROL_PANEL_WIDTH = 566;
     public static final int MINIMUK_DARK_TRESHOLD = 6144;
     public static final int PSF_SIZE = 64;
     public static final int WAVELENGTH_NM_RED = 630;
@@ -56,5 +54,4 @@ public class Constants {
     public static final int DEFAULT_DEROTATION_ACCURATENESS = 4;
     public static final int DEFAULT_DEROTATION_NOISE_ROBUSTNESS = 2;
     public static final int DEFAULT_DEROTATION_ANCHOR_STRENGTH = 3;
-    public static final int DEROTATION_WAIT_INTERVAL_MILLIS = 250;
 }
