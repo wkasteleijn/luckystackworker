@@ -109,7 +109,7 @@ class DispersionCorrectionFilter : LSWFilter {
 
         // Write R, G and B slices to separate temporary files
         val alignmentWorkFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/alignment"
-        LswFileUtil.createDirectory(alignmentWorkFolder)
+        LswFileUtil.createCleanDirectory(alignmentWorkFolder)
 
         val sourceImagePathRed = createTemporaryImageFile(alignmentWorkFolder, ipRed, R)
         val sourceImagePathGreen = createTemporaryImageFile(alignmentWorkFolder, ipGreen, G)

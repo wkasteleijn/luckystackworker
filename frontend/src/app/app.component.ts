@@ -1952,6 +1952,26 @@ export class AppComponent implements OnInit {
     this.isNotificationVisible = false;
   }
 
+  stackImages() {
+    this.isProgressPanelVisible = true;
+    this.workerStatus = 'Working';
+    this.workerProgress = 0;
+    this.workerBusy = true;
+    this.luckyStackWorkerService.stack().subscribe(
+      (data) => {
+        console.log(data);
+        this.waitForWorker();
+      },
+      (error) => {
+        console.log(error);
+        this.isProgressPanelVisible = false;
+        this.notificationText = 'The following error occured: ' + error;
+        this.isNotificationVisible = true;
+        this.workerBusy = false;
+      }
+    );
+  }
+
   private setSharpenOperationForDeringing() {
     if (this.applyWienerDeconvolution) {
       this.settings.operations = ['WIENER_DECONV'];

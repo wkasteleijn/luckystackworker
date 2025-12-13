@@ -47,6 +47,10 @@ export class LuckyStackWorkerService {
     return this.http.put(`${this.baseUrl}/reference/derotate`, derotation);
   }
 
+  stack(): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/reference/stack`, null);
+  }
+
   exit(): Observable<Object> {
     return this.http.put(`${this.baseUrl}/profiles/exit`, null);
   }

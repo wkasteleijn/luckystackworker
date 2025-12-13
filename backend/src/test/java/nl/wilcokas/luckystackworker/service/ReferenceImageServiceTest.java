@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.time.LocalDateTime;
+
 import nl.wilcokas.luckystackworker.LswConfiguration;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.dto.VersionDTO;
@@ -54,6 +56,9 @@ class ReferenceImageServiceTest {
     private DeRotationService deRotationService;
 
     @Mock
+    private StackService stackService;
+
+    @Mock
     private ObjectMapper snakeCaseObjectMapper;
 
     @InjectMocks
@@ -69,7 +74,8 @@ class ReferenceImageServiceTest {
                 snakeCaseObjectMapper,
                 buildProperties,
                 githubClientService,
-                deRotationService);
+                deRotationService,
+                stackService);
         ReflectionTestUtils.setField(
                 referenceImageService, "snakeCaseObjectMapper", LswConfiguration.createSnakeCaseObjectMapper());
     }
@@ -235,9 +241,9 @@ class ReferenceImageServiceTest {
 
     private void mockServerResponse(String version) {
         when(githubClientService.getAppInfo()).thenReturn(String.format("""
-                                        {
-                                            "tag_name": "v%s",
-                                            "body": "Some random text. ## Release notes\\r\\n- Fixed bug when setting sharpen amount to 0 the next time you start the app it would not work anymore\\r\\n- Fixed bug in the windows startup that only happened for users with a space character in their username\\r\\n- Fixed bug in Bilateral Denoise not able to change values for green and blue channel individually."
-                                        }""", version));
+                {
+                    "tag_name": "v%s",
+                    "body": "Some random text. ## Release notes\\r\\n- Fixed bug when setting sharpen amount to 0 the next time you start the app it would not work anymore\\r\\n- Fixed bug in the windows startup that only happened for users with a space character in their username\\r\\n- Fixed bug in Bilateral Denoise not able to change values for green and blue channel individually."
+                }""", version));
     }
 }

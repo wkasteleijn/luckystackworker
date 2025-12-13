@@ -10,6 +10,7 @@ import ij.ImagePlus;
 import ij.gui.*;
 import ij.io.Opener;
 import ij.process.ColorProcessor;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -39,11 +40,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.dto.ProfileDTO;
@@ -124,6 +125,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private final BuildProperties buildProperties;
     private final GithubClientService githubClientService;
     private final DeRotationService deRotationService;
+    private final StackService stackService;
 
     public ResponseDTO scale(Profile profile) throws IOException {
         this.isLargeImage = openReferenceImage(
@@ -190,9 +192,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         List<FilterEnum> operations = operationValues == null
                 ? emptyList()
                 : operationValues.stream()
-                        .map(operationValue ->
-                                operationValue == null ? null : FilterEnum.valueOf(operationValue.toUpperCase()))
-                        .toList();
+                .map(operationValue ->
+                        operationValue == null ? null : FilterEnum.valueOf(operationValue.toUpperCase()))
+                .toList();
         if (roiSwitched) {
             operations = emptyList();
             roiSwitched = false;
@@ -368,7 +370,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 .build();
         if (settings.getLatestKnownVersionChecked() == null
                 || currentDate.isAfter(
-                        settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
+                settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
             LswVersionNumber latestVersionFromGithub = requestLatestVersion().orElse(null);
             if (latestVersionFromGithub != null
                     && (latestVersionFromGithub.getConvertedVersion() > latestKnowVersion.getConvertedVersion())) {
@@ -429,37 +431,48 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     @Override
-    public void windowOpened(WindowEvent e) {}
+    public void windowOpened(WindowEvent e) {
+    }
 
     @Override
-    public void windowClosing(WindowEvent e) {}
+    public void windowClosing(WindowEvent e) {
+    }
 
     @Override
-    public void windowClosed(WindowEvent e) {}
+    public void windowClosed(WindowEvent e) {
+    }
 
     @Override
-    public void windowIconified(WindowEvent e) {}
+    public void windowIconified(WindowEvent e) {
+    }
 
     @Override
-    public void windowDeiconified(WindowEvent e) {}
+    public void windowDeiconified(WindowEvent e) {
+    }
 
     @Override
-    public void windowActivated(WindowEvent e) {}
+    public void windowActivated(WindowEvent e) {
+    }
 
     @Override
-    public void windowDeactivated(WindowEvent e) {}
+    public void windowDeactivated(WindowEvent e) {
+    }
 
     @Override
-    public void componentResized(ComponentEvent e) {}
+    public void componentResized(ComponentEvent e) {
+    }
 
     @Override
-    public void componentMoved(ComponentEvent e) {}
+    public void componentMoved(ComponentEvent e) {
+    }
 
     @Override
-    public void componentShown(ComponentEvent e) {}
+    public void componentShown(ComponentEvent e) {
+    }
 
     @Override
-    public void componentHidden(ComponentEvent e) {}
+    public void componentHidden(ComponentEvent e) {
+    }
 
     public void updateHistogramMetadata(Profile profile) {
         int[][] rgbHistograms = get16BitRGBHistogram(finalResultImage, 100);
@@ -621,27 +634,50 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
                         openReferenceImage(deRotatedImagePath, profile, LocalDateTime.now());
                     }
-                    deRotationService.removeDerotationWorkFolder();
                 },
                 executor);
     }
 
-    public void stackImages(List<String> imageNames) {
-        if (!imageNames.isEmpty()) {
-            String stackFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "stacks";
-            ImagePlus image = new Opener().openImage(settingsService.getRootFolder() + "/" + imageNames.getFirst());
-            String stackedImagePath = LswKotlinUtilKt.stackImages(
-                    stackFolder,
-                    image.getWidth(),
-                    image.getHeight(),
-                    imageNames.stream()
-                            .map(s -> settingsService.getRootFolder() + "/" + s)
-                            .toList());
-            String profileName = LswFileUtil.deriveProfileFromImageName(stackedImagePath);
-            Profile profile = profileService
-                    .findByName(profileName)
-                    .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
-            openReferenceImage(stackedImagePath, profile, LocalDateTime.now());
+    public void stackImages() {
+        JFileChooser jfc = getJFileChooser(settingsService.getRootFolder());
+        jfc.setMultiSelectionEnabled(true);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
+        jfc.setFileFilter(filter);
+        JFrame frame = getParentFrame();
+        List<String> selectedImages = new ArrayList<>();
+        int returnValue = getFilenameFromDialog(frame, jfc, false);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File[] selectedFiles = jfc.getSelectedFiles();
+            if (selectedFiles.length > 0) {
+                for (File selectedFile : selectedFiles) {
+                    String selectedFilePath = selectedFile.getAbsolutePath();
+                    if (validateSelectedFile(selectedFilePath)) {
+                        selectedImages.add(selectedFile.getAbsolutePath());
+                    }
+                }
+                var executor = Executors.newVirtualThreadPerTaskExecutor();
+                CompletableFuture.runAsync(
+                        () -> {
+                            try {
+                                String stackFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/stacks";
+                                LswFileUtil.createCleanDirectory(stackFolder);
+                                ImagePlus image = new Opener().openImage(selectedImages.getFirst());
+                                String stackedImagePath = stackService.stackImages(
+                                        stackFolder,
+                                        image.getWidth(),
+                                        image.getHeight(),
+                                        selectedImages.stream().map(LswFileUtil::getIJFileFormat).toList());
+                                String profileName = LswFileUtil.deriveProfileFromImageName(stackedImagePath);
+                                Profile profile = profileService
+                                        .findByName(profileName)
+                                        .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
+                                openReferenceImage(stackedImagePath, profile, LocalDateTime.now());
+                            } catch (IOException e) {
+                                log.error("Error stacking images : ", e);
+                            }
+                        },
+                        executor);
+            }
         }
     }
 

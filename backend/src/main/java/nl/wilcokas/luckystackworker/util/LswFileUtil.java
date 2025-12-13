@@ -31,6 +31,7 @@ import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
 import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -578,11 +579,12 @@ public class LswFileUtil {
         saveImage(image, null, dataFolder + "/psf_%s.jpg".formatted(profileName), false, false, true, false);
     }
 
-    public static void createDirectory(String path) throws IOException {
+    public static void createCleanDirectory(String path) throws IOException {
         try {
             Files.createDirectory(Paths.get(path));
         } catch (FileAlreadyExistsException e) {
-            log.warn("Directory {} already existed!", path);
+            log.info("Directory {} already existed, removing all files from it", path);
+            FileUtils.cleanDirectory(new File(path));
         }
     }
 

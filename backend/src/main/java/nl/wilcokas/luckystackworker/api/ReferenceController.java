@@ -164,8 +164,8 @@ public class ReferenceController {
     }
 
     @PutMapping("/stack")
-    public void stack(@RequestBody List<String> imageNames) {
-        referenceImageService.stackImages(imageNames);
+    public void stack() {
+        referenceImageService.stackImages();
     }
 
     private boolean asJpeg(File selectedFile) {

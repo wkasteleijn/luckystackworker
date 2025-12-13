@@ -13,12 +13,10 @@ import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter
 import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode
 import nl.wilcokas.luckystackworker.model.Profile
-import nl.wilcokas.luckystackworker.service.bean.LswImageLayers
 import nl.wilcokas.luckystackworker.util.LswFileUtil
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil
 import nl.wilcokas.luckystackworker.util.LswUtil
 import nl.wilcokas.luckystackworker.util.logger
-import nl.wilcokas.luckystackworker.util.stackImages
 import org.apache.commons.io.FileUtils
 import org.springframework.stereotype.Service
 import java.io.File
@@ -28,7 +26,8 @@ import java.util.*
 class DeRotationService(
     private val lswSharpenFilter: LSWSharpenFilter,
     private val savitzkyGolayFilter: SavitzkyGolayFilter,
-    private val luckyStackWorkerContext: LuckyStackWorkerContext
+    private val luckyStackWorkerContext: LuckyStackWorkerContext,
+    private val stackService: StackService
 ) {
     private val log by logger()
 
@@ -64,7 +63,7 @@ class DeRotationService(
         val referenceImagePath = "${rootFolder}/${referenceImageFilename}"
         val referenceImage = Opener().openImage(referenceImagePath)
         val derotationWorkFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation"
-        LswFileUtil.createDirectory(derotationWorkFolder)
+        LswFileUtil.createCleanDirectory(derotationWorkFolder)
 
         val sharpenedImagePaths: MutableList<String> = ArrayList<String>()
 
@@ -97,7 +96,7 @@ class DeRotationService(
             )
 
             log.info("Stacking images")
-            stackImages(
+            stackService.stackImages(
                 derotationWorkFolder,
                 referenceImage.getWidth(),
                 referenceImage.getHeight(),
@@ -118,11 +117,6 @@ class DeRotationService(
             luckyStackWorkerContext.totalFilesCount = 0
             luckyStackWorkerContext.isProfileBeingApplied = false
         }
-    }
-
-    fun removeDerotationWorkFolder() {
-        val derotationWorkFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation"
-        FileUtils.deleteDirectory(File(derotationWorkFolder))
     }
 
     private fun warpImages(
@@ -354,7 +348,8 @@ fun main(args: Array<String>) {
             return
         }
 
-        DeRotationService(LSWSharpenFilter(), SavitzkyGolayFilter(), LuckyStackWorkerContext())
+        val luckyStackWorkerContext = LuckyStackWorkerContext()
+        DeRotationService(LSWSharpenFilter(), SavitzkyGolayFilter(), luckyStackWorkerContext, StackService(luckyStackWorkerContext))
             .derotate(arguments[0], arguments[1], arguments.subList(2, arguments.size), 4, 2, 4)
     } catch (e: Exception) {
         e.printStackTrace()
