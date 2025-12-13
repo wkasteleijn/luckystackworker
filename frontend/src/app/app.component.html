@@ -85,7 +85,7 @@
       class="{{
         nightModeEnabled() ? 'activeColorNight button' : 'activeColor button'
       }}"
-      matTooltip="Open a 16-bit image stack for processing."
+      matTooltip="Open"
     >
       <img src="assets/images/open.png" class="openButton zoomIcon" />
     </button>
@@ -106,7 +106,7 @@
         [(ngModel)]="openImageMode"
         name="openAs"
         (change)="openImageModeChanged()"
-        matTooltip="Select the desired channel used for opening the image stack."
+        matTooltip="Select channel for opening"
         class="{{
           !refImageSelected || !openRefImageEnabled()
             ? 'channelDropdown dropdownMargin dropdown_disabled'
@@ -127,7 +127,7 @@
         [disabled]="shouldShowSpinner()"
         [(ngModel)]="scale"
         (change)="scaleChanged()"
-        matTooltip="Select the scale used for opening the image stack. The selected scale is not persisted with the object profile."
+        matTooltip="Select scale used for opening"
         class="{{
           'dropdownMargin ' +
             (isRunningOnWindows() ? 'winScaleSelector ' : 'macScaleSelector ') +
@@ -185,7 +185,7 @@
               ? ' dropdown activeColorNight'
               : ' dropdown activeColor')
         }}"
-        matTooltip="Select the object profile"
+        matTooltip="Select  profile"
       >
         <option *ngFor="let profile of profiles" [value]="profile.value">
           {{ profile.viewValue }}
@@ -214,68 +214,6 @@
       matTooltip="Load profile"
     >
       <img src="assets/images/loadprofile.png" class="genericButton" />
-    </button>
-
-    <button
-      *ngIf="openRefImageEnabled() && refImageSelected"
-      type="button"
-      mat-button
-      (click)="channelChanged()"
-      class="{{
-        'buttonChannelSwitcher buttonMargin ' +
-          (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
-      }}"
-      matTooltip="Switch visible channel"
-    >
-      <img
-        *ngIf="visibleChannel === 'RGB'"
-        src="assets/images/rgb.png"
-        class="channelSwitcher"
-      />
-      <img
-        *ngIf="visibleChannel === 'R'"
-        src="assets/images/red.png"
-        class="channelSwitcher"
-      />
-      <img
-        *ngIf="visibleChannel === 'G'"
-        src="assets/images/green.png"
-        class="channelSwitcher"
-      />
-      <img
-        *ngIf="visibleChannel === 'B'"
-        src="assets/images/blue.png"
-        class="channelSwitcher"
-      />
-    </button>
-    <button
-      *ngIf="!openRefImageEnabled() || !refImageSelected"
-      type="button"
-      mat-button
-      disabled
-      class="buttonChannelSwitcherDisabled buttonMargin"
-      matTooltip="Switch channel"
-    >
-      <img
-        *ngIf="visibleChannel === 'RGB'"
-        src="assets/images/rgb.png"
-        class="channelSwitcher"
-      />
-      <img
-        *ngIf="visibleChannel === 'R'"
-        src="assets/images/red.png"
-        class="channelSwitcher"
-      />
-      <img
-        *ngIf="visibleChannel === 'G'"
-        src="assets/images/green.png"
-        class="channelSwitcher"
-      />
-      <img
-        *ngIf="visibleChannel === 'B'"
-        src="assets/images/blue.png"
-        class="channelSwitcher"
-      />
     </button>
 
     <button
@@ -314,7 +252,7 @@
           : 'buttonZoom relatedButtonsSpace activeColor') +
           (isMaximized ? 'Pressed' : '')
       }}"
-      matTooltip="Show image at 100% scale"
+      matTooltip="Show at 100% scale"
     >
       <img src="assets/images/maximize.png" class="genericButton" />
     </button>
@@ -327,56 +265,122 @@
     >
       <img src="assets/images/maximize.png" class="genericButton" />
     </button>
-
-    <button
-      *ngIf="openRefImageEnabled() && refImageSelected"
-      type="button"
-      mat-button
-      (click)="zoomIn()"
-      class="{{
-        (nightModeEnabled()
-          ? 'plusZoom buttonZoom activeColorNight'
-          : 'plusZoom buttonZoom activeColor') + (isZoomedIn() ? 'Pressed' : '')
-      }}"
-      matTooltip="Zoom in"
-    >
-      <img src="assets/images/zoomin.png" class="genericButton" />
-    </button>
-    <button
-      *ngIf="!openRefImageEnabled() || !refImageSelected"
-      type="button"
-      mat-button
-      disabled
-      class="plusZoom buttonDisabledZoom"
-    >
-      <img src="assets/images/zoomin.png" class="genericButton" />
-    </button>
-
-    <button
-      *ngIf="openRefImageEnabled() && refImageSelected"
-      type="button"
-      mat-button
-      (click)="zoomOut()"
-      class="{{
-        (nightModeEnabled()
-          ? 'minZoom buttonZoom relatedButtonsSpace activeColorNight'
-          : 'minZoom buttonZoom relatedButtonsSpace activeColor') +
-          (isZoomedOut() ? 'Pressed' : '')
-      }}"
-      matTooltip="Zoom out"
-    >
-      <img src="assets/images/zoomout.png" class="minZoomButton" />
-    </button>
-    <button
-      *ngIf="!openRefImageEnabled() || !refImageSelected"
-      type="button"
-      mat-button
-      disabled
-      class="minZoom buttonDisabledZoom relatedButtonsSpace"
-    >
-      <img src="assets/images/zoomout.png" class="minZoomButton" />
-    </button>
   </div>
+
+  <!-- Floating buttons -->
+  <div class="verticalSeparator"></div>
+  <button
+    *ngIf="openRefImageEnabled() && refImageSelected"
+    type="button"
+    mat-button
+    (click)="channelChanged()"
+    class="{{
+      'buttonChannelSwitcher buttonMargin ' +
+        (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
+    }}"
+    matTooltip="Switch visible channel"
+  >
+    <img
+      *ngIf="visibleChannel === 'RGB'"
+      src="assets/images/rgb.png"
+      class="channelSwitcher"
+    />
+    <img
+      *ngIf="visibleChannel === 'R'"
+      src="assets/images/red.png"
+      class="channelSwitcher"
+    />
+    <img
+      *ngIf="visibleChannel === 'G'"
+      src="assets/images/green.png"
+      class="channelSwitcher"
+    />
+    <img
+      *ngIf="visibleChannel === 'B'"
+      src="assets/images/blue.png"
+      class="channelSwitcher"
+    />
+  </button>
+  <button
+    *ngIf="!openRefImageEnabled() || !refImageSelected"
+    type="button"
+    mat-button
+    disabled
+    class="buttonChannelSwitcherDisabled buttonMargin"
+    matTooltip="Switch channel"
+  >
+    <img
+      *ngIf="visibleChannel === 'RGB'"
+      src="assets/images/rgb.png"
+      class="channelSwitcher"
+    />
+    <img
+      *ngIf="visibleChannel === 'R'"
+      src="assets/images/red.png"
+      class="channelSwitcher"
+    />
+    <img
+      *ngIf="visibleChannel === 'G'"
+      src="assets/images/green.png"
+      class="channelSwitcher"
+    />
+    <img
+      *ngIf="visibleChannel === 'B'"
+      src="assets/images/blue.png"
+      class="channelSwitcher"
+    />
+  </button>
+
+  <button
+    *ngIf="openRefImageEnabled() && refImageSelected"
+    type="button"
+    mat-button
+    (click)="zoomIn()"
+    class="{{
+      (nightModeEnabled()
+        ? 'plusZoom buttonZoom activeColorNight'
+        : 'plusZoom buttonZoom activeColor') + (isZoomedIn() ? 'Pressed' : '')
+    }}"
+    matTooltip="Zoom in"
+  >
+    <img src="assets/images/zoomin.png" class="genericButton" />
+  </button>
+  <button
+    *ngIf="!openRefImageEnabled() || !refImageSelected"
+    type="button"
+    mat-button
+    disabled
+    class="plusZoom buttonDisabledZoom"
+  >
+    <img src="assets/images/zoomin.png" class="genericButton" />
+  </button>
+
+  <button
+    *ngIf="openRefImageEnabled() && refImageSelected"
+    type="button"
+    mat-button
+    (click)="zoomOut()"
+    class="{{
+      (nightModeEnabled()
+        ? 'minZoom buttonZoom relatedButtonsSpace activeColorNight'
+        : 'minZoom buttonZoom relatedButtonsSpace activeColor') +
+        (isZoomedOut() ? 'Pressed' : '')
+    }}"
+    matTooltip="Zoom out"
+  >
+    <img src="assets/images/zoomout.png" class="minZoomButton" />
+  </button>
+  <button
+    *ngIf="!openRefImageEnabled() || !refImageSelected"
+    type="button"
+    mat-button
+    disabled
+    class="minZoom buttonDisabledZoom relatedButtonsSpace"
+  >
+    <img src="assets/images/zoomout.png" class="minZoomButton" />
+  </button>
+
+  <!-- End floating buttons -->
 
   <div class="button_container_top button_container">
     <button
@@ -442,9 +446,7 @@
             class="button {{
               nightModeEnabled() ? 'activeColorNight' : 'activeColor'
             }}"
-            matTooltip="Start batch worker to process all {{
-              selectedProfile
-            }} stacks found in the root folder."
+            matTooltip="Process {{ selectedProfile }} stacks in root folder"
           >
             <img src="assets/images/startbatch.png" class="startBatchButton" />
           </button>
@@ -491,7 +493,7 @@
             class="relatedButtonsSpace button {{
               nightModeEnabled() ? 'activeColorNight' : 'activeColor'
             }}"
-            matTooltip="Derotate a selected series of images"
+            matTooltip="Derotate images"
           >
             <img src="assets/images/derotate.png" class="stopBatchButton" />
           </button>
@@ -500,7 +502,7 @@
             type="button"
             mat-button
             disabled
-            class="button_disabled"
+            class="relatedButtonsSpace button_disabled"
           >
             <img src="assets/images/derotate.png" class="stopBatchButton" />
           </button>
@@ -513,7 +515,7 @@
             class="relatedButtonsSpace button {{
               nightModeEnabled() ? 'activeColorNight' : 'activeColor'
             }}"
-            matTooltip="Stack a selected series of images"
+            matTooltip="Stack images"
           >
             <img src="assets/images/stack.png" class="stopBatchButton" />
           </button>
@@ -522,7 +524,7 @@
             type="button"
             mat-button
             disabled
-            class="button_disabled"
+            class="relatedButtonsSpace button_disabled"
           >
             <img src="assets/images/stack.png" class="stopBatchButton" />
           </button>
@@ -630,7 +632,7 @@
       class="button3thRow infoButtonMargin {{
         nightModeEnabled() ? 'activeColorNight' : 'activeColor'
       }}"
-      matTooltip="This will save the currently open stack with all applied the post-processing. You can save it as a 16-bit TIFF or a 100% quality JPG. To do so add the applicable extension to the filename (filename.tif, filename.jpg)."
+      matTooltip="Save"
     >
       <img src="assets/images/save.png" class="saveButton zoomIcon" />
     </button>

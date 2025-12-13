@@ -111,8 +111,8 @@
   margin-top: -8px !important;
 }
 .rootFolder {
-  width: 345px;
-  margin-left: 6px;
+  width: 354px;
+  margin-left: 8px;
 }
 .dropdown_label {
   color: rgb(168, 168, 168);
@@ -167,7 +167,7 @@
 }
 
 .relatedButtonsSpace {
-  margin-left: 6px;
+  margin-left: 8px;
 }
 
 .profileSelectorSpace {
@@ -188,14 +188,14 @@
 .plusZoom {
   position: fixed;
   top: 54px;
-  right: 12px;
+  right: 16px;
   z-index: 100;
   height: 38px;
 }
 .minZoom {
   position: fixed;
   top: 104px;
-  right: 12px;
+  right: 16px;
   z-index: 150;
   height: 38px;
   width: 39px;
@@ -209,19 +209,19 @@
 }
 
 .roiMargin {
-  margin-left: 40px;
+  margin-left: 21px;
 }
 
 .buttonMargin {
-  margin-left: 6px;
+  margin-left: 8px;
 }
 
 .buttonMarginHighlight {
-  margin-left: 40px;
+  margin-left: 22px;
 }
 
 .infoButtonMargin {
-  margin-left: 4px;
+  margin-left: 8px;
 }
 
 .colorNewversion {
@@ -404,7 +404,7 @@
   top: 368px;
 }
 .dropdownMargin {
-  margin-left: 6px;
+  margin-left: 8px;
 }
 .channelDropdown {
   width: 88px;
@@ -497,4 +497,20 @@
 }
 .macScaleSelector {
   width: 86px;
+}
+
+.verticalSeparator {
+  position: fixed;
+  top: 8px;
+  right: 116px;
+  z-index: 100;
+  width: 2px;
+  height: 134px;
+  background-color: #404040;
+}
+
+/* Optional: If you are using flexbox for the button-group */
+.button-group {
+  display: flex;
+  align-items: center;
 }

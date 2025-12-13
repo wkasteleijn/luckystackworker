@@ -2,6 +2,7 @@ package nl.wilcokas.luckystackworker.service;
 
 import static java.util.Collections.*;
 import static nl.wilcokas.luckystackworker.constants.Constants.MAX_RELEASE_NOTES_SHOWN;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.createCleanDirectory;
 import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.get16BitRGBHistogram;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -660,7 +661,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                         () -> {
                             try {
                                 String stackFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/stacks";
-                                LswFileUtil.createCleanDirectory(stackFolder);
+                                createCleanDirectory(stackFolder);
                                 ImagePlus image = new Opener().openImage(selectedImages.getFirst());
                                 String stackedImagePath = stackService.stackImages(
                                         stackFolder,
