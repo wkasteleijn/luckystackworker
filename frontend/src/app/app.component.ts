@@ -1302,6 +1302,7 @@ export class AppComponent implements OnInit {
   dispersionCorrectionClicked(direction: string, color: string) {
     console.log('dispersionCorrectionClicked called: ' + direction);
     this.settings.operations = ['DISPERSION'];
+    const roundOneDecimal = (val: number) => Math.round(val * 10) / 10;
     if (color === 'RED') {
       switch (direction) {
         case 'LEFT-UP':
@@ -1366,6 +1367,12 @@ export class AppComponent implements OnInit {
           break;
       }
     }
+    this.profile.dispersionCorrectionRedX = roundOneDecimal(
+      this.profile.dispersionCorrectionRedX
+    );
+    this.profile.dispersionCorrectionRedY = roundOneDecimal(
+      this.profile.dispersionCorrectionRedY
+    );
     this.updateProfile();
   }
 

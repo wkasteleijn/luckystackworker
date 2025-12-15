@@ -394,14 +394,14 @@
 }
 .dispersionIndicators {
   position: fixed;
-  width: 40px;
+  width: 52px;
   z-index: 100;
-  top: 368px;
-  left: 468px;
+  top: 428px;
+  left: 444px;
 }
 .dispersionIndicatorBlue {
-  left: 508px;
-  top: 368px;
+  left: 498px;
+  top: 428px;
 }
 .dropdownMargin {
   margin-left: 8px;

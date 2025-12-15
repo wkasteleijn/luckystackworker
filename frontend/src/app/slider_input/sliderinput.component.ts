@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
-import { MatLegacyDialog } from '@angular/material/legacy-dialog';
 
 @Component({
   selector: 'app-sliderinput',
