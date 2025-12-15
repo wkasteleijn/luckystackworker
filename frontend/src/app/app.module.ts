@@ -23,6 +23,7 @@ import { ProgressPanelComponent } from './progresspanel/progresspanel.component'
 import { SyntheticPsfComponent } from './psf/synthetic.psf.component';
 import { RotationComponent } from './rotate/rotation.component';
 import { SliderComponent } from './slider/slider.component';
+import { SliderInputComponent } from './slider_input/sliderinput.component';
 
 import {
   BrowserAnimationsModule,
@@ -45,6 +46,7 @@ import { ConfirmationComponent } from './confirmation/confirmation.component';
     NewVersionComponent,
     SliderComponent,
     NotificationComponent,
+    SliderInputComponent,
   ],
   imports: [
     BrowserModule,

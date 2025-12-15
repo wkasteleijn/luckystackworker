@@ -827,15 +827,15 @@
             max="100"
             (input)="clippingSuppressionChanged($event, false)"
             (change)="clippingSuppressionChanged($event, true)"
-            [(ngModel)]="clippingSuppression"
+            [value]="clippingSuppression"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ clippingSuppression }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ clippingSuppression == 0 ? "Off" : "" }}</span
-          >
+          <app-sliderinput
+            [sliderInputValue]="clippingSuppression"
+            sliderInputMinValue="0"
+            sliderInputMaxValue="100"
+            (sliderInputValueChanged)="clippingSuppressionChanged($event, true)"
+          />
         </div>
       </div>
 
@@ -853,7 +853,12 @@
               [(ngModel)]="wienerIterations"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel">{{ wienerIterations }}</span>
+            <app-sliderinput
+              [sliderInputValue]="wienerIterations"
+              sliderInputMinValue="1"
+              sliderInputMaxValue="40"
+              (sliderInputValueChanged)="wienerIterationsChanged($event, true)"
+            />
           </div>
         </div>
       </span>
@@ -872,7 +877,12 @@
               [(ngModel)]="radius"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel">{{ radius }}</span>
+            <app-sliderinput
+              [sliderInputValue]="radius"
+              sliderInputMinValue="0.5"
+              sliderInputMaxValue="4"
+              (sliderInputValueChanged)="radiusChanged($event, true)"
+            />
           </div>
         </div>
         <div class="sliderRow">
@@ -888,7 +898,12 @@
               [(ngModel)]="amount"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel">{{ amount }}</span>
+            <app-sliderinput
+              [sliderInputValue]="amount"
+              sliderInputMinValue="0"
+              sliderInputMaxValue="9999"
+              (sliderInputValueChanged)="amountChanged($event, true)"
+            />
           </div>
         </div>
         <div class="sliderRow">
@@ -905,7 +920,12 @@
               [(ngModel)]="iterations"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel">{{ iterations }}</span>
+            <app-sliderinput
+              [sliderInputValue]="iterations"
+              sliderInputMinValue="1"
+              sliderInputMaxValue="10"
+              (sliderInputValueChanged)="iterationsChanged($event, true)"
+            />
           </div>
         </div>
       </span>
@@ -924,7 +944,12 @@
             [(ngModel)]="blendRaw"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ blendRaw }}</span>
+          <app-sliderinput
+            [sliderInputValue]="blendRaw"
+            sliderInputMinValue="0"
+            sliderInputMaxValue="100"
+            (sliderInputValueChanged)="blendRawChanged($event, true)"
+          />
         </div>
       </div>
 
@@ -974,7 +999,12 @@
               [(ngModel)]="clippingStrength"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel">{{ clippingStrength }}</span>
+            <app-sliderinput
+              [sliderInputValue]="clippingStrength"
+              sliderInputMinValue="1"
+              sliderInputMaxValue="100"
+              (sliderInputValueChanged)="clippingStrengthChanged($event, true)"
+            />
           </div>
         </div>
         <div class="sliderRow">
@@ -995,12 +1025,12 @@
               [(ngModel)]="clippingRange"
               [color]="colorTheme()"
             ></mat-slider>
-            <span
-              class="{{
-                clippingStrength === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
-              }}"
-              >{{ clippingRange }}</span
-            >
+            <app-sliderinput
+              [sliderInputValue]="clippingRange"
+              sliderInputMinValue="1"
+              sliderInputMaxValue="100"
+              (sliderInputValueChanged)="clippingRangeChanged($event, true)"
+            />
           </div>
         </div>
       </div>
@@ -1020,12 +1050,12 @@
               [(ngModel)]="deringStrength"
               [color]="colorTheme()"
             ></mat-slider>
-            <span
-              class="{{
-                deringStrength === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
-              }}"
-              >{{ deringStrength }}</span
-            >
+            <app-sliderinput
+              [sliderInputValue]="deringStrength"
+              sliderInputMinValue="1"
+              sliderInputMaxValue="100"
+              (sliderInputValueChanged)="deringStrengthChanged($event, true)"
+            />
           </div>
         </div>
         <div class="sliderRow">
@@ -1044,12 +1074,12 @@
               [(ngModel)]="deringRadius"
               [color]="colorTheme()"
             ></mat-slider>
-            <span
-              class="{{
-                deringRadius === 0 ? 'sliderLabelDisabled' : 'sliderLabel'
-              }}"
-              >{{ deringRadius }}</span
-            >
+            <app-sliderinput
+              [sliderInputValue]="deringRadius"
+              sliderInputMinValue="1"
+              sliderInputMaxValue="100"
+              (sliderInputValueChanged)="deringRadiusChanged($event, true)"
+            />
           </div>
         </div>
       </div>
@@ -1101,12 +1131,12 @@
               [(ngModel)]="denoise1Amount"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel">{{ denoise1Amount }}</span>
-            <span
-              *ngIf="refImageSelected"
-              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-              >{{ denoise1Amount == 0 ? "Off" : "" }}</span
-            >
+            <app-sliderinput
+              [sliderInputValue]="denoise1Amount"
+              sliderInputMinValue="0"
+              sliderInputMaxValue="100"
+              (sliderInputValueChanged)="denoise1AmountChanged($event, true)"
+            />
           </div>
         </div>
 
@@ -1124,7 +1154,12 @@
               [(ngModel)]="denoise1Radius"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel">{{ denoise1Radius }}</span>
+            <app-sliderinput
+              [sliderInputValue]="denoise1Radius"
+              sliderInputMinValue="0.5"
+              sliderInputMaxValue="4"
+              (sliderInputValueChanged)="denoise1RadiusChanged($event, true)"
+            />
           </div>
         </div>
 
@@ -1142,48 +1177,14 @@
               [(ngModel)]="denoise1Iterations"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel">{{ denoise1Iterations }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div *ngIf="denoiseAlgorithm1 === 'ROF'">
-        <div class="sliderRow">
-          <div class="sliderLabel">Theta</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              step="10"
-              min="10"
-              max="1000"
-              (input)="rofThetaChanged($event, false)"
-              (change)="rofThetaChanged($event, true)"
-              [(ngModel)]="rofTheta"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <span class="sliderLabel">{{ rofTheta }}</span>
-            <span
-              *ngIf="refImageSelected"
-              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-              >{{ rofTheta == 0 ? "Off" : "" }}</span
-            >
-          </div>
-        </div>
-
-        <div class="sliderRow">
-          <div class="sliderLabel">Iterations</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              step="1"
-              min="2"
-              max="20"
-              (input)="rofIterationsChanged($event, false)"
-              (change)="rofIterationsChanged($event, true)"
-              [(ngModel)]="rofIterations"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <span class="sliderLabel">{{ rofIterations }}</span>
+            <app-sliderinput
+              [sliderInputValue]="denoise1Radius"
+              sliderInputMinValue="1"
+              sliderInputMaxValue="10"
+              (sliderInputValueChanged)="
+                denoise1IterationsChanged($event, true)
+              "
+            />
           </div>
         </div>
       </div>
@@ -1202,12 +1203,14 @@
               [(ngModel)]="bilateralSigmaColor"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel">{{ bilateralSigmaColor }}</span>
-            <span
-              *ngIf="refImageSelected"
-              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-              >{{ bilateralSigmaColor == 0 ? "Off" : "" }}</span
-            >
+            <app-sliderinput
+              [sliderInputValue]="bilateralSigmaColor"
+              sliderInputMinValue="1"
+              sliderInputMaxValue="1000"
+              (sliderInputValueChanged)="
+                bilateralSigmaColorChanged($event, true)
+              "
+            />
           </div>
         </div>
         <div class="sliderRow">
@@ -1223,12 +1226,12 @@
               [(ngModel)]="bilateralRadius"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel">{{ bilateralRadius }}</span>
-            <span
-              *ngIf="refImageSelected"
-              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-              >{{ bilateralRadius == 0 ? "Off" : "" }}</span
-            >
+            <app-sliderinput
+              [sliderInputValue]="bilateralRadius"
+              sliderInputMinValue="1"
+              sliderInputMaxValue="5"
+              (sliderInputValueChanged)="bilateralRadiusChanged($event, true)"
+            />
           </div>
         </div>
         <div class="sliderRow">
@@ -1244,12 +1247,14 @@
               [(ngModel)]="bilateralIterations"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel">{{ bilateralIterations }}</span>
-            <span
-              *ngIf="refImageSelected"
-              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-              >{{ bilateralIterations == 0 ? "Off" : "" }}</span
-            >
+            <app-sliderinput
+              [sliderInputValue]="bilateralIterations"
+              sliderInputMinValue="1"
+              sliderInputMaxValue="10"
+              (sliderInputValueChanged)="
+                bilateralIterationsChanged($event, true)
+              "
+            />
           </div>
         </div>
       </div>
@@ -1338,19 +1343,14 @@
               [(ngModel)]="savitzkyGolayAmount"
               [color]="colorTheme()"
             ></mat-slider>
-            <span
-              class="{{
-                savitzkyGolaySize === '0'
-                  ? 'sliderLabelDisabled'
-                  : 'sliderLabel'
-              }}"
-              >{{ savitzkyGolayAmount }}</span
-            >
-            <span
-              *ngIf="refImageSelected"
-              class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-              >{{ savitzkyGolayAmount == 0 ? "Off" : "" }}</span
-            >
+            <app-sliderinput
+              [sliderInputValue]="savitzkyGolayAmount"
+              sliderInputMinValue="1"
+              sliderInputMaxValue="100"
+              (sliderInputValueChanged)="
+                savitzkyGolayAmountChanged($event, true)
+              "
+            />
           </div>
         </div>
 
@@ -1378,14 +1378,14 @@
               [(ngModel)]="savitzkyGolayIterations"
               [color]="colorTheme()"
             ></mat-slider>
-            <span
-              class="{{
-                savitzkyGolaySize === '0'
-                  ? 'sliderLabelDisabled'
-                  : 'sliderLabel'
-              }}"
-              >{{ savitzkyGolayIterations }}</span
-            >
+            <app-sliderinput
+              [sliderInputValue]="savitzkyGolayIterations"
+              sliderInputMinValue="1"
+              sliderInputMaxValue="10"
+              (sliderInputValueChanged)="
+                savitzkyGolayIterationsChanged($event, true)
+              "
+            />
           </div>
         </div>
       </div>
@@ -1405,7 +1405,12 @@
               [(ngModel)]="denoise2Radius"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel">{{ denoise2Radius }}</span>
+            <app-sliderinput
+              [sliderInputValue]="denoise2Radius"
+              sliderInputMinValue="0.5"
+              sliderInputMaxValue="4"
+              (sliderInputValueChanged)="denoise2RadiusChanged($event, true)"
+            />
           </div>
         </div>
 
@@ -1423,7 +1428,14 @@
               [(ngModel)]="denoise2Iterations"
               [color]="colorTheme()"
             ></mat-slider>
-            <span class="sliderLabel">{{ denoise2Iterations }}</span>
+            <app-sliderinput
+              [sliderInputValue]="denoise2Iterations"
+              sliderInputMinValue="1"
+              sliderInputMaxValue="10"
+              (sliderInputValueChanged)="
+                denoise2IterationsChanged($event, true)
+              "
+            />
           </div>
         </div>
       </div>
@@ -1484,12 +1496,12 @@
             [(ngModel)]="localContrastFine"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ localContrastFine }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ localContrastFine == 0 ? "Off" : "" }}</span
-          >
+          <app-sliderinput
+            [sliderInputValue]="localContrastFine"
+            sliderInputMinValue="0"
+            sliderInputMaxValue="99"
+            (sliderInputValueChanged)="localContrastFineChanged($event, true)"
+          />
         </div>
       </div>
       <div class="sliderRow">
@@ -1505,12 +1517,12 @@
             [(ngModel)]="localContrastMedium"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ localContrastMedium }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ localContrastMedium == 0 ? "Off" : "" }}</span
-          >
+          <app-sliderinput
+            [sliderInputValue]="localContrastMedium"
+            sliderInputMinValue="0"
+            sliderInputMaxValue="99"
+            (sliderInputValueChanged)="localContrastMediumChanged($event, true)"
+          />
         </div>
       </div>
       <div class="sliderRow">
@@ -1526,12 +1538,12 @@
             [(ngModel)]="localContrastLarge"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ localContrastLarge }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ localContrastLarge == 0 ? "Off" : "" }}</span
-          >
+          <app-sliderinput
+            [sliderInputValue]="localContrastLarge"
+            sliderInputMinValue="0"
+            sliderInputMaxValue="99"
+            (sliderInputValueChanged)="localContrastLargeChanged($event, true)"
+          />
         </div>
       </div>
       <div class="sliderRow sliderRowLight">
@@ -1567,12 +1579,12 @@
             [(ngModel)]="gamma"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ gamma }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ gamma == 1 ? "Off" : "" }}</span
-          >
+          <app-sliderinput
+            [sliderInputValue]="gamma"
+            sliderInputMinValue="0.0"
+            sliderInputMaxValue="2.0"
+            (sliderInputValueChanged)="gammaChanged($event, true)"
+          />
         </div>
       </div>
 
@@ -1589,12 +1601,12 @@
             [(ngModel)]="contrast"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ contrast }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ contrast == 0 ? "Off" : "" }}</span
-          >
+          <app-sliderinput
+            [sliderInputValue]="contrast"
+            sliderInputMinValue="0"
+            sliderInputMaxValue="100"
+            (sliderInputValueChanged)="contrastChanged($event, true)"
+          />
         </div>
       </div>
 
@@ -1611,12 +1623,12 @@
             [(ngModel)]="brightness"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ brightness }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ brightness == 0 ? "Off" : "" }}</span
-          >
+          <app-sliderinput
+            [sliderInputValue]="brightness"
+            sliderInputMinValue="-100"
+            sliderInputMaxValue="100"
+            (sliderInputValueChanged)="brightnessChanged($event, true)"
+          />
         </div>
       </div>
 
@@ -1633,12 +1645,12 @@
             [(ngModel)]="lightness"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ lightness }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ lightness == 0 ? "Off" : "" }}</span
-          >
+          <app-sliderinput
+            [sliderInputValue]="lightness"
+            sliderInputMinValue="-100"
+            sliderInputMaxValue="100"
+            (sliderInputValueChanged)="lightnessChanged($event, true)"
+          />
         </div>
       </div>
 
@@ -1655,12 +1667,12 @@
             [(ngModel)]="background"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ background }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ background == 0 ? "Off" : "" }}</span
-          >
+          <app-sliderinput
+            [sliderInputValue]="background"
+            sliderInputMinValue="0"
+            sliderInputMaxValue="100"
+            (sliderInputValueChanged)="backgroundChanged($event, true)"
+          />
         </div>
       </div>
     </mat-tab>
@@ -1689,12 +1701,12 @@
             [(ngModel)]="saturation"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ saturation }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ saturation == 1 ? "Off" : "" }}</span
-          >
+          <app-sliderinput
+            [sliderInputValue]="saturation"
+            sliderInputMinValue="1.00"
+            sliderInputMaxValue="5.00"
+            (sliderInputValueChanged)="saturationChanged($event, true)"
+          />
         </div>
       </div>
       <div class="sliderRow">
@@ -1710,12 +1722,12 @@
             [(ngModel)]="purple"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ purple }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ purple == 0 ? "Off" : "" }}</span
-          >
+          <app-sliderinput
+            [sliderInputValue]="purple"
+            sliderInputMinValue="0"
+            sliderInputMaxValue="255"
+            (sliderInputValueChanged)="purpleChanged($event, true)"
+          />
         </div>
       </div>
 
@@ -1779,12 +1791,12 @@
             [(ngModel)]="red"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ red }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ red == 0 ? "Off" : "" }}</span
-          >
+          <app-sliderinput
+            [sliderInputValue]="red"
+            sliderInputMinValue="-100"
+            sliderInputMaxValue="100"
+            (sliderInputValueChanged)="redChanged($event, true)"
+          />
         </div>
       </div>
       <div class="sliderRow">
@@ -1800,12 +1812,12 @@
             [(ngModel)]="green"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ green }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ green == 0 ? "Off" : "" }}</span
-          >
+          <app-sliderinput
+            [sliderInputValue]="green"
+            sliderInputMinValue="-100"
+            sliderInputMaxValue="100"
+            (sliderInputValueChanged)="greenChanged($event, true)"
+          />
         </div>
       </div>
       <div class="sliderRow">
@@ -1821,12 +1833,12 @@
             [(ngModel)]="blue"
             [color]="colorTheme()"
           ></mat-slider>
-          <span class="sliderLabel">{{ blue }}</span>
-          <span
-            *ngIf="refImageSelected"
-            class="{{ nightMode ? 'modeLabelNight' : 'modeLabel' }}"
-            >{{ blue == 0 ? "Off" : "" }}</span
-          >
+          <app-sliderinput
+            [sliderInputValue]="blue"
+            sliderInputMinValue="-100"
+            sliderInputMaxValue="100"
+            (sliderInputValueChanged)="blueChanged($event, true)"
+          />
         </div>
       </div>
 
