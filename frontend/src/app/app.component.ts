@@ -1575,6 +1575,7 @@ export class AppComponent implements OnInit {
     this.applyWienerDeconvolution = this.profile.applyWienerDeconvolution;
     this.wienerIterations = this.profile.wienerIterations;
     this.clippingSuppression = this.profile.clippingSuppression;
+    this.dispersionCorrectionEnabled = this.profile.dispersionCorrectionEnabled;
     this.setNonPersistentSettings();
   }
 
@@ -1586,7 +1587,6 @@ export class AppComponent implements OnInit {
   }
 
   private setNonPersistentSettings() {
-    this.dispersionCorrectionEnabled = false;
     this.luminanceIncludeRed = true;
     this.luminanceIncludeGreen = true;
     this.luminanceIncludeBlue = true;
@@ -2088,6 +2088,7 @@ export class AppComponent implements OnInit {
     this.profile.dispersionCorrectionEnabled = false;
 
     this.selectedProfile = this.profile.name;
+    this.settings.operations = [];
     this.updateProfileSettings();
     this.updateProfile();
   }

@@ -164,7 +164,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 } else {
                     log.info("Profile file found, profile was loaded from there.");
                 }
-                LswImageProcessingUtil.setNonPersistentSettings(profile, scale, openImageMode);
+                LswImageProcessingUtil.setNonPersistentSettings(profile, scale, openImageMode, false);
                 profileService.updateProfile(new ProfileDTO(profile));
 
                 isLargeImage =
