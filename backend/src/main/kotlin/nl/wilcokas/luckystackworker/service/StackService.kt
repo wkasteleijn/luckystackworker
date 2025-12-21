@@ -11,82 +11,79 @@ import nl.wilcokas.luckystackworker.util.logger
 import org.springframework.stereotype.Service
 
 @Service
-class StackService(
-    private val luckyStackWorkerContext: LuckyStackWorkerContext
-) {
+class StackService(private val luckyStackWorkerContext: LuckyStackWorkerContext) {
 
-    private val log by logger()
+  private val log by logger()
 
-    fun stackImages(
-        workFolder: String,
-        width: Int,
-        height: Int,
-        imagesFilePaths: List<String>
-    ): String {
-        try {
-            luckyStackWorkerContext.totalFilesCount = imagesFilePaths.size
-            luckyStackWorkerContext.filesProcessedCount = 0
+  fun stackImages(
+      workFolder: String,
+      width: Int,
+      height: Int,
+      imagesFilePaths: List<String>,
+  ): String {
+    try {
+      luckyStackWorkerContext.totalFilesCount = imagesFilePaths.size
+      luckyStackWorkerContext.filesProcessedCount = 0
 
-            val redPixels = LongArray(width * height)
-            val greenPixels = LongArray(width * height)
-            val bluePixels = LongArray(width * height)
-            for (i in imagesFilePaths.indices) {
-                val image = Opener().openImage(imagesFilePaths[i])
-                val redIP = image.getStack().getProcessor(1)
-                val greenLayerIndex = if (image.stackSize == 1) 1 else 2
-                val blueLayerIndex = if (image.stackSize == 1) 1 else 3
-                val greenIP = image.getStack().getProcessor(greenLayerIndex)
-                val blueIP = image.getStack().getProcessor(blueLayerIndex)
-                for (y in 0..<height) {
-                    for (x in 0..<width) {
-                        val index = y * width + x
-                        redPixels[index] += redIP.getPixel(x, y).toLong()
-                        greenPixels[index] += greenIP.getPixel(x, y).toLong()
-                        bluePixels[index] += blueIP.getPixel(x, y).toLong()
-                    }
-                }
-                increaseProgressCounter("Stacking image ${LswFileUtil.getFilenameFromPath(imagesFilePaths[i])}")
-            }
-            val redPixelsAverages = ShortArray(redPixels.size)
-            val greenPixelsAverages = ShortArray(greenPixels.size)
-            val bluePixelsAverages = ShortArray(bluePixels.size)
-            for (i in redPixels.indices) {
-                redPixelsAverages[i] = (redPixels[i] / imagesFilePaths.size).toShort()
-                greenPixelsAverages[i] = (greenPixels[i] / imagesFilePaths.size).toShort()
-                bluePixelsAverages[i] = (bluePixels[i] / imagesFilePaths.size).toShort()
-            }
-            val layers = arrayOf(redPixelsAverages, greenPixelsAverages, bluePixelsAverages)
-            val lswImageLayers = LswImageLayers(width, height, layers)
-            val referenceImageFilename = LswFileUtil.getFilenameFromPath(imagesFilePaths[0])
-            val stackedImage = LswImageProcessingUtil.create16BitRGBImage(
-                "${workFolder}/STACK_${referenceImageFilename}", lswImageLayers, true, true, true
-            )
-            val stackedImagePath = "${workFolder}/STACK_${referenceImageFilename}";
-            LswFileUtil.saveImage(
-                stackedImage,
-                null,
-                stackedImagePath,
-                true,
-                false,
-                false,
-                false
-            )
-            return stackedImagePath
-        } finally {
-            luckyStackWorkerContext.status = STATUS_IDLE
-            luckyStackWorkerContext.filesProcessedCount = 0
-            luckyStackWorkerContext.totalFilesCount = 0
-            luckyStackWorkerContext.isProfileBeingApplied = false
+      val redPixels = LongArray(width * height)
+      val greenPixels = LongArray(width * height)
+      val bluePixels = LongArray(width * height)
+      for (i in imagesFilePaths.indices) {
+        val image = Opener().openImage(imagesFilePaths[i])
+        val redIP = image.getStack().getProcessor(1)
+        val greenLayerIndex = if (image.stackSize == 1) 1 else 2
+        val blueLayerIndex = if (image.stackSize == 1) 1 else 3
+        val greenIP = image.getStack().getProcessor(greenLayerIndex)
+        val blueIP = image.getStack().getProcessor(blueLayerIndex)
+        for (y in 0..<height) {
+          for (x in 0..<width) {
+            val index = y * width + x
+            redPixels[index] += redIP.getPixel(x, y).toLong()
+            greenPixels[index] += greenIP.getPixel(x, y).toLong()
+            bluePixels[index] += blueIP.getPixel(x, y).toLong()
+          }
         }
+        increaseProgressCounter(
+            "Stacking image ${LswFileUtil.getFilenameFromPath(imagesFilePaths[i])}"
+        )
+      }
+      val redPixelsAverages = ShortArray(redPixels.size)
+      val greenPixelsAverages = ShortArray(greenPixels.size)
+      val bluePixelsAverages = ShortArray(bluePixels.size)
+      for (i in redPixels.indices) {
+        redPixelsAverages[i] = (redPixels[i] / imagesFilePaths.size).toShort()
+        greenPixelsAverages[i] = (greenPixels[i] / imagesFilePaths.size).toShort()
+        bluePixelsAverages[i] = (bluePixels[i] / imagesFilePaths.size).toShort()
+      }
+      val layers = arrayOf(redPixelsAverages, greenPixelsAverages, bluePixelsAverages)
+      val lswImageLayers = LswImageLayers(width, height, layers)
+      val referenceImageFilename = LswFileUtil.getFilenameFromPath(imagesFilePaths[0])
+      val stackedImage =
+          LswImageProcessingUtil.create16BitRGBImage(
+              "${workFolder}/STACK_${referenceImageFilename}",
+              lswImageLayers,
+              true,
+              true,
+              true,
+          )
+      val stackedImagePath = "${workFolder}/STACK_${referenceImageFilename}"
+      LswFileUtil.saveImage(stackedImage, null, stackedImagePath, true, false, false, false)
+      return stackedImagePath
+    } finally {
+      luckyStackWorkerContext.status = STATUS_IDLE
+      luckyStackWorkerContext.filesProcessedCount = 0
+      luckyStackWorkerContext.totalFilesCount = 0
+      luckyStackWorkerContext.isProfileBeingApplied = false
     }
+  }
 
-    private fun increaseProgressCounter(statusMessage: String) {
-        log.info(statusMessage)
-        luckyStackWorkerContext.filesProcessedCount += 1
-        luckyStackWorkerContext.status = statusMessage
-        if (luckyStackWorkerContext.isWorkerStopped) {
-            luckyStackWorkerContext.isWorkerStopped = false
-            throw DeRotationStoppedException("Stacking was stooped")
-        }
+  private fun increaseProgressCounter(statusMessage: String) {
+    log.info(statusMessage)
+    luckyStackWorkerContext.filesProcessedCount += 1
+    luckyStackWorkerContext.status = statusMessage
+    if (luckyStackWorkerContext.isWorkerStopped) {
+      luckyStackWorkerContext.isWorkerStopped = false
+      throw DeRotationStoppedException("Stacking was stooped")
     }
+  }
 }

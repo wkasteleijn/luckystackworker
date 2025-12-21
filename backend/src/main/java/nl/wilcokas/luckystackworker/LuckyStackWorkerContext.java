@@ -2,8 +2,6 @@ package nl.wilcokas.luckystackworker;
 
 import ij.gui.Roi;
 import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.Setter;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.dto.StatusUpdateDTO;
 import org.springframework.stereotype.Component;

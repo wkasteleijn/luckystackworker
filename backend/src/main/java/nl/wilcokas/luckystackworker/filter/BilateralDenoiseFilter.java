@@ -136,7 +136,7 @@ public class BilateralDenoiseFilter implements LSWFilter {
 
         BilateralDenoiseFilter filter = new BilateralDenoiseFilter();
         Profile profile = new Profile();
-                profile.setBilateralRadius(2);
+        profile.setBilateralRadius(2);
         profile.setBilateralIterations(1);
         profile.setBilateralSigmaColor(25000);
         profile.setBilateralSigmaSpace(40000);

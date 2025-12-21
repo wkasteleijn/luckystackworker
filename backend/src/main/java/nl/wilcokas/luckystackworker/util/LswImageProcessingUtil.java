@@ -12,7 +12,6 @@ import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +20,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.exceptions.FilterException;
@@ -34,8 +32,7 @@ import org.apache.commons.lang3.tuple.Pair;
 @Slf4j
 public class LswImageProcessingUtil {
 
-    private LswImageProcessingUtil() {
-    }
+    private LswImageProcessingUtil() {}
 
     public static int getMaxHistogramPercentage(ImagePlus image) {
         Pair<Integer, Integer> maxHistogram = getMaxHistogram(image);
@@ -190,7 +187,7 @@ public class LswImageProcessingUtil {
         float red = ((r_ + m) + 0.5f) * (1f + hueCorrectionFactor);
         float green = ((g_ + m) + 0.5f) * (1f - hueCorrectionFactor);
         float blue = ((b_ + m) + 0.5f) * (1f + hueCorrectionFactor);
-        return new float[]{red, green, blue};
+        return new float[] {red, green, blue};
     }
 
     public static boolean validateImageFormat(ImagePlus image, JFrame parentFrame, String activeOSProfile) {
@@ -250,10 +247,12 @@ public class LswImageProcessingUtil {
                 profile.getScale(),
                 profile.getOpenImageMode() == null
                         ? OpenImageModeEnum.RGB.name()
-                        : profile.getOpenImageMode().name(), true);
+                        : profile.getOpenImageMode().name(),
+                true);
     }
 
-    public static void setNonPersistentSettings(Profile profile, double scale, String openImageMode, boolean isProfileBeingLoaded) {
+    public static void setNonPersistentSettings(
+            Profile profile, double scale, String openImageMode, boolean isProfileBeingLoaded) {
         if (!isProfileBeingLoaded) {
             profile.setDispersionCorrectionEnabled(false); // dispersion correction is only corrected for load profile
         }
@@ -635,5 +634,4 @@ public class LswImageProcessingUtil {
             toPixels[i] = (short) value;
         }
     }
-
 }

@@ -7,7 +7,6 @@ import ij.process.ImageProcessor;
 import java.awt.Rectangle;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-
 import nl.wilcokas.luckystackworker.model.Profile;
 import org.springframework.stereotype.Component;
 

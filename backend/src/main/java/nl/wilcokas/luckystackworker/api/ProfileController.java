@@ -8,7 +8,6 @@ import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
@@ -16,10 +15,10 @@ import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.dto.*;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
 import nl.wilcokas.luckystackworker.model.Profile;
-import nl.wilcokas.luckystackworker.service.PSFService;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
-import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.repository.SettingsRepository;
+import nl.wilcokas.luckystackworker.service.PSFService;
+import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import org.apache.velocity.exception.ResourceNotFoundException;
@@ -112,7 +111,7 @@ public class ProfileController {
         Profile profile = null;
         if (activeOperationTime == null
                 || LocalDateTime.now()
-                .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
+                        .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
             luckyStackWorkerContext.setActiveOperationTime(LocalDateTime.now());
             profile = profileService.updateProfile(profileDTO);
             psfImage = referenceImageService.updateProcessing(profile, operations);
@@ -120,7 +119,11 @@ public class ProfileController {
         } else {
             log.warn("Attempt to update image while another operation was in progress");
         }
-        PSFImageDto psfImageDto = psfImage == null ? null : PSFImageDto.builder().imageData(Base64.getEncoder().encodeToString(psfImage)).build();
+        PSFImageDto psfImageDto = psfImage == null
+                ? null
+                : PSFImageDto.builder()
+                        .imageData(Base64.getEncoder().encodeToString(psfImage))
+                        .build();
         return ResponseEntity.ok(UpdateProfileResponseDto.builder()
                 .psfImage(psfImageDto)
                 .profile(profile == null ? null : new ProfileDTO(profile))
