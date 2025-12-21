@@ -1609,7 +1609,9 @@ export class AppComponent implements OnInit {
       .subscribe(
         (data) => {
           if (data) {
-            this.psfImage = data.psfImage?.imageData;
+            if (data.psfImage) {
+              this.psfImage = data.psfImage?.imageData;
+            }
             this.profile = data.profile;
           }
           if (this.slowProcessing) {
