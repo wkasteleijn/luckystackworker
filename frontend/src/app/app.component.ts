@@ -127,7 +127,7 @@ export class AppComponent implements OnInit {
   workerStatus: string = 'Idle';
   workerProgress: number;
   workerBusy: boolean = false;
-  refImageSelected: boolean = true; // TODO: set to false by default!
+  refImageSelected: boolean = false;
   nightMode: boolean = false;
   blinkClippedAreas: boolean = false;
   roi: boolean = false;

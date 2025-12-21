@@ -11,6 +11,7 @@ import ij.ImagePlus;
 import ij.gui.*;
 import ij.io.Opener;
 import ij.process.ColorProcessor;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -40,6 +41,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -191,9 +193,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         List<FilterEnum> operations = operationValues == null
                 ? emptyList()
                 : operationValues.stream()
-                        .map(operationValue ->
-                                operationValue == null ? null : FilterEnum.valueOf(operationValue.toUpperCase()))
-                        .toList();
+                .map(operationValue ->
+                        operationValue == null ? null : FilterEnum.valueOf(operationValue.toUpperCase()))
+                .toList();
         if (roiSwitched) {
             operations = emptyList();
             roiSwitched = false;
@@ -369,7 +371,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 .build();
         if (settings.getLatestKnownVersionChecked() == null
                 || currentDate.isAfter(
-                        settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
+                settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
             LswVersionNumber latestVersionFromGithub = requestLatestVersion().orElse(null);
             if (latestVersionFromGithub != null
                     && (latestVersionFromGithub.getConvertedVersion() > latestKnowVersion.getConvertedVersion())) {
@@ -430,37 +432,48 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     @Override
-    public void windowOpened(WindowEvent e) {}
+    public void windowOpened(WindowEvent e) {
+    }
 
     @Override
-    public void windowClosing(WindowEvent e) {}
+    public void windowClosing(WindowEvent e) {
+    }
 
     @Override
-    public void windowClosed(WindowEvent e) {}
+    public void windowClosed(WindowEvent e) {
+    }
 
     @Override
-    public void windowIconified(WindowEvent e) {}
+    public void windowIconified(WindowEvent e) {
+    }
 
     @Override
-    public void windowDeiconified(WindowEvent e) {}
+    public void windowDeiconified(WindowEvent e) {
+    }
 
     @Override
-    public void windowActivated(WindowEvent e) {}
+    public void windowActivated(WindowEvent e) {
+    }
 
     @Override
-    public void windowDeactivated(WindowEvent e) {}
+    public void windowDeactivated(WindowEvent e) {
+    }
 
     @Override
-    public void componentResized(ComponentEvent e) {}
+    public void componentResized(ComponentEvent e) {
+    }
 
     @Override
-    public void componentMoved(ComponentEvent e) {}
+    public void componentMoved(ComponentEvent e) {
+    }
 
     @Override
-    public void componentShown(ComponentEvent e) {}
+    public void componentShown(ComponentEvent e) {
+    }
 
     @Override
-    public void componentHidden(ComponentEvent e) {}
+    public void componentHidden(ComponentEvent e) {
+    }
 
     public void updateHistogramMetadata(Profile profile) {
         int[][] rgbHistograms = get16BitRGBHistogram(finalResultImage, 100);
@@ -621,6 +634,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 .findByName(profileName)
                                 .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
                         openReferenceImage(deRotatedImagePath, profile, LocalDateTime.now());
+                        luckyStackWorkerContext.setSelectedProfile(profile.getName());
                     }
                 },
                 executor);
