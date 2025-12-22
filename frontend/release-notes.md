@@ -1,5 +1,18 @@
 # LuckyStackWorker - RELEASE NOTES
 
+## 02/01/2026 major release 7.0.0
+
+- Added Derotation function to automatically derotate a set of images to a selected reference image
+- Added Stacking function to stack a set of images
+- Dispersion correction now automatically corrects to the estimated optimal values. Works on sub-pixel level
+- Enlarged histogram graphic for better visual reading
+- Filter values can now also be adjusted manually by entering the numerical values directly
+- Load profile now also applies the earlier used dispersion correction
+- Added "Quadratic" deconvolution option to apply deconvolution 2x
+- Revised look-and-feel: replaced batch panel with dedicated batch button bar, more "balanced" contrast colors
+- Permanently removed deprecated GMIC filters Ian's denoise and Enhance locally.
+- Upgraded all dependencies to the latest versions.
+
 ## 14/09/2025 revision release 6.21.1
 
 - Fixed bug when opening a non 16-bit image the app did not show a warning and the spinner stayed active
