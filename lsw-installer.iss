@@ -25,7 +25,7 @@ LicenseFile=C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 OutputBaseFilename=LuckyStackWorker-{#MyAppVersion}-setup
-SetupIconFile=C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\resources\app\lsw_icon.ico
+SetupIconFile=C:\Users\wkast\git\luckystackworker\frontend\lsw_icon.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -45,7 +45,7 @@ end;
 [Files]
 Source: "C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\lsworker.bat"; DestDir: "{localappdata}\LuckyStackWorker"; Flags: ignoreversion
+Source: "C:\Users\wkast\git\luckystackworker\frontend\lsworker.bat"; DestDir: "{localappdata}\LuckyStackWorker"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
