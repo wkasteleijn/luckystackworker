@@ -4,13 +4,16 @@
     <img src="assets/images/close.png" class="buttonImg" />
   </button>
 
-  <div
-    *ngIf="showWarning()"
-    class="warning {{ nightMode ? 'titleNight' : 'title' }}"
-  >
-    You must select a reference image first!
-  </div>
-  <div *ngIf="!showWarning()" class="slidersStartMargin"></div>
+  @if (showWarning()) {
+    <div
+      class="warning {{ nightMode ? 'titleNight' : 'title' }}"
+      >
+      You must select a reference image first!
+    </div>
+  }
+  @if (!showWarning()) {
+    <div class="slidersStartMargin"></div>
+  }
 
   <div class="sliderContainer">
     <div class="sliderGroupFileSelector">
@@ -24,10 +27,12 @@
             (nightMode ? 'activeColorNight' : 'activeColor')
         }}"
         (change)="onRefImageChanged()"
-      >
-        <option *ngFor="let image of deRotation.images" [value]="image">
-          {{ image }}
-        </option>
+        >
+        @for (image of deRotation.images; track image) {
+          <option [value]="image">
+            {{ image }}
+          </option>
+        }
       </select>
     </div>
     <app-slider
@@ -67,7 +72,7 @@
     (click)="onStart()"
     class="button {{ nightMode ? 'activeColorNight' : 'activeColor' }}"
     matTooltip="Start de-rotating the selected images."
-  >
+    >
     <img src="assets/images/startbatch.png" class="startButton" />
   </button>
 </div>

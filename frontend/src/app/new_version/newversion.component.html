@@ -6,7 +6,9 @@
     improvements:
   </p>
   <ul>
-    <li *ngFor="let note of releaseNotes">{{ note }}</li>
+    @for (note of releaseNotes; track note) {
+      <li>{{ note }}</li>
+    }
   </ul>
 
   <div class="buttons">
@@ -14,7 +16,7 @@
       mat-raised-button
       class="button activeColorPressed"
       (click)="onGetItNow()"
-    >
+      >
       &nbsp;&nbsp;Get it now&nbsp;&nbsp;
     </button>
     &nbsp;&nbsp;
