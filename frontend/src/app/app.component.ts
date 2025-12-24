@@ -1574,6 +1574,8 @@ export class AppComponent implements OnInit {
     this.applyUnsharpMask = this.profile.applyUnsharpMask;
     this.applyWienerDeconvolution = this.profile.applyWienerDeconvolution;
     this.wienerIterations = this.profile.wienerIterations;
+    this.wienerDeconvolutionQuadratic =
+      this.profile.wienerRepetitions > 1 ? true : false;
     this.clippingSuppression = this.profile.clippingSuppression;
     this.dispersionCorrectionEnabled = this.profile.dispersionCorrectionEnabled;
     this.setNonPersistentSettings();
