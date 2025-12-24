@@ -491,7 +491,7 @@ public class LswFileUtil {
             UnaryOperator<ImagePlus> scaler,
             JFrame parentFrame) {
         ImagePlus newImage = new Opener().openImage(LswFileUtil.getIJFileFormat(filepath));
-        if (parentFrame != null && !LswFileUtil.validateImageFormat(newImage, parentFrame)) {
+        if (parentFrame != null && !validateImageFormat(newImage, parentFrame)) {
             throw new NotARawImageException("Invalid image format");
         }
 

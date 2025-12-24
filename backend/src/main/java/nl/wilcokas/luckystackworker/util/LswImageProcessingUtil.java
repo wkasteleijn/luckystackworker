@@ -190,30 +190,6 @@ public class LswImageProcessingUtil {
         return new float[] {red, green, blue};
     }
 
-    public static boolean validateImageFormat(ImagePlus image, JFrame parentFrame, String activeOSProfile) {
-        String message =
-                "This file format is not supported. %nYou can only open 16-bit RGB and grayscale PNG and TIFF images.";
-        boolean is16Bit = false;
-        if (image != null) {
-            ImageProcessor processor = image.getProcessor();
-            is16Bit = processor instanceof ShortProcessor;
-            if (processor instanceof ColorProcessor) {
-                message += "%nThe file you selected is in 8-bit color format.";
-            } else if (processor instanceof FloatProcessor) {
-                message += "%nThe file you selected is in 32-bit grayscale format.";
-            }
-        }
-        if (!is16Bit) {
-            log.warn("Attempt to open a non 16-bit image");
-            if (parentFrame != null) {
-                LswUtil.delayMacOS();
-                JOptionPane.showMessageDialog(parentFrame, String.format(message));
-            }
-            return false;
-        }
-        return true;
-    }
-
     public static int convertToUnsignedInt(final short value) {
         return value < 0 ? value + Constants.UNSIGNED_INT_SIZE : value;
     }
