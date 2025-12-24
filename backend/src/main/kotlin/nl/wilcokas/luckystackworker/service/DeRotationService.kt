@@ -2,7 +2,6 @@ package nl.wilcokas.luckystackworker.service
 
 import bunwarpj.bUnwarpJ_
 import ij.ImagePlus
-import ij.io.Opener
 import ij.process.FloatProcessor
 import ij.process.ShortProcessor
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext
@@ -13,6 +12,7 @@ import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter
 import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode
 import nl.wilcokas.luckystackworker.model.Profile
+import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum.RGB
 import nl.wilcokas.luckystackworker.util.LswFileUtil
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil
 import nl.wilcokas.luckystackworker.util.LswUtil
@@ -65,7 +65,7 @@ class DeRotationService(
         luckyStackWorkerContext.filesProcessedCount = 0
 
         val referenceImagePath = "${rootFolder}/${referenceImageFilename}"
-        val referenceImage = Opener().openImage(referenceImagePath)
+        val referenceImage = openImage(referenceImagePath, parentFrame)
         val derotationWorkFolder =
             LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation"
         LswFileUtil.createCleanDirectory(derotationWorkFolder)
@@ -139,7 +139,7 @@ class DeRotationService(
         var sourceReachedReference = false
         for (i in allImagesFilenames.indices) {
             val sourceImageFilename = allImagesFilenames[i]
-            val sourceImage = Opener().openImage("${rootFolder}/${sourceImageFilename}")
+            val sourceImage = openImage("${rootFolder}/${sourceImageFilename}", parentFrame)
             if (referenceImageFilename == sourceImageFilename) {
                 sourceReachedReference = true
             } else {
@@ -158,7 +158,7 @@ class DeRotationService(
                     val transformationFile = imagesWithTransformation[transformationReferenceFile]!!
                     val targetImage =
                         if (targetImageFilename == referenceImageFilename) referenceImage
-                        else Opener().openImage("${rootFolder}/${targetImageFilename}")
+                        else openImage("${rootFolder}/${targetImageFilename}", parentFrame)
                     applyTransformation(sourceImage, targetImage, transformationFile)
                     validateTransformationResult(sourceImage, targetImage, parentFrame)
                     sourceImage.updateAndDraw()
@@ -197,8 +197,8 @@ class DeRotationService(
         val totalPixels = sourceProcessor.width * sourceProcessor.height
         for (x in 0 until sourceProcessor.width) {
             for (y in 0 until sourceProcessor.height) {
-                totalValueSource += sourceProcessor.getPixel(x,y)
-                totalValueTarget += targetProcessor.getPixel(x,y)
+                totalValueSource += sourceProcessor.getPixel(x, y)
+                totalValueTarget += targetProcessor.getPixel(x, y)
             }
         }
         val averageValueDeviation = abs(totalValueSource - totalValueTarget) / totalPixels
@@ -246,7 +246,7 @@ class DeRotationService(
         referenceImageFilename: String,
     ): Map<String, String> {
         var referenceEncountered = false
-        val imagesWithTransformation: MutableMap<String, String> = HashMap<String, String>()
+        val imagesWithTransformation: MutableMap<String, String> = HashMap()
         log.info("Create transformation files from copies")
         for (i in sharpenedImagePaths.indices) {
             val sourceFullPath = sharpenedImagePaths[i]
@@ -278,10 +278,10 @@ class DeRotationService(
         parentFrame: JFrame?,
     ) {
         log.info("Create pre-sharpened luminance copies...")
-        var imageDimensions: MutableList<IntArray> = ArrayList()
+        val imageDimensions: MutableList<IntArray> = ArrayList()
         for (imageFilename in allImagesFilenames) {
             val imagePath = "${rootFolder}/${imageFilename}"
-            val image = Opener().openImage(imagePath)
+            val image = openImage(imagePath, parentFrame)
             imageDimensions.add(image.dimensions)
             sharpenAsLuminanceImage(image, anchorStrength.toDouble())
             val profile = Profile()
@@ -304,6 +304,10 @@ class DeRotationService(
         }
         validateImageDimensions(imageDimensions, parentFrame)
         log.info("Done")
+    }
+
+    private fun openImage(imagePath: String, parentFrame: JFrame?): ImagePlus {
+        return LswFileUtil.openImage(imagePath, RGB, null, null, 1.0, null, parentFrame).left;
     }
 
     private fun validateImageDimensions(imageDimensions: List<IntArray>, parentFrame: JFrame?) {
@@ -389,37 +393,32 @@ class DeRotationService(
         val fpRed = ipRed.toFloat(1, null)
         val pixelsRed = fpRed.pixels as FloatArray
         var fpLum: FloatProcessor
-        if (stack.size > 1) {
-            val ipGreen = stack.getProcessor(2)
-            val ipBlue = stack.getProcessor(3)
-            val fpGreen = ipGreen.toFloat(2, null)
-            val fpBlue = ipBlue.toFloat(3, null)
-            val pixelsGreen = fpGreen.pixels as FloatArray
-            val pixelsBlue = fpBlue.pixels as FloatArray
-            val pixelsLum = FloatArray(pixelsRed.size)
-            for (i in pixelsRed.indices) {
-                val hsl =
-                    LswImageProcessingUtil.rgbToHsl(
-                        pixelsRed[i],
-                        pixelsGreen[i],
-                        pixelsBlue[i],
-                        true,
-                        true,
-                        true,
-                        true,
-                        LSWSharpenMode.LUMINANCE,
-                    )
-                pixelsLum[i] = hsl[2]
-            }
-            fpLum = FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum)
-            fpLum.snapshot()
-            lswSharpenFilter.doUnsharpMask(radius, 0.990f, 0f, fpLum)
-            ipGreen.setPixels(2, fpLum)
-            ipBlue.setPixels(3, fpLum)
-        } else {
-            fpLum = FloatProcessor(image.getWidth(), image.getHeight(), pixelsRed)
-            lswSharpenFilter.doUnsharpMask(radius, 0.990f, 0f, fpLum)
+        val ipGreen = stack.getProcessor(2)
+        val ipBlue = stack.getProcessor(3)
+        val fpGreen = ipGreen.toFloat(2, null)
+        val fpBlue = ipBlue.toFloat(3, null)
+        val pixelsGreen = fpGreen.pixels as FloatArray
+        val pixelsBlue = fpBlue.pixels as FloatArray
+        val pixelsLum = FloatArray(pixelsRed.size)
+        for (i in pixelsRed.indices) {
+            val hsl =
+                LswImageProcessingUtil.rgbToHsl(
+                    pixelsRed[i],
+                    pixelsGreen[i],
+                    pixelsBlue[i],
+                    true,
+                    true,
+                    true,
+                    true,
+                    LSWSharpenMode.LUMINANCE,
+                )
+            pixelsLum[i] = hsl[2]
         }
+        fpLum = FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum)
+        fpLum.snapshot()
+        lswSharpenFilter.doUnsharpMask(radius, 0.990f, 0f, fpLum)
+        ipGreen.setPixels(2, fpLum)
+        ipBlue.setPixels(3, fpLum)
         ipRed.setPixels(1, fpLum)
     }
 }
