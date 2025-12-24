@@ -2,6 +2,7 @@ package nl.wilcokas.luckystackworker.service;
 
 import static java.util.Collections.*;
 import static nl.wilcokas.luckystackworker.constants.Constants.MAX_RELEASE_NOTES_SHOWN;
+import static nl.wilcokas.luckystackworker.constants.Constants.STATUS_IDLE;
 import static nl.wilcokas.luckystackworker.util.LswFileUtil.createCleanDirectory;
 import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.get16BitRGBHistogram;
 
@@ -11,6 +12,7 @@ import ij.ImagePlus;
 import ij.gui.*;
 import ij.io.Opener;
 import ij.process.ColorProcessor;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -40,6 +42,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -139,7 +142,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     public ResponseDTO selectReferenceImage(String filePath, double scale, String openImageMode) throws IOException {
         JFrame frame = getParentFrame();
-        JFileChooser jfc = getJFileChooser(filePath);
+        JFileChooser jfc = getJFileChooser(filePath, "Open image");
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
         jfc.setFileFilter(filter);
         int returnValue = getFilenameFromDialog(frame, jfc, false);
@@ -191,9 +194,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         List<FilterEnum> operations = operationValues == null
                 ? emptyList()
                 : operationValues.stream()
-                        .map(operationValue ->
-                                operationValue == null ? null : FilterEnum.valueOf(operationValue.toUpperCase()))
-                        .toList();
+                .map(operationValue ->
+                        operationValue == null ? null : FilterEnum.valueOf(operationValue.toUpperCase()))
+                .toList();
         if (roiSwitched) {
             operations = emptyList();
             roiSwitched = false;
@@ -232,8 +235,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         writeProfile(pathNoExt);
     }
 
-    public MyFileChooser getJFileChooser(String path) {
-        MyFileChooser jfc = new MyFileChooser(path);
+    public MyFileChooser getJFileChooser(String path, String title) {
+        MyFileChooser jfc = new MyFileChooser(path, title);
         jfc.requestFocus();
         return jfc;
     }
@@ -369,7 +372,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 .build();
         if (settings.getLatestKnownVersionChecked() == null
                 || currentDate.isAfter(
-                        settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
+                settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
             LswVersionNumber latestVersionFromGithub = requestLatestVersion().orElse(null);
             if (latestVersionFromGithub != null
                     && (latestVersionFromGithub.getConvertedVersion() > latestKnowVersion.getConvertedVersion())) {
@@ -430,37 +433,48 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     @Override
-    public void windowOpened(WindowEvent e) {}
+    public void windowOpened(WindowEvent e) {
+    }
 
     @Override
-    public void windowClosing(WindowEvent e) {}
+    public void windowClosing(WindowEvent e) {
+    }
 
     @Override
-    public void windowClosed(WindowEvent e) {}
+    public void windowClosed(WindowEvent e) {
+    }
 
     @Override
-    public void windowIconified(WindowEvent e) {}
+    public void windowIconified(WindowEvent e) {
+    }
 
     @Override
-    public void windowDeiconified(WindowEvent e) {}
+    public void windowDeiconified(WindowEvent e) {
+    }
 
     @Override
-    public void windowActivated(WindowEvent e) {}
+    public void windowActivated(WindowEvent e) {
+    }
 
     @Override
-    public void windowDeactivated(WindowEvent e) {}
+    public void windowDeactivated(WindowEvent e) {
+    }
 
     @Override
-    public void componentResized(ComponentEvent e) {}
+    public void componentResized(ComponentEvent e) {
+    }
 
     @Override
-    public void componentMoved(ComponentEvent e) {}
+    public void componentMoved(ComponentEvent e) {
+    }
 
     @Override
-    public void componentShown(ComponentEvent e) {}
+    public void componentShown(ComponentEvent e) {
+    }
 
     @Override
-    public void componentHidden(ComponentEvent e) {}
+    public void componentHidden(ComponentEvent e) {
+    }
 
     public void updateHistogramMetadata(Profile profile) {
         int[][] rgbHistograms = get16BitRGBHistogram(finalResultImage, 100);
@@ -569,7 +583,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public DeRotation selectDerotationImages() {
-        JFileChooser jfc = getJFileChooser(settingsService.getRootFolder());
+        JFileChooser jfc = getJFileChooser(settingsService.getRootFolder(), "Open images, use shift+click to select multiple");
         jfc.setMultiSelectionEnabled(true);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
         jfc.setFileFilter(filter);
@@ -629,7 +643,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void stackImages() {
-        JFileChooser jfc = getJFileChooser(settingsService.getRootFolder());
+        JFileChooser jfc = getJFileChooser(settingsService.getRootFolder(), "Open images, use shift+click to select multiple");
         jfc.setMultiSelectionEnabled(true);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
         jfc.setFileFilter(filter);
@@ -672,6 +686,11 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                         },
                         executor);
             }
+        } else {
+            luckyStackWorkerContext.setStatus(STATUS_IDLE);
+            luckyStackWorkerContext.setFilesProcessedCount(0);
+            luckyStackWorkerContext.setTotalFilesCount(0);
+            luckyStackWorkerContext.setProfileBeingApplied(false);
         }
     }
 
@@ -884,14 +903,18 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     final class MyFileChooser extends JFileChooser {
 
-        MyFileChooser(String path) {
+        private final String title;
+
+        MyFileChooser(String path, String title) {
             super(path);
+            this.title = title;
         }
 
         @Override
         protected JDialog createDialog(Component parent) throws HeadlessException {
             JDialog dlg = super.createDialog(parent);
             dlg.setLocation(controllerLastKnownPositionX + 8, controllerLastKnownPositionY + 36);
+            dlg.setTitle(title);
             return dlg;
         }
     }

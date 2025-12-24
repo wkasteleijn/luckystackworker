@@ -35,7 +35,7 @@ public class PSFService {
 
     public SettingsDTO loadCustomPSF() throws IOException {
         JFrame frame = referenceImageService.getParentFrame();
-        JFileChooser jfc = referenceImageService.getJFileChooser(settingsService.getRootFolder());
+        JFileChooser jfc = referenceImageService.getJFileChooser(settingsService.getRootFolder(),"Select PSF file");
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIF, TIFF, PNG", "tif", "tiff", "png");
         jfc.setFileFilter(filter);
         int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, false);
