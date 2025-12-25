@@ -441,6 +441,9 @@ public class LswFileUtil {
         if (profile.getWienerRepetitions() == 0) {
             profile.setWienerRepetitions(1);
         }
+        if (profile.getSaveScale() == 0D) {
+            profile.setScale(100D);
+        }
     }
 
     public static boolean validateImageFormat(ImagePlus image, JFrame parentFrame) {

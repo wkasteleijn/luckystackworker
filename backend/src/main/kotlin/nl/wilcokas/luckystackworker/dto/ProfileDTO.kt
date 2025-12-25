@@ -123,147 +123,155 @@ data class ProfileDTO(
     var luminanceIncludeBlue: Boolean = false,
     var luminanceIncludeColor: Boolean = false,
     var normalizeColorBalance: Boolean = false,
+
+    // Non persistent settings
     var scale: Double = 0.0,
     var rotationAngle: Double = 0.0,
     var openImageMode: OpenImageModeEnum? = null,
     var psf: PSFDTO? = null,
+    var saveScale: Double = 100.0,
+    var saveDimensionX: Int = 0,
+    var saveDimensionY: Int = 0,
 ) {
-  // Secondary constructor for mapping from domain Profile
-  constructor(profile: Profile) : this() {
-    this.name = profile.name
+    // Secondary constructor for mapping from domain Profile
+    constructor(profile: Profile) : this() {
+        this.name = profile.name
 
-    // sharpen
-    this.applySharpenToChannel = ChannelEnum.RGB
-    this.radius = profile.radius
-    this.amount = profile.amount
-    this.iterations = profile.iterations
-    this.level = profile.level
-    this.clippingStrength = profile.clippingStrength
-    this.clippingRange = profile.clippingRange
-    this.deringRadius = profile.deringRadius
-    this.deringStrength = profile.deringStrength
-    this.blendRaw = profile.blendRaw
-    this.wienerIterations = profile.wienerIterations
-    this.wienerRepetitions = profile.wienerRepetitions
+        // sharpen
+        this.applySharpenToChannel = ChannelEnum.RGB
+        this.radius = profile.radius
+        this.amount = profile.amount
+        this.iterations = profile.iterations
+        this.level = profile.level
+        this.clippingStrength = profile.clippingStrength
+        this.clippingRange = profile.clippingRange
+        this.deringRadius = profile.deringRadius
+        this.deringStrength = profile.deringStrength
+        this.blendRaw = profile.blendRaw
+        this.wienerIterations = profile.wienerIterations
+        this.wienerRepetitions = profile.wienerRepetitions
 
-    this.radiusGreen = profile.radiusGreen
-    this.amountGreen = profile.amountGreen
-    this.iterationsGreen = profile.iterationsGreen
-    this.levelGreen = profile.levelGreen
-    this.clippingStrengthGreen = profile.clippingStrengthGreen
-    this.clippingRangeGreen = profile.clippingRangeGreen
-    this.deringRadiusGreen = profile.deringRadiusGreen
-    this.deringStrengthGreen = profile.deringStrengthGreen
-    this.blendRawGreen = profile.blendRawGreen
-    this.wienerIterationsGreen = profile.wienerIterationsGreen
+        this.radiusGreen = profile.radiusGreen
+        this.amountGreen = profile.amountGreen
+        this.iterationsGreen = profile.iterationsGreen
+        this.levelGreen = profile.levelGreen
+        this.clippingStrengthGreen = profile.clippingStrengthGreen
+        this.clippingRangeGreen = profile.clippingRangeGreen
+        this.deringRadiusGreen = profile.deringRadiusGreen
+        this.deringStrengthGreen = profile.deringStrengthGreen
+        this.blendRawGreen = profile.blendRawGreen
+        this.wienerIterationsGreen = profile.wienerIterationsGreen
 
-    this.radiusBlue = profile.radiusBlue
-    this.amountBlue = profile.amountBlue
-    this.iterationsBlue = profile.iterationsBlue
-    this.levelBlue = profile.levelBlue
-    this.clippingStrengthBlue = profile.clippingStrengthBlue
-    this.clippingRangeBlue = profile.clippingRangeBlue
-    this.deringRadiusBlue = profile.deringRadiusBlue
-    this.deringStrengthBlue = profile.deringStrengthBlue
-    this.blendRawBlue = profile.blendRawBlue
-    this.wienerIterationsBlue = profile.wienerIterationsBlue
+        this.radiusBlue = profile.radiusBlue
+        this.amountBlue = profile.amountBlue
+        this.iterationsBlue = profile.iterationsBlue
+        this.levelBlue = profile.levelBlue
+        this.clippingStrengthBlue = profile.clippingStrengthBlue
+        this.clippingRangeBlue = profile.clippingRangeBlue
+        this.deringRadiusBlue = profile.deringRadiusBlue
+        this.deringStrengthBlue = profile.deringStrengthBlue
+        this.blendRawBlue = profile.blendRawBlue
+        this.wienerIterationsBlue = profile.wienerIterationsBlue
 
-    this.sharpenMode = profile.sharpenMode
-    this.luminanceIncludeRed = profile.luminanceIncludeRed
-    this.luminanceIncludeGreen = profile.luminanceIncludeGreen
-    this.luminanceIncludeBlue = profile.luminanceIncludeBlue
-    this.luminanceIncludeColor = profile.luminanceIncludeColor
+        this.sharpenMode = profile.sharpenMode
+        this.luminanceIncludeRed = profile.luminanceIncludeRed
+        this.luminanceIncludeGreen = profile.luminanceIncludeGreen
+        this.luminanceIncludeBlue = profile.luminanceIncludeBlue
+        this.luminanceIncludeColor = profile.luminanceIncludeColor
 
-    // Let op: In Profile was dit Boolean object (nullable), hier primitive boolean.
-    // We gebruiken Elvis operator ?: false voor safety
-    this.applyWienerDeconvolution = profile.applyWienerDeconvolution ?: false
-    this.applyUnsharpMask = profile.applyUnsharpMask ?: false
+        // Let op: In Profile was dit Boolean object (nullable), hier primitive boolean.
+        // We gebruiken Elvis operator ?: false voor safety
+        this.applyWienerDeconvolution = profile.applyWienerDeconvolution ?: false
+        this.applyUnsharpMask = profile.applyUnsharpMask ?: false
 
-    // denoise
-    this.denoiseAlgorithm1 = profile.denoiseAlgorithm1
-    this.denoise1Amount = profile.denoise1Amount
-    this.denoise1Radius = profile.denoise1Radius
-    this.denoise1Iterations = profile.denoise1Iterations
-    this.denoiseAlgorithm2 = profile.denoiseAlgorithm2
-    this.denoise2Radius = profile.denoise2Radius
-    this.denoise2Iterations = profile.denoise2Iterations
-    this.savitzkyGolaySize = profile.savitzkyGolaySize
-    this.savitzkyGolayAmount = profile.savitzkyGolayAmount
-    this.savitzkyGolayIterations = profile.savitzkyGolayIterations
-    this.bilateralIterations = profile.bilateralIterations
-    this.bilateralRadius = profile.bilateralRadius
-    this.bilateralSigmaColor = profile.bilateralSigmaColor
-    this.bilateralSigmaSpace = profile.bilateralSigmaSpace
+        // denoise
+        this.denoiseAlgorithm1 = profile.denoiseAlgorithm1
+        this.denoise1Amount = profile.denoise1Amount
+        this.denoise1Radius = profile.denoise1Radius
+        this.denoise1Iterations = profile.denoise1Iterations
+        this.denoiseAlgorithm2 = profile.denoiseAlgorithm2
+        this.denoise2Radius = profile.denoise2Radius
+        this.denoise2Iterations = profile.denoise2Iterations
+        this.savitzkyGolaySize = profile.savitzkyGolaySize
+        this.savitzkyGolayAmount = profile.savitzkyGolayAmount
+        this.savitzkyGolayIterations = profile.savitzkyGolayIterations
+        this.bilateralIterations = profile.bilateralIterations
+        this.bilateralRadius = profile.bilateralRadius
+        this.bilateralSigmaColor = profile.bilateralSigmaColor
+        this.bilateralSigmaSpace = profile.bilateralSigmaSpace
 
-    this.denoise1AmountGreen = profile.denoise1AmountGreen
-    this.denoise1RadiusGreen = profile.denoise1RadiusGreen
-    this.denoise1IterationsGreen = profile.denoise1IterationsGreen
-    this.denoise2RadiusGreen = profile.denoise2RadiusGreen
-    this.denoise2IterationsGreen = profile.denoise2IterationsGreen
-    this.savitzkyGolaySizeGreen = profile.savitzkyGolaySizeGreen
-    this.savitzkyGolayAmountGreen = profile.savitzkyGolayAmountGreen
-    this.savitzkyGolayIterationsGreen = profile.savitzkyGolayIterationsGreen
-    this.rofThetaGreen = profile.rofThetaGreen
-    this.rofIterationsGreen = profile.rofIterationsGreen
-    this.bilateralIterationsGreen = profile.bilateralIterationsGreen
-    this.bilateralRadiusGreen = profile.bilateralRadiusGreen
-    this.bilateralSigmaColorGreen = profile.bilateralSigmaColorGreen
-    this.bilateralSigmaSpaceGreen = profile.bilateralSigmaSpaceGreen
+        this.denoise1AmountGreen = profile.denoise1AmountGreen
+        this.denoise1RadiusGreen = profile.denoise1RadiusGreen
+        this.denoise1IterationsGreen = profile.denoise1IterationsGreen
+        this.denoise2RadiusGreen = profile.denoise2RadiusGreen
+        this.denoise2IterationsGreen = profile.denoise2IterationsGreen
+        this.savitzkyGolaySizeGreen = profile.savitzkyGolaySizeGreen
+        this.savitzkyGolayAmountGreen = profile.savitzkyGolayAmountGreen
+        this.savitzkyGolayIterationsGreen = profile.savitzkyGolayIterationsGreen
+        this.rofThetaGreen = profile.rofThetaGreen
+        this.rofIterationsGreen = profile.rofIterationsGreen
+        this.bilateralIterationsGreen = profile.bilateralIterationsGreen
+        this.bilateralRadiusGreen = profile.bilateralRadiusGreen
+        this.bilateralSigmaColorGreen = profile.bilateralSigmaColorGreen
+        this.bilateralSigmaSpaceGreen = profile.bilateralSigmaSpaceGreen
 
-    this.denoise1AmountBlue = profile.denoise1AmountBlue
-    this.denoise1RadiusBlue = profile.denoise1RadiusBlue
-    this.denoise1IterationsBlue = profile.denoise1IterationsBlue
-    this.denoise2RadiusBlue = profile.denoise2RadiusBlue
-    this.denoise2IterationsBlue = profile.denoise2IterationsBlue
-    this.savitzkyGolaySizeBlue = profile.savitzkyGolaySizeBlue
-    this.savitzkyGolayAmountBlue = profile.savitzkyGolayAmountBlue
-    this.savitzkyGolayIterationsBlue = profile.savitzkyGolayIterationsBlue
-    this.rofThetaBlue = profile.rofThetaBlue
-    this.rofIterationsBlue = profile.rofIterationsBlue
-    this.bilateralIterationsBlue = profile.bilateralIterationsBlue
-    this.bilateralRadiusBlue = profile.bilateralRadiusBlue
-    this.bilateralSigmaColorBlue = profile.bilateralSigmaColorBlue
-    this.bilateralSigmaSpaceBlue = profile.bilateralSigmaSpaceBlue
+        this.denoise1AmountBlue = profile.denoise1AmountBlue
+        this.denoise1RadiusBlue = profile.denoise1RadiusBlue
+        this.denoise1IterationsBlue = profile.denoise1IterationsBlue
+        this.denoise2RadiusBlue = profile.denoise2RadiusBlue
+        this.denoise2IterationsBlue = profile.denoise2IterationsBlue
+        this.savitzkyGolaySizeBlue = profile.savitzkyGolaySizeBlue
+        this.savitzkyGolayAmountBlue = profile.savitzkyGolayAmountBlue
+        this.savitzkyGolayIterationsBlue = profile.savitzkyGolayIterationsBlue
+        this.rofThetaBlue = profile.rofThetaBlue
+        this.rofIterationsBlue = profile.rofIterationsBlue
+        this.bilateralIterationsBlue = profile.bilateralIterationsBlue
+        this.bilateralRadiusBlue = profile.bilateralRadiusBlue
+        this.bilateralSigmaColorBlue = profile.bilateralSigmaColorBlue
+        this.bilateralSigmaSpaceBlue = profile.bilateralSigmaSpaceBlue
 
-    // color & dispersion
-    this.red = profile.red
-    this.green = profile.green
-    this.blue = profile.blue
-    this.purple = profile.purple
-    this.saturation = profile.saturation
-    this.normalizeColorBalance = profile.normalizeColorBalance
+        // color & dispersion
+        this.red = profile.red
+        this.green = profile.green
+        this.blue = profile.blue
+        this.purple = profile.purple
+        this.saturation = profile.saturation
+        this.normalizeColorBalance = profile.normalizeColorBalance
 
-    // constrast & light
-    this.gamma = profile.gamma
-    this.contrast = profile.contrast
-    this.brightness = profile.brightness
-    this.lightness = profile.lightness
-    this.background = profile.background
-    this.localContrastMode = profile.localContrastMode
-    this.localContrastFine = profile.localContrastFine
-    this.localContrastMedium = profile.localContrastMedium
-    this.localContrastLarge = profile.localContrastLarge
-    this.dispersionCorrectionEnabled = profile.dispersionCorrectionEnabled
-    this.dispersionCorrectionRedX = profile.dispersionCorrectionRedX
-    this.dispersionCorrectionBlueX = profile.dispersionCorrectionBlueX
-    this.dispersionCorrectionRedY = profile.dispersionCorrectionRedY
-    this.dispersionCorrectionBlueY = profile.dispersionCorrectionBlueY
-    this.preserveDarkBackground = profile.preserveDarkBackground
-    this.clippingSuppression = profile.clippingSuppression
+        // constrast & light
+        this.gamma = profile.gamma
+        this.contrast = profile.contrast
+        this.brightness = profile.brightness
+        this.lightness = profile.lightness
+        this.background = profile.background
+        this.localContrastMode = profile.localContrastMode
+        this.localContrastFine = profile.localContrastFine
+        this.localContrastMedium = profile.localContrastMedium
+        this.localContrastLarge = profile.localContrastLarge
+        this.dispersionCorrectionEnabled = profile.dispersionCorrectionEnabled
+        this.dispersionCorrectionRedX = profile.dispersionCorrectionRedX
+        this.dispersionCorrectionBlueX = profile.dispersionCorrectionBlueX
+        this.dispersionCorrectionRedY = profile.dispersionCorrectionRedY
+        this.dispersionCorrectionBlueY = profile.dispersionCorrectionBlueY
+        this.preserveDarkBackground = profile.preserveDarkBackground
+        this.clippingSuppression = profile.clippingSuppression
 
-    this.scale = profile.scale
-    this.rotationAngle = profile.rotationAngle
-    this.openImageMode = profile.openImageMode
+        this.scale = profile.scale
+        this.rotationAngle = profile.rotationAngle
+        this.openImageMode = profile.openImageMode
+        this.saveScale = profile.saveScale
+        this.saveDimensionX = profile.saveDimensionX
+        this.saveDimensionY = profile.saveDimensionY
 
-    val profilePsf = profile.psf
-    if (profilePsf != null) {
-      this.psf =
-          PSFDTO(
-              profilePsf.airyDiskRadius,
-              profilePsf.seeingIndex,
-              profilePsf.diffractionIntensity,
-              profilePsf.type,
-          )
+        val profilePsf = profile.psf
+        if (profilePsf != null) {
+            this.psf =
+                PSFDTO(
+                    profilePsf.airyDiskRadius,
+                    profilePsf.seeingIndex,
+                    profilePsf.diffractionIntensity,
+                    profilePsf.type,
+                )
+        }
     }
-  }
 }
