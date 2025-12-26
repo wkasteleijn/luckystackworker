@@ -226,7 +226,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
 
         // Test
-        profile.setSaveScale(85);
+        profile.setSaveScale(50);
         profile.setSaveDimensionX(800);
         profile.setSaveDimensionY(600);
         // End test

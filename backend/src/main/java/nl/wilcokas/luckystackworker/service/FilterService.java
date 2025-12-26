@@ -1,6 +1,7 @@
 
 package nl.wilcokas.luckystackworker.service;
 
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.convertToUnsignedInt;
 import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getLswImageLayers;
 
 import ij.ImagePlus;
@@ -139,9 +140,19 @@ public class FilterService {
     }
 
     public ImagePlus resizeImageBackground(final ImagePlus image, int dimensionX, int dimensionY) {
-        // 1. Based on pixels luminance intensity, consider only the ones with 10% or less intensity above the lowest pixel value and calculate the average R G B pixel intensity over those.
         int width = image.getWidth();
         int height = image.getHeight();
+
+        if (dimensionX < width || dimensionY < height) {
+            int cropWidth = Math.min(dimensionX, width);
+            int cropHeight = Math.min(dimensionY, height);
+            int x = (width - cropWidth) / 2;
+            int y = (height - cropHeight) / 2;
+            Roi roi = new Roi(x, y, cropWidth, cropHeight);
+            return LswImageProcessingUtil.crop(image, roi, "cropped");
+        }
+
+        // 1. Based on pixels luminance intensity, consider only the ones with 10% or less intensity above the lowest pixel value and calculate the average R G B pixel intensity over those.
         ImageStack stack = image.getStack();
         short[] redPixels = (short[]) stack.getProcessor(Constants.RED_LAYER_INDEX).getPixels();
         short[] greenPixels = (short[]) stack.getProcessor(Constants.GREEN_LAYER_INDEX).getPixels();
@@ -149,21 +160,21 @@ public class FilterService {
 
         double minLuminance = Double.MAX_VALUE;
         for (int i = 0; i < redPixels.length; i++) {
-            double luminance = 0.299 * LswImageProcessingUtil.convertToUnsignedInt(redPixels[i])
-                    + 0.587 * LswImageProcessingUtil.convertToUnsignedInt(greenPixels[i])
-                    + 0.114 * LswImageProcessingUtil.convertToUnsignedInt(bluePixels[i]);
+            double luminance = 0.299 * convertToUnsignedInt(redPixels[i])
+                    + 0.587 * convertToUnsignedInt(greenPixels[i])
+                    + 0.114 * convertToUnsignedInt(bluePixels[i]);
             if (luminance < minLuminance) {
                 minLuminance = luminance;
             }
         }
 
-        double luminanceThreshold = minLuminance * 1.10;
+        double luminanceThreshold = minLuminance * 1.5;
         long sumRed = 0, sumGreen = 0, sumBlue = 0;
         int count = 0;
         for (int i = 0; i < redPixels.length; i++) {
-            int r = LswImageProcessingUtil.convertToUnsignedInt(redPixels[i]);
-            int g = LswImageProcessingUtil.convertToUnsignedInt(greenPixels[i]);
-            int b = LswImageProcessingUtil.convertToUnsignedInt(bluePixels[i]);
+            int r = convertToUnsignedInt(redPixels[i]);
+            int g = convertToUnsignedInt(greenPixels[i]);
+            int b = convertToUnsignedInt(bluePixels[i]);
             double luminance = 0.299 * r + 0.587 * g + 0.114 * b;
             if (luminance <= luminanceThreshold) {
                 sumRed += r;
@@ -190,18 +201,17 @@ public class FilterService {
         int yOffset = (dimensionY - height) / 2;
 
         double avgLuminance = 0.299 * avgRed + 0.587 * avgGreen + 0.114 * avgBlue;
-        double replaceThreshold = avgLuminance * 1.05;
+        double replaceThreshold = avgLuminance * 1.5;
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int oldIndex = y * width + x;
-                int r = LswImageProcessingUtil.convertToUnsignedInt(redPixels[oldIndex]);
-                int g = LswImageProcessingUtil.convertToUnsignedInt(greenPixels[oldIndex]);
-                int b = LswImageProcessingUtil.convertToUnsignedInt(bluePixels[oldIndex]);
+                int r = convertToUnsignedInt(redPixels[oldIndex]);
+                int g = convertToUnsignedInt(greenPixels[oldIndex]);
+                int b = convertToUnsignedInt(bluePixels[oldIndex]);
                 double luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-
-                // 3. Those pixels from the image that are within an intensity range of say 5% of the averages, replace those with the averages instead.
-                if (luminance > replaceThreshold) {
+                // 3. disregard the edges of the original image, 5 pixels from the edge will be included to be precise.
+                if ((x > 5 && x < width - 6 && y > 5 && y < height - 6) && (luminance > replaceThreshold)) {
                     int newIndex = (y + yOffset) * dimensionX + (x + xOffset);
                     newRedPixels[newIndex] = redPixels[oldIndex];
                     newGreenPixels[newIndex] = greenPixels[oldIndex];
@@ -209,7 +219,7 @@ public class FilterService {
                 }
             }
         }
-        LswImageLayers newLayers = new LswImageLayers(width, height, new short[][]{newRedPixels, newGreenPixels, newBluePixels});
+        LswImageLayers newLayers = new LswImageLayers(dimensionX, dimensionY, new short[][]{newRedPixels, newGreenPixels, newBluePixels});
         return LswImageProcessingUtil.create16BitRGBImage("resized", newLayers,true, true, true);
     }
 

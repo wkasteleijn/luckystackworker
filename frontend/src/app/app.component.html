@@ -384,6 +384,76 @@ isDerotationPanelVisible || isNotificationVisible ) {
         matTooltip="Select root folder"
       />
     </mat-form-field>
+
+    <!-- Info button -->
+    @if (openRefImageEnabled() && showVersionButton()) {
+    <button
+      type="button"
+      mat-button
+      class="button2ndRow infoButtonMargin {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      (click)="showVersionButton() ? openDownloadPage() : openAbout()"
+      matTooltip="You are currently using an older version {{
+        versionInfo.localVersion
+      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
+        versionInfo.latestVersion
+      }}."
+    >
+      <img
+        src="assets/images/info.png"
+        class="infoButton zoomIcon buttonBottom"
+      />
+    </button>
+    } @if (!openRefImageEnabled() && showVersionButton()) {
+    <button
+      type="button"
+      mat-button
+      disabled
+      class="button2ndRowDisabled infoButtonMargin {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      matTooltip="You are currently using an older version {{
+        getCurrentVersion()
+      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
+        getLatestKnownVersion()
+      }}."
+    >
+      <img
+        src="assets/images/info.png"
+        class="infoButton zoomIcon buttonBottom"
+      />
+    </button>
+    } @if (openRefImageEnabled() && !showVersionButton()) {
+    <button
+      type="button"
+      mat-button
+      class="button2ndRow infoButtonMargin {{
+        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      }}"
+      (click)="openAbout()"
+      matTooltip="About"
+    >
+      <img
+        src="assets/images/info.png"
+        class="infoButton zoomIcon buttonBottom"
+      />
+    </button>
+    } @if (!openRefImageEnabled() && !showVersionButton()) {
+    <button
+      type="button"
+      mat-button
+      disabled
+      class="button2ndRowDisabled infoButtonMargin"
+      matTooltip="About"
+    >
+      <img
+        src="assets/images/info.png"
+        class="infoButton zoomIcon buttonBottom"
+      />
+    </button>
+    }
+    <!-- End info button -->
   </div>
 
   <div class="button_container_top button_container">
@@ -509,71 +579,28 @@ isDerotationPanelVisible || isNotificationVisible ) {
     >
       <img src="assets/images/nightmode.png" class="genericButton" />
     </button>
-    } @if (openRefImageEnabled() && showVersionButton()) {
+    } @if (openRefImageEnabled() && refImageSelected) {
     <button
       type="button"
       mat-button
-      class="button3thRow infoButtonMargin {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+      (click)="openSaveScaledPanel()"
+      class="{{
+        'button3thRow infoButtonMargin ' +
+          (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+          (blinkClippedAreas ? 'Pressed' : '')
       }}"
-      (click)="showVersionButton() ? openDownloadPage() : openAbout()"
-      matTooltip="You are currently using an older version {{
-        versionInfo.localVersion
-      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
-        versionInfo.latestVersion
-      }}."
+      matTooltip="Save scaled"
     >
-      <img
-        src="assets/images/info.png"
-        class="infoButton zoomIcon buttonBottom"
-      />
+      <img src="assets/images/resize.png" class="genericButton" />
     </button>
-    } @if (!openRefImageEnabled() && showVersionButton()) {
-    <button
-      type="button"
-      mat-button
-      disabled
-      class="button3thRowDisabled infoButtonMargin {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      matTooltip="You are currently using an older version {{
-        getCurrentVersion()
-      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
-        getLatestKnownVersion()
-      }}."
-    >
-      <img
-        src="assets/images/info.png"
-        class="infoButton zoomIcon buttonBottom"
-      />
-    </button>
-    } @if (openRefImageEnabled() && !showVersionButton()) {
-    <button
-      type="button"
-      mat-button
-      class="button3thRow infoButtonMargin {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      (click)="openAbout()"
-      matTooltip="About"
-    >
-      <img
-        src="assets/images/info.png"
-        class="infoButton zoomIcon buttonBottom"
-      />
-    </button>
-    } @if (!openRefImageEnabled() && !showVersionButton()) {
+    } @if (!refImageSelected || !openRefImageEnabled()) {
     <button
       type="button"
       mat-button
       disabled
       class="button3thRowDisabled infoButtonMargin"
-      matTooltip="About"
     >
-      <img
-        src="assets/images/info.png"
-        class="infoButton zoomIcon buttonBottom"
-      />
+      <img src="assets/images/resize.png" class="genericButton" />
     </button>
     } @if (openRefImageEnabled() && refImageSelected) {
     <button

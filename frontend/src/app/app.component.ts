@@ -367,6 +367,14 @@ export class AppComponent implements OnInit {
     this.isRotationPanelVisible = true;
   }
 
+  openSaveScaledPanel() {
+    console.log('openSaveScaledPanel called');
+    if (this.profile) {
+      // TODO: implement
+      this.isRotationPanelVisible = true;
+    }
+  }
+
   hidePSF() {
     console.log('hidePSF called');
     this.isPsfPanelVisible = false;
