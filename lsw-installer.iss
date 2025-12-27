@@ -19,7 +19,7 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
-ArchitecturesInstallIn64BitMode=x64
+ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
 LicenseFile=C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\LICENSE_LSW.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
@@ -28,7 +28,8 @@ OutputBaseFilename=LuckyStackWorker-{#MyAppVersion}-setup
 SetupIconFile=C:\Users\wkast\git\luckystackworker\frontend\lsw_icon.ico
 Compression=lzma
 SolidCompression=yes
-WizardStyle=modern
+WizardStyle=modern dynamic
+WizardImageFile=C:\Users\wkast\git\luckystackworker\graphics\luckystackworker_icon.png
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

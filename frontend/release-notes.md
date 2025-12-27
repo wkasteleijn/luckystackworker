@@ -4,6 +4,7 @@
 
 - Added Derotation function to automatically derotate a set of images to a selected reference image
 - Added Stacking function to stack a set of images
+- Added "Set save scale & size" function to apply scaling and background resizing during saving and batch apply
 - Dispersion correction now automatically corrects to the estimated optimal values. Works on sub-pixel level
 - Enlarged histogram graphic for better visual reading
 - Filter values can now also be adjusted manually by entering the numerical values directly
