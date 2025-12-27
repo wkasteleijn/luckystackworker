@@ -17,6 +17,16 @@
   (close)="hideRotationPanel()"
   (angleChanged)="rotationAngleChanged($event)"
 ></app-rotation-panel>
+} @if (isSaveScaledPanelVisible) {
+<app-savescaling-panel
+  [scale]="profile.saveScale"
+  [dimensionX]="profile.saveDimensionX"
+  [dimensionY]="profile.saveDimensionY"
+  [nightMode]="nightMode"
+  [spinnerShown]="shouldShowSpinner()"
+  (close)="hideSaveScalingPanel()"
+  (scaleChanged)="saveScaleChanged($event)"
+></app-savescaling-panel>
 } @if (isProgressPanelVisible) {
 <app-progress-panel
   [workerProgress]="workerProgress"
@@ -42,7 +52,8 @@
   (close)="hideNotification()"
 ></app-notification>
 } @if ( isPsfPanelVisible || isRotationPanelVisible || isProgressPanelVisible ||
-isDerotationPanelVisible || isNotificationVisible ) {
+isDerotationPanelVisible || isNotificationVisible || isSaveScaledPanelVisible )
+{
 <div class="backdrop"></div>
 } @if (showNewVersionPopup) {
 <app-newversion
@@ -587,9 +598,9 @@ isDerotationPanelVisible || isNotificationVisible ) {
       class="{{
         'button3thRow infoButtonMargin ' +
           (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-          (blinkClippedAreas ? 'Pressed' : '')
+          (saveScaledEnabled() ? 'Pressed' : '')
       }}"
-      matTooltip="Save scaled"
+      matTooltip="Set save scale and size"
     >
       <img src="assets/images/resize.png" class="genericButton" />
     </button>

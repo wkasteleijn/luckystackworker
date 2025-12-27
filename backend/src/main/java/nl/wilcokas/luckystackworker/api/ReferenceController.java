@@ -18,6 +18,7 @@ import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.model.DeRotation;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
+import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
@@ -38,6 +39,7 @@ public class ReferenceController {
 
     private final SettingsRepository settingsService;
     private final ReferenceImageService referenceImageService;
+    private final ProfileRepository profileRepository;
     private final LuckyStackWorkerContext luckyStackWorkerContext;
 
     @GetMapping("/open")
@@ -64,7 +66,7 @@ public class ReferenceController {
     }
 
     @PutMapping("/save")
-    public void saveReferenceImage(@RequestBody ProfileDTO profile) throws IOException {
+    public void saveReferenceImage(@RequestBody ProfileDTO profileDTO) throws IOException {
         JFrame frame = referenceImageService.getParentFrame();
         JFileChooser jfc = referenceImageService.getJFileChooser(settingsService.getRootFolder(),"Specify location and file name");
         jfc.setFileFilter(new FileNameExtensionFilter("TIFF, JPG", "tif", "tiff", "jpg", "jpeg"));
@@ -75,8 +77,9 @@ public class ReferenceController {
         frame.dispose();
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
+            profileRepository.updateProfile(profileDTO);
             referenceImageService.saveReferenceImage(
-                    selectedFile.getAbsolutePath(), asJpeg(selectedFile), new Profile(profile));
+                    selectedFile.getAbsolutePath(), asJpeg(selectedFile), new Profile(profileDTO));
         }
     }
 

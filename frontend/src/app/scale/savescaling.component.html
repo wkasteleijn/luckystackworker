@@ -1,0 +1,67 @@
+<div class="popup-container">
+  <h2 class="{{ nightMode ? 'titleNight' : 'title' }}">
+    Set saving scale and size
+  </h2>
+  <button (click)="closePopup()" class="closeButton" matTooltip="Close panel">
+    <img src="assets/images/close.png" class="buttonImg" />
+  </button>
+
+  <p class="slidersStartMargin"></p>
+
+  <mat-button-toggle-group
+    [(ngModel)]="dimensions"
+    class="toggle"
+    (change)="onDimensionsChanged()"
+  >
+    <mat-button-toggle value="640x480">640x480</mat-button-toggle>
+    <mat-button-toggle value="800x600">800x600</mat-button-toggle>
+    <mat-button-toggle value="1024x768">1024x768</mat-button-toggle>
+    <mat-button-toggle value="1280x1024">1280x1024</mat-button-toggle>
+    <mat-button-toggle value="1600x1200">1600x1200</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <p class="backgroundSizeMargin"></p>
+
+  <div>
+    Background size
+    <input
+      matInput
+      type="text"
+      (keypress)="onDimensionXChanged()"
+      [(ngModel)]="dimensionX"
+      class="valueInput"
+    />
+    x
+    <input
+      matInput
+      type="text"
+      (keypress)="onDimensionYChanged()"
+      [(ngModel)]="dimensionY"
+      class="valueInput"
+    />
+  </div>
+
+  <div class="sliderContainer">
+    <div class="sliderGroup">
+      <label class="sliderLabel">Scale</label>
+      <mat-slider
+        class="slider"
+        step="1"
+        min="1"
+        max="200"
+        (input)="onScaleUpdated($event)"
+        (change)="onScaleChanged()"
+        [(ngModel)]="scale"
+        [color]="colorTheme()"
+        [disabled]="spinnerShown"
+      ></mat-slider>
+      <input
+        matInput
+        type="text"
+        (keypress)="onInputKeyPress($event)"
+        [(ngModel)]="scaleManualInput"
+        class="valueInput"
+      />
+    </div>
+  </div>
+</div>

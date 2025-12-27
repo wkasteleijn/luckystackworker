@@ -235,6 +235,9 @@ public class LswImageProcessingUtil {
         profile.setLuminanceIncludeColor(true);
         profile.setScale(scale);
         profile.setRotationAngle(0);
+        profile.setSaveDimensionX(0);
+        profile.setSaveDimensionY(0);
+        profile.setSaveScale(100);
         profile.setOpenImageMode(
                 openImageMode == null ? OpenImageModeEnum.RGB : OpenImageModeEnum.valueOf(openImageMode));
     }
@@ -606,5 +609,9 @@ public class LswImageProcessingUtil {
             if (value > 65535f) value = 65535f;
             toPixels[i] = (short) value;
         }
+    }
+
+    public static int getLuminanceValue(int r, int g, int b) {
+        return (int)(0.299 * r + 0.587 * g + 0.114 * b);
     }
 }

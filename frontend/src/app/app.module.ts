@@ -22,6 +22,7 @@ import { NotificationComponent } from './notification/notification.component';
 import { ProgressPanelComponent } from './progresspanel/progresspanel.component';
 import { SyntheticPsfComponent } from './psf/synthetic.psf.component';
 import { RotationComponent } from './rotate/rotation.component';
+import { SaveScalingComponent } from './scale/savescaling.component';
 import { SliderComponent } from './slider/slider.component';
 import { SliderInputComponent } from './slider_input/sliderinput.component';
 
@@ -47,6 +48,7 @@ import { ConfirmationComponent } from './confirmation/confirmation.component';
     SliderComponent,
     NotificationComponent,
     SliderInputComponent,
+    SaveScalingComponent,
   ],
   imports: [
     BrowserModule,

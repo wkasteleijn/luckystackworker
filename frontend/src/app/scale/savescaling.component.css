@@ -1,0 +1,134 @@
+.popup-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgb(168, 168, 168);
+  background-color: #191919;
+  border: 1px solid rgb(168, 168, 168);
+  padding: 20px;
+  width: 400px;
+  height: 175px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.sliderContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-left: 0px;
+  padding-right: 12px;
+}
+
+.sliderGroup {
+  display: grid;
+  grid-template-columns: 24px 264px 10px;
+  align-items: center;
+  height: 16px;
+  column-gap: 8px;
+}
+
+.sliderLabel {
+  white-space: nowrap;
+}
+
+.slider {
+  width: 100%;
+}
+
+.sliderValue {
+  text-align: left;
+}
+
+.image-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.psfImage {
+  width: 128px;
+  border: 1px solid rgb(168, 168, 168);
+  position: fixed;
+  top: 24px;
+  left: 151px;
+}
+.slidersStartMargin {
+  margin-top: 40px;
+}
+.backgroundSizeMargin {
+  margin-top: 8px;
+}
+
+.closeButton {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  border-style: hidden;
+}
+
+button {
+  height: 40px;
+  font-size: 12px;
+  border: 0px;
+  color: rgb(168, 168, 168);
+  background-color: #404040;
+  border-radius: 24px;
+  padding-left: 11px;
+  padding-right: 11px;
+  border-radius: 20px;
+  padding-top: 2px;
+  padding-bottom: 0px;
+}
+
+.buttonImg {
+  width: 20px;
+}
+.type {
+  height: 24px;
+  color: rgb(132, 233, 132);
+}
+.typeNight {
+  height: 24px;
+  color: orange;
+}
+.title {
+  color: rgb(132, 233, 132);
+}
+.titleNight {
+  color: orange;
+}
+
+h2 {
+  height: 20px;
+}
+
+.loadCustomPsfButton {
+  margin-top: 8px;
+}
+.toggle {
+  background-color: #191919 !important; /* Black background */
+  color: rgb(168, 168, 168) !important; /* Light gray text */
+  border-radius: 0; /* Remove rounded corners */
+}
+
+/* Style each button */
+mat-button-toggle {
+  background-color: #191919 !important; /* Ensure the button background is black */
+  color: rgb(168, 168, 168) !important; /* Text color */
+  border: 1px solid gray !important; /* Optional: Adds a border */
+  border-radius: 0px;
+}
+
+/* Change background of selected button */
+mat-button-toggle.mat-button-toggle-checked {
+  background-color: darkgray !important; /* Dark gray when selected */
+  color: black !important; /* Black text when selected */
+}
+
+.valueInput {
+  width: 38px;
+  color: rgb(168, 168, 168);
+  border: 1px solid rgb(168, 168, 168);
+  background-color: #191919;
+}

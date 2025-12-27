@@ -150,6 +150,7 @@ export class AppComponent implements OnInit {
   applyDenoiseToChannel: string = 'RGB';
   isPsfPanelVisible: boolean = false;
   isRotationPanelVisible: boolean = false;
+  isSaveScaledPanelVisible: boolean = false;
   isProgressPanelVisible: boolean = false;
   isDerotationPanelVisible: boolean = false;
   isNotificationVisible: boolean = false;
@@ -364,13 +365,12 @@ export class AppComponent implements OnInit {
 
   openRotationPanel() {
     console.log('openRotationPanel called');
-    this.isRotationPanelVisible = true;
-  }
-
-  openSaveScaledPanel() {
-    console.log('openSaveScaledPanel called');
-    if (this.profile) {
-      // TODO: implement
+    if (this.rotationAngle !== 0) {
+      this.rotationAngle = 0;
+      this.settings.operations = ['ROTATE'];
+      this.profile.rotationAngle = this.rotationAngle;
+      this.updateProfile();
+    } else {
       this.isRotationPanelVisible = true;
     }
   }
@@ -383,6 +383,37 @@ export class AppComponent implements OnInit {
   hideRotationPanel() {
     console.log('hideRotationPanel called');
     this.isRotationPanelVisible = false;
+  }
+
+  openSaveScaledPanel() {
+    console.log('openSaveScaledPanel called');
+    if (!this.saveScaledEnabled()) {
+      this.isSaveScaledPanelVisible = true;
+    } else {
+      this.profile.saveScale = 100;
+      this.profile.saveDimensionX = 0;
+      this.profile.saveDimensionY = 0;
+    }
+  }
+
+  saveScaleChanged(event: any) {
+    console.log('saveScaleChanged called');
+    this.profile.saveScale = event.scale;
+    this.profile.saveDimensionX = event.dimensionX;
+    this.profile.saveDimensionY = event.dimensionY;
+  }
+
+  saveScaledEnabled() {
+    return (
+      this.profile.saveDimensionX > 0 ||
+      this.profile.saveDimensionY > 0 ||
+      this.profile.saveScale !== 100
+    );
+  }
+
+  hideSaveScalingPanel() {
+    console.log('saveScaleChanged called');
+    this.isSaveScaledPanelVisible = false;
   }
 
   radiusChanged(event: any, update: boolean) {

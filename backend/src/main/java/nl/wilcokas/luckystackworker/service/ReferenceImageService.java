@@ -224,18 +224,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             Roi roi = luckyStackWorkerContext.getSelectedRoi();
             savedImage = LswImageProcessingUtil.crop(finalResultImage, roi, path);
         }
-
-        // Test
-        profile.setSaveScale(50);
-        profile.setSaveDimensionX(800);
-        profile.setSaveDimensionY(600);
-        // End test
-
         if (profile.getSaveScale() != 100.0) {
             savedImage = operationService.scaleImage(savedImage, profile.getSaveScale() / 100D);
         }
-        if ((profile.getSaveDimensionX() != 0D && profile.getSaveDimensionY() != 0D) &&
-                (profile.getSaveDimensionX() != savedImage.getWidth() || profile.getSaveDimensionY() != savedImage.getHeight())) {
+        if (profile.getSaveDimensionX() != 0D && profile.getSaveDimensionY() != 0D) {
             savedImage = operationService.resizeImageBackground(savedImage, profile.getSaveDimensionX(), profile.getSaveDimensionY());
         }
         LswFileUtil.saveImage(

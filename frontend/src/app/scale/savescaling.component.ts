@@ -1,40 +1,59 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
-import { MatLegacyDialog } from '@angular/material/legacy-dialog';
 
 @Component({
-  selector: 'app-rotation-panel',
-  templateUrl: './rotation.component.html',
-  styleUrls: ['./rotation.component.css'],
+  selector: 'app-savescaling-panel',
+  templateUrl: './savescaling.component.html',
+  styleUrls: ['./savescaling.component.css'],
   standalone: false,
 })
-export class RotationComponent {
-  @Input() angle: number = 0;
+export class SaveScalingComponent {
+  @Input() scale: number = 100;
+  @Input() dimensionX: number = 100;
+  @Input() dimensionY: number = 100;
   @Input() nightMode: boolean = false;
   @Input() spinnerShown = false;
-  @Output() angleChanged = new EventEmitter<any>();
+  @Output() scaleChanged = new EventEmitter<any>();
   @Output() close = new EventEmitter<any>();
 
-  angleManualInput: number = 0;
+  scaleManualInput: number = 100;
+
+  dimensions: string;
 
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
 
-  constructor(private confirmationDialog: MatLegacyDialog) {}
+  constructor() {}
 
   closePopup() {
     this.close.emit();
   }
 
-  onAngleUpdated(event: any) {
-    console.log('onAngleUpdated called');
-    this.angle = event.value;
-    this.angleManualInput = this.angle;
+  onDimensionsChanged() {
+    this.dimensionX = Number(this.dimensions.split('x')[0]);
+    this.dimensionY = Number(this.dimensions.split('x')[1]);
+    this.emitScaleChanged();
   }
 
-  onAngleChanged() {
-    console.log('onAngleChanged called');
-    this.emitAngleChanged();
+  onDimensionXChanged() {
+    console.log('onDimensionXChanged called');
+    this.emitScaleChanged();
+  }
+
+  onDimensionYChanged() {
+    console.log('onDimensionYChanged called');
+    this.emitScaleChanged();
+  }
+
+  onScaleUpdated(event: any) {
+    console.log('onScaleChanged called');
+    this.scale = event.value;
+    this.scaleManualInput = this.scale;
+  }
+
+  onScaleChanged() {
+    console.log('onScaleChanged called');
+    this.emitScaleChanged();
   }
 
   colorTheme() {
@@ -63,14 +82,14 @@ export class RotationComponent {
       return true;
     }
 
-    const enteredAngle = Number(inputValue);
-    if (enteredAngle < -180) {
-      this.angle = -180;
-      inputElement.value = this.angle.toString();
+    const enteredScale = Number(inputValue);
+    if (enteredScale < -180) {
+      this.scale = -180;
+      inputElement.value = this.scale.toString();
     }
-    if (enteredAngle > 180) {
-      this.angle = 180;
-      inputElement.value = this.angle.toString();
+    if (enteredScale > 180) {
+      this.scale = 180;
+      inputElement.value = this.scale.toString();
     }
 
     if (char === 'Enter') {
@@ -82,11 +101,11 @@ export class RotationComponent {
     return false;
   }
 
-  onTextInput(event: any): void {
+  private onTextInput(event: any): void {
     console.log('onTextInput called');
     const input = event.target.value;
     event.target.value = input;
-    this.angle = input;
+    this.scale = input;
     const decimalMatch = input.match(/\./g);
 
     let isValidNumber = true;
@@ -99,12 +118,16 @@ export class RotationComponent {
 
     if (isValidNumber) {
       event.target.value = input;
-      this.angle = input;
-      this.emitAngleChanged();
+      this.scale = input;
+      this.emitScaleChanged();
     }
   }
 
-  private emitAngleChanged() {
-    this.angleChanged.emit(this.angle);
+  private emitScaleChanged() {
+    this.scaleChanged.emit({
+      scale: this.scale,
+      dimensionX: this.dimensionX,
+      dimensionY: this.dimensionY,
+    });
   }
 }

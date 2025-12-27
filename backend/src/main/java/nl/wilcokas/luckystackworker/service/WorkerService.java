@@ -174,6 +174,12 @@ public class WorkerService {
                         imp.setRoi(luckyStackWorkerContext.getSelectedRoi());
                         imp = imp.crop();
                     }
+                    if (profile.getSaveScale() != 100.0) {
+                        imp = operationService.scaleImage(imp, profile.getSaveScale() / 100D);
+                    }
+                    if (profile.getSaveDimensionX() != 0D && profile.getSaveDimensionY() != 0D) {
+                        imp = operationService.resizeImageBackground(imp, profile.getSaveDimensionX(), profile.getSaveDimensionY());
+                    }
                     LswFileUtil.saveImage(
                             imp,
                             profileName,

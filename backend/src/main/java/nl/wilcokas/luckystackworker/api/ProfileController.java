@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class ProfileController {
 
-    private final ProfileRepository profileService;
+    private final ProfileRepository profileRepository;
     private final ReferenceImageService referenceImageService;
     private final SettingsRepository settingsService;
     private final PSFService psfService;
@@ -48,7 +48,7 @@ public class ProfileController {
     @GetMapping
     public List<ProfileDTO> getProfiles() {
         log.info("getProfiles called");
-        return profileService.getAllProfiles().stream().map(ProfileDTO::new).toList();
+        return profileRepository.getAllProfiles().stream().map(ProfileDTO::new).toList();
     }
 
     @GetMapping("/selected")
@@ -57,7 +57,7 @@ public class ProfileController {
         ProfileDTO profile = new ProfileDTO();
         String profileName = luckyStackWorkerContext.getSelectedProfile();
         if (profileName != null) {
-            profile = new ProfileDTO(profileService
+            profile = new ProfileDTO(profileRepository
                     .findByName(profileName)
                     .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName))));
         }
@@ -70,7 +70,7 @@ public class ProfileController {
     @GetMapping("/{profile}")
     public ProfileDTO getProfile(@PathVariable(value = "profile") String profileName) {
         log.info("getProfile called with profile {}", profileName);
-        return new ProfileDTO(profileService
+        return new ProfileDTO(profileRepository
                 .findByName(profileName)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName))));
     }
@@ -113,7 +113,7 @@ public class ProfileController {
                 || LocalDateTime.now()
                         .isAfter(activeOperationTime.plusSeconds(Constants.MAX_OPERATION_TIME_BEFORE_RESUMING))) {
             luckyStackWorkerContext.setActiveOperationTime(LocalDateTime.now());
-            profile = profileService.updateProfile(profileDTO);
+            profile = profileRepository.updateProfile(profileDTO);
             psfImage = referenceImageService.updateProcessing(profile, operations);
             luckyStackWorkerContext.setActiveOperationTime(null);
         } else {
@@ -134,6 +134,7 @@ public class ProfileController {
     public void applyProfile(@RequestBody ProfileDTO profile) throws IOException {
         String profileName = profile.getName();
         if (profileName != null) {
+            profileRepository.updateProfile(profile);
             luckyStackWorkerContext.setStatus(Constants.STATUS_WORKING);
             luckyStackWorkerContext.setSelectedRoi(
                     referenceImageService.getDisplayedImage().getRoi());
@@ -160,7 +161,7 @@ public class ProfileController {
 
     @PutMapping("/scale")
     public ResponseDTO scale(@RequestBody ProfileDTO profileDTO) throws IOException {
-        Profile profile = profileService.updateProfile(profileDTO);
+        Profile profile = profileRepository.updateProfile(profileDTO);
         return referenceImageService.scale(profile);
     }
 

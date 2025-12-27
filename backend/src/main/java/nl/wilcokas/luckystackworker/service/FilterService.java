@@ -1,16 +1,15 @@
 
 package nl.wilcokas.luckystackworker.service;
 
-import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.convertToUnsignedInt;
-import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getLswImageLayers;
-
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.gui.Roi;
 import ij.plugin.Scaler;
 import jakarta.annotation.PostConstruct;
+
 import java.io.IOException;
 import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
@@ -28,6 +27,9 @@ import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.PsfDiskGenerator;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
+
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.*;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.convertToShort;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -152,64 +154,36 @@ public class FilterService {
             return LswImageProcessingUtil.crop(image, roi, "cropped");
         }
 
-        // 1. Based on pixels luminance intensity, consider only the ones with 10% or less intensity above the lowest pixel value and calculate the average R G B pixel intensity over those.
         ImageStack stack = image.getStack();
         short[] redPixels = (short[]) stack.getProcessor(Constants.RED_LAYER_INDEX).getPixels();
         short[] greenPixels = (short[]) stack.getProcessor(Constants.GREEN_LAYER_INDEX).getPixels();
         short[] bluePixels = (short[]) stack.getProcessor(Constants.BLUE_LAYER_INDEX).getPixels();
 
-        double minLuminance = Double.MAX_VALUE;
-        for (int i = 0; i < redPixels.length; i++) {
-            double luminance = 0.299 * convertToUnsignedInt(redPixels[i])
-                    + 0.587 * convertToUnsignedInt(greenPixels[i])
-                    + 0.114 * convertToUnsignedInt(bluePixels[i]);
-            if (luminance < minLuminance) {
-                minLuminance = luminance;
-            }
-        }
+        int backgroundLuminanceValueRed = determineBackgroundValue(redPixels, width);
+        int backgroundLuminanceValueGreen = determineBackgroundValue(greenPixels, width);
+        int backgroundLuminanceValueBlue = determineBackgroundValue(bluePixels, width);
 
-        double luminanceThreshold = minLuminance * 1.5;
-        long sumRed = 0, sumGreen = 0, sumBlue = 0;
-        int count = 0;
-        for (int i = 0; i < redPixels.length; i++) {
-            int r = convertToUnsignedInt(redPixels[i]);
-            int g = convertToUnsignedInt(greenPixels[i]);
-            int b = convertToUnsignedInt(bluePixels[i]);
-            double luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-            if (luminance <= luminanceThreshold) {
-                sumRed += r;
-                sumGreen += g;
-                sumBlue += b;
-                count++;
-            }
-        }
-
-        short avgRed = (short) (count > 0 ? sumRed / count : 0);
-        short avgGreen = (short) (count > 0 ? sumGreen / count : 0);
-        short avgBlue = (short) (count > 0 ? sumBlue / count : 0);
-
-        // 2. Use the averages to create a new image with the specified dimensions.
         short[] newRedPixels = new short[dimensionX * dimensionY];
         short[] newGreenPixels = new short[dimensionX * dimensionY];
         short[] newBluePixels = new short[dimensionX * dimensionY];
 
-        Arrays.fill(newRedPixels, avgRed);
-        Arrays.fill(newGreenPixels, avgGreen);
-        Arrays.fill(newBluePixels, avgBlue);
+        // 2. Use the averages to create a new image with the specified dimensions.
+        Arrays.fill(newRedPixels, convertToShort(backgroundLuminanceValueRed));
+        Arrays.fill(newGreenPixels, convertToShort(backgroundLuminanceValueGreen));
+        Arrays.fill(newBluePixels, convertToShort(backgroundLuminanceValueBlue));
 
         int xOffset = (dimensionX - width) / 2;
         int yOffset = (dimensionY - height) / 2;
 
-        double avgLuminance = 0.299 * avgRed + 0.587 * avgGreen + 0.114 * avgBlue;
-        double replaceThreshold = avgLuminance * 1.5;
-
+        double avgLuminance = getLuminanceValue(backgroundLuminanceValueRed, backgroundLuminanceValueGreen, backgroundLuminanceValueBlue);
+        double replaceThreshold = avgLuminance * 1.1;
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int oldIndex = y * width + x;
                 int r = convertToUnsignedInt(redPixels[oldIndex]);
                 int g = convertToUnsignedInt(greenPixels[oldIndex]);
                 int b = convertToUnsignedInt(bluePixels[oldIndex]);
-                double luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+                double luminance = getLuminanceValue(r, g, b);
                 // 3. disregard the edges of the original image, 5 pixels from the edge will be included to be precise.
                 if ((x > 5 && x < width - 6 && y > 5 && y < height - 6) && (luminance > replaceThreshold)) {
                     int newIndex = (y + yOffset) * dimensionX + (x + xOffset);
@@ -220,7 +194,19 @@ public class FilterService {
             }
         }
         LswImageLayers newLayers = new LswImageLayers(dimensionX, dimensionY, new short[][]{newRedPixels, newGreenPixels, newBluePixels});
-        return LswImageProcessingUtil.create16BitRGBImage("resized", newLayers,true, true, true);
+        return LswImageProcessingUtil.create16BitRGBImage("resized", newLayers, true, true, true);
+    }
+
+    private int determineBackgroundValue(short[] pixels, int width) {
+        double value = 0;
+        int offsetStart = width * 20 + 20;
+        if (pixels.length > offsetStart+20) {
+            // Take a sample of the left top 20 pixels (with 20 offset) to determine the background luminance.
+            for (int i = offsetStart; i < offsetStart+20; i++) {
+                value += convertToUnsignedInt(pixels[i]);
+            }
+        }
+        return (int) (value / 20);
     }
 
     private void applyFilters(

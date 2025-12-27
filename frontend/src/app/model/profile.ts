@@ -136,6 +136,9 @@ export class Profile {
   scale: number;
   rotationAngle: number;
   openImageMode: string;
+  saveScale: number;
+  saveDimensionX: number;
+  saveDimensionY: number;
 
   psf: PSF;
 }
