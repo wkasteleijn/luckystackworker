@@ -79,7 +79,7 @@ public class ProfileController {
     public ResponseDTO loadProfile() {
         log.info("loadProfile called");
         JFrame frame = referenceImageService.getParentFrame();
-        JFileChooser jfc = referenceImageService.getJFileChooser(settingsService.getRootFolder(),"Open yaml file");
+        JFileChooser jfc = referenceImageService.getJFileChooser(settingsService.getRootFolder(), "Open yaml file");
         FileNameExtensionFilter filter = new FileNameExtensionFilter("YAML", "yaml");
         jfc.setFileFilter(filter);
         int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, false);

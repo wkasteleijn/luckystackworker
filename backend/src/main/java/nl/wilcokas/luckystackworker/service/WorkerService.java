@@ -178,7 +178,8 @@ public class WorkerService {
                         imp = operationService.scaleImage(imp, profile.getSaveScale() / 100D);
                     }
                     if (profile.getSaveDimensionX() != 0D && profile.getSaveDimensionY() != 0D) {
-                        imp = operationService.resizeImageBackground(imp, profile.getSaveDimensionX(), profile.getSaveDimensionY());
+                        imp = operationService.resizeImageBackground(
+                                imp, profile.getSaveDimensionX(), profile.getSaveDimensionY());
                     }
                     LswFileUtil.saveImage(
                             imp,

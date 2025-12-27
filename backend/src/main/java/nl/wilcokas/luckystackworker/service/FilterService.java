@@ -1,15 +1,15 @@
-
 package nl.wilcokas.luckystackworker.service;
+
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.*;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.convertToShort;
 
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.gui.Roi;
 import ij.plugin.Scaler;
 import jakarta.annotation.PostConstruct;
-
 import java.io.IOException;
 import java.util.*;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
@@ -27,9 +27,6 @@ import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.PsfDiskGenerator;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
-
-import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.*;
-import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.convertToShort;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -155,9 +152,12 @@ public class FilterService {
         }
 
         ImageStack stack = image.getStack();
-        short[] redPixels = (short[]) stack.getProcessor(Constants.RED_LAYER_INDEX).getPixels();
-        short[] greenPixels = (short[]) stack.getProcessor(Constants.GREEN_LAYER_INDEX).getPixels();
-        short[] bluePixels = (short[]) stack.getProcessor(Constants.BLUE_LAYER_INDEX).getPixels();
+        short[] redPixels =
+                (short[]) stack.getProcessor(Constants.RED_LAYER_INDEX).getPixels();
+        short[] greenPixels =
+                (short[]) stack.getProcessor(Constants.GREEN_LAYER_INDEX).getPixels();
+        short[] bluePixels =
+                (short[]) stack.getProcessor(Constants.BLUE_LAYER_INDEX).getPixels();
 
         int backgroundLuminanceValueRed = determineBackgroundValue(redPixels, width);
         int backgroundLuminanceValueGreen = determineBackgroundValue(greenPixels, width);
@@ -175,7 +175,8 @@ public class FilterService {
         int xOffset = (dimensionX - width) / 2;
         int yOffset = (dimensionY - height) / 2;
 
-        double avgLuminance = getLuminanceValue(backgroundLuminanceValueRed, backgroundLuminanceValueGreen, backgroundLuminanceValueBlue);
+        double avgLuminance = getLuminanceValue(
+                backgroundLuminanceValueRed, backgroundLuminanceValueGreen, backgroundLuminanceValueBlue);
         double replaceThreshold = avgLuminance * 1.1;
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -193,16 +194,17 @@ public class FilterService {
                 }
             }
         }
-        LswImageLayers newLayers = new LswImageLayers(dimensionX, dimensionY, new short[][]{newRedPixels, newGreenPixels, newBluePixels});
+        LswImageLayers newLayers =
+                new LswImageLayers(dimensionX, dimensionY, new short[][] {newRedPixels, newGreenPixels, newBluePixels});
         return LswImageProcessingUtil.create16BitRGBImage("resized", newLayers, true, true, true);
     }
 
     private int determineBackgroundValue(short[] pixels, int width) {
         double value = 0;
         int offsetStart = width * 20 + 20;
-        if (pixels.length > offsetStart+20) {
+        if (pixels.length > offsetStart + 20) {
             // Take a sample of the left top 20 pixels (with 20 offset) to determine the background luminance.
-            for (int i = offsetStart; i < offsetStart+20; i++) {
+            for (int i = offsetStart; i < offsetStart + 20; i++) {
                 value += convertToUnsignedInt(pixels[i]);
             }
         }

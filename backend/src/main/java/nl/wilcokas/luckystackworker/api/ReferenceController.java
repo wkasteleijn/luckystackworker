@@ -53,7 +53,7 @@ public class ReferenceController {
     public SettingsDTO selectRootFolder() {
         JFrame frame = referenceImageService.getParentFrame();
         SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
-        JFileChooser jfc = referenceImageService.getJFileChooser(settingsDTO.getRootFolder(),"Select root folder");
+        JFileChooser jfc = referenceImageService.getJFileChooser(settingsDTO.getRootFolder(), "Select root folder");
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, false);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -68,7 +68,8 @@ public class ReferenceController {
     @PutMapping("/save")
     public void saveReferenceImage(@RequestBody ProfileDTO profileDTO) throws IOException {
         JFrame frame = referenceImageService.getParentFrame();
-        JFileChooser jfc = referenceImageService.getJFileChooser(settingsService.getRootFolder(),"Specify location and file name");
+        JFileChooser jfc = referenceImageService.getJFileChooser(
+                settingsService.getRootFolder(), "Specify location and file name");
         jfc.setFileFilter(new FileNameExtensionFilter("TIFF, JPG", "tif", "tiff", "jpg", "jpeg"));
         String fileNameNoExt = LswFileUtil.getFilename(referenceImageService.getFilePath());
         jfc.setSelectedFile(

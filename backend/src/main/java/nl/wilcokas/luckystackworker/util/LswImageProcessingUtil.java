@@ -612,6 +612,6 @@ public class LswImageProcessingUtil {
     }
 
     public static int getLuminanceValue(int r, int g, int b) {
-        return (int)(0.299 * r + 0.587 * g + 0.114 * b);
+        return (int) (0.299 * r + 0.587 * g + 0.114 * b);
     }
 }
