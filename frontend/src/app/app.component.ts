@@ -405,9 +405,10 @@ export class AppComponent implements OnInit {
 
   saveScaledEnabled() {
     return (
-      this.profile.saveDimensionX > 0 ||
-      this.profile.saveDimensionY > 0 ||
-      this.profile.saveScale !== 100
+      this.profile &&
+      (this.profile.saveDimensionX > 0 ||
+        this.profile.saveDimensionY > 0 ||
+        this.profile.saveScale !== 100)
     );
   }
 

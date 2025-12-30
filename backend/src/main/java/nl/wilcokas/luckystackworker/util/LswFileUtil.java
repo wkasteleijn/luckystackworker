@@ -9,6 +9,7 @@ import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
+
 import java.awt.image.ColorModel;
 import java.io.*;
 import java.math.BigDecimal;
@@ -21,6 +22,7 @@ import java.time.ZoneOffset;
 import java.util.function.UnaryOperator;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.exceptions.NotARawImageException;
@@ -44,7 +46,8 @@ import org.yaml.snakeyaml.inspector.TagInspector;
 @Slf4j
 public class LswFileUtil {
 
-    private LswFileUtil() {}
+    private LswFileUtil() {
+    }
 
     public static boolean fileExists(String path) {
         return Files.exists(Paths.get(path));
@@ -533,11 +536,11 @@ public class LswFileUtil {
         }
     }
 
-    public static LocalDateTime getObjectDateTime(final String filePath) throws IOException {
+    public static LocalDateTime getObjectDateTime(final String filePath) {
         // Attempt to derive from filename hopefully winjupos formatted (e.g. 2024-04-16-1857_6_...)
         String filename =
                 LswFileUtil.getFilenameFromPath(LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(filePath)));
-        String[] parts = filename.split("-");
+        String[] parts = filename.replaceFirst("STACK_", "").split("-");
         if (parts[0].length() == 4
                 && NumberUtils.isCreatable(parts[0])
                 && parts[3].length() >= 4
@@ -556,8 +559,13 @@ public class LswFileUtil {
             }
         }
         // Use file date as a fallback
-        return LocalDateTime.ofInstant(
-                ((FileTime) Files.getAttribute(Paths.get(filePath), "creationTime")).toInstant(), ZoneOffset.UTC);
+        try {
+            return LocalDateTime.ofInstant(
+                    ((FileTime) Files.getAttribute(Paths.get(filePath), "creationTime")).toInstant(), ZoneOffset.UTC);
+        } catch (IOException _) {
+            // Or the current date time if nothing else is available
+            return LocalDateTime.now();
+        }
     }
 
     public static ImagePlus getWienerDeconvolutionPSF(String profileName) {

@@ -160,7 +160,7 @@ public class ProfileController {
     }
 
     @PutMapping("/scale")
-    public ResponseDTO scale(@RequestBody ProfileDTO profileDTO) throws IOException {
+    public ResponseDTO scale(@RequestBody ProfileDTO profileDTO) {
         Profile profile = profileRepository.updateProfile(profileDTO);
         return referenceImageService.scale(profile);
     }

@@ -12,6 +12,7 @@ import ij.ImagePlus;
 import ij.gui.*;
 import ij.io.Opener;
 import ij.process.ColorProcessor;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -41,6 +42,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -127,7 +129,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     private final DeRotationService deRotationService;
     private final StackService stackService;
 
-    public ResponseDTO scale(Profile profile) throws IOException {
+    public ResponseDTO scale(Profile profile) {
         this.isLargeImage = openReferenceImage(
                 this.imageMetadata.getFilePath(),
                 profile,
@@ -138,7 +140,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
     }
 
-    public ResponseDTO selectReferenceImage(String filePath, double scale, String openImageMode) throws IOException {
+    public ResponseDTO selectReferenceImage(String filePath, double scale, String openImageMode) {
         JFrame frame = getParentFrame();
         JFileChooser jfc = getJFileChooser(filePath, "Open image");
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
@@ -192,9 +194,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         List<FilterEnum> operations = operationValues == null
                 ? emptyList()
                 : operationValues.stream()
-                        .map(operationValue ->
-                                operationValue == null ? null : FilterEnum.valueOf(operationValue.toUpperCase()))
-                        .toList();
+                .map(operationValue ->
+                        operationValue == null ? null : FilterEnum.valueOf(operationValue.toUpperCase()))
+                .toList();
         if (roiSwitched) {
             operations = emptyList();
             roiSwitched = false;
@@ -320,7 +322,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         operationService.clearCache();
         roiSwitched = true;
         if (!luckyStackWorkerContext.isRoiActive()) {
-            if (luckyStackWorkerContext.getSelectedRoi() == null) {
+            if (luckyStackWorkerContext.getSelectedRoi() == null || !isValidCachedRoi()) {
                 int width = displayedImage.getWidth() / 2;
                 int height = displayedImage.getHeight() / 2;
                 int x = (displayedImage.getWidth() - width) / 2;
@@ -377,7 +379,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 .build();
         if (settings.getLatestKnownVersionChecked() == null
                 || currentDate.isAfter(
-                        settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
+                settings.getLatestKnownVersionChecked().plusDays(Constants.VERSION_REQUEST_FREQUENCY))) {
             LswVersionNumber latestVersionFromGithub = requestLatestVersion().orElse(null);
             if (latestVersionFromGithub != null
                     && (latestVersionFromGithub.getConvertedVersion() > latestKnowVersion.getConvertedVersion())) {
@@ -438,37 +440,48 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     @Override
-    public void windowOpened(WindowEvent e) {}
+    public void windowOpened(WindowEvent e) {
+    }
 
     @Override
-    public void windowClosing(WindowEvent e) {}
+    public void windowClosing(WindowEvent e) {
+    }
 
     @Override
-    public void windowClosed(WindowEvent e) {}
+    public void windowClosed(WindowEvent e) {
+    }
 
     @Override
-    public void windowIconified(WindowEvent e) {}
+    public void windowIconified(WindowEvent e) {
+    }
 
     @Override
-    public void windowDeiconified(WindowEvent e) {}
+    public void windowDeiconified(WindowEvent e) {
+    }
 
     @Override
-    public void windowActivated(WindowEvent e) {}
+    public void windowActivated(WindowEvent e) {
+    }
 
     @Override
-    public void windowDeactivated(WindowEvent e) {}
+    public void windowDeactivated(WindowEvent e) {
+    }
 
     @Override
-    public void componentResized(ComponentEvent e) {}
+    public void componentResized(ComponentEvent e) {
+    }
 
     @Override
-    public void componentMoved(ComponentEvent e) {}
+    public void componentMoved(ComponentEvent e) {
+    }
 
     @Override
-    public void componentShown(ComponentEvent e) {}
+    public void componentShown(ComponentEvent e) {
+    }
 
     @Override
-    public void componentHidden(ComponentEvent e) {}
+    public void componentHidden(ComponentEvent e) {
+    }
 
     public void updateHistogramMetadata(Profile profile) {
         int[][] rgbHistograms = get16BitRGBHistogram(finalResultImage, 100);
@@ -630,7 +643,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                         Profile profile = profileService
                                 .findByName(profileName)
                                 .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
-                        openReferenceImage(deRotatedImagePath, profile, LocalDateTime.now());
+                        openReferenceImage(deRotatedImagePath, profile, LswFileUtil.getObjectDateTime(deRotatedImagePath));
                         luckyStackWorkerContext.setSelectedProfile(profile.getName());
                     }
                 },
@@ -887,6 +900,15 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 new LswImageViewer(title, new ColorProcessor(image.getWidth(), image.getHeight()));
         LswImageProcessingUtil.convertLayersToColorImage(layersDto.getLayers(), singleLayerColorImage);
         return singleLayerColorImage;
+    }
+
+    private boolean isValidCachedRoi() {
+        Roi roi = luckyStackWorkerContext.getSelectedRoi();
+        // If the cached ROI is sonehow almost as large as the whole image then assume that something is wrong
+        if ((roi.getFloatWidth() > 0.95 * displayedImage.getWidth()) || (roi.getFloatHeight() > 0.95 * displayedImage.getHeight())) {
+            return false;
+        }
+        return true;
     }
 
     private List<String> limitNotesList(final List<String> notes, int limit) {
