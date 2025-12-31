@@ -191,9 +191,9 @@ export class AppComponent implements OnInit {
       .subscribe({
         next: (data) => {
           console.log('Successfully opened the image: ', data);
-          this.refImageSelected = true;
           this.roi = false;
           if (data && data.profile) {
+            this.refImageSelected = true;
             this.profile = data.profile;
             this.settings = data.settings;
             this.selectedProfile = this.profile.name;
