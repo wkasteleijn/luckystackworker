@@ -9,7 +9,6 @@ import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
-
 import java.awt.image.ColorModel;
 import java.io.*;
 import java.math.BigDecimal;
@@ -22,7 +21,6 @@ import java.time.ZoneOffset;
 import java.util.function.UnaryOperator;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.exceptions.NotARawImageException;
@@ -46,8 +44,7 @@ import org.yaml.snakeyaml.inspector.TagInspector;
 @Slf4j
 public class LswFileUtil {
 
-    private LswFileUtil() {
-    }
+    private LswFileUtil() {}
 
     public static boolean fileExists(String path) {
         return Files.exists(Paths.get(path));
