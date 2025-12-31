@@ -77,8 +77,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
             setTextGap(getCenterOnScreen() ? 0 : TEXT_GAP);
         }
         setForeground(Color.black);
-        if (IJ.isLinux()) setBackground(ImageJ.backgroundColor);
-        else setBackground(Color.white);
+        setBackground(backgroundColor);
         ij = IJ.getInstance();
         this.imp = imp;
         ic = new LswImageCanvas(imp);

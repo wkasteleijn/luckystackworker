@@ -455,16 +455,16 @@
   transform: scale(1.9);
   margin-top: 2px;
 }
+.startBatchButton {
+  width: 13px;
+  transform: scale(2.5);
+  margin-top: 2px;
+}
 .minZoomButton {
   width: 13px;
   transform: scale(1.9);
   margin-top: 2px;
   margin-left: -1px;
-}
-.startBatchButton {
-  width: 13px;
-  transform: scale(2.5);
-  margin-top: 2px;
 }
 .stopBatchButton {
   width: 13px;
@@ -507,6 +507,10 @@
   width: 2px;
   height: 134px;
   background-color: #404040;
+}
+
+.batchBarDisabledMargin {
+  margin-top: -1px;
 }
 
 /* Optional: If you are using flexbox for the button-group */

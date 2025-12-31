@@ -12,9 +12,7 @@ function createWindow() {
     resizable: false,
     autoHideMenuBar: true,
     width: process.platform !== "win32" ? 566 : 582,
-    height: process.platform !== "win32" ? 603 : 613,
-    x: 64,
-    y: 64,
+    height: process.platform !== "win32" ? 606 : 613,
   });
   mainWindow.removeMenu();
 
@@ -40,10 +38,6 @@ function createWindow() {
   });
 
   mainWindow.on("minimize", () => {
-    minimize();
-  });
-
-  mainWindow.on("hide", () => {
     minimize();
   });
 
@@ -105,6 +99,8 @@ app.on("ready", function () {
       bgStarter = "./lsworker_linux.sh";
   }
   createWindow();
+  mainWindow.setPosition(64, 64);
+  mainWindow.show();
 });
 
 function callPassOnPosition() {

@@ -493,7 +493,12 @@ isDerotationPanelVisible || isNotificationVisible || isSaveScaledPanelVisible )
             <img src="assets/images/startbatch.png" class="startBatchButton" />
           </button>
           } @if (!openRefImageEnabled() || !refImageSelected) {
-          <button type="button" mat-button disabled class="button_disabled">
+          <button
+            type="button"
+            mat-button
+            disabled
+            class="button_disabled batchBarDisabledMargin"
+          >
             <img src="assets/images/startbatch.png" class="startBatchButton" />
           </button>
           } @if (openRefImageEnabled() && refImageSelected) {
@@ -515,7 +520,7 @@ isDerotationPanelVisible || isNotificationVisible || isSaveScaledPanelVisible )
             type="button"
             mat-button
             disabled
-            class="relatedButtonsSpace buttonDisabledZoom connectButton"
+            class="relatedButtonsSpace buttonDisabledZoom batchBarDisabledMargin connectButton"
             matTooltip="Connect to stacking software"
           >
             <img src="assets/images/connect.png" class="genericButton" />
@@ -537,7 +542,7 @@ isDerotationPanelVisible || isNotificationVisible || isSaveScaledPanelVisible )
             type="button"
             mat-button
             disabled
-            class="relatedButtonsSpace button_disabled"
+            class="relatedButtonsSpace batchBarDisabledMargin button_disabled"
           >
             <img src="assets/images/derotate.png" class="stopBatchButton" />
           </button>
@@ -558,7 +563,7 @@ isDerotationPanelVisible || isNotificationVisible || isSaveScaledPanelVisible )
             type="button"
             mat-button
             disabled
-            class="relatedButtonsSpace button_disabled"
+            class="relatedButtonsSpace batchBarDisabledMargin button_disabled"
           >
             <img src="assets/images/stack.png" class="stopBatchButton" />
           </button>

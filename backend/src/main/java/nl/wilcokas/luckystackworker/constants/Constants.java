@@ -41,7 +41,7 @@ public class Constants {
     public static final String DENOISE_ALGORITHM_SAVGOLAY = "SAVGOLAY";
     public static final String DENOISE_ALGORITHM_BILATERAL = "BILATERAL";
     public static final int SECONDS_AFTER_NEXT_EXECUTION = 3;
-    public static final int MINIMUM_WINDOW_WIDTH = 610;
+    public static final int MINIMUM_WINDOW_WIDTH = 624;
     public static final int ARTIFICIAL_PROGRESS_DELAY = 500;
     public static final int BLINK_CLIPPING_DELAY = 250;
     public static final int CONTROL_PANEL_WIDTH = 566;
