@@ -34,11 +34,13 @@ import { AboutComponent } from './about/about.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ConfirmationComponent } from './confirmation/confirmation.component';
+import { SplashComponent } from './splash/splash.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AboutComponent,
+    SplashComponent,
     ConfirmationComponent,
     SyntheticPsfComponent,
     RotationComponent,

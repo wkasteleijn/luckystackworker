@@ -1,0 +1,57 @@
+.title {
+  text-align: center;
+  font-weight: bold;
+  max-height: 16px;
+  margin-top: -32px;
+}
+
+.message {
+  position: absolute;
+  text-align: center;
+  font-weight: bold;
+  font-size: 24px;
+  top: 60%;
+  left: 28%;
+  animation: colorFade 1s infinite;
+}
+
+@keyframes colorFade {
+  0% {
+    color: white;
+  }
+  50% {
+    color: gray;
+  }
+  100% {
+    color: white;
+  }
+}
+
+.subtitle {
+  text-align: center;
+  font-weight: bold;
+  max-height: 8px;
+  margin-bottom: 32px;
+}
+.splash {
+  width: 552px;
+  margin-left: -16px;
+  margin-top: -14px;
+  margin-right: 0px;
+}
+
+.aboutText {
+  margin-top: -16px;
+  margin-left: 32px;
+}
+
+.aboutLink {
+  color: lightblue;
+}
+
+.splashSpinner {
+  position: absolute;
+  z-index: 1001;
+  top: 47%;
+  left: 37%;
+}

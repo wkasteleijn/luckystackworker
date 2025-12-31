@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { MatLegacyDialog } from '@angular/material/legacy-dialog';
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar';
-import { timeout } from 'rxjs/operators';
 import { AboutComponent } from './about/about.component';
 import {
   ConfirmationComponent,
@@ -14,6 +13,7 @@ import { Profile } from './model/profile';
 import { PSF } from './model/psf';
 import { Settings } from './model/settings';
 import { Version } from './model/version';
+import { SplashComponent } from './splash/splash.component';
 
 const SERVICE_POLL_DELAY_MS = 250;
 const ROOT_FOLDER_MAX_LENGTH = 28;
@@ -167,6 +167,7 @@ export class AppComponent implements OnInit {
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
     private aboutSnackbar: MatLegacySnackBar,
+    private splashSnackbar: MatLegacySnackBar,
     private confirmationDialog: MatLegacyDialog
   ) {}
 
@@ -176,31 +177,15 @@ export class AppComponent implements OnInit {
         event.preventDefault();
       }
     });
+    this.splashSnackbar.openFromComponent(SplashComponent, {
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+    });
   }
 
   openReferenceImage() {
     console.log('openReferenceImage called');
     this.showSpinner();
-    this.checkHealth();
-  }
-
-  private checkHealth() {
-    this.luckyStackWorkerService
-      .checkHealth()
-      .pipe(timeout(2000))
-      .subscribe({
-        error: (error) => {
-          console.log('Backend is still starting or is unavailable: ' + error);
-          setTimeout(() => this.checkHealth(), SERVICE_POLL_DELAY_MS);
-        },
-        complete: () => {
-          console.log('Backend is up and running, opening the reference image');
-          this.callopenReferenceImage();
-        },
-      });
-  }
-
-  private callopenReferenceImage() {
     this.luckyStackWorkerService
       .openReferenceImage(Number(this.scale), this.openImageMode)
       .subscribe({
