@@ -48,8 +48,10 @@ function createWindow() {
   mainWindow.on(
     "show",
     () => {
-      restore();
-      setTimeout(() => app.show(), 500);
+      if (process.platform !== "win32") {
+        restore();
+        setTimeout(() => app.show(), 500);
+      }
     },
     1000
   );
