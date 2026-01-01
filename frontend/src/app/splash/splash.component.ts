@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
-import { MatLegacySnackBarRef } from '@angular/material/legacy-snack-bar';
 import { timeout } from 'rxjs/operators';
 import version from '../../../package.json';
 import { LuckyStackWorkerService } from '../luckystackworker.service';
@@ -14,12 +13,11 @@ const SERVICE_POLL_DELAY_MS = 250;
   standalone: false,
 })
 export class SplashComponent implements OnInit {
+  @Output() close = new EventEmitter<any>();
+
   componentColor: ThemePalette = 'primary';
 
-  constructor(
-    public snackBarRef: MatLegacySnackBarRef<SplashComponent>,
-    private luckyStackWorkerService: LuckyStackWorkerService
-  ) {}
+  constructor(private luckyStackWorkerService: LuckyStackWorkerService) {}
 
   ngOnInit(): void {
     this.checkHealth();
@@ -44,7 +42,7 @@ export class SplashComponent implements OnInit {
         },
         complete: () => {
           console.log('Backend is up and running');
-          this.snackBarRef.dismiss();
+          this.close.emit();
         },
       });
   }

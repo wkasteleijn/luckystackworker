@@ -13,7 +13,6 @@ import { Profile } from './model/profile';
 import { PSF } from './model/psf';
 import { Settings } from './model/settings';
 import { Version } from './model/version';
-import { SplashComponent } from './splash/splash.component';
 
 const SERVICE_POLL_DELAY_MS = 250;
 const ROOT_FOLDER_MAX_LENGTH = 28;
@@ -161,13 +160,13 @@ export class AppComponent implements OnInit {
 
   versionInfo: Version;
   showNewVersionPopup: boolean = false;
+  isSplashPanelVisible: boolean = true;
 
   resetToRawText = 'Are you sure you want to reset everything?';
 
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
     private aboutSnackbar: MatLegacySnackBar,
-    private splashSnackbar: MatLegacySnackBar,
     private confirmationDialog: MatLegacyDialog
   ) {}
 
@@ -176,10 +175,6 @@ export class AppComponent implements OnInit {
       if (event.altKey) {
         event.preventDefault();
       }
-    });
-    this.splashSnackbar.openFromComponent(SplashComponent, {
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
     });
   }
 
@@ -1986,6 +1981,10 @@ export class AppComponent implements OnInit {
 
   hideNotification() {
     this.isNotificationVisible = false;
+  }
+
+  hideSplash() {
+    this.isSplashPanelVisible = false;
   }
 
   stackImages() {

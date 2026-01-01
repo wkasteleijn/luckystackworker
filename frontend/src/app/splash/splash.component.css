@@ -1,17 +1,34 @@
+.popup-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgb(168, 168, 168);
+  background-color: hsl(0, 0%, 10%);
+  border: 1px solid white;
+  padding: 20px;
+  width: 320px;
+  height: 231px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
 .title {
+  position: absolute;
   text-align: center;
   font-weight: bold;
   max-height: 16px;
-  margin-top: -32px;
+  top: 63%;
+  left: 28%;
+  color: white;
 }
 
 .message {
   position: absolute;
   text-align: center;
   font-weight: bold;
-  font-size: 24px;
-  top: 60%;
-  left: 28%;
+  top: 82%;
+  left: 25%;
   animation: colorFade 1s infinite;
 }
 
@@ -20,29 +37,26 @@
     color: white;
   }
   50% {
-    color: gray;
+    color: transparent;
   }
   100% {
     color: white;
   }
 }
 
-.subtitle {
-  text-align: center;
-  font-weight: bold;
-  max-height: 8px;
-  margin-bottom: 32px;
-}
 .splash {
-  width: 552px;
-  margin-left: -16px;
-  margin-top: -14px;
+  width: 360px;
+  margin-left: -20px;
+  margin-top: -20px;
   margin-right: 0px;
 }
 
 .aboutText {
-  margin-top: -16px;
-  margin-left: 32px;
+  position: absolute;
+  text-align: center;
+  top: 73%;
+  left: 17%;
+  color: white;
 }
 
 .aboutLink {

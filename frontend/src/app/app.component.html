@@ -52,8 +52,8 @@
   (close)="hideNotification()"
 ></app-notification>
 } @if ( isPsfPanelVisible || isRotationPanelVisible || isProgressPanelVisible ||
-isDerotationPanelVisible || isNotificationVisible || isSaveScaledPanelVisible )
-{
+isDerotationPanelVisible || isNotificationVisible || isSaveScaledPanelVisible ||
+isSplashPanelVisible ) {
 <div class="backdrop"></div>
 } @if (showNewVersionPopup) {
 <app-newversion
@@ -72,6 +72,8 @@ isDerotationPanelVisible || isNotificationVisible || isSaveScaledPanelVisible )
   >
   </mat-progress-spinner>
 </div>
+} @if (isSplashPanelVisible) {
+<app-splash (close)="hideSplash()"></app-splash>
 }
 <div
   class="{{
