@@ -11,6 +11,7 @@
 - Load profile now also applies the earlier used dispersion correction
 - Added "Quadratic" deconvolution option to apply deconvolution 2x
 - Revised look-and-feel: replaced batch panel with dedicated batch button bar, more "balanced" contrast colors
+- At first installation the app will now no longer apply any filters to the image
 - Permanently removed deprecated GMIC filters Ian's denoise and Enhance locally.
 - Upgraded all dependencies to the latest versions.
 
