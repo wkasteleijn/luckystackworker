@@ -71,6 +71,7 @@ public class LswUtil {
     public static String getFullObjectName(String profileName) {
         return switch (profileName) {
             case "sun" -> "Sun";
+            case "moon" -> "Moon";
             case "mer" -> "Mercury";
             case "ven" -> "Venus";
             case "mar" -> "Mars";
