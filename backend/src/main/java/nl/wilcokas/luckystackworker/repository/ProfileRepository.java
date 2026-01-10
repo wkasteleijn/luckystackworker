@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -86,11 +87,24 @@ public class ProfileRepository {
         }
         try {
             List<Profile> list = objectMapper.readValue(json, new TypeReference<>() {});
+            list = addNewProfilesWhenMissing(list);
             list.forEach(LswFileUtil::correctProfileForBackwardCompatability);
             profiles = list.stream().collect(Collectors.toMap(Profile::getName, Function.identity()));
         } catch (JsonProcessingException e) {
             log.error("Error reading profiles: ", e);
             throw new ProfileNotFoundException(e.getMessage());
         }
+    }
+
+    private List<Profile> addNewProfilesWhenMissing(final List<Profile> list) throws JsonProcessingException {
+        List<Profile> currentList = objectMapper.readValue(defaultProfilesJson, new TypeReference<>() {});
+        List<Profile> amendedList = new ArrayList<>(list);
+        List<String> existingProfileNames = list.stream().map(Profile::getName).toList();
+        currentList.forEach(profile -> {
+            if (!existingProfileNames.contains(profile.getName())) {
+                amendedList.add(profile);
+            }
+        });
+        return amendedList;
     }
 }

@@ -39,10 +39,6 @@ public class SettingsRepository {
         return getSettings().getExtensions().split(",");
     }
 
-    public String getDefaultProfile() {
-        return getSettings().getDefaultProfile();
-    }
-
     public Settings getSettings() {
         if (settings == null) {
             readSettings();
@@ -68,7 +64,7 @@ public class SettingsRepository {
     private Settings getDefaultSettings() {
         String activeOs = LswUtil.getActiveOSProfile();
         return Settings.builder()
-                .defaultProfile("moon")
+                .defaultProfile("unspecified")
                 .extensions("tif,png,tiff")
                 .latestKnownVersion(null)
                 .latestKnownVersionChecked(null)

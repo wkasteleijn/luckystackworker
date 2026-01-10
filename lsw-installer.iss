@@ -24,7 +24,7 @@ DisableProgramGroupPage=yes
 LicenseFile=C:\Users\wkast\git\luckystackworker\frontend\LuckyStackWorker-win32-x64\LICENSE_LSW.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputBaseFilename=LuckyStackWorker-{#MyAppVersion}-setup
+OutputBaseFilename=LuckyStackWorker-{#MyAppVersion}-Windows-setup
 SetupIconFile=C:\Users\wkast\git\luckystackworker\frontend\lsw_icon.ico
 Compression=lzma
 SolidCompression=yes

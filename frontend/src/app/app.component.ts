@@ -30,6 +30,7 @@ interface ProfileSelection {
 })
 export class AppComponent implements OnInit {
   profiles: ProfileSelection[] = [
+    { value: 'unspecified', viewValue: 'None' },
     { value: 'mer', viewValue: 'Mercury' },
     { value: 'ven', viewValue: 'Venus' },
     { value: 'moon', viewValue: 'Moon' },
@@ -39,6 +40,12 @@ export class AppComponent implements OnInit {
     { value: 'sat', viewValue: 'Saturn' },
     { value: 'uranus', viewValue: 'Uranus' },
     { value: 'neptune', viewValue: 'Neptune' },
+    { value: 'iss', viewValue: 'ISS' },
+    { value: 'eur', viewValue: 'Europa' },
+    { value: 'gan', viewValue: 'Ganymede' },
+    { value: 'cal', viewValue: 'Callisto' },
+    { value: 'io', viewValue: 'Io' },
+    { value: 'tit', viewValue: 'Titan' },
   ];
 
   openImageModes: ProfileSelection[] = [

@@ -154,8 +154,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 if (profile == null) {
                     String profileName = LswFileUtil.deriveProfileFromImageName(selectedFilePath);
                     if (profileName == null) {
-                        log.info("Profile not found for reference image, taking the default, {}", profileName);
-                        profileName = settingsService.getDefaultProfile();
+                        log.info("Profile not found for reference image, taking the default");
+                        profileName = Constants.DEFAULT_PROFILE;
                     }
                     profile = profileService
                             .findByName(profileName)

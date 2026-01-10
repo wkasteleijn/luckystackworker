@@ -54,4 +54,5 @@ public class Constants {
     public static final int DEFAULT_DEROTATION_ACCURATENESS = 4;
     public static final int DEFAULT_DEROTATION_NOISE_ROBUSTNESS = 2;
     public static final int DEFAULT_DEROTATION_ANCHOR_STRENGTH = 3;
+    public static final String DEFAULT_PROFILE = "unspecified";
 }

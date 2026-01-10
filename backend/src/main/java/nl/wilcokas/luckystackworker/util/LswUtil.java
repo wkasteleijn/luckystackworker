@@ -77,8 +77,14 @@ public class LswUtil {
             case "jup" -> "Jupiter";
             case "sat" -> "Saturn";
             case "uranus" -> "Uranus";
-            case "nep" -> "Neptune";
-            default -> "Moon";
+            case "neptune" -> "Neptune";
+            case "iss" -> "ISS";
+            case "eur" -> "Europa";
+            case "gan" -> "Ganymede";
+            case "cal" -> "Callisto";
+            case "io" -> "Io";
+            case "tit" -> "Titan";
+            default -> "Unspecified";
         };
     }
 

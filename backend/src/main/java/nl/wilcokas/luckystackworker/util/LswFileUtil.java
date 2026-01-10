@@ -102,8 +102,20 @@ public class LswFileUtil {
             return "neptune";
         } else if (name.contains("sun")) {
             return "sun";
+        } else if (name.contains("iss")) {
+            return "ISS";
+        } else if (name.contains("eur")) {
+            return "Europa";
+        } else if (name.contains("gan")) {
+            return "Ganymede";
+        } else if (name.contains("cal")) {
+            return "Callisto";
+        } else if (name.contains("io")) {
+            return "Io";
+        } else if (name.contains("tit")) {
+            return "Titan";
         }
-        return null;
+        return "unspecified";
     }
 
     public static String getFileDirectory(String path) {
