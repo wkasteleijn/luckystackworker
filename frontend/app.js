@@ -48,7 +48,7 @@ function createWindow() {
   mainWindow.on(
     "show",
     () => {
-      if (process.platform !== "win32") {
+      if (process.platform === "darwin") {
         restore();
         setTimeout(() => app.show(), 500);
       }
