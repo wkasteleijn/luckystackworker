@@ -365,8 +365,8 @@ class DeRotationService(
     args[2] = "NULL"
     args[3] = "${folder}/${target}"
     args[4] = "NULL"
-    args[5] = "0" // min_scale_deformation
-    args[6] = accurateness.toString() // max_scale_deformation
+    args[5] = (4-accurateness).toString() // min_scale_deformation
+    args[6] = "3" // max_scale_deformation
     args[7] = "0" // max_subsamp_fact
     args[8] = "0" // divWeight
     args[9] = "0" // curlWeight
