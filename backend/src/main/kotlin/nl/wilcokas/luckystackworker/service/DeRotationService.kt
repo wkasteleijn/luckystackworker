@@ -1,5 +1,6 @@
 package nl.wilcokas.luckystackworker.service
 
+import bunwarpj.MiscTools
 import bunwarpj.bUnwarpJ_
 import ij.ImagePlus
 import ij.process.FloatProcessor
@@ -365,7 +366,7 @@ class DeRotationService(
     args[2] = "NULL"
     args[3] = "${folder}/${target}"
     args[4] = "NULL"
-    args[5] = (4-accurateness).toString() // min_scale_deformation
+    args[5] = (4 - accurateness).toString() // min_scale_deformation
     args[6] = "3" // max_scale_deformation
     args[7] = "0" // max_subsamp_fact
     args[8] = "0" // divWeight
@@ -436,26 +437,110 @@ class DeRotationService(
     ipBlue.setPixels(3, fpLum)
     ipRed.setPixels(1, fpLum)
   }
+
+  fun transformFromTo(
+      rootFolder: String,
+      sourceImageFilename: String,
+      targetImageFilename: String,
+      transformationFile: String,
+      factor: Double,
+  ) {
+    val sourceImagePath = "${rootFolder}/${sourceImageFilename}"
+    val targetImagePath = "${rootFolder}/${targetImageFilename}"
+    val source = LswFileUtil.openImage(sourceImagePath, RGB, null, null, 1.0, null, null).left
+    val target = LswFileUtil.openImage(targetImagePath, RGB, null, null, 1.0, null, null).left
+
+    val intervals = MiscTools.numberOfIntervalsOfTransformation("$rootFolder/$transformationFile")
+    val cx = Array<DoubleArray?>(intervals + 3) { DoubleArray(intervals + 3) }
+    val cy = Array<DoubleArray?>(intervals + 3) { DoubleArray(intervals + 3) }
+    MiscTools.loadTransformation("${rootFolder}/${transformationFile}", cx, cy)
+
+    val initialCx = Array<DoubleArray?>(intervals + 3) { DoubleArray(intervals + 3) }
+    val initialCy = Array<DoubleArray?>(intervals + 3) { DoubleArray(intervals + 3) }
+
+    // Manually calculate the initial control point positions
+    val xSpacing = source.width.toDouble() / intervals
+    val ySpacing = source.height.toDouble() / intervals
+    for (i in 0 until intervals + 3) {
+      for (j in 0 until intervals + 3) {
+        initialCx[i]!![j] = (j - 1) * xSpacing
+        initialCy[i]!![j] = (i - 1) * ySpacing
+      }
+    }
+
+    for (i in cx.indices) {
+      for (j in cx[i]!!.indices) {
+        // Calculate displacement from the initial control point positions
+        val dx = cx[i]!![j] - initialCx[i]!![j]
+        val dy = cy[i]!![j] - initialCy[i]!![j]
+
+        // Apply factor to the displacement and add it back to the initial position
+        cx[i]!![j] = initialCx[i]!![j] + dx * factor
+        cy[i]!![j] = initialCy[i]!![j] + dy * factor
+      }
+    }
+
+    MiscTools.saveElasticTransformation(
+        intervals,
+        cx,
+        cy,
+        "${rootFolder}/OFFSET_${transformationFile}",
+    )
+
+    applyTransformation(source, target, "${rootFolder}/OFFSET_${transformationFile}")
+
+    LswFileUtil.saveImage(
+        source,
+        null,
+        "${rootFolder}/OFFSET_${sourceImageFilename}",
+        true,
+        false,
+        false,
+        false,
+    )
+  }
 }
 
 fun main(args: Array<String>) {
   try {
     val arguments = Arrays.stream<String>(args).toList()
-    if (arguments.size < 3) {
+    if (arguments.size < 4) {
       println(
-          "Usage: java DeRotationService <rootFolder> <referenceImageFilename> <filename1> ... filenameX>"
+          "Usage: java DeRotationService -[derotate|transform] <rootFolder> <referenceImageFilename> [<filename1> ... filenameX>|transformationFile] [factor]"
       )
       return
     }
 
     val luckyStackWorkerContext = LuckyStackWorkerContext()
-    DeRotationService(
+    val service =
+        DeRotationService(
             LSWSharpenFilter(),
             SavitzkyGolayFilter(),
             luckyStackWorkerContext,
             StackService(luckyStackWorkerContext),
         )
-        .derotate(arguments[0], arguments[1], arguments.subList(2, arguments.size), 4, 2, 4, null)
+
+    if (arguments[0].equals("-derotate")) {
+      service.derotate(
+          arguments[1],
+          arguments[2],
+          arguments.subList(3, arguments.size),
+          4,
+          2,
+          4,
+          null,
+      )
+    } else if (arguments[0].equals("-transform")) {
+      service.transformFromTo(
+          arguments[1],
+          arguments[2],
+          arguments[3],
+          arguments[4],
+          arguments[5].toDoubleOrNull() ?: 1.0,
+      )
+    } else {
+      println("Invalid command line arguments: ${arguments[0]}")
+    }
   } catch (e: Exception) {
     e.printStackTrace()
   }
