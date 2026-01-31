@@ -3,12 +3,9 @@ package nl.wilcokas.luckystackworker.service
 import bunwarpj.MiscTools
 import bunwarpj.bUnwarpJ_
 import ij.ImagePlus
+import ij.io.Opener
 import ij.process.FloatProcessor
 import ij.process.ShortProcessor
-import java.util.*
-import javax.swing.JFrame
-import javax.swing.JOptionPane
-import kotlin.math.abs
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext
 import nl.wilcokas.luckystackworker.constants.Constants
 import nl.wilcokas.luckystackworker.constants.Constants.STATUS_IDLE
@@ -23,8 +20,11 @@ import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil
 import nl.wilcokas.luckystackworker.util.LswUtil
 import nl.wilcokas.luckystackworker.util.logger
 import org.springframework.stereotype.Service
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.set
+import javax.swing.JFrame
+import javax.swing.JOptionPane
+import kotlin.math.abs
 
 @Service
 class DeRotationService(
@@ -62,8 +62,8 @@ class DeRotationService(
         this._accurateness = accurateness
 
         luckyStackWorkerContext.totalFilesCount =
-            allImagesFilenames.size * 2 +
-                    2 // 2 steps * nr of files (pre-sharpening, create transformation files, warp. Luminance masks and Stacking
+            allImagesFilenames.size * 3 +
+                    1 // 3 steps * nr of files (pre-sharpening, create transformation files, warp. Luminance masks while Stacking
         // count as a single step).
         luckyStackWorkerContext.filesProcessedCount = 0
 
@@ -90,6 +90,7 @@ class DeRotationService(
                     accurateness,
                     allImagesFilenames,
                     referenceImageFilename,
+                    parentFrame,
                 )
 
             warpImages(
@@ -138,7 +139,7 @@ class DeRotationService(
     ) {
         log.info("Create warped images based on the transformation files")
         val threads = mutableListOf<Thread>()
-        var failedImage:String? = null
+        var failedImage: String? = null
         for (i in allImagesFilenames.indices) {
             val thread = Thread.ofVirtual().start {
                 val sourceImageFilename = allImagesFilenames[i]
@@ -150,7 +151,7 @@ class DeRotationService(
                     // Iteratively warp source image towards the reference image by applying the transformation
                     // file of each consecutive image until the reference image is reached.
                     while (!targetAtReference) {
-                        if (failedImage!= null) {
+                        if (failedImage != null) {
                             break
                         }
                         val targetImageFilename =
@@ -169,7 +170,7 @@ class DeRotationService(
                             if (targetImageFilename == referenceImageFilename) referenceImage
                             else openImage("${rootFolder}/${targetImageFilename}", parentFrame)
                         applyTransformation(sourceImage, targetImage, transformationFile)
-                        if (!validateTransformationResult(sourceImage, targetImage, parentFrame)) {
+                        if (!validateTransformationResult(sourceImage, targetImage)) {
                             failedImage = sourceImageFilename
                             break
                         }
@@ -202,11 +203,11 @@ class DeRotationService(
             threads.add(thread)
         }
         threads.forEach { it.join() }
-        if (failedImage!= null) {
+        if (failedImage != null) {
             if (parentFrame != null) {
                 JOptionPane.showMessageDialog(
                     parentFrame,
-                    "Image warping failed for image ${failedImage}. Choose different values for Noise Robustness and/or Anchor Strength",
+                    "Image warping failed for image ${failedImage}.\nChoose different values for Noise Robustness, Anchor Strength or Accuracy.",
                 )
             }
             throw BatchStoppedException("Transformation validation failed")
@@ -227,7 +228,6 @@ class DeRotationService(
     private fun validateTransformationResult(
         sourceImage: ImagePlus,
         targetImage: ImagePlus,
-        parentFrame: JFrame?,
     ): Boolean {
         val sourceProcessor = sourceImage.getProcessor() as ShortProcessor
         val targetProcessor = targetImage.getProcessor() as ShortProcessor
@@ -289,10 +289,12 @@ class DeRotationService(
         accurateness: Int,
         allImagesFilenames: List<String>,
         referenceImageFilename: String,
+        parentFrame: JFrame?,
     ): Map<String, String> {
         var referenceEncountered = false
         val imagesWithTransformation: MutableMap<String, String> = ConcurrentHashMap()
         log.info("Create transformation files from copies")
+        var failedTransformationImage: String? = null
         val threads = mutableListOf<Thread>()
         for (i in sharpenedImagePaths.indices) {
             val sourceFullPath = sharpenedImagePaths[i]
@@ -305,19 +307,32 @@ class DeRotationService(
                     if (referenceEncountered) sharpenedImagePaths[i - 1] else sharpenedImagePaths[i + 1]
                 val target = LswFileUtil.getFilenameFromPath(targetFullPath)
                 val thread = Thread.ofVirtual().start {
-                    callBunwarpJAlignImages(
-                        derotationWorkFolder,
-                        source,
-                        target,
-                        accurateness,
-                        imagesWithTransformation,
-                        originalSource
-                    )
+                    if (failedTransformationImage == null) {
+                        if (!callBunwarpJAlignImages(
+                            derotationWorkFolder,
+                            source,
+                            target,
+                            accurateness,
+                            imagesWithTransformation,
+                            originalSource
+                        )) {
+                            failedTransformationImage = originalSource
+                        }
+                    }
                 }
                 threads.add(thread)
             }
         }
         threads.forEach { it.join() }
+        if (failedTransformationImage!= null) {
+            if (parentFrame!= null) {
+                JOptionPane.showMessageDialog(
+                    parentFrame,
+                    "Transformation failed for image ${failedTransformationImage}.\nChoose different values for Noise Robustness, Anchor Strength or Accuracy.",
+                )
+            }
+            throw BatchStoppedException("Transformation creation failed")
+        }
         log.info("Done")
         return imagesWithTransformation
     }
@@ -345,12 +360,12 @@ class DeRotationService(
                 val sharpenedImagePath =
                     saveToDataFolder(toBeDeRotatedImageFilenameNoExt, image, derotationWorkFolder, imagePath)
                 sharpenedImagePaths.add(sharpenedImagePath)
+                increaseProgressCounter("Created de-rotation mask for image ${imageFilename}")
             }
             threads.add(thread)
         }
         threads.forEach { it.join() }
         validateImageDimensions(imageDimensions, parentFrame)
-        increaseProgressCounter("Created de-rotation masks")
         log.info("Done")
         return sharpenedImagePaths.sorted().toMutableList()
     }
@@ -410,7 +425,7 @@ class DeRotationService(
         accurateness: Int,
         imagesWithTransformation: MutableMap<String, String>,
         sourceFilename: String,
-    ) {
+    ): Boolean {
         val args = arrayOfNulls<String>(15)
         args[1] = "${folder}/${source}"
         args[2] = "NULL"
@@ -431,8 +446,10 @@ class DeRotationService(
             bUnwarpJ_::class.java.getDeclaredMethod("alignImagesCommandLine", Array<String>::class.java)
         method.isAccessible = true
         method.invoke(null, *arrayOf<Any>(args))
+
         imagesWithTransformation[sourceFilename] = folder + "/D2_${LswFileUtil.getFilename(source)}_transf.txt"
         increaseProgressCounter("Created transformation for image $sourceFilename")
+        return validateTransformationFile(args[13]);
     }
 
     private fun saveToDataFolder(
@@ -452,6 +469,31 @@ class DeRotationService(
             false,
         )
         return savedFilePath
+    }
+
+    private fun validateTransformationFile(transformationFilePath: String?): Boolean {
+        val image = Opener().openImage(LswFileUtil.getIJFileFormat(transformationFilePath))
+        val processor = image.getProcessor() as FloatProcessor
+        val minAndMax = LswImageProcessingUtil.getMinAndMaxValues(processor)
+        var totalValue: Long = 0
+        var totalPixels = 0
+        for (x in 0 until processor.width) {
+            for (y in 0 until processor.height) {
+                val value = processor.getf(x, y)
+                val shortValue = LswImageProcessingUtil.convertToShort(value, minAndMax.getLeft(), minAndMax.getRight())
+                val intValue = LswImageProcessingUtil.convertToUnsignedInt(shortValue)
+                totalValue += intValue
+                totalPixels++
+            }
+        }
+        val averageValue = totalValue / totalPixels
+        if (
+            averageValue < 4096
+        ) {
+            return false
+        }
+        log.info("Transformation file validation passed for image ${image.title}")
+        return true
     }
 
     private fun sharpenAsLuminanceImage(image: ImagePlus, radius: Double) {
