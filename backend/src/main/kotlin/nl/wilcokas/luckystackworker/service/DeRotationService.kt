@@ -10,9 +10,11 @@ import nl.wilcokas.luckystackworker.LuckyStackWorkerContext
 import nl.wilcokas.luckystackworker.constants.Constants
 import nl.wilcokas.luckystackworker.constants.Constants.STATUS_IDLE
 import nl.wilcokas.luckystackworker.exceptions.BatchStoppedException
+import nl.wilcokas.luckystackworker.exceptions.DeRotationException
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter
 import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode
+import nl.wilcokas.luckystackworker.model.DeRotation
 import nl.wilcokas.luckystackworker.model.Profile
 import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum.RGB
 import nl.wilcokas.luckystackworker.util.LswFileUtil
@@ -51,15 +53,15 @@ class DeRotationService(
         rootFolder: String,
         referenceImageFilename: String,
         allImagesFilenames: List<String>,
-        anchorStrength: Int,
-        noiseRobustness: Int,
-        accurateness: Int,
+        initialAnchorStrength: Int,
+        initialNoiseRobustness: Int,
+        initialAccurateness: Int,
         parentFrame: JFrame?,
     ): String? {
 
-        this._anchorStrength = anchorStrength
-        this._noiseRobustness = noiseRobustness
-        this._accurateness = accurateness
+        this._anchorStrength = initialAnchorStrength
+        this._noiseRobustness = initialNoiseRobustness
+        this._accurateness = initialAccurateness
 
         luckyStackWorkerContext.totalFilesCount =
             allImagesFilenames.size * 3 +
@@ -73,59 +75,81 @@ class DeRotationService(
             LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation"
         LswFileUtil.createCleanDirectory(derotationWorkFolder)
 
-        try {
-            val sharpenedImagePaths = createPreSharpenedLuminanceCopies(
-                rootFolder,
-                derotationWorkFolder,
-                allImagesFilenames,
-                anchorStrength,
-                noiseRobustness,
-                parentFrame,
-            )
-
-            val imagesWithTransformation =
-                createTransformationFiles(
-                    sharpenedImagePaths,
+        val totalRuns = 6 - noiseRobustness
+        for (run in 1 until totalRuns) {
+            try {
+                val sharpenedImagePaths = createPreSharpenedLuminanceCopies(
+                    rootFolder,
                     derotationWorkFolder,
-                    accurateness,
+                    allImagesFilenames,
+                    anchorStrength,
+                    noiseRobustness,
+                    parentFrame,
+                )
+
+                val imagesWithTransformation =
+                    createTransformationFiles(
+                        sharpenedImagePaths,
+                        derotationWorkFolder,
+                        accurateness,
+                        allImagesFilenames,
+                        referenceImageFilename,
+                    )
+
+                warpImages(
+                    referenceImage,
+                    derotationWorkFolder,
+                    rootFolder,
+                    imagesWithTransformation,
                     allImagesFilenames,
                     referenceImageFilename,
                     parentFrame,
                 )
 
-            warpImages(
-                referenceImage,
-                derotationWorkFolder,
-                rootFolder,
-                imagesWithTransformation,
-                allImagesFilenames,
-                referenceImageFilename,
-                parentFrame,
-            )
-
-            log.info("Stacking images")
-            stackService.stackImages(
-                derotationWorkFolder,
-                referenceImage.getWidth(),
-                referenceImage.getHeight(),
-                listOf("${rootFolder}/${referenceImageFilename}") +
-                        allImagesFilenames.filterNot { it == referenceImageFilename }
-                            .map { f -> "${derotationWorkFolder}/D_${f}" }.toList(),
-                parentFrame,
-            )
-            log.info("Done")
-            increaseProgressCounter("Stacked images")
-
-            return "${derotationWorkFolder}/STACK_$referenceImageFilename"
-        } catch (e: Exception) {
-            log.info("DeRotation was stopped with reason: ", e)
-            return null
-        } finally {
-            luckyStackWorkerContext.status = STATUS_IDLE
-            luckyStackWorkerContext.filesProcessedCount = 0
-            luckyStackWorkerContext.totalFilesCount = 0
-            luckyStackWorkerContext.isProfileBeingApplied = false
+                log.info("Stacking images")
+                stackService.stackImages(
+                    derotationWorkFolder,
+                    referenceImage.getWidth(),
+                    referenceImage.getHeight(),
+                    listOf("${rootFolder}/${referenceImageFilename}") +
+                            allImagesFilenames.filterNot { it == referenceImageFilename }
+                                .map { f -> "${derotationWorkFolder}/D_${f}" }.toList(),
+                    parentFrame,
+                )
+                log.info("Done")
+                increaseProgressCounter("Stacked images")
+                signalDerotationFinished()
+                return "${derotationWorkFolder}/STACK_$referenceImageFilename"
+            } catch (e: DeRotationException) {
+                log.info("DeRotation run ${run} unsuccessful, trying again with adjusted parameters...")
+                _anchorStrength = if (_anchorStrength > 1) _anchorStrength - 1 else 1
+                _noiseRobustness = if (_noiseRobustness < 6) _noiseRobustness + 1 else _noiseRobustness
+                if (run > 2) {
+                    _accurateness = if (_accurateness > 1) _accurateness - 1 else 1
+                }
+                increaseProgressCounter("Run ${run} unsuccessful, trying with adjusted parameters")
+                luckyStackWorkerContext.filesProcessedCount = 0
+            } catch (e: Exception) {
+                log.info("DeRotation was stopped with reason: ", e)
+                signalDerotationFinished()
+                return null
+            }
         }
+        if (parentFrame != null) {
+            JOptionPane.showMessageDialog(
+                parentFrame,
+                "Derotation failed after ${totalRuns} runs.\nChoose different values for Noise Robustness, Anchor Strength or Accuracy.",
+            )
+        }
+        signalDerotationFinished()
+        return null // last attempt failed
+    }
+
+    private fun signalDerotationFinished() {
+        luckyStackWorkerContext.status = STATUS_IDLE
+        luckyStackWorkerContext.filesProcessedCount = 0
+        luckyStackWorkerContext.totalFilesCount = 0
+        luckyStackWorkerContext.isProfileBeingApplied = false
     }
 
     private fun warpImages(
@@ -204,13 +228,7 @@ class DeRotationService(
         }
         threads.forEach { it.join() }
         if (failedImage != null) {
-            if (parentFrame != null) {
-                JOptionPane.showMessageDialog(
-                    parentFrame,
-                    "Image warping failed for image ${failedImage}.\nChoose different values for Noise Robustness, Anchor Strength or Accuracy.",
-                )
-            }
-            throw BatchStoppedException("Transformation validation failed")
+            throw DeRotationException("Transformation validation failed")
         }
         log.info("Done")
     }
@@ -289,7 +307,6 @@ class DeRotationService(
         accurateness: Int,
         allImagesFilenames: List<String>,
         referenceImageFilename: String,
-        parentFrame: JFrame?,
     ): Map<String, String> {
         var referenceEncountered = false
         val imagesWithTransformation: MutableMap<String, String> = ConcurrentHashMap()
@@ -309,13 +326,14 @@ class DeRotationService(
                 val thread = Thread.ofVirtual().start {
                     if (failedTransformationImage == null) {
                         if (!callBunwarpJAlignImages(
-                            derotationWorkFolder,
-                            source,
-                            target,
-                            accurateness,
-                            imagesWithTransformation,
-                            originalSource
-                        )) {
+                                derotationWorkFolder,
+                                source,
+                                target,
+                                accurateness,
+                                imagesWithTransformation,
+                                originalSource
+                            )
+                        ) {
                             failedTransformationImage = originalSource
                         }
                     }
@@ -324,15 +342,6 @@ class DeRotationService(
             }
         }
         threads.forEach { it.join() }
-        if (failedTransformationImage!= null) {
-            if (parentFrame!= null) {
-                JOptionPane.showMessageDialog(
-                    parentFrame,
-                    "Transformation failed for image ${failedTransformationImage}.\nChoose different values for Noise Robustness, Anchor Strength or Accuracy.",
-                )
-            }
-            throw BatchStoppedException("Transformation creation failed")
-        }
         log.info("Done")
         return imagesWithTransformation
     }
@@ -408,6 +417,7 @@ class DeRotationService(
         }
     }
 
+    @Synchronized
     private fun increaseProgressCounter(statusMessage: String) {
         log.info(statusMessage)
         luckyStackWorkerContext.filesProcessedCount += 1
