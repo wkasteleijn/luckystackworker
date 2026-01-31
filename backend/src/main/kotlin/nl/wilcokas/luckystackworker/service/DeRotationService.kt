@@ -138,6 +138,7 @@ class DeRotationService(
     ) {
         log.info("Create warped images based on the transformation files")
         val threads = mutableListOf<Thread>()
+        var failedImage:String? = null
         for (i in allImagesFilenames.indices) {
             val thread = Thread.ofVirtual().start {
                 val sourceImageFilename = allImagesFilenames[i]
@@ -149,6 +150,9 @@ class DeRotationService(
                     // Iteratively warp source image towards the reference image by applying the transformation
                     // file of each consecutive image until the reference image is reached.
                     while (!targetAtReference) {
+                        if (failedImage!= null) {
+                            break
+                        }
                         val targetImageFilename =
                             if (isSourceBeforeReference(
                                     sourceImageFilename,
@@ -165,7 +169,10 @@ class DeRotationService(
                             if (targetImageFilename == referenceImageFilename) referenceImage
                             else openImage("${rootFolder}/${targetImageFilename}", parentFrame)
                         applyTransformation(sourceImage, targetImage, transformationFile)
-                        validateTransformationResult(sourceImage, targetImage, parentFrame)
+                        if (!validateTransformationResult(sourceImage, targetImage, parentFrame)) {
+                            failedImage = sourceImageFilename
+                            break
+                        }
                         sourceImage.updateAndDraw()
                         LswFileUtil.saveImage(
                             sourceImage,
@@ -195,6 +202,15 @@ class DeRotationService(
             threads.add(thread)
         }
         threads.forEach { it.join() }
+        if (failedImage!= null) {
+            if (parentFrame != null) {
+                JOptionPane.showMessageDialog(
+                    parentFrame,
+                    "Image warping failed for image ${failedImage}. Choose different values for Noise Robustness and/or Anchor Strength",
+                )
+            }
+            throw BatchStoppedException("Transformation validation failed")
+        }
         log.info("Done")
     }
 
@@ -212,7 +228,7 @@ class DeRotationService(
         sourceImage: ImagePlus,
         targetImage: ImagePlus,
         parentFrame: JFrame?,
-    ) {
+    ): Boolean {
         val sourceProcessor = sourceImage.getProcessor() as ShortProcessor
         val targetProcessor = targetImage.getProcessor() as ShortProcessor
         var totalValueSource: Long = 0
@@ -236,16 +252,11 @@ class DeRotationService(
         log.info("Average value deviation for image ${sourceImage.title} = $averageValueDeviation")
         if (
             averageValueDeviation > 4096
-        ) { // significant deviation in brightness detected, the transformation must have failed
-            if (parentFrame != null) {
-                JOptionPane.showMessageDialog(
-                    parentFrame,
-                    "Image warping failed for image ${sourceImage.title}. Choose different values for Noise Robustness and/or Anchor Strength",
-                )
-            }
-            throw BatchStoppedException("Transformation validation failed")
+        ) {
+            return false
         }
         log.info("Transformation validation passed for image ${sourceImage.title}")
+        return true
     }
 
     private fun applyTransformation(
@@ -348,13 +359,13 @@ class DeRotationService(
         val profile = Profile()
         profile.savitzkyGolayAmount = 100
         profile.savitzkyGolayIterations = noiseRobustness
-        profile.savitzkyGolaySize = 6
+        profile.savitzkyGolaySize = 5
         profile.savitzkyGolayAmountGreen = 100
         profile.savitzkyGolayIterationsGreen = noiseRobustness
-        profile.savitzkyGolaySizeGreen = 6
+        profile.savitzkyGolaySizeGreen = 5
         profile.savitzkyGolayAmountBlue = 100
         profile.savitzkyGolayIterationsBlue = noiseRobustness
-        profile.savitzkyGolaySizeBlue = 6
+        profile.savitzkyGolaySizeBlue = 5
         profile.denoiseAlgorithm2 = Constants.DENOISE_ALGORITHM_SAVGOLAY
         return profile
     }
