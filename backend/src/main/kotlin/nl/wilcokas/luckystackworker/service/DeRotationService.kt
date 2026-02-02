@@ -24,6 +24,11 @@ import nl.wilcokas.luckystackworker.util.logger
 import org.springframework.stereotype.Service
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
+import java.util.concurrent.Semaphore
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.JFrame
 import javax.swing.JOptionPane
 import kotlin.math.abs
@@ -73,10 +78,10 @@ class DeRotationService(
         val referenceImage = openImage(referenceImagePath, parentFrame)
         val derotationWorkFolder =
             LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation"
-        LswFileUtil.createCleanDirectory(derotationWorkFolder)
 
         val totalRuns = 6 - noiseRobustness
         for (run in 1 until totalRuns) {
+            LswFileUtil.createCleanDirectory(derotationWorkFolder)
             try {
                 val sharpenedImagePaths = createPreSharpenedLuminanceCopies(
                     rootFolder,
@@ -311,8 +316,9 @@ class DeRotationService(
         var referenceEncountered = false
         val imagesWithTransformation: MutableMap<String, String> = ConcurrentHashMap()
         log.info("Create transformation files from copies")
-        var failedTransformationImage: String? = null
+        val semaphore = Semaphore(3)
         val threads = mutableListOf<Thread>()
+        val transformationFailed = AtomicBoolean(false)
         for (i in sharpenedImagePaths.indices) {
             val sourceFullPath = sharpenedImagePaths[i]
             val source = LswFileUtil.getFilenameFromPath(sourceFullPath)
@@ -323,28 +329,61 @@ class DeRotationService(
                 val targetFullPath =
                     if (referenceEncountered) sharpenedImagePaths[i - 1] else sharpenedImagePaths[i + 1]
                 val target = LswFileUtil.getFilenameFromPath(targetFullPath)
-                val thread = Thread.ofVirtual().start {
-                    if (failedTransformationImage == null) {
-                        if (!callBunwarpJAlignImages(
-                                derotationWorkFolder,
-                                source,
-                                target,
-                                accurateness,
-                                imagesWithTransformation,
-                                originalSource
-                            )
-                        ) {
-                            failedTransformationImage = originalSource
-                        }
-                    }
-                }
-                threads.add(thread)
+                threads.add(
+                    startTransformationThread(
+                        semaphore,
+                        transformationFailed,
+                        derotationWorkFolder,
+                        source,
+                        target,
+                        accurateness,
+                        imagesWithTransformation,
+                        originalSource
+                    )
+                )
+            }
+            if (transformationFailed.get()) {
+                break
             }
         }
         threads.forEach { it.join() }
+        if (transformationFailed.get()) {
+            throw DeRotationException("Transformation creation failed")
+        }
         log.info("Done")
         return imagesWithTransformation
     }
+
+    private fun startTransformationThread(
+        semaphore: Semaphore,
+        transformationFailed: AtomicBoolean,
+        derotationWorkFolder: String,
+        source: String,
+        target: String,
+        accurateness: Int,
+        imagesWithTransformation: MutableMap<String, String>,
+        originalSource: String
+    ): Thread {
+        semaphore.acquire()
+        return Thread.ofVirtual().start {
+            try {
+                if (!transformationFailed.get() && !callBunwarpJAlignImages(
+                        derotationWorkFolder,
+                        source,
+                        target,
+                        accurateness,
+                        imagesWithTransformation,
+                        originalSource
+                    )
+                ) {
+                    transformationFailed.set(true)
+                }
+            } finally {
+                semaphore.release()
+            }
+        }
+    }
+
 
     private fun createPreSharpenedLuminanceCopies(
         rootFolder: String,
@@ -458,7 +497,11 @@ class DeRotationService(
         method.invoke(null, *arrayOf<Any>(args))
 
         imagesWithTransformation[sourceFilename] = folder + "/D2_${LswFileUtil.getFilename(source)}_transf.txt"
-        increaseProgressCounter("Created transformation for image $sourceFilename")
+        try {
+            increaseProgressCounter("Created transformation for image $sourceFilename")
+        } catch (e: BatchStoppedException) {
+            return false
+        }
         return validateTransformationFile(args[13]);
     }
 
