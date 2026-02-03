@@ -13,7 +13,9 @@ import nl.wilcokas.luckystackworker.exceptions.BatchStoppedException
 import nl.wilcokas.luckystackworker.exceptions.DeRotationException
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter
 import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter
+import nl.wilcokas.luckystackworker.filter.SigmaDenoise2Filter
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode
+import nl.wilcokas.luckystackworker.filter.sigma.SigmaFilterPlus
 import nl.wilcokas.luckystackworker.model.DeRotation
 import nl.wilcokas.luckystackworker.model.Profile
 import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum.RGB
@@ -22,6 +24,7 @@ import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil
 import nl.wilcokas.luckystackworker.util.LswUtil
 import nl.wilcokas.luckystackworker.util.logger
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
@@ -36,7 +39,7 @@ import kotlin.math.abs
 @Service
 class DeRotationService(
     private val lswSharpenFilter: LSWSharpenFilter,
-    private val savitzkyGolayFilter: SavitzkyGolayFilter,
+    private val sigmaDenoise2Filter: SigmaDenoise2Filter,
     private val luckyStackWorkerContext: LuckyStackWorkerContext,
     private val stackService: StackService,
 ) {
@@ -80,7 +83,7 @@ class DeRotationService(
             LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation"
 
         val totalRuns = 6 - noiseRobustness
-        for (run in 1 until totalRuns) {
+        for (run in 1 until totalRuns+1) {
             LswFileUtil.createCleanDirectory(derotationWorkFolder)
             try {
                 val sharpenedImagePaths = createPreSharpenedLuminanceCopies(
@@ -316,7 +319,7 @@ class DeRotationService(
         var referenceEncountered = false
         val imagesWithTransformation: MutableMap<String, String> = ConcurrentHashMap()
         log.info("Create transformation files from copies")
-        val semaphore = Semaphore(3)
+        val semaphore = Semaphore(2)
         val threads = mutableListOf<Thread>()
         val transformationFailed = AtomicBoolean(false)
         for (i in sharpenedImagePaths.indices) {
@@ -403,7 +406,7 @@ class DeRotationService(
                 val image = openImage(imagePath, parentFrame)
                 imageDimensions.add(image.dimensions)
                 sharpenAsLuminanceImage(image, anchorStrength.toDouble())
-                savitzkyGolayFilter.apply(image, createDenoiseProfile(noiseRobustness), false, null)
+                sigmaDenoise2Filter.apply(image, createDenoiseProfile(noiseRobustness), false, null)
                 val toBeDeRotatedImageFilenameNoExt = LswFileUtil.getFilename(imageFilename)
                 val sharpenedImagePath =
                     saveToDataFolder(toBeDeRotatedImageFilenameNoExt, image, derotationWorkFolder, imagePath)
@@ -420,16 +423,14 @@ class DeRotationService(
 
     private fun createDenoiseProfile(noiseRobustness: Int): Profile {
         val profile = Profile()
-        profile.savitzkyGolayAmount = 100
-        profile.savitzkyGolayIterations = noiseRobustness
-        profile.savitzkyGolaySize = 5
-        profile.savitzkyGolayAmountGreen = 100
-        profile.savitzkyGolayIterationsGreen = noiseRobustness
-        profile.savitzkyGolaySizeGreen = 5
-        profile.savitzkyGolayAmountBlue = 100
-        profile.savitzkyGolayIterationsBlue = noiseRobustness
-        profile.savitzkyGolaySizeBlue = 5
-        profile.denoiseAlgorithm2 = Constants.DENOISE_ALGORITHM_SAVGOLAY
+        profile.denoise2Radius = BigDecimal(4)
+        profile.denoise2Iterations = noiseRobustness
+        profile.denoiseAlgorithm2 = Constants.DENOISE_ALGORITHM_SIGMA2
+        profile.denoise2RadiusGreen = BigDecimal(4)
+        profile.denoise2IterationsGreen = noiseRobustness
+        profile.denoise2RadiusBlue = BigDecimal(4)
+        profile.denoise2IterationsBlue = noiseRobustness
+        profile.denoiseAlgorithm2 = Constants.DENOISE_ALGORITHM_SIGMA2
         return profile
     }
 
@@ -661,7 +662,7 @@ fun main(args: Array<String>) {
         val service =
             DeRotationService(
                 LSWSharpenFilter(),
-                SavitzkyGolayFilter(),
+                SigmaDenoise2Filter(),
                 luckyStackWorkerContext,
                 StackService(luckyStackWorkerContext),
             )
