@@ -11,6 +11,7 @@ import nl.wilcokas.luckystackworker.constants.Constants
 import nl.wilcokas.luckystackworker.constants.Constants.STATUS_IDLE
 import nl.wilcokas.luckystackworker.exceptions.BatchStoppedException
 import nl.wilcokas.luckystackworker.exceptions.DeRotationException
+import nl.wilcokas.luckystackworker.filter.BilateralDenoiseFilter
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter
 import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter
 import nl.wilcokas.luckystackworker.filter.SigmaDenoise2Filter
@@ -39,7 +40,7 @@ import kotlin.math.abs
 @Service
 class DeRotationService(
     private val lswSharpenFilter: LSWSharpenFilter,
-    private val sigmaDenoise2Filter: SigmaDenoise2Filter,
+    private val bilateralDenoiseFilter: BilateralDenoiseFilter,
     private val luckyStackWorkerContext: LuckyStackWorkerContext,
     private val stackService: StackService,
 ) {
@@ -49,27 +50,15 @@ class DeRotationService(
     val anchorStrength: Int
         get() = _anchorStrength
 
-    private var _noiseRobustness: Int = 0
-    val noiseRobustness: Int
-        get() = _noiseRobustness
-
-    private var _accurateness: Int = 0
-    val accurateness: Int
-        get() = _accurateness
-
     fun derotate(
         rootFolder: String,
         referenceImageFilename: String,
         allImagesFilenames: List<String>,
         initialAnchorStrength: Int,
-        initialNoiseRobustness: Int,
-        initialAccurateness: Int,
         parentFrame: JFrame?,
     ): String? {
 
         this._anchorStrength = initialAnchorStrength
-        this._noiseRobustness = initialNoiseRobustness
-        this._accurateness = initialAccurateness
 
         luckyStackWorkerContext.totalFilesCount =
             allImagesFilenames.size * 3 +
@@ -82,8 +71,7 @@ class DeRotationService(
         val derotationWorkFolder =
             LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation"
 
-        val totalRuns = 6 - noiseRobustness
-        for (run in 1 until totalRuns+1) {
+        for (run in 1 until 4) {
             LswFileUtil.createCleanDirectory(derotationWorkFolder)
             try {
                 val sharpenedImagePaths = createPreSharpenedLuminanceCopies(
@@ -91,7 +79,6 @@ class DeRotationService(
                     derotationWorkFolder,
                     allImagesFilenames,
                     anchorStrength,
-                    noiseRobustness,
                     parentFrame,
                 )
 
@@ -99,7 +86,6 @@ class DeRotationService(
                     createTransformationFiles(
                         sharpenedImagePaths,
                         derotationWorkFolder,
-                        accurateness,
                         allImagesFilenames,
                         referenceImageFilename,
                     )
@@ -131,10 +117,6 @@ class DeRotationService(
             } catch (e: DeRotationException) {
                 log.info("DeRotation run ${run} unsuccessful, trying again with adjusted parameters...")
                 _anchorStrength = if (_anchorStrength > 1) _anchorStrength - 1 else 1
-                _noiseRobustness = if (_noiseRobustness < 6) _noiseRobustness + 1 else _noiseRobustness
-                if (run > 2) {
-                    _accurateness = if (_accurateness > 1) _accurateness - 1 else 1
-                }
                 increaseProgressCounter("Run ${run} unsuccessful, trying with adjusted parameters")
                 luckyStackWorkerContext.filesProcessedCount = 0
             } catch (e: Exception) {
@@ -146,7 +128,7 @@ class DeRotationService(
         if (parentFrame != null) {
             JOptionPane.showMessageDialog(
                 parentFrame,
-                "Derotation failed after ${totalRuns} runs.\nChoose different values for Noise Robustness, Anchor Strength or Accuracy.",
+                "Derotation failed after 3 runs.\nChoose different values for Noise Robustness, Anchor Strength or Accuracy.",
             )
         }
         signalDerotationFinished()
@@ -312,7 +294,6 @@ class DeRotationService(
     private fun createTransformationFiles(
         sharpenedImagePaths: List<String>,
         derotationWorkFolder: String,
-        accurateness: Int,
         allImagesFilenames: List<String>,
         referenceImageFilename: String,
     ): Map<String, String> {
@@ -339,7 +320,6 @@ class DeRotationService(
                         derotationWorkFolder,
                         source,
                         target,
-                        accurateness,
                         imagesWithTransformation,
                         originalSource
                     )
@@ -363,7 +343,6 @@ class DeRotationService(
         derotationWorkFolder: String,
         source: String,
         target: String,
-        accurateness: Int,
         imagesWithTransformation: MutableMap<String, String>,
         originalSource: String
     ): Thread {
@@ -374,7 +353,6 @@ class DeRotationService(
                         derotationWorkFolder,
                         source,
                         target,
-                        accurateness,
                         imagesWithTransformation,
                         originalSource
                     )
@@ -393,7 +371,6 @@ class DeRotationService(
         derotationWorkFolder: String,
         allImagesFilenames: List<String>,
         anchorStrength: Int,
-        noiseRobustness: Int,
         parentFrame: JFrame?,
     ): MutableList<String> {
         log.info("Create pre-sharpened luminance copies...")
@@ -406,7 +383,8 @@ class DeRotationService(
                 val image = openImage(imagePath, parentFrame)
                 imageDimensions.add(image.dimensions)
                 sharpenAsLuminanceImage(image, anchorStrength.toDouble())
-                sigmaDenoise2Filter.apply(image, createDenoiseProfile(noiseRobustness), false, null)
+                val denoiseProfile = createDenoiseProfile();
+                bilateralDenoiseFilter.apply(image, denoiseProfile, false, null);
                 val toBeDeRotatedImageFilenameNoExt = LswFileUtil.getFilename(imageFilename)
                 val sharpenedImagePath =
                     saveToDataFolder(toBeDeRotatedImageFilenameNoExt, image, derotationWorkFolder, imagePath)
@@ -421,16 +399,16 @@ class DeRotationService(
         return sharpenedImagePaths.sorted().toMutableList()
     }
 
-    private fun createDenoiseProfile(noiseRobustness: Int): Profile {
+    private fun createDenoiseProfile(): Profile {
         val profile = Profile()
-        profile.denoise2Radius = BigDecimal(4)
-        profile.denoise2Iterations = noiseRobustness
-        profile.denoiseAlgorithm2 = Constants.DENOISE_ALGORITHM_SIGMA2
-        profile.denoise2RadiusGreen = BigDecimal(4)
-        profile.denoise2IterationsGreen = noiseRobustness
-        profile.denoise2RadiusBlue = BigDecimal(4)
-        profile.denoise2IterationsBlue = noiseRobustness
-        profile.denoiseAlgorithm2 = Constants.DENOISE_ALGORITHM_SIGMA2
+        profile.denoiseAlgorithm1 = Constants.DENOISE_ALGORITHM_BILATERAL
+        profile.bilateralIterations = 5
+        profile.bilateralSigmaColor = 1000
+        profile.bilateralSigmaColorGreen = 1000
+        profile.bilateralSigmaColorBlue = 1000
+        profile.bilateralRadius = 2
+        profile.bilateralRadiusGreen = 2
+        profile.bilateralRadiusBlue = 2
         return profile
     }
 
@@ -472,7 +450,6 @@ class DeRotationService(
         folder: String,
         source: String,
         target: String,
-        accurateness: Int,
         imagesWithTransformation: MutableMap<String, String>,
         sourceFilename: String,
     ): Boolean {
@@ -481,7 +458,7 @@ class DeRotationService(
         args[2] = "NULL"
         args[3] = "${folder}/${target}"
         args[4] = "NULL"
-        args[5] = (4 - accurateness).toString() // min_scale_deformation
+        args[5] = "3" // min_scale_deformation
         args[6] = "3" // max_scale_deformation
         args[7] = "0" // max_subsamp_fact
         args[8] = "0.1" // divWeight
@@ -662,7 +639,7 @@ fun main(args: Array<String>) {
         val service =
             DeRotationService(
                 LSWSharpenFilter(),
-                SigmaDenoise2Filter(),
+                BilateralDenoiseFilter(),
                 luckyStackWorkerContext,
                 StackService(luckyStackWorkerContext),
             )
@@ -672,8 +649,6 @@ fun main(args: Array<String>) {
                 arguments[1],
                 arguments[2],
                 arguments.subList(3, arguments.size),
-                4,
-                2,
                 4,
                 null,
             )

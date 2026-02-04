@@ -47,15 +47,7 @@ export class DeRotationComponent {
     this.deRotation.referenceImage = this.referenceImage;
   }
 
-  onNoiseRobustnessChanged(event: any) {
-    this.deRotation.noiseRobustness = event;
-  }
-
   onAnchorStrengthChanged(event: any) {
     this.deRotation.anchorStrength = event;
-  }
-
-  onAccuratenessChanged(event: any) {
-    this.deRotation.accurateness = event;
   }
 }

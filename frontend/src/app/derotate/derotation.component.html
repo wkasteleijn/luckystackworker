@@ -5,9 +5,7 @@
   </button>
 
   @if (showWarning()) {
-    <div
-      class="warning {{ nightMode ? 'titleNight' : 'title' }}"
-      >
+    <div class="warning {{ nightMode ? 'titleNight' : 'title' }}">
       You must select a reference image first!
     </div>
   }
@@ -27,7 +25,7 @@
             (nightMode ? 'activeColorNight' : 'activeColor')
         }}"
         (change)="onRefImageChanged()"
-        >
+      >
         @for (image of deRotation.images; track image) {
           <option [value]="image">
             {{ image }}
@@ -44,24 +42,6 @@
       [nightMode]="nightMode"
       (sliderValueChanged)="onAnchorStrengthChanged($event)"
     ></app-slider>
-    <app-slider
-      [sliderLabel]="'Noise robustness'"
-      [sliderValue]="deRotation.noiseRobustness"
-      [sliderStep]="1"
-      [sliderMinValue]="1"
-      [sliderMaxValue]="5"
-      [nightMode]="nightMode"
-      (sliderValueChanged)="onNoiseRobustnessChanged($event)"
-    ></app-slider>
-    <app-slider
-      [sliderLabel]="'Accuracy'"
-      [sliderValue]="deRotation.accurateness"
-      [sliderStep]="1"
-      [sliderMinValue]="1"
-      [sliderMaxValue]="4"
-      [nightMode]="nightMode"
-      (sliderValueChanged)="onAccuratenessChanged($event)"
-    ></app-slider>
   </div>
 
   <div class="buttonMargin"></div>
@@ -72,7 +52,7 @@
     (click)="onStart()"
     class="button {{ nightMode ? 'activeColorNight' : 'activeColor' }}"
     matTooltip="Start de-rotating the selected images."
-    >
+  >
     <img src="assets/images/startbatch.png" class="startButton" />
   </button>
 </div>

@@ -174,7 +174,7 @@ export class AppComponent implements OnInit {
   constructor(
     private luckyStackWorkerService: LuckyStackWorkerService,
     private aboutSnackbar: MatLegacySnackBar,
-    private confirmationDialog: MatLegacyDialog
+    private confirmationDialog: MatLegacyDialog,
   ) {}
 
   ngOnInit(): void {
@@ -200,7 +200,7 @@ export class AppComponent implements OnInit {
             this.settings = data.settings;
             this.selectedProfile = this.profile.name;
             this.rootFolder = this.getRootFolderCapped(
-              data.settings.rootFolder
+              data.settings.rootFolder,
             );
             this.zoomFactor = data.settings.zoomFactor;
             this.psfImage = data.settings.psfImage;
@@ -232,7 +232,7 @@ export class AppComponent implements OnInit {
       (error) => {
         this.hideSpinner();
         console.log(error);
-      }
+      },
     );
   }
 
@@ -253,7 +253,7 @@ export class AppComponent implements OnInit {
         this.isProgressPanelVisible = false;
         this.notificationText = 'The following error occured: ' + error;
         this.isNotificationVisible = true;
-      }
+      },
     );
   }
 
@@ -272,7 +272,7 @@ export class AppComponent implements OnInit {
             this.settings = data.settings;
             this.selectedProfile = this.profile.name;
             this.rootFolder = this.getRootFolderCapped(
-              data.settings.rootFolder
+              data.settings.rootFolder,
             );
             this.updateProfileSettings();
           }
@@ -282,7 +282,7 @@ export class AppComponent implements OnInit {
         (error) => {
           console.log(error);
           this.hideSpinner();
-        }
+        },
       );
     }
   }
@@ -322,7 +322,7 @@ export class AppComponent implements OnInit {
     this.wienerIterations = event.value;
     this.settings.operations = ['WIENER_DECONV'];
     console.log(
-      'wienerIterationsChanged called: ' + this.profile.wienerIterations
+      'wienerIterationsChanged called: ' + this.profile.wienerIterations,
     );
     if (update) {
       this.updateProfile();
@@ -334,7 +334,7 @@ export class AppComponent implements OnInit {
     this.clippingSuppression = event.value;
     this.settings.operations = ['CLIPPING_SUPPRESSION'];
     console.log(
-      'clippingSuppressionChanged called: ' + this.profile.clippingSuppression
+      'clippingSuppressionChanged called: ' + this.profile.clippingSuppression,
     );
     if (update) {
       this.updateProfile();
@@ -723,7 +723,7 @@ export class AppComponent implements OnInit {
       (data) => {
         console.log('Response');
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
   }
 
@@ -796,7 +796,7 @@ export class AppComponent implements OnInit {
       (data) => {
         console.log('Response');
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
   }
 
@@ -870,7 +870,7 @@ export class AppComponent implements OnInit {
         this.profile.denoise1IterationsBlue = event.value;
     }
     console.log(
-      'denoise1IterationsChanged called: ' + this.profile.denoise1Iterations
+      'denoise1IterationsChanged called: ' + this.profile.denoise1Iterations,
     );
     if (update) {
       this.updateProfile();
@@ -897,7 +897,7 @@ export class AppComponent implements OnInit {
         this.profile.bilateralIterationsBlue = event.value;
     }
     console.log(
-      'bilateralIterationsChanged called: ' + this.profile.bilateralIterations
+      'bilateralIterationsChanged called: ' + this.profile.bilateralIterations,
     );
     if (update) {
       this.updateProfile();
@@ -924,7 +924,7 @@ export class AppComponent implements OnInit {
         this.profile.bilateralSigmaColorBlue = event.value;
     }
     console.log(
-      'bilateralSigmaColorChanged called: ' + this.profile.bilateralSigmaColor
+      'bilateralSigmaColorChanged called: ' + this.profile.bilateralSigmaColor,
     );
     if (update) {
       this.updateProfile();
@@ -951,7 +951,7 @@ export class AppComponent implements OnInit {
         this.profile.bilateralRadiusBlue = event.value;
     }
     console.log(
-      'bilateralRadiusChanged called: ' + this.profile.bilateralRadius
+      'bilateralRadiusChanged called: ' + this.profile.bilateralRadius,
     );
     if (update) {
       this.updateProfile();
@@ -987,7 +987,7 @@ export class AppComponent implements OnInit {
     this.denoise2Iterations = event.value;
     this.settings.operations = ['SIGMA_DENOISE_2'];
     console.log(
-      'denoise2IterationsChanged called: ' + this.profile.denoise2Iterations
+      'denoise2IterationsChanged called: ' + this.profile.denoise2Iterations,
     );
     switch (this.applyDenoiseToChannel) {
       case 'G':
@@ -1045,7 +1045,7 @@ export class AppComponent implements OnInit {
     this.localContrastMedium = event.value;
     this.settings.operations = ['LOCAL_CONTRAST'];
     console.log(
-      'localContrastMedium called: ' + this.profile.localContrastMedium
+      'localContrastMedium called: ' + this.profile.localContrastMedium,
     );
     if (update) {
       this.updateProfile();
@@ -1057,7 +1057,7 @@ export class AppComponent implements OnInit {
     this.localContrastLarge = event.value;
     this.settings.operations = ['LOCAL_CONTRAST'];
     console.log(
-      'localContrastLarge called: ' + this.profile.localContrastLarge
+      'localContrastLarge called: ' + this.profile.localContrastLarge,
     );
     if (update) {
       this.updateProfile();
@@ -1152,7 +1152,7 @@ export class AppComponent implements OnInit {
         this.profile = data;
         this.updateProfileSettings();
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
   }
 
@@ -1161,7 +1161,7 @@ export class AppComponent implements OnInit {
     this.settings.operations = ['SAVITSKY_GOLAY'];
     console.log(
       'savitzkyGolayIterationsChanged called: ' +
-        this.profile.savitzkyGolayIterations
+        this.profile.savitzkyGolayIterations,
     );
     switch (this.applyDenoiseToChannel) {
       case 'G':
@@ -1188,7 +1188,7 @@ export class AppComponent implements OnInit {
     this.savitzkyGolayAmount = event.value;
     this.settings.operations = ['SAVITSKY_GOLAY'];
     console.log(
-      'savitzkyGolayAmountChanged called: ' + this.profile.savitzkyGolayAmount
+      'savitzkyGolayAmountChanged called: ' + this.profile.savitzkyGolayAmount,
     );
     switch (this.applyDenoiseToChannel) {
       case 'G':
@@ -1215,7 +1215,7 @@ export class AppComponent implements OnInit {
     this.savitzkyGolaySize = event.value;
     this.settings.operations = ['SAVITSKY_GOLAY'];
     console.log(
-      'savitzkyGolaySizeChanged called: ' + this.profile.savitzkyGolaySize
+      'savitzkyGolaySizeChanged called: ' + this.profile.savitzkyGolaySize,
     );
     switch (this.applyDenoiseToChannel) {
       case 'G':
@@ -1272,7 +1272,7 @@ export class AppComponent implements OnInit {
     this.settings.operations = ['COLOR_NORMALIZE'];
     this.profile.normalizeColorBalance = this.normalizeColorBalance;
     console.log(
-      'colorNormalizationChanged called: ' + this.normalizeColorBalance
+      'colorNormalizationChanged called: ' + this.normalizeColorBalance,
     );
     this.updateProfile();
   }
@@ -1281,7 +1281,7 @@ export class AppComponent implements OnInit {
     this.settings.operations = ['HISTOGRAM_STRETCH'];
     this.profile.preserveDarkBackground = this.preserveDarkBackground;
     console.log(
-      'preserveDarkBackgroundChanged called: ' + this.preserveDarkBackground
+      'preserveDarkBackgroundChanged called: ' + this.preserveDarkBackground,
     );
     this.updateProfile();
   }
@@ -1297,14 +1297,14 @@ export class AppComponent implements OnInit {
         },
         (error) => {
           console.log(error);
-        }
+        },
       );
   }
 
   dispersionCorrectionEnabledChanged() {
     console.log(
       'dispersionCorrectionEnabledChanged called: ' +
-        this.dispersionCorrectionEnabled
+        this.dispersionCorrectionEnabled,
     );
     this.dispersionCorrectionEnabled = !this.dispersionCorrectionEnabled;
     this.settings.operations = ['DISPERSION'];
@@ -1395,10 +1395,10 @@ export class AppComponent implements OnInit {
       }
     }
     this.profile.dispersionCorrectionRedX = roundOneDecimal(
-      this.profile.dispersionCorrectionRedX
+      this.profile.dispersionCorrectionRedX,
     );
     this.profile.dispersionCorrectionRedY = roundOneDecimal(
-      this.profile.dispersionCorrectionRedY
+      this.profile.dispersionCorrectionRedY,
     );
     this.updateProfile();
   }
@@ -1406,14 +1406,6 @@ export class AppComponent implements OnInit {
   derotationAnchorStrengthChanged(event: any) {
     console.log('derotationAnchorStrengthChanged called');
     this.deRotation.anchorStrength = event;
-  }
-  derotationNoiseRobustnessChanged(event: any) {
-    console.log('derotationNoiseRobustnessChanged called');
-    this.deRotation.noiseRobustness = event;
-  }
-  derotationAccuratenessChanged(event: any) {
-    console.log('derotationAccuratenessChanged called');
-    this.deRotation.accurateness = event;
   }
 
   derotationRefImageChanged(event: any) {
@@ -1452,7 +1444,7 @@ export class AppComponent implements OnInit {
       (error) => {
         console.log(error);
         this.hideSpinner();
-      }
+      },
     );
   }
 
@@ -1463,7 +1455,7 @@ export class AppComponent implements OnInit {
       (data) => {
         console.log('Response');
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
     // Wait for the background to shutdown gracefully, it takes about 8 seconds
     // but that is too long. Assuming that the user won't immediately re-open.
@@ -1495,7 +1487,7 @@ export class AppComponent implements OnInit {
         }
         this.hideSpinner();
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
   }
 
@@ -1509,7 +1501,7 @@ export class AppComponent implements OnInit {
         this.isNotificationVisible = true;
         this.workerBusy = false;
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
   }
 
@@ -1531,7 +1523,7 @@ export class AppComponent implements OnInit {
         }
         this.hideSpinner();
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
   }
 
@@ -1594,7 +1586,7 @@ export class AppComponent implements OnInit {
     this.purple = this.profile.purple;
     this.slowProcessing = this.determineIfSlowProcessing(
       this.profile,
-      this.settings.largeImage
+      this.settings.largeImage,
     );
     this.normalizeColorBalance = this.profile.normalizeColorBalance;
     this.preserveDarkBackground = this.profile.preserveDarkBackground;
@@ -1610,7 +1602,7 @@ export class AppComponent implements OnInit {
 
   private determineIfSlowProcessing(
     profile: Profile,
-    largeImage: boolean
+    largeImage: boolean,
   ): boolean {
     return largeImage;
   }
@@ -1628,7 +1620,7 @@ export class AppComponent implements OnInit {
     }
     this.slowProcessing = this.determineIfSlowProcessing(
       this.profile,
-      this.settings.largeImage
+      this.settings.largeImage,
     );
     if (this.slowProcessing) {
       this.showSpinner();
@@ -1652,7 +1644,7 @@ export class AppComponent implements OnInit {
           if (this.slowProcessing) {
             this.hideSpinner();
           }
-        }
+        },
       );
   }
 
@@ -1680,11 +1672,11 @@ export class AppComponent implements OnInit {
         this.workerStatus = data.message;
         if (data.filesProcessedCount && data.totalFilesCount) {
           this.workerProgress = Math.round(
-            (data.filesProcessedCount / data.totalFilesCount) * 100
+            (data.filesProcessedCount / data.totalFilesCount) * 100,
           );
         }
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
   }
 
@@ -1708,7 +1700,7 @@ export class AppComponent implements OnInit {
         (data) => {
           console.log('Response');
         },
-        (error) => console.log(error)
+        (error) => console.log(error),
       );
     }
   }
@@ -1721,7 +1713,7 @@ export class AppComponent implements OnInit {
         (data) => {
           console.log('Response');
         },
-        (error) => console.log(error)
+        (error) => console.log(error),
       );
     }
   }
@@ -1737,7 +1729,7 @@ export class AppComponent implements OnInit {
         this.zoomFactor = Number(data);
         console.log('Response');
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
   }
 
@@ -1763,14 +1755,14 @@ export class AppComponent implements OnInit {
       document.body.style.backgroundColor = 'rgb(43,43,43)';
       document.documentElement.style.setProperty(
         '--lsw-tab-color',
-        'lightgreen'
+        'lightgreen',
       );
     }
     this.luckyStackWorkerService.nightModeChanged(this.nightMode).subscribe(
       (data) => {
         console.log('Response');
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
   }
 
@@ -1781,7 +1773,7 @@ export class AppComponent implements OnInit {
       (data) => {
         console.log('Response');
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
   }
 
@@ -1791,7 +1783,7 @@ export class AppComponent implements OnInit {
       (data) => {
         console.log('Response');
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
     const wasRoiSelectionEnabled = this.roi;
     this.roi = !this.roi;
@@ -1823,7 +1815,7 @@ export class AppComponent implements OnInit {
       (data) => {
         console.log('Response');
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
   }
 
@@ -1837,7 +1829,7 @@ export class AppComponent implements OnInit {
       (data) => {
         console.log('Response');
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
   }
 
@@ -1908,7 +1900,7 @@ export class AppComponent implements OnInit {
   openDownloadPage() {
     window.open(
       'https://github.com/wkasteleijn/luckystackworker/releases/latest',
-      '_blank'
+      '_blank',
     );
   }
 
@@ -1957,7 +1949,7 @@ export class AppComponent implements OnInit {
         }
         this.hideSpinner();
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
   }
 
@@ -1978,7 +1970,7 @@ export class AppComponent implements OnInit {
         this.notificationText = 'The following error occured: ' + error;
         this.isNotificationVisible = true;
         this.workerBusy = false;
-      }
+      },
     );
   }
 
@@ -2010,7 +2002,7 @@ export class AppComponent implements OnInit {
         this.notificationText = 'The following error occured: ' + error;
         this.isNotificationVisible = true;
         this.workerBusy = false;
-      }
+      },
     );
   }
 
@@ -2144,7 +2136,7 @@ export class AppComponent implements OnInit {
           this.showNewVersionPopup = true;
         }
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     );
   }
 
@@ -2206,7 +2198,7 @@ export class AppComponent implements OnInit {
       ? '-' +
           rootFolder?.substring(
             rootFolderLength - ROOT_FOLDER_MAX_LENGTH,
-            rootFolderLength
+            rootFolderLength,
           )
       : rootFolder;
   }
