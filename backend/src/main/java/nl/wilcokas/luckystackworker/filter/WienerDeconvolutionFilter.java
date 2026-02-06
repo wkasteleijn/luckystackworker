@@ -227,6 +227,8 @@ public class WienerDeconvolutionFilter implements LSWFilter {
                 double appliedMaskFactor = (1d - deringStrength) + ((maskPixel / 65535d) * deringStrength);
                 // correction on output is needed given that is somehow always brighter than the original
                 // value
+
+                // TODO: Fix needed: this factor should be taken frmm the luminance, which needs to be calculated from G, G and B.
                 double newValue = (LswImageProcessingUtil.convertToUnsignedInt(outPixels[i])
                         * (averagePixelValueIn / averagePixelValueOut));
                 double originalValue = LswImageProcessingUtil.convertToUnsignedInt(pixels[i]);

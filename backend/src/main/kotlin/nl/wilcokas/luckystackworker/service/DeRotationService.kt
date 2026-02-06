@@ -153,7 +153,8 @@ class DeRotationService(
     ) {
         log.info("Create warped images based on the transformation files")
         val threads = mutableListOf<Thread>()
-        var failedImage: String? = null
+        val warpingFailed = AtomicBoolean(false)
+        val warpingStopped = AtomicBoolean(false)
         for (i in allImagesFilenames.indices) {
             val thread = Thread.ofVirtual().start {
                 val sourceImageFilename = allImagesFilenames[i]
@@ -165,7 +166,7 @@ class DeRotationService(
                     // Iteratively warp source image towards the reference image by applying the transformation
                     // file of each consecutive image until the reference image is reached.
                     while (!targetAtReference) {
-                        if (failedImage != null) {
+                        if (warpingFailed.get() || warpingStopped.get()) {
                             break
                         }
                         val targetImageFilename =
@@ -185,7 +186,7 @@ class DeRotationService(
                             else openImage("${rootFolder}/${targetImageFilename}", parentFrame)
                         applyTransformation(sourceImage, targetImage, transformationFile)
                         if (!validateTransformationResult(sourceImage, targetImage)) {
-                            failedImage = sourceImageFilename
+                            warpingFailed.set(true)
                             break
                         }
                         sourceImage.updateAndDraw()
@@ -211,14 +212,21 @@ class DeRotationService(
                         false,
                         false,
                     )
-                    increaseProgressCounter("Warped image ${sourceImageFilename}")
+                    try {
+                        increaseProgressCounter("Warped image ${sourceImageFilename}")
+                    } catch (e: BatchStoppedException) {
+                        warpingStopped.set(true)
+                    }
                 }
             }
             threads.add(thread)
         }
         threads.forEach { it.join() }
-        if (failedImage != null) {
+        if (warpingFailed.get()) {
             throw DeRotationException("Transformation validation failed")
+        }
+        if (warpingStopped.get()) {
+            throw BatchStoppedException("Transformation validation was stopped")
         }
         log.info("Done")
     }
@@ -303,6 +311,7 @@ class DeRotationService(
         val semaphore = Semaphore(2)
         val threads = mutableListOf<Thread>()
         val transformationFailed = AtomicBoolean(false)
+        val transformationStopped = AtomicBoolean(false)
         for (i in sharpenedImagePaths.indices) {
             val sourceFullPath = sharpenedImagePaths[i]
             val source = LswFileUtil.getFilenameFromPath(sourceFullPath)
@@ -317,6 +326,7 @@ class DeRotationService(
                     startTransformationThread(
                         semaphore,
                         transformationFailed,
+                        transformationStopped,
                         derotationWorkFolder,
                         source,
                         target,
@@ -325,13 +335,16 @@ class DeRotationService(
                     )
                 )
             }
-            if (transformationFailed.get()) {
+            if (transformationFailed.get() || transformationStopped.get()) {
                 break
             }
         }
         threads.forEach { it.join() }
         if (transformationFailed.get()) {
             throw DeRotationException("Transformation creation failed")
+        }
+        if (transformationStopped.get()) {
+            throw BatchStoppedException("Transformation creation stopped")
         }
         log.info("Done")
         return imagesWithTransformation
@@ -340,6 +353,7 @@ class DeRotationService(
     private fun startTransformationThread(
         semaphore: Semaphore,
         transformationFailed: AtomicBoolean,
+        transformationStopped: AtomicBoolean,
         derotationWorkFolder: String,
         source: String,
         target: String,
@@ -359,6 +373,8 @@ class DeRotationService(
                 ) {
                     transformationFailed.set(true)
                 }
+            } catch (e: BatchStoppedException) {
+                transformationStopped.set(true)
             } finally {
                 semaphore.release()
             }
@@ -377,6 +393,7 @@ class DeRotationService(
         val imageDimensions: MutableList<IntArray> = Collections.synchronizedList(ArrayList())
         val sharpenedImagePaths: MutableList<String> = Collections.synchronizedList(ArrayList())
         val threads = mutableListOf<Thread>()
+        val imageProcessingStopped = AtomicBoolean(false)
         for (imageFilename in allImagesFilenames) {
             val thread = Thread.ofVirtual().start {
                 val imagePath = "${rootFolder}/${imageFilename}"
@@ -389,12 +406,22 @@ class DeRotationService(
                 val sharpenedImagePath =
                     saveToDataFolder(toBeDeRotatedImageFilenameNoExt, image, derotationWorkFolder, imagePath)
                 sharpenedImagePaths.add(sharpenedImagePath)
-                increaseProgressCounter("Created de-rotation mask for image ${imageFilename}")
+                try {
+                    increaseProgressCounter("Created de-rotation mask for image ${imageFilename}")
+                } catch (e: BatchStoppedException) {
+                    imageProcessingStopped.set(true)
+                }
             }
             threads.add(thread)
+            if (imageProcessingStopped.get()) {
+                break
+            }
         }
         threads.forEach { it.join() }
         validateImageDimensions(imageDimensions, parentFrame)
+        if (imageProcessingStopped.get()) {
+            throw BatchStoppedException("Image processing stopped")
+        }
         log.info("Done")
         return sharpenedImagePaths.sorted().toMutableList()
     }
@@ -442,6 +469,7 @@ class DeRotationService(
         luckyStackWorkerContext.status = statusMessage
         if (luckyStackWorkerContext.isWorkerStopped) {
             luckyStackWorkerContext.isWorkerStopped = false
+            log.info("DeRotation was stopped")
             throw BatchStoppedException("DeRotation was stooped")
         }
     }
@@ -475,11 +503,7 @@ class DeRotationService(
         method.invoke(null, *arrayOf<Any>(args))
 
         imagesWithTransformation[sourceFilename] = folder + "/D2_${LswFileUtil.getFilename(source)}_transf.txt"
-        try {
-            increaseProgressCounter("Created transformation for image $sourceFilename")
-        } catch (e: BatchStoppedException) {
-            return false
-        }
+        increaseProgressCounter("Created transformation for image $sourceFilename")
         return validateTransformationFile(args[13]);
     }
 
