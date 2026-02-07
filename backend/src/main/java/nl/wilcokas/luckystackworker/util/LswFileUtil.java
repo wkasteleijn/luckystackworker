@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.function.UnaryOperator;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -555,13 +556,14 @@ public class LswFileUtil {
                 && parts[3].length() >= 4
                 && NumberUtils.isCreatable(parts[3].substring(0, 4))) {
             try {
+                int sixSecondFraction = Integer.parseInt(parts[3].substring(5));
                 return LocalDateTime.of(
                         Integer.parseInt(parts[0]),
                         Integer.parseInt(parts[1]),
                         Integer.parseInt(parts[2]),
                         Integer.parseInt(parts[3].substring(0, 2)),
                         Integer.parseInt(parts[3].substring(2, 4)),
-                        0,
+                        sixSecondFraction * 6,
                         0);
             } catch (Exception e) {
                 log.warn("Unable to parse date/time from filename {}", filename);
@@ -606,6 +608,10 @@ public class LswFileUtil {
             log.info("Directory {} already existed, removing all files from it", path);
             FileUtils.cleanDirectory(new File(path));
         }
+    }
+
+    public static String toWinjuposTimestamp(LocalDateTime dateTime) {
+        return String.format("%s:%d", dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), dateTime.getSecond() / 6);
     }
 
     private static void hackIncorrectPngFileInfo(LSWFileSaver saver) {

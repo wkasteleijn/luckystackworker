@@ -13,11 +13,7 @@ import nl.wilcokas.luckystackworker.exceptions.BatchStoppedException
 import nl.wilcokas.luckystackworker.exceptions.DeRotationException
 import nl.wilcokas.luckystackworker.filter.BilateralDenoiseFilter
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter
-import nl.wilcokas.luckystackworker.filter.SavitzkyGolayFilter
-import nl.wilcokas.luckystackworker.filter.SigmaDenoise2Filter
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode
-import nl.wilcokas.luckystackworker.filter.sigma.SigmaFilterPlus
-import nl.wilcokas.luckystackworker.model.DeRotation
 import nl.wilcokas.luckystackworker.model.Profile
 import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum.RGB
 import nl.wilcokas.luckystackworker.util.LswFileUtil
@@ -25,13 +21,10 @@ import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil
 import nl.wilcokas.luckystackworker.util.LswUtil
 import nl.wilcokas.luckystackworker.util.logger
 import org.springframework.stereotype.Service
-import java.math.BigDecimal
+import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.Executors
-import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.Semaphore
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.JFrame
 import javax.swing.JOptionPane
@@ -52,9 +45,10 @@ class DeRotationService(
 
     fun derotate(
         rootFolder: String,
-        referenceImageFilename: String,
+        referenceImageFilenameParam: String?,
         allImagesFilenames: List<String>,
         initialAnchorStrength: Int,
+        referenceTime: LocalDateTime?,
         parentFrame: JFrame?,
     ): String? {
 
@@ -66,10 +60,13 @@ class DeRotationService(
         // count as a single step).
         luckyStackWorkerContext.filesProcessedCount = 0
 
-        val referenceImagePath = "${rootFolder}/${referenceImageFilename}"
-        val referenceImage = openImage(referenceImagePath, parentFrame)
+        val referenceImageFilenames = determineReferenceImageFilenames(allImagesFilenames, referenceImageFilenameParam, referenceTime)
+
         val derotationWorkFolder =
             LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation"
+
+        val referenceInterpolationFactors =
+            calculateReferenceInterpolationFactors(referenceImageFilenames, allImagesFilenames, referenceTime)
 
         for (run in 1 until 4) {
             LswFileUtil.createCleanDirectory(derotationWorkFolder)
@@ -87,17 +84,18 @@ class DeRotationService(
                         sharpenedImagePaths,
                         derotationWorkFolder,
                         allImagesFilenames,
-                        referenceImageFilename,
+                        referenceImageFilenames!!,
+                        referenceInterpolationFactors
                     )
 
-                warpImages(
-                    referenceImage,
+                val referenceImage = warpImages(
                     derotationWorkFolder,
                     rootFolder,
                     imagesWithTransformation,
                     allImagesFilenames,
-                    referenceImageFilename,
+                    referenceImageFilenames,
                     parentFrame,
+                    referenceTime
                 )
 
                 log.info("Stacking images")
@@ -105,15 +103,15 @@ class DeRotationService(
                     derotationWorkFolder,
                     referenceImage.getWidth(),
                     referenceImage.getHeight(),
-                    listOf("${rootFolder}/${referenceImageFilename}") +
-                            allImagesFilenames.filterNot { it == referenceImageFilename }
+                    listOf("${rootFolder}/${referenceImage.title}") +
+                            allImagesFilenames.filterNot { it == referenceImage.title }
                                 .map { f -> "${derotationWorkFolder}/D_${f}" }.toList(),
                     parentFrame,
                 )
                 log.info("Done")
                 increaseProgressCounter("Stacked images")
                 signalDerotationFinished()
-                return "${derotationWorkFolder}/STACK_$referenceImageFilename"
+                return "${derotationWorkFolder}/STACK_$referenceImageFilenames"
             } catch (e: DeRotationException) {
                 log.info("DeRotation run ${run} unsuccessful, trying again with adjusted parameters...")
                 _anchorStrength = if (_anchorStrength > 1) _anchorStrength - 1 else 1
@@ -135,6 +133,50 @@ class DeRotationService(
         return null // last attempt failed
     }
 
+    /*
+     * If a reference time was provided, the reference images are determined from the list of files based on the winjupos timestamp in the filaname.
+     * The 2 references will be the files containing a timestamp that happened after and before the provided reference time.
+     */
+    private fun determineReferenceImageFilenames(
+        allImagesFilenames: List<String>,
+        referenceImageFilenameParam: String?,
+        referenceTime: LocalDateTime?
+    ): Pair<String, String> {
+        if (referenceTime == null) {
+            // If this is not time de-rotation then there is only one reference image.
+            return Pair(referenceImageFilenameParam!!,referenceImageFilenameParam)
+        } else {
+            for (i in allImagesFilenames.indices) {
+                val imageTime = LswFileUtil.getObjectDateTime(allImagesFilenames[i])
+                if (imageTime.isAfter(referenceTime)) {
+                    if (i==0) {
+                        throw BatchStoppedException("The provided reference time is before the first image timestamp")
+                    }
+                    return Pair(allImagesFilenames[i-1], allImagesFilenames[i])
+                }
+            }
+            throw BatchStoppedException("The provided reference time is after the lasr image timestamp")
+        }
+    }
+
+
+    /*
+     * The interpolation factors are used to generate the transformation file from the images adjacent to the reference image to the reference image.
+     * These factor are only applied when a reference time was provided instead of a reference image.
+     * The calculation assumes that all files contain winjupos formatted timestamps and that the provided reference time falls inside the first and the last images timestamps.
+     * If not it will throw a BatchStoppedException.
+     */
+    private fun calculateReferenceInterpolationFactors(
+        referenceImageFilenames: Pair<String, String>?,
+        allImagesFilenames: List<String>,
+        referenceTime: LocalDateTime?
+    ): Pair<Double, Double>? {
+        if (referenceTime != null) {
+            throw BatchStoppedException("Implement calculateReferenceInterpolationFactors")
+        }
+        return null
+    }
+
     private fun signalDerotationFinished() {
         luckyStackWorkerContext.status = STATUS_IDLE
         luckyStackWorkerContext.filesProcessedCount = 0
@@ -143,15 +185,23 @@ class DeRotationService(
     }
 
     private fun warpImages(
-        referenceImage: ImagePlus,
         derotationWorkFolder: String,
         rootFolder: String,
         imagesWithTransformation: Map<String, String>,
         allImagesFilenames: List<String>,
-        referenceImageFilename: String,
+        referenceImageFilenames: Pair<String, String>,
         parentFrame: JFrame?,
-    ) {
+        referenceTime: LocalDateTime?
+    ): ImagePlus {
         log.info("Create warped images based on the transformation files")
+
+        var referenceImageFilename = referenceImageFilenames.first
+        if (referenceTime != null) {
+            referenceImageFilename =
+                createInterpolatedReferenceImage(referenceTime, referenceImageFilenames!!, rootFolder)
+        }
+        val referenceImage = openImage("${rootFolder}/${referenceImageFilename}", parentFrame)
+
         val threads = mutableListOf<Thread>()
         val warpingFailed = AtomicBoolean(false)
         val warpingStopped = AtomicBoolean(false)
@@ -184,7 +234,7 @@ class DeRotationService(
                         val targetImage =
                             if (targetImageFilename == referenceImageFilename) referenceImage
                             else openImage("${rootFolder}/${targetImageFilename}", parentFrame)
-                        applyTransformation(sourceImage, targetImage, transformationFile)
+                        applyTransformation(sourceImage, transformationFile)
                         if (!validateTransformationResult(sourceImage, targetImage)) {
                             warpingFailed.set(true)
                             break
@@ -229,6 +279,19 @@ class DeRotationService(
             throw BatchStoppedException("Transformation validation was stopped")
         }
         log.info("Done")
+        return referenceImage
+    }
+
+    /**
+     * The reference image is interpolated here as a stack from the interpolated transformation results of the images surrounding the reference time.
+     *
+     */
+    private fun createInterpolatedReferenceImage(
+        referenceTime: LocalDateTime,
+        referenceImageFilenames: Pair<String, String>,
+        rootFolder: String
+    ): String {
+        throw BatchStoppedException("Implement createInterpolatedReferenceImage")
     }
 
     private fun isSourceBeforeReference(
@@ -277,16 +340,14 @@ class DeRotationService(
 
     private fun applyTransformation(
         sourceImage: ImagePlus,
-        targetImage: ImagePlus,
         transformationFile: String,
     ) {
         for (layer in 1..sourceImage.stack.size) {
             val sourceProcessor = sourceImage.getStack().getProcessor(layer).toFloat(1, null)
-            val targetProcessor = targetImage.getStack().getProcessor(layer).toFloat(1, null)
             val sourceLayerImage = ImagePlus("Layer ${layer}", sourceProcessor)
             bUnwarpJ_.applyTransformToSource(
                 transformationFile,
-                ImagePlus("Layer ${layer}", targetProcessor),
+                sourceLayerImage,
                 sourceLayerImage,
             )
             copyPixelsFromTo(sourceLayerImage, sourceImage, layer)
@@ -303,7 +364,8 @@ class DeRotationService(
         sharpenedImagePaths: List<String>,
         derotationWorkFolder: String,
         allImagesFilenames: List<String>,
-        referenceImageFilename: String,
+        referenceImageFilenames: Pair<String, String>,
+        referenceInterpolationFactors: Pair<Double, Double>?,
     ): Map<String, String> {
         var referenceEncountered = false
         val imagesWithTransformation: MutableMap<String, String> = ConcurrentHashMap()
@@ -316,12 +378,22 @@ class DeRotationService(
             val sourceFullPath = sharpenedImagePaths[i]
             val source = LswFileUtil.getFilenameFromPath(sourceFullPath)
             val originalSource = allImagesFilenames[i]
-            if (referenceImageFilename == originalSource) {
+            if (!referenceEncountered && referenceImageFilenames.first == originalSource) {
                 referenceEncountered = true
-            } else {
-                val targetFullPath =
-                    if (referenceEncountered) sharpenedImagePaths[i - 1] else sharpenedImagePaths[i + 1]
-                val target = LswFileUtil.getFilenameFromPath(targetFullPath)
+            }
+
+            val targetFullPath =
+                if (referenceEncountered) sharpenedImagePaths[i - 1] else sharpenedImagePaths[i + 1]
+            val target = LswFileUtil.getFilenameFromPath(targetFullPath)
+            var factor: Double? = null
+            val actualReferenceImageFilename =
+                if (referenceEncountered) referenceImageFilenames.second else referenceImageFilenames.first
+            if (targetFullPath == actualReferenceImageFilename && referenceInterpolationFactors != null) {
+                factor =
+                    if (referenceEncountered) referenceInterpolationFactors.second else referenceInterpolationFactors.first
+            }
+            val isTimeDeRotation = referenceImageFilenames.first != referenceImageFilenames.second
+            if (isTimeDeRotation || referenceImageFilenames.first != originalSource) {
                 threads.add(
                     startTransformationThread(
                         semaphore,
@@ -331,10 +403,12 @@ class DeRotationService(
                         source,
                         target,
                         imagesWithTransformation,
-                        originalSource
+                        originalSource,
+                        factor
                     )
                 )
             }
+
             if (transformationFailed.get() || transformationStopped.get()) {
                 break
             }
@@ -358,7 +432,8 @@ class DeRotationService(
         source: String,
         target: String,
         imagesWithTransformation: MutableMap<String, String>,
-        originalSource: String
+        originalSource: String,
+        factor: Double?
     ): Thread {
         semaphore.acquire()
         return Thread.ofVirtual().start {
@@ -368,7 +443,8 @@ class DeRotationService(
                         source,
                         target,
                         imagesWithTransformation,
-                        originalSource
+                        originalSource,
+                        factor
                     )
                 ) {
                     transformationFailed.set(true)
@@ -480,6 +556,7 @@ class DeRotationService(
         target: String,
         imagesWithTransformation: MutableMap<String, String>,
         sourceFilename: String,
+        factor: Double?
     ): Boolean {
         val args = arrayOfNulls<String>(15)
         args[1] = "${folder}/${source}"
@@ -497,12 +574,20 @@ class DeRotationService(
         args[13] = "${folder}/D2_${source}" // output 2
         args[14] = "-save_transformation"
 
+
         val method =
             bUnwarpJ_::class.java.getDeclaredMethod("alignImagesCommandLine", Array<String>::class.java)
         method.isAccessible = true
         method.invoke(null, *arrayOf<Any>(args))
 
-        imagesWithTransformation[sourceFilename] = folder + "/D2_${LswFileUtil.getFilename(source)}_transf.txt"
+        var transformationFile = "D2_${LswFileUtil.getFilename(source)}_transf.txt"
+        if (factor != null) {
+            val sourceImage = openImage("${folder}/${source}", null)
+            transformationFile =
+                interpolateNewTransformation(folder, transformationFile, sourceImage.width, sourceImage.height, factor)
+        }
+
+        imagesWithTransformation[sourceFilename] = folder + "/${transformationFile}"
         increaseProgressCounter("Created transformation for image $sourceFilename")
         return validateTransformationFile(args[13]);
     }
@@ -589,15 +674,35 @@ class DeRotationService(
     fun transformFromTo(
         rootFolder: String,
         sourceImageFilename: String,
-        targetImageFilename: String,
         transformationFile: String,
         factor: Double,
     ) {
         val sourceImagePath = "${rootFolder}/${sourceImageFilename}"
-        val targetImagePath = "${rootFolder}/${targetImageFilename}"
         val source = LswFileUtil.openImage(sourceImagePath, RGB, null, null, 1.0, null, null).left
-        val target = LswFileUtil.openImage(targetImagePath, RGB, null, null, 1.0, null, null).left
 
+        val interPolatedTransformationFile =
+            interpolateNewTransformation(rootFolder, transformationFile, source.width, source.height, factor)
+
+        applyTransformation(source, interPolatedTransformationFile)
+
+        LswFileUtil.saveImage(
+            source,
+            null,
+            "${rootFolder}/OFFSET_${sourceImageFilename}",
+            true,
+            false,
+            false,
+            false,
+        )
+    }
+
+    private fun interpolateNewTransformation(
+        rootFolder: String,
+        transformationFile: String,
+        imageWidth: Int,
+        imageHeight: Int,
+        factor: Double
+    ): String {
         val intervals = MiscTools.numberOfIntervalsOfTransformation("$rootFolder/$transformationFile")
         val cx = Array<DoubleArray?>(intervals + 3) { DoubleArray(intervals + 3) }
         val cy = Array<DoubleArray?>(intervals + 3) { DoubleArray(intervals + 3) }
@@ -607,8 +712,8 @@ class DeRotationService(
         val initialCy = Array<DoubleArray?>(intervals + 3) { DoubleArray(intervals + 3) }
 
         // Manually calculate the initial control point positions
-        val xSpacing = source.width.toDouble() / intervals
-        val ySpacing = source.height.toDouble() / intervals
+        val xSpacing = imageWidth.toDouble() / intervals
+        val ySpacing = imageHeight.toDouble() / intervals
         for (i in 0 until intervals + 3) {
             for (j in 0 until intervals + 3) {
                 initialCx[i]!![j] = (j - 1) * xSpacing
@@ -628,24 +733,14 @@ class DeRotationService(
             }
         }
 
+        val interpolatedTransformationPath = "${rootFolder}/OFFSET_${transformationFile}"
         MiscTools.saveElasticTransformation(
             intervals,
             cx,
             cy,
-            "${rootFolder}/OFFSET_${transformationFile}",
+            interpolatedTransformationPath,
         )
-
-        applyTransformation(source, target, "${rootFolder}/OFFSET_${transformationFile}")
-
-        LswFileUtil.saveImage(
-            source,
-            null,
-            "${rootFolder}/OFFSET_${sourceImageFilename}",
-            true,
-            false,
-            false,
-            false,
-        )
+        return interpolatedTransformationPath
     }
 }
 
@@ -668,19 +763,19 @@ fun main(args: Array<String>) {
                 StackService(luckyStackWorkerContext),
             )
 
-        if (arguments[0].equals("-derotate")) {
+        if (arguments[0] == "-derotate") {
             service.derotate(
                 arguments[1],
                 arguments[2],
                 arguments.subList(3, arguments.size),
                 4,
                 null,
+                null
             )
-        } else if (arguments[0].equals("-transform")) {
+        } else if (arguments[0] == "-transform") {
             service.transformFromTo(
                 arguments[1],
                 arguments[2],
-                arguments[3],
                 arguments[4],
                 arguments[5].toDoubleOrNull() ?: 1.0,
             )

@@ -1,11 +1,13 @@
 package nl.wilcokas.luckystackworker.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.wilcokas.luckystackworker.dto.DeRotationDTO;
+import nl.wilcokas.luckystackworker.util.LswFileUtil;
 
 @Data
 @NoArgsConstructor
@@ -14,9 +16,8 @@ import nl.wilcokas.luckystackworker.dto.DeRotationDTO;
 public class DeRotation {
     private List<String> images;
     private String referenceImage;
-    private int noiseRobustness;
+    private LocalDateTime referenceTime;
     private int anchorStrength;
-    private int accurateness;
 
     public DeRotation(DeRotationDTO deRotation) {
         mapFromDTO(deRotation);
@@ -25,8 +26,9 @@ public class DeRotation {
     private void mapFromDTO(final DeRotationDTO deRotation) {
         this.images = deRotation.getImages();
         this.referenceImage = deRotation.getReferenceImage();
-        this.noiseRobustness = deRotation.getNoiseRobustness();
+        this.referenceTime = deRotation.getReferenceTime() == null
+                ? null
+                : LswFileUtil.getObjectDateTime(deRotation.getReferenceTime());
         this.anchorStrength = deRotation.getAnchorStrength();
-        this.accurateness = deRotation.getAccurateness();
     }
 }

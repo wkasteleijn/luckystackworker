@@ -614,6 +614,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                             deRotation.getReferenceImage(),
                             deRotation.getImages(),
                             deRotation.getAnchorStrength(),
+                            deRotation.getReferenceTime(),
                             getParentFrame());
                     if (deRotatedImagePath != null) {
                         String profileName = LswFileUtil.deriveProfileFromImageName(deRotatedImagePath);
