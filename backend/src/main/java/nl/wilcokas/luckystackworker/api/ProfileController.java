@@ -70,6 +70,7 @@ public class ProfileController {
     @GetMapping("/{profile}")
     public ProfileDTO getProfile(@PathVariable(value = "profile") String profileName) {
         log.info("getProfile called with profile {}", profileName);
+        luckyStackWorkerContext.setSelectedProfile(profileName);
         return new ProfileDTO(profileRepository
                 .findByName(profileName)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Unknown profile %s", profileName))));

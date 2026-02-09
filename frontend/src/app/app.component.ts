@@ -204,7 +204,6 @@ export class AppComponent implements OnInit {
             );
             this.zoomFactor = data.settings.zoomFactor;
             this.psfImage = data.settings.psfImage;
-            this.checkLatestVersion();
             this.updateProfileSettings();
           }
           this.hideSpinner();
@@ -245,7 +244,7 @@ export class AppComponent implements OnInit {
     this.luckyStackWorkerService.applyProfileBatch(this.profile).subscribe(
       (data) => {
         console.log(data);
-        this.waitForWorker();
+        this.waitForWorker(false);
       },
       (error) => {
         console.log(error);
@@ -1648,11 +1647,14 @@ export class AppComponent implements OnInit {
       );
   }
 
-  private waitForWorker() {
+  private waitForWorker(isDeRotationOrStacking: boolean) {
     this.getStatusUpdate();
     if (this.workerBusy && 'Idle' !== this.workerStatus) {
       console.log(this.workerStatus);
-      setTimeout(() => this.waitForWorker(), SERVICE_POLL_DELAY_MS);
+      setTimeout(
+        () => this.waitForWorker(isDeRotationOrStacking),
+        SERVICE_POLL_DELAY_MS,
+      );
     } else {
       console.log('Worker is done!');
       this.workerProgress = 100;
@@ -1662,7 +1664,35 @@ export class AppComponent implements OnInit {
         this.notificationText = 'Done!';
         this.isNotificationVisible = true;
       }
+      if (isDeRotationOrStacking) {
+        this.handleStackedResult();
+      }
     }
+  }
+
+  private handleStackedResult() {
+    this.luckyStackWorkerService.getSelectedProfile().subscribe({
+      next: (data) => {
+        console.log('Successfully stacked the images: ', data);
+        this.roi = false;
+        if (data && data.profile) {
+          this.refImageSelected = true;
+          this.profile = data.profile;
+          this.settings = data.settings;
+          this.selectedProfile = this.profile.name;
+          this.rootFolder = this.getRootFolderCapped(data.settings.rootFolder);
+          this.zoomFactor = data.settings.zoomFactor;
+          this.psfImage = data.settings.psfImage;
+          this.updateProfileSettings();
+        }
+      },
+      error: (error) => {
+        console.log('Eror getting the selected profile and settings: ' + error);
+      },
+      complete: () => {
+        console.log('Request completed successfully');
+      },
+    });
   }
 
   private getStatusUpdate() {
@@ -1962,7 +1992,7 @@ export class AppComponent implements OnInit {
     this.luckyStackWorkerService.startDeRotation(this.deRotation).subscribe(
       (data) => {
         console.log(data);
-        this.waitForWorker();
+        this.waitForWorker(true);
       },
       (error) => {
         console.log(error);
@@ -1984,6 +2014,7 @@ export class AppComponent implements OnInit {
 
   hideSplash() {
     this.isSplashPanelVisible = false;
+    this.checkLatestVersion();
   }
 
   stackImages() {
@@ -1994,7 +2025,7 @@ export class AppComponent implements OnInit {
     this.luckyStackWorkerService.stack().subscribe(
       (data) => {
         console.log(data);
-        this.waitForWorker();
+        this.waitForWorker(true);
       },
       (error) => {
         console.log(error);

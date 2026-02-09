@@ -1,79 +1,94 @@
 @if (isPsfPanelVisible) {
-<app-synthetic-psf-panel
-  [imageData]="psfImage"
-  [nightMode]="nightMode"
-  [spinnerShown]="shouldShowSpinner()"
-  [psf]="profile.psf"
-  [profileName]="profile.name"
-  (close)="hidePSF()"
-  (slidersChanged)="psfSlidersChanged($event)"
-  (loadCustomPSF)="loadCustomPSFClicked()"
-></app-synthetic-psf-panel>
-} @if (isRotationPanelVisible) {
-<app-rotation-panel
-  [angle]="rotationAngle"
-  [nightMode]="nightMode"
-  [spinnerShown]="shouldShowSpinner()"
-  (close)="hideRotationPanel()"
-  (angleChanged)="rotationAngleChanged($event)"
-></app-rotation-panel>
-} @if (isSaveScaledPanelVisible) {
-<app-savescaling-panel
-  [scale]="profile.saveScale"
-  [dimensionX]="profile.saveDimensionX"
-  [dimensionY]="profile.saveDimensionY"
-  [nightMode]="nightMode"
-  [spinnerShown]="shouldShowSpinner()"
-  (close)="hideSaveScalingPanel()"
-  (scaleChanged)="saveScaleChanged($event)"
-></app-savescaling-panel>
-} @if (isProgressPanelVisible) {
-<app-progress-panel
-  [workerProgress]="workerProgress"
-  [workerStatus]="workerStatus"
-  [nightMode]="nightMode"
-  [spinnerShown]="shouldShowSpinner()"
-  (stop)="stopWorker()"
-></app-progress-panel>
-} @if (isDerotationPanelVisible) {
-<app-derotation-panel
-  [deRotation]="deRotation"
-  [nightMode]="nightMode"
-  [spinnerShown]="shouldShowSpinner()"
-  [images]="deRotation.images"
-  (close)="hideDeRotationPanel()"
-  (start)="startDeRotation($event)"
-></app-derotation-panel>
-} @if (isNotificationVisible) {
-<app-notification
-  [notificationText]="notificationText"
-  [nightMode]="nightMode"
-  [spinnerShown]="shouldShowSpinner()"
-  (close)="hideNotification()"
-></app-notification>
-} @if ( isPsfPanelVisible || isRotationPanelVisible || isProgressPanelVisible ||
-isDerotationPanelVisible || isNotificationVisible || isSaveScaledPanelVisible ||
-isSplashPanelVisible ) {
-<div class="backdrop"></div>
-} @if (showNewVersionPopup) {
-<app-newversion
-  [version]="versionInfo?.latestVersion"
-  (close)="hideNewVersionPopup()"
-  (getItNow)="hideNewVersionPopup(); openDownloadPage()"
-  [releaseNotes]="versionInfo?.releaseNotes"
-></app-newversion>
-} @if (shouldShowSpinner()) {
-<div>
-  <mat-progress-spinner
-    class="spinner"
-    mode="indeterminate"
-    diameter="120"
-    [color]="colorTheme()"
-  >
-  </mat-progress-spinner>
-</div>
-} @if (isSplashPanelVisible) {
-<app-splash (close)="hideSplash()"></app-splash>
+  <app-synthetic-psf-panel
+    [imageData]="psfImage"
+    [nightMode]="nightMode"
+    [spinnerShown]="shouldShowSpinner()"
+    [psf]="profile.psf"
+    [profileName]="profile.name"
+    (close)="hidePSF()"
+    (slidersChanged)="psfSlidersChanged($event)"
+    (loadCustomPSF)="loadCustomPSFClicked()"
+  ></app-synthetic-psf-panel>
+}
+@if (isRotationPanelVisible) {
+  <app-rotation-panel
+    [angle]="rotationAngle"
+    [nightMode]="nightMode"
+    [spinnerShown]="shouldShowSpinner()"
+    (close)="hideRotationPanel()"
+    (angleChanged)="rotationAngleChanged($event)"
+  ></app-rotation-panel>
+}
+@if (isSaveScaledPanelVisible) {
+  <app-savescaling-panel
+    [scale]="profile.saveScale"
+    [dimensionX]="profile.saveDimensionX"
+    [dimensionY]="profile.saveDimensionY"
+    [nightMode]="nightMode"
+    [spinnerShown]="shouldShowSpinner()"
+    (close)="hideSaveScalingPanel()"
+    (scaleChanged)="saveScaleChanged($event)"
+  ></app-savescaling-panel>
+}
+@if (isProgressPanelVisible) {
+  <app-progress-panel
+    [workerProgress]="workerProgress"
+    [workerStatus]="workerStatus"
+    [nightMode]="nightMode"
+    [spinnerShown]="shouldShowSpinner()"
+    (stop)="stopWorker()"
+  ></app-progress-panel>
+}
+@if (isDerotationPanelVisible) {
+  <app-derotation-panel
+    [deRotation]="deRotation"
+    [nightMode]="nightMode"
+    [spinnerShown]="shouldShowSpinner()"
+    [images]="deRotation.images"
+    (close)="hideDeRotationPanel()"
+    (start)="startDeRotation($event)"
+  ></app-derotation-panel>
+}
+@if (isNotificationVisible) {
+  <app-notification
+    [notificationText]="notificationText"
+    [nightMode]="nightMode"
+    [spinnerShown]="shouldShowSpinner()"
+    (close)="hideNotification()"
+  ></app-notification>
+}
+@if (
+  isPsfPanelVisible ||
+  isRotationPanelVisible ||
+  isProgressPanelVisible ||
+  isDerotationPanelVisible ||
+  isNotificationVisible ||
+  isSaveScaledPanelVisible ||
+  isSplashPanelVisible
+) {
+  <div class="backdrop"></div>
+}
+@if (showNewVersionPopup) {
+  <app-newversion
+    [version]="versionInfo?.latestVersion"
+    (close)="hideNewVersionPopup()"
+    (getItNow)="hideNewVersionPopup(); openDownloadPage()"
+    [releaseNotes]="versionInfo?.releaseNotes"
+  ></app-newversion>
+}
+@if (shouldShowSpinner()) {
+  <div>
+    <mat-progress-spinner
+      class="spinner"
+      mode="indeterminate"
+      diameter="120"
+      [color]="colorTheme()"
+    >
+    </mat-progress-spinner>
+  </div>
+}
+@if (isSplashPanelVisible) {
+  <app-splash (close)="hideSplash()"></app-splash>
 }
 <div
   class="{{
@@ -84,21 +99,22 @@ isSplashPanelVisible ) {
 >
   <div class="button_container topButtonContainer">
     @if (openRefImageEnabled()) {
-    <button
-      type="button"
-      mat-button
-      (click)="openReferenceImage()"
-      class="{{
-        nightModeEnabled() ? 'activeColorNight button' : 'activeColor button'
-      }}"
-      matTooltip="Open"
-    >
-      <img src="assets/images/open.png" class="openButton zoomIcon" />
-    </button>
-    } @if (!openRefImageEnabled()) {
-    <button type="button" mat-button disabled class="button_disabled">
-      <img src="assets/images/open.png" class="openButton zoomIcon" />
-    </button>
+      <button
+        type="button"
+        mat-button
+        (click)="openReferenceImage()"
+        class="{{
+          nightModeEnabled() ? 'activeColorNight button' : 'activeColor button'
+        }}"
+        matTooltip="Open"
+      >
+        <img src="assets/images/open.png" class="openButton zoomIcon" />
+      </button>
+    }
+    @if (!openRefImageEnabled()) {
+      <button type="button" mat-button disabled class="button_disabled">
+        <img src="assets/images/open.png" class="openButton zoomIcon" />
+      </button>
     }
 
     <mat-form-field appearance="fill">
@@ -113,14 +129,14 @@ isSplashPanelVisible ) {
           !refImageSelected || !openRefImageEnabled()
             ? 'channelDropdown dropdownMargin dropdown_disabled'
             : nightModeEnabled()
-            ? 'channelDropdown dropdownMargin dropdown activeColorNight'
-            : 'channelDropdown dropdownMargin dropdown activeColor'
+              ? 'channelDropdown dropdownMargin dropdown activeColorNight'
+              : 'channelDropdown dropdownMargin dropdown activeColor'
         }}"
       >
         @for (mode of openImageModes; track mode) {
-        <option [value]="mode.value">
-          {{ mode.viewValue }}
-        </option>
+          <option [value]="mode.value">
+            {{ mode.viewValue }}
+          </option>
         }
       </select>
     </mat-form-field>
@@ -138,8 +154,8 @@ isSplashPanelVisible ) {
             (!refImageSelected || !openRefImageEnabled()
               ? 'dropdown_disabled'
               : nightModeEnabled()
-              ? 'dropdown activeColorNight'
-              : 'dropdown activeColor')
+                ? 'dropdown activeColorNight'
+                : 'dropdown activeColor')
         }}"
       >
         <option [value]="1">1x</option>
@@ -150,234 +166,257 @@ isSplashPanelVisible ) {
     </mat-form-field>
 
     @if (openRefImageEnabled() && refImageSelected) {
-    <button
-      type="button"
-      mat-button
-      (click)="openRotationPanel()"
-      class="{{
-        'buttonZoom buttonMargin ' +
-          (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-          (rotationAngle !== 0 ? 'Pressed' : '')
-      }}"
-      matTooltip="Rotate"
-    >
-      <img src="assets/images/rotate.png" class="rotate" />
-    </button>
-    } @if (!openRefImageEnabled() || !refImageSelected) {
-    <button
-      type="button"
-      mat-button
-      disabled
-      class="button_disabled buttonMargin"
-      matTooltip="Rotate"
-    >
-      <img src="assets/images/rotate.png" class="rotate" />
-    </button>
+      <button
+        type="button"
+        mat-button
+        (click)="openRotationPanel()"
+        class="{{
+          'buttonZoom buttonMargin ' +
+            (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+            (rotationAngle !== 0 ? 'Pressed' : '')
+        }}"
+        matTooltip="Rotate"
+      >
+        <img src="assets/images/rotate.png" class="rotate" />
+      </button>
+    }
+    @if (!openRefImageEnabled() || !refImageSelected) {
+      <button
+        type="button"
+        mat-button
+        disabled
+        class="button_disabled buttonMargin"
+        matTooltip="Rotate"
+      >
+        <img src="assets/images/rotate.png" class="rotate" />
+      </button>
     }
 
     <mat-form-field appearance="fill">
       <select
         matNativeControl
-        [disabled]="!refImageSelected || !openRefImageEnabled()"
+        [disabled]="!openRefImageEnabled()"
         [(ngModel)]="selectedProfile"
         name="profile"
         (change)="profileSelectionChanged()"
         class="{{
           'dropdownMargin profileSelector ' +
-            (!refImageSelected || !openRefImageEnabled()
+            (!openRefImageEnabled()
               ? ' dropdown_disabled'
               : nightModeEnabled()
-              ? ' dropdown activeColorNight'
-              : ' dropdown activeColor')
+                ? ' dropdown activeColorNight'
+                : ' dropdown activeColor')
         }}"
-        matTooltip="Select  profile"
+        matTooltip="Select profile"
       >
         @for (profile of profiles; track profile) {
-        <option [value]="profile.value">
-          {{ profile.viewValue }}
-        </option>
+          <option [value]="profile.value">
+            {{ profile.viewValue }}
+          </option>
         }
       </select>
     </mat-form-field>
 
     @if (openRefImageEnabled() && refImageSelected) {
-    <button
-      type="button"
-      mat-button
-      class="button buttonMargin {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      (click)="loadProfile()"
-      matTooltip="Load profile"
-    >
-      <img src="assets/images/loadprofile.png" class="genericButton" />
-    </button>
-    } @if (!openRefImageEnabled() || !refImageSelected) {
-    <button
-      type="button"
-      mat-button
-      disabled
-      class="button_disabled buttonMargin"
-      matTooltip="Load profile"
-    >
-      <img src="assets/images/loadprofile.png" class="genericButton" />
-    </button>
-    } @if (openRefImageEnabled() && refImageSelected) {
-    <button
-      type="button"
-      mat-button
-      (click)="roiSelectionChanged()"
-      class="{{
-        'roiMargin buttonZoom ' +
-          (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-          (roiEnabled() ? 'Pressed' : '')
-      }}"
-      matTooltip="Select ROI"
-    >
-      <img src="assets/images/roi.png" class="genericButton" />
-    </button>
-    } @if (!openRefImageEnabled() || !refImageSelected) {
-    <button
-      type="button"
-      mat-button
-      disabled
-      class="roiMargin button_disabled"
-      matTooltip="Select ROI"
-    >
-      <img src="assets/images/roi.png" class="genericButton" />
-    </button>
-    } @if (openRefImageEnabled() && refImageSelected) {
-    <button
-      type="button"
-      mat-button
-      (click)="maximize()"
-      class="{{
-        (nightModeEnabled()
-          ? 'buttonZoom relatedButtonsSpace activeColorNight'
-          : 'buttonZoom relatedButtonsSpace activeColor') +
-          (isMaximized ? 'Pressed' : '')
-      }}"
-      matTooltip="Show at 100% scale"
-    >
-      <img src="assets/images/maximize.png" class="genericButton" />
-    </button>
-    } @if (!openRefImageEnabled() || !refImageSelected) {
-    <button
-      type="button"
-      mat-button
-      disabled
-      class="buttonDisabledZoom relatedButtonsSpace"
-    >
-      <img src="assets/images/maximize.png" class="genericButton" />
-    </button>
+      <button
+        type="button"
+        mat-button
+        class="button buttonMargin {{
+          nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+        }}"
+        (click)="loadProfile()"
+        matTooltip="Load profile"
+      >
+        <img src="assets/images/loadprofile.png" class="genericButton" />
+      </button>
+    }
+    @if (!openRefImageEnabled() || !refImageSelected) {
+      <button
+        type="button"
+        mat-button
+        disabled
+        class="button_disabled buttonMargin"
+        matTooltip="Load profile"
+      >
+        <img src="assets/images/loadprofile.png" class="genericButton" />
+      </button>
+    }
+    @if (openRefImageEnabled() && refImageSelected) {
+      <button
+        type="button"
+        mat-button
+        (click)="roiSelectionChanged()"
+        class="{{
+          'roiMargin buttonZoom ' +
+            (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+            (roiEnabled() ? 'Pressed' : '')
+        }}"
+        matTooltip="Select ROI"
+      >
+        <img src="assets/images/roi.png" class="genericButton" />
+      </button>
+    }
+    @if (!openRefImageEnabled() || !refImageSelected) {
+      <button
+        type="button"
+        mat-button
+        disabled
+        class="roiMargin button_disabled"
+        matTooltip="Select ROI"
+      >
+        <img src="assets/images/roi.png" class="genericButton" />
+      </button>
+    }
+    @if (openRefImageEnabled() && refImageSelected) {
+      <button
+        type="button"
+        mat-button
+        (click)="maximize()"
+        class="{{
+          (nightModeEnabled()
+            ? 'buttonZoom relatedButtonsSpace activeColorNight'
+            : 'buttonZoom relatedButtonsSpace activeColor') +
+            (isMaximized ? 'Pressed' : '')
+        }}"
+        matTooltip="Show at 100% scale"
+      >
+        <img src="assets/images/maximize.png" class="genericButton" />
+      </button>
+    }
+    @if (!openRefImageEnabled() || !refImageSelected) {
+      <button
+        type="button"
+        mat-button
+        disabled
+        class="buttonDisabledZoom relatedButtonsSpace"
+      >
+        <img src="assets/images/maximize.png" class="genericButton" />
+      </button>
     }
   </div>
 
   <!-- Floating buttons -->
   <div class="verticalSeparator"></div>
   @if (openRefImageEnabled() && refImageSelected) {
-  <button
-    type="button"
-    mat-button
-    (click)="channelChanged()"
-    class="{{
-      'buttonChannelSwitcher buttonMargin ' +
-        (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
-    }}"
-    matTooltip="Switch visible channel"
-  >
-    @if (visibleChannel === 'RGB') {
-    <img src="assets/images/rgb.png" class="channelSwitcher" />
-    } @if (visibleChannel === 'R') {
-    <img src="assets/images/red.png" class="channelSwitcher" />
-    } @if (visibleChannel === 'G') {
-    <img src="assets/images/green.png" class="channelSwitcher" />
-    } @if (visibleChannel === 'B') {
-    <img src="assets/images/blue.png" class="channelSwitcher" />
-    }
-  </button>
-  } @if (!openRefImageEnabled() || !refImageSelected) {
-  <button
-    type="button"
-    mat-button
-    disabled
-    class="buttonChannelSwitcherDisabled buttonMargin"
-    matTooltip="Switch channel"
-  >
-    @if (visibleChannel === 'RGB') {
-    <img src="assets/images/rgb.png" class="channelSwitcher" />
-    } @if (visibleChannel === 'R') {
-    <img src="assets/images/red.png" class="channelSwitcher" />
-    } @if (visibleChannel === 'G') {
-    <img src="assets/images/green.png" class="channelSwitcher" />
-    } @if (visibleChannel === 'B') {
-    <img src="assets/images/blue.png" class="channelSwitcher" />
-    }
-  </button>
-  } @if (openRefImageEnabled() && refImageSelected) {
-  <button
-    type="button"
-    mat-button
-    (click)="zoomIn()"
-    class="{{
-      (nightModeEnabled()
-        ? 'plusZoom buttonZoom activeColorNight'
-        : 'plusZoom buttonZoom activeColor') + (isZoomedIn() ? 'Pressed' : '')
-    }}"
-    matTooltip="Zoom in"
-  >
-    <img src="assets/images/zoomin.png" class="genericButton" />
-  </button>
-  } @if (!openRefImageEnabled() || !refImageSelected) {
-  <button type="button" mat-button disabled class="plusZoom buttonDisabledZoom">
-    <img src="assets/images/zoomin.png" class="genericButton" />
-  </button>
-  } @if (openRefImageEnabled() && refImageSelected) {
-  <button
-    type="button"
-    mat-button
-    (click)="zoomOut()"
-    class="{{
-      (nightModeEnabled()
-        ? 'minZoom buttonZoom relatedButtonsSpace activeColorNight'
-        : 'minZoom buttonZoom relatedButtonsSpace activeColor') +
-        (isZoomedOut() ? 'Pressed' : '')
-    }}"
-    matTooltip="Zoom out"
-  >
-    <img src="assets/images/zoomout.png" class="minZoomButton" />
-  </button>
-  } @if (!openRefImageEnabled() || !refImageSelected) {
-  <button
-    type="button"
-    mat-button
-    disabled
-    class="minZoom buttonDisabledZoom relatedButtonsSpace"
-  >
-    <img src="assets/images/zoomout.png" class="minZoomButton" />
-  </button>
+    <button
+      type="button"
+      mat-button
+      (click)="channelChanged()"
+      class="{{
+        'buttonChannelSwitcher buttonMargin ' +
+          (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
+      }}"
+      matTooltip="Switch visible channel"
+    >
+      @if (visibleChannel === "RGB") {
+        <img src="assets/images/rgb.png" class="channelSwitcher" />
+      }
+      @if (visibleChannel === "R") {
+        <img src="assets/images/red.png" class="channelSwitcher" />
+      }
+      @if (visibleChannel === "G") {
+        <img src="assets/images/green.png" class="channelSwitcher" />
+      }
+      @if (visibleChannel === "B") {
+        <img src="assets/images/blue.png" class="channelSwitcher" />
+      }
+    </button>
+  }
+  @if (!openRefImageEnabled() || !refImageSelected) {
+    <button
+      type="button"
+      mat-button
+      disabled
+      class="buttonChannelSwitcherDisabled buttonMargin"
+      matTooltip="Switch channel"
+    >
+      @if (visibleChannel === "RGB") {
+        <img src="assets/images/rgb.png" class="channelSwitcher" />
+      }
+      @if (visibleChannel === "R") {
+        <img src="assets/images/red.png" class="channelSwitcher" />
+      }
+      @if (visibleChannel === "G") {
+        <img src="assets/images/green.png" class="channelSwitcher" />
+      }
+      @if (visibleChannel === "B") {
+        <img src="assets/images/blue.png" class="channelSwitcher" />
+      }
+    </button>
+  }
+  @if (openRefImageEnabled() && refImageSelected) {
+    <button
+      type="button"
+      mat-button
+      (click)="zoomIn()"
+      class="{{
+        (nightModeEnabled()
+          ? 'plusZoom buttonZoom activeColorNight'
+          : 'plusZoom buttonZoom activeColor') + (isZoomedIn() ? 'Pressed' : '')
+      }}"
+      matTooltip="Zoom in"
+    >
+      <img src="assets/images/zoomin.png" class="genericButton" />
+    </button>
+  }
+  @if (!openRefImageEnabled() || !refImageSelected) {
+    <button
+      type="button"
+      mat-button
+      disabled
+      class="plusZoom buttonDisabledZoom"
+    >
+      <img src="assets/images/zoomin.png" class="genericButton" />
+    </button>
+  }
+  @if (openRefImageEnabled() && refImageSelected) {
+    <button
+      type="button"
+      mat-button
+      (click)="zoomOut()"
+      class="{{
+        (nightModeEnabled()
+          ? 'minZoom buttonZoom relatedButtonsSpace activeColorNight'
+          : 'minZoom buttonZoom relatedButtonsSpace activeColor') +
+          (isZoomedOut() ? 'Pressed' : '')
+      }}"
+      matTooltip="Zoom out"
+    >
+      <img src="assets/images/zoomout.png" class="minZoomButton" />
+    </button>
+  }
+  @if (!openRefImageEnabled() || !refImageSelected) {
+    <button
+      type="button"
+      mat-button
+      disabled
+      class="minZoom buttonDisabledZoom relatedButtonsSpace"
+    >
+      <img src="assets/images/zoomout.png" class="minZoomButton" />
+    </button>
   }
 
   <!-- End floating buttons -->
 
   <div class="button_container_top button_container">
     @if (openRefImageEnabled() && refImageSelected) {
-    <button
-      type="button"
-      mat-button
-      (click)="openConfirmation(resetToRawText)"
-      class="{{
-        'buttonRevert ' +
-          (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
-      }}"
-      matTooltip="Revert changes"
-    >
-      <img src="assets/images/reset.png" class="revertImg" />
-    </button>
-    } @if (!refImageSelected || !openRefImageEnabled()) {
-    <button type="button" mat-button disabled class="buttonRevertDisabled">
-      <img src="assets/images/reset.png" class="revertImg" />
-    </button>
+      <button
+        type="button"
+        mat-button
+        (click)="openConfirmation(resetToRawText)"
+        class="{{
+          'buttonRevert ' +
+            (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
+        }}"
+        matTooltip="Revert changes"
+      >
+        <img src="assets/images/reset.png" class="revertImg" />
+      </button>
+    }
+    @if (!refImageSelected || !openRefImageEnabled()) {
+      <button type="button" mat-button disabled class="buttonRevertDisabled">
+        <img src="assets/images/reset.png" class="revertImg" />
+      </button>
     }
 
     <mat-form-field appearance="fill">
@@ -391,8 +430,8 @@ isSplashPanelVisible ) {
           !refImageSelected || !openRefImageEnabled()
             ? 'dropdown_disabled rootFolder'
             : nightModeEnabled()
-            ? ' activeColorNight dropdown rootFolder'
-            : 'activeColor dropdown rootFolder'
+              ? ' activeColorNight dropdown rootFolder'
+              : 'activeColor dropdown rootFolder'
         }}"
         matTooltip="Select root folder"
       />
@@ -400,71 +439,74 @@ isSplashPanelVisible ) {
 
     <!-- Info button -->
     @if (openRefImageEnabled() && showVersionButton()) {
-    <button
-      type="button"
-      mat-button
-      class="button2ndRow infoButtonMargin {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      (click)="showVersionButton() ? openDownloadPage() : openAbout()"
-      matTooltip="You are currently using an older version {{
-        versionInfo.localVersion
-      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
-        versionInfo.latestVersion
-      }}."
-    >
-      <img
-        src="assets/images/info.png"
-        class="infoButton zoomIcon buttonBottom"
-      />
-    </button>
-    } @if (!openRefImageEnabled() && showVersionButton()) {
-    <button
-      type="button"
-      mat-button
-      disabled
-      class="button2ndRowDisabled infoButtonMargin {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      matTooltip="You are currently using an older version {{
-        getCurrentVersion()
-      }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
-        getLatestKnownVersion()
-      }}."
-    >
-      <img
-        src="assets/images/info.png"
-        class="infoButton zoomIcon buttonBottom"
-      />
-    </button>
-    } @if (openRefImageEnabled() && !showVersionButton()) {
-    <button
-      type="button"
-      mat-button
-      class="button2ndRow infoButtonMargin {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      (click)="openAbout()"
-      matTooltip="About"
-    >
-      <img
-        src="assets/images/info.png"
-        class="infoButton zoomIcon buttonBottom"
-      />
-    </button>
-    } @if (!openRefImageEnabled() && !showVersionButton()) {
-    <button
-      type="button"
-      mat-button
-      disabled
-      class="button2ndRowDisabled infoButtonMargin"
-      matTooltip="About"
-    >
-      <img
-        src="assets/images/info.png"
-        class="infoButton zoomIcon buttonBottom"
-      />
-    </button>
+      <button
+        type="button"
+        mat-button
+        class="button2ndRow infoButtonMargin {{
+          nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+        }}"
+        (click)="showVersionButton() ? openDownloadPage() : openAbout()"
+        matTooltip="You are currently using an older version {{
+          versionInfo.localVersion
+        }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
+          versionInfo.latestVersion
+        }}."
+      >
+        <img
+          src="assets/images/info.png"
+          class="infoButton zoomIcon buttonBottom"
+        />
+      </button>
+    }
+    @if (!openRefImageEnabled() && showVersionButton()) {
+      <button
+        type="button"
+        mat-button
+        disabled
+        class="button2ndRowDisabled infoButtonMargin {{
+          nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+        }}"
+        matTooltip="You are currently using an older version {{
+          getCurrentVersion()
+        }}. Don't miss out on the latest new features & improvement by downloading the latest version {{
+          getLatestKnownVersion()
+        }}."
+      >
+        <img
+          src="assets/images/info.png"
+          class="infoButton zoomIcon buttonBottom"
+        />
+      </button>
+    }
+    @if (openRefImageEnabled() && !showVersionButton()) {
+      <button
+        type="button"
+        mat-button
+        class="button2ndRow infoButtonMargin {{
+          nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+        }}"
+        (click)="openAbout()"
+        matTooltip="About"
+      >
+        <img
+          src="assets/images/info.png"
+          class="infoButton zoomIcon buttonBottom"
+        />
+      </button>
+    }
+    @if (!openRefImageEnabled() && !showVersionButton()) {
+      <button
+        type="button"
+        mat-button
+        disabled
+        class="button2ndRowDisabled infoButtonMargin"
+        matTooltip="About"
+      >
+        <img
+          src="assets/images/info.png"
+          class="infoButton zoomIcon buttonBottom"
+        />
+      </button>
     }
     <!-- End info button -->
   </div>
@@ -482,188 +524,208 @@ isSplashPanelVisible ) {
             }}"
             >Batch</span
           >
-          @if (openRefImageEnabled() && refImageSelected) {
-          <button
-            type="button"
-            mat-button
-            (click)="applyProfileBatch()"
-            class="button {{
-              nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-            }}"
-            matTooltip="Process {{ selectedProfile }} stacks in root folder"
-          >
-            <img src="assets/images/startbatch.png" class="startBatchButton" />
-          </button>
-          } @if (!openRefImageEnabled() || !refImageSelected) {
-          <button
-            type="button"
-            mat-button
-            disabled
-            class="button_disabled batchBarDisabledMargin"
-          >
-            <img src="assets/images/startbatch.png" class="startBatchButton" />
-          </button>
-          } @if (openRefImageEnabled() && refImageSelected) {
-          <button
-            type="button"
-            mat-button
-            (click)="realtimeEnabledChanged()"
-            class="{{
-              'relatedButtonsSpace buttonZoom connectButton ' +
-                (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-                (realtimeEnabled ? 'Pressed' : '')
-            }}"
-            matTooltip="Connect to stacking software"
-          >
-            <img src="assets/images/connect.png" class="genericButton" />
-          </button>
-          } @if (!openRefImageEnabled() || !refImageSelected) {
-          <button
-            type="button"
-            mat-button
-            disabled
-            class="relatedButtonsSpace buttonDisabledZoom batchBarDisabledMargin connectButton"
-            matTooltip="Connect to stacking software"
-          >
-            <img src="assets/images/connect.png" class="genericButton" />
-          </button>
-          } @if (openRefImageEnabled() && refImageSelected) {
-          <button
-            type="button"
-            mat-button
-            (click)="loadFilesForDerotation()"
-            class="relatedButtonsSpace button {{
-              nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-            }}"
-            matTooltip="Derotate images"
-          >
-            <img src="assets/images/derotate.png" class="stopBatchButton" />
-          </button>
-          } @if (!openRefImageEnabled() || !refImageSelected) {
-          <button
-            type="button"
-            mat-button
-            disabled
-            class="relatedButtonsSpace batchBarDisabledMargin button_disabled"
-          >
-            <img src="assets/images/derotate.png" class="stopBatchButton" />
-          </button>
-          } @if (openRefImageEnabled() && refImageSelected) {
-          <button
-            type="button"
-            mat-button
-            (click)="stackImages()"
-            class="relatedButtonsSpace button {{
-              nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-            }}"
-            matTooltip="Stack images"
-          >
-            <img src="assets/images/stack.png" class="stopBatchButton" />
-          </button>
-          } @if (!openRefImageEnabled() || !refImageSelected) {
-          <button
-            type="button"
-            mat-button
-            disabled
-            class="relatedButtonsSpace batchBarDisabledMargin button_disabled"
-          >
-            <img src="assets/images/stack.png" class="stopBatchButton" />
-          </button>
+          @if (openRefImageEnabled()) {
+            <button
+              type="button"
+              mat-button
+              (click)="applyProfileBatch()"
+              class="button {{
+                nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+              }}"
+              matTooltip="Process {{ selectedProfile }} stacks in root folder"
+            >
+              <img
+                src="assets/images/startbatch.png"
+                class="startBatchButton"
+              />
+            </button>
+          }
+          @if (!openRefImageEnabled()) {
+            <button
+              type="button"
+              mat-button
+              disabled
+              class="button_disabled batchBarDisabledMargin"
+            >
+              <img
+                src="assets/images/startbatch.png"
+                class="startBatchButton"
+              />
+            </button>
+          }
+          @if (openRefImageEnabled()) {
+            <button
+              type="button"
+              mat-button
+              (click)="realtimeEnabledChanged()"
+              class="{{
+                'relatedButtonsSpace buttonZoom connectButton ' +
+                  (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+                  (realtimeEnabled ? 'Pressed' : '')
+              }}"
+              matTooltip="Connect to stacking software"
+            >
+              <img src="assets/images/connect.png" class="genericButton" />
+            </button>
+          }
+          @if (!openRefImageEnabled()) {
+            <button
+              type="button"
+              mat-button
+              disabled
+              class="relatedButtonsSpace buttonDisabledZoom batchBarDisabledMargin connectButton"
+              matTooltip="Connect to stacking software"
+            >
+              <img src="assets/images/connect.png" class="genericButton" />
+            </button>
+          }
+          @if (openRefImageEnabled()) {
+            <button
+              type="button"
+              mat-button
+              (click)="loadFilesForDerotation()"
+              class="relatedButtonsSpace button {{
+                nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+              }}"
+              matTooltip="Derotate images"
+            >
+              <img src="assets/images/derotate.png" class="stopBatchButton" />
+            </button>
+          }
+          @if (!openRefImageEnabled()) {
+            <button
+              type="button"
+              mat-button
+              disabled
+              class="relatedButtonsSpace batchBarDisabledMargin button_disabled"
+            >
+              <img src="assets/images/derotate.png" class="stopBatchButton" />
+            </button>
+          }
+          @if (openRefImageEnabled()) {
+            <button
+              type="button"
+              mat-button
+              (click)="stackImages()"
+              class="relatedButtonsSpace button {{
+                nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+              }}"
+              matTooltip="Stack images"
+            >
+              <img src="assets/images/stack.png" class="stopBatchButton" />
+            </button>
+          }
+          @if (!openRefImageEnabled()) {
+            <button
+              type="button"
+              mat-button
+              disabled
+              class="relatedButtonsSpace batchBarDisabledMargin button_disabled"
+            >
+              <img src="assets/images/stack.png" class="stopBatchButton" />
+            </button>
           }
         </div>
       </mat-card-content>
     </mat-card>
 
+    @if (openRefImageEnabled()) {
+      <button
+        type="button"
+        mat-button
+        (click)="nightModeChanged()"
+        class="{{
+          'button3thRow buttonMargin ' +
+            (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+            (nightModeEnabled() ? 'Pressed' : '')
+        }}"
+        matTooltip="Night mode"
+      >
+        <img src="assets/images/nightmode.png" class="genericButton" />
+      </button>
+    }
+    @if (!openRefImageEnabled()) {
+      <button
+        type="button"
+        mat-button
+        disabled
+        class="button3thRowDisabled buttonMargin"
+      >
+        <img src="assets/images/nightmode.png" class="genericButton" />
+      </button>
+    }
     @if (openRefImageEnabled() && refImageSelected) {
-    <button
-      type="button"
-      mat-button
-      (click)="nightModeChanged()"
-      class="{{
-        'button3thRow buttonMargin ' +
-          (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-          (nightModeEnabled() ? 'Pressed' : '')
-      }}"
-      matTooltip="Night mode"
-    >
-      <img src="assets/images/nightmode.png" class="genericButton" />
-    </button>
-    } @if (!refImageSelected || !openRefImageEnabled()) {
-    <button
-      type="button"
-      mat-button
-      disabled
-      class="button3thRowDisabled buttonMargin"
-    >
-      <img src="assets/images/nightmode.png" class="genericButton" />
-    </button>
-    } @if (openRefImageEnabled() && refImageSelected) {
-    <button
-      type="button"
-      mat-button
-      (click)="openSaveScaledPanel()"
-      class="{{
-        'button3thRow infoButtonMargin ' +
-          (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-          (saveScaledEnabled() ? 'Pressed' : '')
-      }}"
-      matTooltip="Set save scale and size"
-    >
-      <img src="assets/images/resize.png" class="genericButton" />
-    </button>
-    } @if (!refImageSelected || !openRefImageEnabled()) {
-    <button
-      type="button"
-      mat-button
-      disabled
-      class="button3thRowDisabled infoButtonMargin"
-    >
-      <img src="assets/images/resize.png" class="genericButton" />
-    </button>
-    } @if (openRefImageEnabled() && refImageSelected) {
-    <button
-      type="button"
-      mat-button
-      (click)="saveReferenceImage()"
-      class="button3thRow infoButtonMargin {{
-        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-      }}"
-      matTooltip="Save"
-    >
-      <img src="assets/images/save.png" class="saveButton zoomIcon" />
-    </button>
-    } @if (!refImageSelected || !openRefImageEnabled()) {
-    <button
-      type="button"
-      mat-button
-      disabled
-      class="button3thRowDisabled infoButtonMargin"
-    >
-      <img src="assets/images/save.png" class="saveButton zoomIcon" />
-    </button>
-    } @if (openRefImageEnabled() && refImageSelected) {
-    <button
-      type="button"
-      mat-button
-      (click)="blinkClippedAreasChanged()"
-      class="{{
-        'button3thRow buttonMarginHighlight ' +
-          (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-          (blinkClippedAreas ? 'Pressed' : '')
-      }}"
-      matTooltip="Highlight clipped areas"
-    >
-      <img src="assets/images/highlight-clipped.png" class="genericButton" />
-    </button>
-    } @if (!refImageSelected || !openRefImageEnabled()) {
-    <button
-      type="button"
-      mat-button
-      disabled
-      class="button3thRowDisabled buttonMarginHighlight"
-    >
-      <img src="assets/images/highlight-clipped.png" class="genericButton" />
-    </button>
+      <button
+        type="button"
+        mat-button
+        (click)="openSaveScaledPanel()"
+        class="{{
+          'button3thRow infoButtonMargin ' +
+            (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+            (saveScaledEnabled() ? 'Pressed' : '')
+        }}"
+        matTooltip="Set save scale and size"
+      >
+        <img src="assets/images/resize.png" class="genericButton" />
+      </button>
+    }
+    @if (!refImageSelected || !openRefImageEnabled()) {
+      <button
+        type="button"
+        mat-button
+        disabled
+        class="button3thRowDisabled infoButtonMargin"
+      >
+        <img src="assets/images/resize.png" class="genericButton" />
+      </button>
+    }
+    @if (openRefImageEnabled() && refImageSelected) {
+      <button
+        type="button"
+        mat-button
+        (click)="saveReferenceImage()"
+        class="button3thRow infoButtonMargin {{
+          nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+        }}"
+        matTooltip="Save"
+      >
+        <img src="assets/images/save.png" class="saveButton zoomIcon" />
+      </button>
+    }
+    @if (!refImageSelected || !openRefImageEnabled()) {
+      <button
+        type="button"
+        mat-button
+        disabled
+        class="button3thRowDisabled infoButtonMargin"
+      >
+        <img src="assets/images/save.png" class="saveButton zoomIcon" />
+      </button>
+    }
+    @if (openRefImageEnabled() && refImageSelected) {
+      <button
+        type="button"
+        mat-button
+        (click)="blinkClippedAreasChanged()"
+        class="{{
+          'button3thRow buttonMarginHighlight ' +
+            (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+            (blinkClippedAreas ? 'Pressed' : '')
+        }}"
+        matTooltip="Highlight clipped areas"
+      >
+        <img src="assets/images/highlight-clipped.png" class="genericButton" />
+      </button>
+    }
+    @if (!refImageSelected || !openRefImageEnabled()) {
+      <button
+        type="button"
+        mat-button
+        disabled
+        class="button3thRowDisabled buttonMarginHighlight"
+      >
+        <img src="assets/images/highlight-clipped.png" class="genericButton" />
+      </button>
     }
   </div>
 
@@ -699,88 +761,96 @@ isSplashPanelVisible ) {
             </mat-radio-button>
           </mat-radio-group>
         </div>
-        @if (sharpenMode === 'LUMINANCE') {
-        <div>
-          <mat-checkbox
-            [(ngModel)]="luminanceIncludeRed"
-            (change)="sharpenModeChanged(undefined, true)"
-            [color]="colorTheme()"
-            [disabled]="shouldShowSpinner() || !refImageSelected"
-            >Red</mat-checkbox
-          >
-          <mat-checkbox
-            [(ngModel)]="luminanceIncludeGreen"
-            (change)="sharpenModeChanged(undefined, true)"
-            [color]="colorTheme()"
-            [disabled]="shouldShowSpinner() || !refImageSelected"
-            class="luminanceIncludeBox"
-            >Green</mat-checkbox
-          >
-          <mat-checkbox
-            [(ngModel)]="luminanceIncludeBlue"
-            (change)="sharpenModeChanged(undefined, true)"
-            [color]="colorTheme()"
-            class="luminanceIncludeBox"
-            [disabled]="shouldShowSpinner() || !refImageSelected"
-            >Blue</mat-checkbox
-          >
-          <mat-checkbox
-            [(ngModel)]="luminanceIncludeColor"
-            (change)="sharpenModeChanged(undefined, true)"
-            [color]="colorTheme()"
-            class="luminanceIncludeBox"
-            [disabled]="shouldShowSpinner() || !refImageSelected"
-            >Color</mat-checkbox
-          >
-        </div>
-        } @if (sharpenMode === 'RGB') {
-        <div>
-          <mat-radio-group
-            [color]="colorTheme()"
-            [disabled]="shouldShowSpinner() || !refImageSelected"
-            [(ngModel)]="applySharpenToChannel"
-            (change)="applySharpenToChannelChanged($event)"
-            class="sharpenMode"
-          >
-            <mat-radio-button value="RGB">All</mat-radio-button>
-            <mat-radio-button value="R">Red </mat-radio-button>
-            <mat-radio-button value="G">Green</mat-radio-button>
-            <mat-radio-button value="B">Blue</mat-radio-button>
-          </mat-radio-group>
-        </div>
+        @if (sharpenMode === "LUMINANCE") {
+          <div>
+            <mat-checkbox
+              [(ngModel)]="luminanceIncludeRed"
+              (change)="sharpenModeChanged(undefined, true)"
+              [color]="colorTheme()"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
+              >Red</mat-checkbox
+            >
+            <mat-checkbox
+              [(ngModel)]="luminanceIncludeGreen"
+              (change)="sharpenModeChanged(undefined, true)"
+              [color]="colorTheme()"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
+              class="luminanceIncludeBox"
+              >Green</mat-checkbox
+            >
+            <mat-checkbox
+              [(ngModel)]="luminanceIncludeBlue"
+              (change)="sharpenModeChanged(undefined, true)"
+              [color]="colorTheme()"
+              class="luminanceIncludeBox"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
+              >Blue</mat-checkbox
+            >
+            <mat-checkbox
+              [(ngModel)]="luminanceIncludeColor"
+              (change)="sharpenModeChanged(undefined, true)"
+              [color]="colorTheme()"
+              class="luminanceIncludeBox"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
+              >Color</mat-checkbox
+            >
+          </div>
+        }
+        @if (sharpenMode === "RGB") {
+          <div>
+            <mat-radio-group
+              [color]="colorTheme()"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
+              [(ngModel)]="applySharpenToChannel"
+              (change)="applySharpenToChannelChanged($event)"
+              class="sharpenMode"
+            >
+              <mat-radio-button value="RGB">All</mat-radio-button>
+              <mat-radio-button value="R">Red </mat-radio-button>
+              <mat-radio-button value="G">Green</mat-radio-button>
+              <mat-radio-button value="B">Blue</mat-radio-button>
+            </mat-radio-group>
+          </div>
         }
       </div>
       <div class="sharpenTypeMargin sliderRow">
         @if (!applyWienerDeconvolution) {
-        <div class="noWiener">&nbsp;</div>
+          <div class="noWiener">&nbsp;</div>
         }
         <div class="methodsLabel">Methods</div>
         <div class="slider">
-          @if ( applyWienerDeconvolution && openRefImageEnabled() &&
-          refImageSelected ) {
-          <button
-            type="button"
-            mat-button
-            (click)="createPSF()"
-            class="{{
-              'psfButton buttonZoom ' +
-                (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
-            }}"
-            matTooltip="Load PSF"
-          >
-            <img src="assets/images/synth-psf.png" class="psfButtonImg" />
-          </button>
-          } @if ( !applyWienerDeconvolution || !openRefImageEnabled() ||
-          !refImageSelected ) {
-          <button
-            type="button"
-            mat-button
-            disabled
-            class="psfButton psfButtonDisabled buttonDisabledZoom"
-            matTooltip="Load PSF"
-          >
-            <img src="assets/images/synth-psf.png" class="psfButtonImg" />
-          </button>
+          @if (
+            applyWienerDeconvolution &&
+            openRefImageEnabled() &&
+            refImageSelected
+          ) {
+            <button
+              type="button"
+              mat-button
+              (click)="createPSF()"
+              class="{{
+                'psfButton buttonZoom ' +
+                  (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
+              }}"
+              matTooltip="Load PSF"
+            >
+              <img src="assets/images/synth-psf.png" class="psfButtonImg" />
+            </button>
+          }
+          @if (
+            !applyWienerDeconvolution ||
+            !openRefImageEnabled() ||
+            !refImageSelected
+          ) {
+            <button
+              type="button"
+              mat-button
+              disabled
+              class="psfButton psfButtonDisabled buttonDisabledZoom"
+              matTooltip="Load PSF"
+            >
+              <img src="assets/images/synth-psf.png" class="psfButtonImg" />
+            </button>
           }
 
           <mat-checkbox
@@ -802,14 +872,14 @@ isSplashPanelVisible ) {
           >
 
           @if (applyWienerDeconvolution) {
-          <mat-checkbox
-            [(ngModel)]="wienerDeconvolutionQuadratic"
-            (change)="applyWienerDeconvolutionQuadraticChanged()"
-            [color]="colorTheme()"
-            class="applyUnsharpMaskCheckBox"
-            [disabled]="shouldShowSpinner() || !refImageSelected"
-            >Quadratic Deconvolution</mat-checkbox
-          >
+            <mat-checkbox
+              [(ngModel)]="wienerDeconvolutionQuadratic"
+              (change)="applyWienerDeconvolutionQuadraticChanged()"
+              [color]="colorTheme()"
+              class="applyUnsharpMaskCheckBox"
+              [disabled]="shouldShowSpinner() || !refImageSelected"
+              >Quadratic Deconvolution</mat-checkbox
+            >
           }
         </div>
       </div>
@@ -837,96 +907,99 @@ isSplashPanelVisible ) {
       </div>
 
       @if (applyWienerDeconvolution) {
-      <span>
-        <div class="sliderRow">
-          <div class="sliderLabel">Deconv. iterations</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              step="1"
-              min="1"
-              max="40"
-              (input)="wienerIterationsChanged($event, false)"
-              (change)="wienerIterationsChanged($event, true)"
-              [(ngModel)]="wienerIterations"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="wienerIterations"
-              sliderInputMinValue="1"
-              sliderInputMaxValue="40"
-              (sliderInputValueChanged)="wienerIterationsChanged($event, true)"
-            />
+        <span>
+          <div class="sliderRow">
+            <div class="sliderLabel">Deconv. iterations</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="shouldShowSpinner() || !refImageSelected"
+                step="1"
+                min="1"
+                max="40"
+                (input)="wienerIterationsChanged($event, false)"
+                (change)="wienerIterationsChanged($event, true)"
+                [(ngModel)]="wienerIterations"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="wienerIterations"
+                sliderInputMinValue="1"
+                sliderInputMaxValue="40"
+                (sliderInputValueChanged)="
+                  wienerIterationsChanged($event, true)
+                "
+              />
+            </div>
           </div>
-        </div>
-      </span>
-      } @if (applyUnsharpMask) {
-      <span>
-        <div class="sliderRow">
-          <div class="sliderLabel">Radius</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              step="0.1"
-              min="0.5"
-              max="4"
-              (input)="radiusChanged($event, false)"
-              (change)="radiusChanged($event, true)"
-              [(ngModel)]="radius"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="radius"
-              sliderInputMinValue="0.5"
-              sliderInputMaxValue="4"
-              (sliderInputValueChanged)="radiusChanged($event, true)"
-            />
+        </span>
+      }
+      @if (applyUnsharpMask) {
+        <span>
+          <div class="sliderRow">
+            <div class="sliderLabel">Radius</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="shouldShowSpinner() || !refImageSelected"
+                step="0.1"
+                min="0.5"
+                max="4"
+                (input)="radiusChanged($event, false)"
+                (change)="radiusChanged($event, true)"
+                [(ngModel)]="radius"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="radius"
+                sliderInputMinValue="0.5"
+                sliderInputMaxValue="4"
+                (sliderInputValueChanged)="radiusChanged($event, true)"
+              />
+            </div>
           </div>
-        </div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Amount</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              step="10"
-              min="0"
-              max="9999"
-              (input)="amountChanged($event, false)"
-              (change)="amountChanged($event, true)"
-              [(ngModel)]="amount"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="amount"
-              sliderInputMinValue="0"
-              sliderInputMaxValue="9999"
-              (sliderInputValueChanged)="amountChanged($event, true)"
-            />
+          <div class="sliderRow">
+            <div class="sliderLabel">Amount</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="shouldShowSpinner() || !refImageSelected"
+                step="10"
+                min="0"
+                max="9999"
+                (input)="amountChanged($event, false)"
+                (change)="amountChanged($event, true)"
+                [(ngModel)]="amount"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="amount"
+                sliderInputMinValue="0"
+                sliderInputMaxValue="9999"
+                (sliderInputValueChanged)="amountChanged($event, true)"
+              />
+            </div>
           </div>
-        </div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Sharpen iterations</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              tickInterval="1"
-              step="1"
-              min="1"
-              max="10"
-              (input)="iterationsChanged($event, false)"
-              (change)="iterationsChanged($event, true)"
-              [(ngModel)]="iterations"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="iterations"
-              sliderInputMinValue="1"
-              sliderInputMaxValue="10"
-              (sliderInputValueChanged)="iterationsChanged($event, true)"
-            />
+          <div class="sliderRow">
+            <div class="sliderLabel">Sharpen iterations</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="shouldShowSpinner() || !refImageSelected"
+                tickInterval="1"
+                step="1"
+                min="1"
+                max="10"
+                (input)="iterationsChanged($event, false)"
+                (change)="iterationsChanged($event, true)"
+                [(ngModel)]="iterations"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="iterations"
+                sliderInputMinValue="1"
+                sliderInputMaxValue="10"
+                (sliderInputValueChanged)="iterationsChanged($event, true)"
+              />
+            </div>
           </div>
-        </div>
-      </span>
+        </span>
       }
 
       <div class="sliderRow">
@@ -983,106 +1056,111 @@ isSplashPanelVisible ) {
         </div>
       </div>
 
-      @if (edgeArtefactSupressionMode === 'CLIPPING') {
-      <div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Suppress Clipping</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              tickInterval="1"
-              step="1"
-              min="1"
-              max="100"
-              (input)="clippingStrengthChanged($event, false)"
-              (change)="clippingStrengthChanged($event, true)"
-              [(ngModel)]="clippingStrength"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="clippingStrength"
-              sliderInputMinValue="1"
-              sliderInputMaxValue="100"
-              (sliderInputValueChanged)="clippingStrengthChanged($event, true)"
-            />
+      @if (edgeArtefactSupressionMode === "CLIPPING") {
+        <div>
+          <div class="sliderRow">
+            <div class="sliderLabel">Suppress Clipping</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="shouldShowSpinner() || !refImageSelected"
+                tickInterval="1"
+                step="1"
+                min="1"
+                max="100"
+                (input)="clippingStrengthChanged($event, false)"
+                (change)="clippingStrengthChanged($event, true)"
+                [(ngModel)]="clippingStrength"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="clippingStrength"
+                sliderInputMinValue="1"
+                sliderInputMaxValue="100"
+                (sliderInputValueChanged)="
+                  clippingStrengthChanged($event, true)
+                "
+              />
+            </div>
+          </div>
+          <div class="sliderRow">
+            <div class="sliderLabel">Suppression Range</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="
+                  shouldShowSpinner() ||
+                  !refImageSelected ||
+                  clippingStrength === 0
+                "
+                tickInterval="1"
+                step="1"
+                min="1"
+                max="100"
+                (input)="clippingRangeChanged($event, false)"
+                (change)="clippingRangeChanged($event, true)"
+                [(ngModel)]="clippingRange"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="clippingRange"
+                sliderInputMinValue="1"
+                sliderInputMaxValue="100"
+                (sliderInputValueChanged)="clippingRangeChanged($event, true)"
+              />
+            </div>
           </div>
         </div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Suppression Range</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="
-                shouldShowSpinner() ||
-                !refImageSelected ||
-                clippingStrength === 0
-              "
-              tickInterval="1"
-              step="1"
-              min="1"
-              max="100"
-              (input)="clippingRangeChanged($event, false)"
-              (change)="clippingRangeChanged($event, true)"
-              [(ngModel)]="clippingRange"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="clippingRange"
-              sliderInputMinValue="1"
-              sliderInputMaxValue="100"
-              (sliderInputValueChanged)="clippingRangeChanged($event, true)"
-            />
+      }
+      @if (edgeArtefactSupressionMode === "DERING") {
+        <div>
+          <div class="sliderRow">
+            <div class="sliderLabel">Strength</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="shouldShowSpinner() || !refImageSelected"
+                tickInterval="1"
+                step="1"
+                min="1"
+                max="100"
+                (input)="deringStrengthChanged($event, false)"
+                (change)="deringStrengthChanged($event, true)"
+                [(ngModel)]="deringStrength"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="deringStrength"
+                sliderInputMinValue="1"
+                sliderInputMaxValue="100"
+                (sliderInputValueChanged)="deringStrengthChanged($event, true)"
+              />
+            </div>
+          </div>
+          <div class="sliderRow">
+            <div class="sliderLabel">Radius</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="
+                  shouldShowSpinner() ||
+                  !refImageSelected ||
+                  deringStrength === 0
+                "
+                tickInterval="1"
+                step="1"
+                min="1"
+                max="100"
+                (input)="deringRadiusChanged($event, false)"
+                (change)="deringRadiusChanged($event, true)"
+                [(ngModel)]="deringRadius"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="deringRadius"
+                sliderInputMinValue="1"
+                sliderInputMaxValue="100"
+                (sliderInputValueChanged)="deringRadiusChanged($event, true)"
+              />
+            </div>
           </div>
         </div>
-      </div>
-      } @if (edgeArtefactSupressionMode === 'DERING') {
-      <div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Strength</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              tickInterval="1"
-              step="1"
-              min="1"
-              max="100"
-              (input)="deringStrengthChanged($event, false)"
-              (change)="deringStrengthChanged($event, true)"
-              [(ngModel)]="deringStrength"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="deringStrength"
-              sliderInputMinValue="1"
-              sliderInputMaxValue="100"
-              (sliderInputValueChanged)="deringStrengthChanged($event, true)"
-            />
-          </div>
-        </div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Radius</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="
-                shouldShowSpinner() || !refImageSelected || deringStrength === 0
-              "
-              tickInterval="1"
-              step="1"
-              min="1"
-              max="100"
-              (input)="deringRadiusChanged($event, false)"
-              (change)="deringRadiusChanged($event, true)"
-              [(ngModel)]="deringRadius"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="deringRadius"
-              sliderInputMinValue="1"
-              sliderInputMaxValue="100"
-              (sliderInputValueChanged)="deringRadiusChanged($event, true)"
-            />
-          </div>
-        </div>
-      </div>
       }
     </mat-tab>
 
@@ -1093,8 +1171,8 @@ isSplashPanelVisible ) {
             denoiseAlgorithm1 === 'OFF'
               ? 'denoiseOffLabel'
               : nightModeEnabled()
-              ? 'sliderRowCategoryTitleColorNight'
-              : 'sliderRowCategoryTitleColor'
+                ? 'sliderRowCategoryTitleColorNight'
+                : 'sliderRowCategoryTitleColor'
           }}"
         >
           Denoise
@@ -1117,147 +1195,148 @@ isSplashPanelVisible ) {
         </mat-radio-group>
       </div>
 
-      @if (denoiseAlgorithm1 === 'SIGMA1') {
-      <div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Amount</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              tickInterval="1000"
-              step="1"
-              min="0"
-              max="100"
-              (input)="denoise1AmountChanged($event, false)"
-              (change)="denoise1AmountChanged($event, true)"
-              [(ngModel)]="denoise1Amount"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="denoise1Amount"
-              sliderInputMinValue="0"
-              sliderInputMaxValue="100"
-              (sliderInputValueChanged)="denoise1AmountChanged($event, true)"
-            />
+      @if (denoiseAlgorithm1 === "SIGMA1") {
+        <div>
+          <div class="sliderRow">
+            <div class="sliderLabel">Amount</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="shouldShowSpinner() || !refImageSelected"
+                tickInterval="1000"
+                step="1"
+                min="0"
+                max="100"
+                (input)="denoise1AmountChanged($event, false)"
+                (change)="denoise1AmountChanged($event, true)"
+                [(ngModel)]="denoise1Amount"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="denoise1Amount"
+                sliderInputMinValue="0"
+                sliderInputMaxValue="100"
+                (sliderInputValueChanged)="denoise1AmountChanged($event, true)"
+              />
+            </div>
+          </div>
+          <div class="sliderRow">
+            <div class="sliderLabel">Radius</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="shouldShowSpinner() || !refImageSelected"
+                tickInterval="1000"
+                step="0.1"
+                min="0.5"
+                max="4"
+                (input)="denoise1RadiusChanged($event, false)"
+                (change)="denoise1RadiusChanged($event, true)"
+                [(ngModel)]="denoise1Radius"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="denoise1Radius"
+                sliderInputMinValue="0.5"
+                sliderInputMaxValue="4"
+                (sliderInputValueChanged)="denoise1RadiusChanged($event, true)"
+              />
+            </div>
+          </div>
+          <div class="sliderRow">
+            <div class="sliderLabel">Iterations</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="shouldShowSpinner() || !refImageSelected"
+                tickInterval="1"
+                step="1"
+                min="1"
+                max="10"
+                (input)="denoise1IterationsChanged($event, false)"
+                (change)="denoise1IterationsChanged($event, true)"
+                [(ngModel)]="denoise1Iterations"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="denoise1Radius"
+                sliderInputMinValue="1"
+                sliderInputMaxValue="10"
+                (sliderInputValueChanged)="
+                  denoise1IterationsChanged($event, true)
+                "
+              />
+            </div>
           </div>
         </div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Radius</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              tickInterval="1000"
-              step="0.1"
-              min="0.5"
-              max="4"
-              (input)="denoise1RadiusChanged($event, false)"
-              (change)="denoise1RadiusChanged($event, true)"
-              [(ngModel)]="denoise1Radius"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="denoise1Radius"
-              sliderInputMinValue="0.5"
-              sliderInputMaxValue="4"
-              (sliderInputValueChanged)="denoise1RadiusChanged($event, true)"
-            />
+      }
+      @if (denoiseAlgorithm1 === "BILATERAL") {
+        <div>
+          <div class="sliderRow">
+            <div class="sliderLabel">Sigma color</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="shouldShowSpinner() || !refImageSelected"
+                step="1"
+                min="1"
+                max="1000"
+                (input)="bilateralSigmaColorChanged($event, false)"
+                (change)="bilateralSigmaColorChanged($event, true)"
+                [(ngModel)]="bilateralSigmaColor"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="bilateralSigmaColor"
+                sliderInputMinValue="1"
+                sliderInputMaxValue="1000"
+                (sliderInputValueChanged)="
+                  bilateralSigmaColorChanged($event, true)
+                "
+              />
+            </div>
+          </div>
+          <div class="sliderRow">
+            <div class="sliderLabel">Radius</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="shouldShowSpinner() || !refImageSelected"
+                step="1"
+                min="1"
+                max="5"
+                (input)="bilateralRadiusChanged($event, false)"
+                (change)="bilateralRadiusChanged($event, true)"
+                [(ngModel)]="bilateralRadius"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="bilateralRadius"
+                sliderInputMinValue="1"
+                sliderInputMaxValue="5"
+                (sliderInputValueChanged)="bilateralRadiusChanged($event, true)"
+              />
+            </div>
+          </div>
+          <div class="sliderRow">
+            <div class="sliderLabel">Iterations</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="shouldShowSpinner() || !refImageSelected"
+                step="1"
+                min="1"
+                max="10"
+                (input)="bilateralIterationsChanged($event, false)"
+                (change)="bilateralIterationsChanged($event, true)"
+                [(ngModel)]="bilateralIterations"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="bilateralIterations"
+                sliderInputMinValue="1"
+                sliderInputMaxValue="10"
+                (sliderInputValueChanged)="
+                  bilateralIterationsChanged($event, true)
+                "
+              />
+            </div>
           </div>
         </div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Iterations</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              tickInterval="1"
-              step="1"
-              min="1"
-              max="10"
-              (input)="denoise1IterationsChanged($event, false)"
-              (change)="denoise1IterationsChanged($event, true)"
-              [(ngModel)]="denoise1Iterations"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="denoise1Radius"
-              sliderInputMinValue="1"
-              sliderInputMaxValue="10"
-              (sliderInputValueChanged)="
-                denoise1IterationsChanged($event, true)
-              "
-            />
-          </div>
-        </div>
-      </div>
-      } @if (denoiseAlgorithm1 === 'BILATERAL') {
-      <div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Sigma color</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              step="1"
-              min="1"
-              max="1000"
-              (input)="bilateralSigmaColorChanged($event, false)"
-              (change)="bilateralSigmaColorChanged($event, true)"
-              [(ngModel)]="bilateralSigmaColor"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="bilateralSigmaColor"
-              sliderInputMinValue="1"
-              sliderInputMaxValue="1000"
-              (sliderInputValueChanged)="
-                bilateralSigmaColorChanged($event, true)
-              "
-            />
-          </div>
-        </div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Radius</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              step="1"
-              min="1"
-              max="5"
-              (input)="bilateralRadiusChanged($event, false)"
-              (change)="bilateralRadiusChanged($event, true)"
-              [(ngModel)]="bilateralRadius"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="bilateralRadius"
-              sliderInputMinValue="1"
-              sliderInputMaxValue="5"
-              (sliderInputValueChanged)="bilateralRadiusChanged($event, true)"
-            />
-          </div>
-        </div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Iterations</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              step="1"
-              min="1"
-              max="10"
-              (input)="bilateralIterationsChanged($event, false)"
-              (change)="bilateralIterationsChanged($event, true)"
-              [(ngModel)]="bilateralIterations"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="bilateralIterations"
-              sliderInputMinValue="1"
-              sliderInputMaxValue="10"
-              (sliderInputValueChanged)="
-                bilateralIterationsChanged($event, true)
-              "
-            />
-          </div>
-        </div>
-      </div>
       }
 
       <div class="sliderRow">
@@ -1266,8 +1345,8 @@ isSplashPanelVisible ) {
             denoiseAlgorithm2 === 'OFF'
               ? 'denoiseOffLabel'
               : nightModeEnabled()
-              ? 'sliderRowCategoryTitleColorNight'
-              : 'sliderRowCategoryTitleColor'
+                ? 'sliderRowCategoryTitleColorNight'
+                : 'sliderRowCategoryTitleColor'
           }}"
         >
           Smoothing
@@ -1289,184 +1368,192 @@ isSplashPanelVisible ) {
           >
         </mat-radio-group>
       </div>
-      @if (denoiseAlgorithm2 === 'SAVGOLAY') {
-      <div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Kernel Size</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="
-                shouldShowSpinner() ||
-                !refImageSelected ||
-                savitzkyGolaySize === '0'
-              "
-              tickInterval="1"
-              step="1"
-              min="2"
-              max="6"
-              (input)="savitzkyGolaySizeChanged($event, false)"
-              (change)="savitzkyGolaySizeChanged($event, true)"
-              [(ngModel)]="savitzkyGolaySize"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <span
+      @if (denoiseAlgorithm2 === "SAVGOLAY") {
+        <div>
+          <div class="sliderRow">
+            <div class="sliderLabel">Kernel Size</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="
+                  shouldShowSpinner() ||
+                  !refImageSelected ||
+                  savitzkyGolaySize === '0'
+                "
+                tickInterval="1"
+                step="1"
+                min="2"
+                max="6"
+                (input)="savitzkyGolaySizeChanged($event, false)"
+                (change)="savitzkyGolaySizeChanged($event, true)"
+                [(ngModel)]="savitzkyGolaySize"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <span
+                class="{{
+                  savitzkyGolaySize === '0'
+                    ? 'sliderLabelDisabled'
+                    : 'sliderLabel'
+                }}"
+                >{{ savitzkyGolaySizeDisplayValue }}</span
+              >
+            </div>
+          </div>
+          <div class="savgolayRadio"></div>
+          <div class="sliderRow">
+            <div
               class="{{
                 savitzkyGolaySize === '0'
                   ? 'sliderLabelDisabled'
                   : 'sliderLabel'
               }}"
-              >{{ savitzkyGolaySizeDisplayValue }}</span
             >
+              Amount
+            </div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="
+                  shouldShowSpinner() ||
+                  !refImageSelected ||
+                  savitzkyGolaySize === '0'
+                "
+                tickInterval="1"
+                step="1"
+                min="1"
+                max="100"
+                (input)="savitzkyGolayAmountChanged($event, false)"
+                (change)="savitzkyGolayAmountChanged($event, true)"
+                [(ngModel)]="savitzkyGolayAmount"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="savitzkyGolayAmount"
+                sliderInputMinValue="1"
+                sliderInputMaxValue="100"
+                (sliderInputValueChanged)="
+                  savitzkyGolayAmountChanged($event, true)
+                "
+              />
+            </div>
+          </div>
+          <div class="sliderRow">
+            <div
+              class="{{
+                savitzkyGolaySize === '0'
+                  ? 'sliderLabelDisabled'
+                  : 'sliderLabel'
+              }}"
+            >
+              Iterations
+            </div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="
+                  shouldShowSpinner() ||
+                  !refImageSelected ||
+                  savitzkyGolaySize === '0'
+                "
+                tickInterval="1"
+                step="1"
+                min="1"
+                max="10"
+                (input)="savitzkyGolayIterationsChanged($event, false)"
+                (change)="savitzkyGolayIterationsChanged($event, true)"
+                [(ngModel)]="savitzkyGolayIterations"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="savitzkyGolayIterations"
+                sliderInputMinValue="1"
+                sliderInputMaxValue="10"
+                (sliderInputValueChanged)="
+                  savitzkyGolayIterationsChanged($event, true)
+                "
+              />
+            </div>
           </div>
         </div>
-        <div class="savgolayRadio"></div>
+      }
+      @if (denoiseAlgorithm2 === "SIGMA2") {
+        <div>
+          <div class="sliderRow">
+            <div class="sliderLabel">Radius</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="shouldShowSpinner() || !refImageSelected"
+                tickInterval="1000"
+                step="0.1"
+                min="0.5"
+                max="4"
+                (input)="denoise2RadiusChanged($event, false)"
+                (change)="denoise2RadiusChanged($event, true)"
+                [(ngModel)]="denoise2Radius"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="denoise2Radius"
+                sliderInputMinValue="0.5"
+                sliderInputMaxValue="4"
+                (sliderInputValueChanged)="denoise2RadiusChanged($event, true)"
+              />
+            </div>
+          </div>
+          <div class="sliderRow">
+            <div class="sliderLabel">Iterations</div>
+            <div class="slider">
+              <mat-slider
+                [disabled]="shouldShowSpinner() || !refImageSelected"
+                tickInterval="1"
+                step="1"
+                min="1"
+                max="10"
+                (input)="denoise2IterationsChanged($event, false)"
+                (change)="denoise2IterationsChanged($event, true)"
+                [(ngModel)]="denoise2Iterations"
+                [color]="colorTheme()"
+              ></mat-slider>
+              <app-sliderinput
+                [sliderInputValue]="denoise2Iterations"
+                sliderInputMinValue="1"
+                sliderInputMaxValue="10"
+                (sliderInputValueChanged)="
+                  denoise2IterationsChanged($event, true)
+                "
+              />
+            </div>
+          </div>
+        </div>
+      }
+      @if (denoiseAlgorithm1 !== "IAN") {
         <div class="sliderRow">
           <div
-            class="{{
-              savitzkyGolaySize === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
+            class="sliderRowCategoryTitle {{
+              nightModeEnabled()
+                ? 'sliderRowCategoryTitleColorNight'
+                : 'sliderRowCategoryTitleColor'
             }}"
           >
-            Amount
+            Apply to
           </div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="
-                shouldShowSpinner() ||
-                !refImageSelected ||
-                savitzkyGolaySize === '0'
-              "
-              tickInterval="1"
-              step="1"
-              min="1"
-              max="100"
-              (input)="savitzkyGolayAmountChanged($event, false)"
-              (change)="savitzkyGolayAmountChanged($event, true)"
-              [(ngModel)]="savitzkyGolayAmount"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="savitzkyGolayAmount"
-              sliderInputMinValue="1"
-              sliderInputMaxValue="100"
-              (sliderInputValueChanged)="
-                savitzkyGolayAmountChanged($event, true)
-              "
-            />
-          </div>
-        </div>
-        <div class="sliderRow">
-          <div
-            class="{{
-              savitzkyGolaySize === '0' ? 'sliderLabelDisabled' : 'sliderLabel'
-            }}"
+          <mat-radio-group
+            [color]="colorTheme()"
+            [disabled]="shouldShowSpinner() || !refImageSelected"
+            [(ngModel)]="applyDenoiseToChannel"
+            (change)="applyDenoiseToChannelChanged($event)"
           >
-            Iterations
-          </div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="
-                shouldShowSpinner() ||
-                !refImageSelected ||
-                savitzkyGolaySize === '0'
-              "
-              tickInterval="1"
-              step="1"
-              min="1"
-              max="10"
-              (input)="savitzkyGolayIterationsChanged($event, false)"
-              (change)="savitzkyGolayIterationsChanged($event, true)"
-              [(ngModel)]="savitzkyGolayIterations"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="savitzkyGolayIterations"
-              sliderInputMinValue="1"
-              sliderInputMaxValue="10"
-              (sliderInputValueChanged)="
-                savitzkyGolayIterationsChanged($event, true)
-              "
-            />
-          </div>
+            <mat-radio-button value="RGB" class="radioSizeButtonDenoise2"
+              >All</mat-radio-button
+            >
+            <mat-radio-button value="R" class="denoiseMode"
+              >Red</mat-radio-button
+            >
+            <mat-radio-button value="G" class="denoiseMode"
+              >Green</mat-radio-button
+            >
+            <mat-radio-button value="B" class="denoiseMode"
+              >Blue</mat-radio-button
+            >
+          </mat-radio-group>
         </div>
-      </div>
-      } @if (denoiseAlgorithm2 === 'SIGMA2') {
-      <div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Radius</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              tickInterval="1000"
-              step="0.1"
-              min="0.5"
-              max="4"
-              (input)="denoise2RadiusChanged($event, false)"
-              (change)="denoise2RadiusChanged($event, true)"
-              [(ngModel)]="denoise2Radius"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="denoise2Radius"
-              sliderInputMinValue="0.5"
-              sliderInputMaxValue="4"
-              (sliderInputValueChanged)="denoise2RadiusChanged($event, true)"
-            />
-          </div>
-        </div>
-        <div class="sliderRow">
-          <div class="sliderLabel">Iterations</div>
-          <div class="slider">
-            <mat-slider
-              [disabled]="shouldShowSpinner() || !refImageSelected"
-              tickInterval="1"
-              step="1"
-              min="1"
-              max="10"
-              (input)="denoise2IterationsChanged($event, false)"
-              (change)="denoise2IterationsChanged($event, true)"
-              [(ngModel)]="denoise2Iterations"
-              [color]="colorTheme()"
-            ></mat-slider>
-            <app-sliderinput
-              [sliderInputValue]="denoise2Iterations"
-              sliderInputMinValue="1"
-              sliderInputMaxValue="10"
-              (sliderInputValueChanged)="
-                denoise2IterationsChanged($event, true)
-              "
-            />
-          </div>
-        </div>
-      </div>
-      } @if (denoiseAlgorithm1 !== 'IAN') {
-      <div class="sliderRow">
-        <div
-          class="sliderRowCategoryTitle {{
-            nightModeEnabled()
-              ? 'sliderRowCategoryTitleColorNight'
-              : 'sliderRowCategoryTitleColor'
-          }}"
-        >
-          Apply to
-        </div>
-        <mat-radio-group
-          [color]="colorTheme()"
-          [disabled]="shouldShowSpinner() || !refImageSelected"
-          [(ngModel)]="applyDenoiseToChannel"
-          (change)="applyDenoiseToChannelChanged($event)"
-        >
-          <mat-radio-button value="RGB" class="radioSizeButtonDenoise2"
-            >All</mat-radio-button
-          >
-          <mat-radio-button value="R" class="denoiseMode">Red</mat-radio-button>
-          <mat-radio-button value="G" class="denoiseMode"
-            >Green</mat-radio-button
-          >
-          <mat-radio-button value="B" class="denoiseMode"
-            >Blue</mat-radio-button
-          >
-        </mat-radio-group>
-      </div>
       }
     </mat-tab>
 
@@ -1744,28 +1831,29 @@ isSplashPanelVisible ) {
 
         <div class="balanceButton">
           @if (openRefImageEnabled() && refImageSelected) {
-          <button
-            type="button"
-            mat-button
-            (click)="resetBalanceClicked()"
-            class="{{
-              'buttonColorBalance buttonZoom ' +
-                (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
-            }}"
-            matTooltip="Reset color balance"
-          >
-            <img src="assets/images/reset.png" class="balanceButtonImg" />
-          </button>
-          } @if (!openRefImageEnabled() || !refImageSelected) {
-          <button
-            type="button"
-            mat-button
-            disabled
-            class="buttonColorBalance buttonDisabledZoom"
-            matTooltip="Reset color balance"
-          >
-            <img src="assets/images/reset.png" class="balanceButtonImg" />
-          </button>
+            <button
+              type="button"
+              mat-button
+              (click)="resetBalanceClicked()"
+              class="{{
+                'buttonColorBalance buttonZoom ' +
+                  (nightModeEnabled() ? 'activeColorNight' : 'activeColor')
+              }}"
+              matTooltip="Reset color balance"
+            >
+              <img src="assets/images/reset.png" class="balanceButtonImg" />
+            </button>
+          }
+          @if (!openRefImageEnabled() || !refImageSelected) {
+            <button
+              type="button"
+              mat-button
+              disabled
+              class="buttonColorBalance buttonDisabledZoom"
+              matTooltip="Reset color balance"
+            >
+              <img src="assets/images/reset.png" class="balanceButtonImg" />
+            </button>
           }
         </div>
 
@@ -1857,538 +1945,556 @@ isSplashPanelVisible ) {
         <div class="dispersionLeftButtons">
           <div class="dispersionPanelRow dispersionButton">
             @if (openRefImageEnabled() && refImageSelected) {
-            <button
-              type="button"
-              mat-button
-              (click)="dispersionCorrectionEnabledChanged()"
-              class="{{
-                'buttonZoom ' +
-                  (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
-                  (dispersionCorrectionEnabled ? 'Pressed' : '')
-              }}"
-              matTooltip="Dispersion Correction"
-            >
-              <img src="assets/images/dispersion.png" class="dispersionImg" />
-            </button>
-            } @if (!openRefImageEnabled() || !refImageSelected) {
-            <button
-              type="button"
-              mat-button
-              disabled
-              class="buttonDisabledZoom"
-              matTooltip="Dispersion Correction"
-            >
-              <img src="assets/images/dispersion.png" class="dispersionImg" />
-            </button>
+              <button
+                type="button"
+                mat-button
+                (click)="dispersionCorrectionEnabledChanged()"
+                class="{{
+                  'buttonZoom ' +
+                    (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+                    (dispersionCorrectionEnabled ? 'Pressed' : '')
+                }}"
+                matTooltip="Dispersion Correction"
+              >
+                <img src="assets/images/dispersion.png" class="dispersionImg" />
+              </button>
+            }
+            @if (!openRefImageEnabled() || !refImageSelected) {
+              <button
+                type="button"
+                mat-button
+                disabled
+                class="buttonDisabledZoom"
+                matTooltip="Dispersion Correction"
+              >
+                <img src="assets/images/dispersion.png" class="dispersionImg" />
+              </button>
             }
           </div>
         </div>
         <div class="dispersionPanel">
           @if (dispersionCorrectionEnabled) {
-          <section>
-            <div class="dispersionPanelRow">
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="{{
-                    dispersionCorrectionEnabled ? 'button' : 'button_disabled'
-                  }} {{
-                    nightModeEnabled() ? ' activeColorNight' : ' activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('LEFT-UP', 'RED')"
-                >
-                  <img
-                    src="assets/images/left-up.png"
-                    class="dispersionArrow"
-                  />
-                </button>
+            <section>
+              <div class="dispersionPanelRow">
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="{{
+                      dispersionCorrectionEnabled ? 'button' : 'button_disabled'
+                    }} {{
+                      nightModeEnabled() ? ' activeColorNight' : ' activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('LEFT-UP', 'RED')"
+                  >
+                    <img
+                      src="assets/images/left-up.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="button {{
+                      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('UP', 'RED')"
+                  >
+                    <img src="assets/images/up.png" class="dispersionArrow" />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="button {{
+                      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('RIGHT-UP', 'RED')"
+                  >
+                    <img
+                      src="assets/images/right-up.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
               </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('UP', 'RED')"
-                >
-                  <img src="assets/images/up.png" class="dispersionArrow" />
-                </button>
+              <div class="dispersionPanelRow">
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="button {{
+                      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('LEFT', 'RED')"
+                  >
+                    <img src="assets/images/left.png" class="dispersionArrow" />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <div class="buttonAuto">Red</div>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="button {{
+                      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('RIGHT', 'RED')"
+                  >
+                    <img
+                      src="assets/images/right.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
               </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('RIGHT-UP', 'RED')"
-                >
-                  <img
-                    src="assets/images/right-up.png"
-                    class="dispersionArrow"
-                  />
-                </button>
+              <div class="dispersionPanelRow">
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="button {{
+                      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('LEFT-DOWN', 'RED')"
+                  >
+                    <img
+                      src="assets/images/left-down.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="button {{
+                      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('DOWN', 'RED')"
+                  >
+                    <img src="assets/images/down.png" class="dispersionArrow" />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="button {{
+                      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('RIGHT-DOWN', 'RED')"
+                  >
+                    <img
+                      src="assets/images/right-down.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
               </div>
-            </div>
-            <div class="dispersionPanelRow">
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('LEFT', 'RED')"
-                >
-                  <img src="assets/images/left.png" class="dispersionArrow" />
-                </button>
+            </section>
+          }
+          @if (!dispersionCorrectionEnabled) {
+            <section>
+              <div class="dispersionPanelRow">
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img
+                      src="assets/images/left-up.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img src="assets/images/up.png" class="dispersionArrow" />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img
+                      src="assets/images/right-up.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
               </div>
-              <div class="dispersionPanelColumn">
-                <div class="buttonAuto">Red</div>
+              <div class="dispersionPanelRow">
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img src="assets/images/left.png" class="dispersionArrow" />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <div class="buttonAuto">Red</div>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img
+                      src="assets/images/right.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
               </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('RIGHT', 'RED')"
-                >
-                  <img src="assets/images/right.png" class="dispersionArrow" />
-                </button>
+              <div class="dispersionPanelRow">
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img
+                      src="assets/images/left-down.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img src="assets/images/down.png" class="dispersionArrow" />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img
+                      src="assets/images/right-down.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
               </div>
-            </div>
-            <div class="dispersionPanelRow">
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('LEFT-DOWN', 'RED')"
-                >
-                  <img
-                    src="assets/images/left-down.png"
-                    class="dispersionArrow"
-                  />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('DOWN', 'RED')"
-                >
-                  <img src="assets/images/down.png" class="dispersionArrow" />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('RIGHT-DOWN', 'RED')"
-                >
-                  <img
-                    src="assets/images/right-down.png"
-                    class="dispersionArrow"
-                  />
-                </button>
-              </div>
-            </div>
-          </section>
-          } @if (!dispersionCorrectionEnabled) {
-          <section>
-            <div class="dispersionPanelRow">
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img
-                    src="assets/images/left-up.png"
-                    class="dispersionArrow"
-                  />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img src="assets/images/up.png" class="dispersionArrow" />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img
-                    src="assets/images/right-up.png"
-                    class="dispersionArrow"
-                  />
-                </button>
-              </div>
-            </div>
-            <div class="dispersionPanelRow">
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img src="assets/images/left.png" class="dispersionArrow" />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">
-                <div class="buttonAuto">Red</div>
-              </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img src="assets/images/right.png" class="dispersionArrow" />
-                </button>
-              </div>
-            </div>
-            <div class="dispersionPanelRow">
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img
-                    src="assets/images/left-down.png"
-                    class="dispersionArrow"
-                  />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img src="assets/images/down.png" class="dispersionArrow" />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img
-                    src="assets/images/right-down.png"
-                    class="dispersionArrow"
-                  />
-                </button>
-              </div>
-            </div>
-          </section>
+            </section>
           }
         </div>
         <div class="dispersionGutter"></div>
         <div class="dispersionPanel">
           @if (dispersionCorrectionEnabled) {
-          <section>
-            <div class="dispersionPanelRow">
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="{{
-                    dispersionCorrectionEnabled ? 'button' : 'button_disabled'
-                  }} {{
-                    nightModeEnabled() ? ' activeColorNight' : ' activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('LEFT-UP', 'BLUE')"
-                >
-                  <img
-                    src="assets/images/left-up.png"
-                    class="dispersionArrow"
-                  />
-                </button>
+            <section>
+              <div class="dispersionPanelRow">
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="{{
+                      dispersionCorrectionEnabled ? 'button' : 'button_disabled'
+                    }} {{
+                      nightModeEnabled() ? ' activeColorNight' : ' activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('LEFT-UP', 'BLUE')"
+                  >
+                    <img
+                      src="assets/images/left-up.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="button {{
+                      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('UP', 'BLUE')"
+                  >
+                    <img src="assets/images/up.png" class="dispersionArrow" />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="button {{
+                      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('RIGHT-UP', 'BLUE')"
+                  >
+                    <img
+                      src="assets/images/right-up.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">&nbsp;</div>
               </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('UP', 'BLUE')"
-                >
-                  <img src="assets/images/up.png" class="dispersionArrow" />
-                </button>
+              <div class="dispersionPanelRow">
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="button {{
+                      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('LEFT', 'BLUE')"
+                  >
+                    <img src="assets/images/left.png" class="dispersionArrow" />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <div class="buttonAuto">Blue</div>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="button {{
+                      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('RIGHT', 'BLUE')"
+                  >
+                    <img
+                      src="assets/images/right.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">&nbsp;</div>
               </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('RIGHT-UP', 'BLUE')"
-                >
-                  <img
-                    src="assets/images/right-up.png"
-                    class="dispersionArrow"
-                  />
-                </button>
+              <div class="dispersionPanelRow">
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="button {{
+                      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('LEFT-DOWN', 'BLUE')"
+                  >
+                    <img
+                      src="assets/images/left-down.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="button {{
+                      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('DOWN', 'BLUE')"
+                  >
+                    <img src="assets/images/down.png" class="dispersionArrow" />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    class="button {{
+                      nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                    }}"
+                    (click)="dispersionCorrectionClicked('RIGHT-DOWN', 'BLUE')"
+                  >
+                    <img
+                      src="assets/images/right-down.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  @if (dispersionCorrectionEnabled) {
+                    <button
+                      type="button"
+                      mat-button
+                      class="buttonZoom resetButton {{
+                        nightModeEnabled() ? 'activeColorNight' : 'activeColor'
+                      }}"
+                      (click)="resetDispersionCorrection()"
+                      matTooltip="Reset"
+                    >
+                      <img
+                        src="assets/images/reset.png"
+                        class="resetDispersionCorrection"
+                      />
+                    </button>
+                  }
+                </div>
               </div>
-              <div class="dispersionPanelColumn">&nbsp;</div>
-            </div>
-            <div class="dispersionPanelRow">
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('LEFT', 'BLUE')"
-                >
-                  <img src="assets/images/left.png" class="dispersionArrow" />
-                </button>
+              <div class="dispersionIndicators">
+                <div class="{{ dispersionIndicatorRedColor() }}">Red</div>
+                dx: {{ profile.dispersionCorrectionRedX }}<br />
+                dy: {{ profile.dispersionCorrectionRedY }}
               </div>
-              <div class="dispersionPanelColumn">
-                <div class="buttonAuto">Blue</div>
+              <div class="dispersionIndicators dispersionIndicatorBlue">
+                <div class="{{ dispersionIndicatorBlueColor() }}">Blue</div>
+                dx: {{ profile.dispersionCorrectionBlueX }}<br />
+                dy: {{ profile.dispersionCorrectionBlueY }}
               </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('RIGHT', 'BLUE')"
-                >
-                  <img src="assets/images/right.png" class="dispersionArrow" />
-                </button>
+            </section>
+          }
+          @if (!dispersionCorrectionEnabled) {
+            <section>
+              <div class="dispersionPanelRow">
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img
+                      src="assets/images/left-up.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img src="assets/images/up.png" class="dispersionArrow" />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img
+                      src="assets/images/right-up.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">&nbsp;</div>
               </div>
-              <div class="dispersionPanelColumn">&nbsp;</div>
-            </div>
-            <div class="dispersionPanelRow">
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('LEFT-DOWN', 'BLUE')"
-                >
-                  <img
-                    src="assets/images/left-down.png"
-                    class="dispersionArrow"
-                  />
-                </button>
+              <div class="dispersionPanelRow">
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img src="assets/images/left.png" class="dispersionArrow" />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <div class="buttonAuto">Blue</div>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img
+                      src="assets/images/right.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">&nbsp;</div>
               </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('DOWN', 'BLUE')"
-                >
-                  <img src="assets/images/down.png" class="dispersionArrow" />
-                </button>
+              <div class="dispersionPanelRow">
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img
+                      src="assets/images/left-down.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img src="assets/images/down.png" class="dispersionArrow" />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  <button
+                    type="button"
+                    mat-button
+                    disabled
+                    class="button_disabled"
+                  >
+                    <img
+                      src="assets/images/right-down.png"
+                      class="dispersionArrow"
+                    />
+                  </button>
+                </div>
+                <div class="dispersionPanelColumn">
+                  @if (
+                    !dispersionCorrectionEnabled ||
+                    !openRefImageEnabled() ||
+                    !refImageSelected
+                  ) {
+                    <button
+                      type="button"
+                      mat-button
+                      disabled
+                      class="buttonDisabledZoom resetButton"
+                      matTooltip="Reset"
+                    >
+                      <img
+                        src="assets/images/reset.png"
+                        class="resetDispersionCorrection"
+                      />
+                    </button>
+                  }
+                </div>
               </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  class="button {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="dispersionCorrectionClicked('RIGHT-DOWN', 'BLUE')"
-                >
-                  <img
-                    src="assets/images/right-down.png"
-                    class="dispersionArrow"
-                  />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">
-                @if (dispersionCorrectionEnabled) {
-                <button
-                  type="button"
-                  mat-button
-                  class="buttonZoom resetButton {{
-                    nightModeEnabled() ? 'activeColorNight' : 'activeColor'
-                  }}"
-                  (click)="resetDispersionCorrection()"
-                  matTooltip="Reset"
-                >
-                  <img
-                    src="assets/images/reset.png"
-                    class="resetDispersionCorrection"
-                  />
-                </button>
-                }
-              </div>
-            </div>
-            <div class="dispersionIndicators">
-              <div class="{{ dispersionIndicatorRedColor() }}">Red</div>
-              dx: {{ profile.dispersionCorrectionRedX }}<br />
-              dy: {{ profile.dispersionCorrectionRedY }}
-            </div>
-            <div class="dispersionIndicators dispersionIndicatorBlue">
-              <div class="{{ dispersionIndicatorBlueColor() }}">Blue</div>
-              dx: {{ profile.dispersionCorrectionBlueX }}<br />
-              dy: {{ profile.dispersionCorrectionBlueY }}
-            </div>
-          </section>
-          } @if (!dispersionCorrectionEnabled) {
-          <section>
-            <div class="dispersionPanelRow">
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img
-                    src="assets/images/left-up.png"
-                    class="dispersionArrow"
-                  />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img src="assets/images/up.png" class="dispersionArrow" />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img
-                    src="assets/images/right-up.png"
-                    class="dispersionArrow"
-                  />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">&nbsp;</div>
-            </div>
-            <div class="dispersionPanelRow">
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img src="assets/images/left.png" class="dispersionArrow" />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">
-                <div class="buttonAuto">Blue</div>
-              </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img src="assets/images/right.png" class="dispersionArrow" />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">&nbsp;</div>
-            </div>
-            <div class="dispersionPanelRow">
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img
-                    src="assets/images/left-down.png"
-                    class="dispersionArrow"
-                  />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img src="assets/images/down.png" class="dispersionArrow" />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="button_disabled"
-                >
-                  <img
-                    src="assets/images/right-down.png"
-                    class="dispersionArrow"
-                  />
-                </button>
-              </div>
-              <div class="dispersionPanelColumn">
-                @if ( !dispersionCorrectionEnabled || !openRefImageEnabled() ||
-                !refImageSelected ) {
-                <button
-                  type="button"
-                  mat-button
-                  disabled
-                  class="buttonDisabledZoom resetButton"
-                  matTooltip="Reset"
-                >
-                  <img
-                    src="assets/images/reset.png"
-                    class="resetDispersionCorrection"
-                  />
-                </button>
-                }
-              </div>
-            </div>
-          </section>
+            </section>
           }
         </div>
       </div>
