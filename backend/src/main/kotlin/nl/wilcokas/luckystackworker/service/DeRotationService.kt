@@ -112,7 +112,6 @@ class DeRotationService(
                 )
                 log.info("Done")
                 increaseProgressCounter("Stacked images")
-                signalDerotationFinished()
                 return "${derotationWorkFolder}/STACK_$referenceImageFilename"
             } catch (e: DeRotationException) {
                 log.info("DeRotation run ${run} unsuccessful, trying again with adjusted parameters...")
@@ -121,7 +120,6 @@ class DeRotationService(
                 luckyStackWorkerContext.filesProcessedCount = 0
             } catch (e: Exception) {
                 log.info("DeRotation was stopped with reason: ", e)
-                signalDerotationFinished()
                 return null
             }
         }
@@ -131,15 +129,7 @@ class DeRotationService(
                 "Derotation failed after 3 runs.\nChoose different values for Noise Robustness, Anchor Strength or Accuracy.",
             )
         }
-        signalDerotationFinished()
         return null // last attempt failed
-    }
-
-    private fun signalDerotationFinished() {
-        luckyStackWorkerContext.status = STATUS_IDLE
-        luckyStackWorkerContext.filesProcessedCount = 0
-        luckyStackWorkerContext.totalFilesCount = 0
-        luckyStackWorkerContext.isProfileBeingApplied = false
     }
 
     private fun warpImages(

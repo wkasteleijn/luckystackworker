@@ -17,6 +17,7 @@ public class DeRotation {
     private int noiseRobustness;
     private int anchorStrength;
     private int accurateness;
+    private String rootFolder;
 
     public DeRotation(DeRotationDTO deRotation) {
         mapFromDTO(deRotation);

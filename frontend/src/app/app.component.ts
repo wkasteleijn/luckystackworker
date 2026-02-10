@@ -1976,6 +1976,9 @@ export class AppComponent implements OnInit {
           console.log(data);
           this.deRotation = data;
           this.isDerotationPanelVisible = true;
+          this.rootFolder = this.rootFolder = this.getRootFolderCapped(
+            this.deRotation.rootFolder,
+          );
         }
         this.hideSpinner();
       },

@@ -586,13 +586,18 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         JFrame frame = getParentFrame();
         List<String> selectedImages = new ArrayList<>();
         int returnValue = getFilenameFromDialog(frame, jfc, false);
+        String rootFolder = settingsService.getSettings().getRootFolder();
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File[] selectedFiles = jfc.getSelectedFiles();
-            for (File selectedFile : selectedFiles) {
-                String selectedFilePath = selectedFile.getAbsolutePath();
-                if (validateSelectedFile(selectedFilePath)) {
-                    selectedImages.add(selectedFile.getName());
+            if (selectedFiles.length > 0) {
+                for (File selectedFile : selectedFiles) {
+                    String selectedFilePath = selectedFile.getAbsolutePath();
+                    if (validateSelectedFile(selectedFilePath)) {
+                        selectedImages.add(selectedFile.getName());
+                    }
                 }
+                rootFolder = LswFileUtil.getFileDirectory(selectedFiles[0].getAbsolutePath());
+                updateSettingsForRootFolder(rootFolder);
             }
         }
         return DeRotation.builder()
@@ -601,6 +606,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                         deRotationService.getAnchorStrength() == 0
                                 ? Constants.DEFAULT_DEROTATION_ANCHOR_STRENGTH
                                 : deRotationService.getAnchorStrength())
+                .rootFolder(rootFolder)
                 .build();
     }
 
@@ -610,14 +616,18 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         var executor = Executors.newVirtualThreadPerTaskExecutor();
         CompletableFuture.runAsync(
                 () -> {
-                    String deRotatedImagePath = deRotationService.derotate(
-                            settingsService.getRootFolder(),
-                            deRotation.getReferenceImage(),
-                            deRotation.getImages(),
-                            deRotation.getAnchorStrength(),
-                            getParentFrame());
-                    if (deRotatedImagePath != null) {
-                        openImageAfterStacking(deRotatedImagePath);
+                    try {
+                        String deRotatedImagePath = deRotationService.derotate(
+                                settingsService.getRootFolder(),
+                                deRotation.getReferenceImage(),
+                                deRotation.getImages(),
+                                deRotation.getAnchorStrength(),
+                                getParentFrame());
+                        if (deRotatedImagePath != null) {
+                            openImageAfterStacking(deRotatedImagePath);
+                        }
+                    } finally {
+                        signalBatchFinished();
                     }
                 },
                 executor);
@@ -641,6 +651,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                         selectedImages.add(selectedFile.getAbsolutePath());
                     }
                 }
+                String rootFolder = LswFileUtil.getFileDirectory(selectedFiles[0].getAbsolutePath());
+                updateSettingsForRootFolder(rootFolder);
                 var executor = Executors.newVirtualThreadPerTaskExecutor();
                 CompletableFuture.runAsync(
                         () -> {
@@ -660,29 +672,36 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 openImageAfterStacking(stackedImagePath);
                             } catch (IOException e) {
                                 log.error("Error stacking images : ", e);
+                            } finally {
+                                signalBatchFinished();
                             }
                         },
                         executor);
             }
         } else {
-            luckyStackWorkerContext.setStatus(STATUS_IDLE);
-            luckyStackWorkerContext.setFilesProcessedCount(0);
-            luckyStackWorkerContext.setTotalFilesCount(0);
-            luckyStackWorkerContext.setProfileBeingApplied(false);
+            signalBatchFinished();
         }
+    }
+
+    private void signalBatchFinished() {
+        luckyStackWorkerContext.setStatus(STATUS_IDLE);
+        luckyStackWorkerContext.setFilesProcessedCount(0);
+        luckyStackWorkerContext.setTotalFilesCount(0);
+        luckyStackWorkerContext.setProfileBeingApplied(false);
     }
 
     private void openImageAfterStacking(String imagePath) {
         String profileName = LswFileUtil.deriveProfileFromImageName(imagePath);
         String selectedProfile = luckyStackWorkerContext.getSelectedProfile();
-        if (profileName.equals(Constants.DEFAULT_PROFILE) && selectedProfile!=null && !selectedProfile.equals(Constants.DEFAULT_PROFILE)) {
+        if (profileName.equals(Constants.DEFAULT_PROFILE)
+                && selectedProfile != null
+                && !selectedProfile.equals(Constants.DEFAULT_PROFILE)) {
             profileName = selectedProfile;
         }
         Profile profile = profileService
                 .findByName(profileName)
                 .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
-        openReferenceImage(
-                imagePath, profile, LswFileUtil.getObjectDateTime(imagePath));
+        openReferenceImage(imagePath, profile, LswFileUtil.getObjectDateTime(imagePath));
         luckyStackWorkerContext.setSelectedProfile(profileName);
     }
 
