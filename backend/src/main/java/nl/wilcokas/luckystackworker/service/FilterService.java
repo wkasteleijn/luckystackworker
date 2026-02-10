@@ -134,8 +134,20 @@ public class FilterService {
         int newWidth = (int) (image.getWidth() * scale);
         int newHeight = (int) (image.getHeight() * scale);
         int depth = image.getStack().size();
-        return Scaler.resize(
+        ImagePlus result = Scaler.resize(
                 image, newWidth, newHeight, depth, "depth=%s interpolation=Bicubic create".formatted(depth));
+        // TODO: fix issue with loosing composite TIFF info, fix below does not work.
+        ImageStack stack = result.getStack();
+        short[] redPixels =
+                (short[]) stack.getProcessor(Constants.RED_LAYER_INDEX).getPixels();
+        short[] greenPixels =
+                (short[]) stack.getProcessor(Constants.GREEN_LAYER_INDEX).getPixels();
+        short[] bluePixels =
+                (short[]) stack.getProcessor(Constants.BLUE_LAYER_INDEX).getPixels();
+        LswImageLayers newLayers =
+                new LswImageLayers(newWidth, newHeight, new short[][] {redPixels, greenPixels, bluePixels});
+        return LswImageProcessingUtil.create16BitRGBImage("resized", newLayers, true, true, true);
+
     }
 
     public ImagePlus resizeImageBackground(final ImagePlus image, int dimensionX, int dimensionY) {
