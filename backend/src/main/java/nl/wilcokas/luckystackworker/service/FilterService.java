@@ -2,6 +2,7 @@ package nl.wilcokas.luckystackworker.service;
 
 import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.*;
 import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.convertToShort;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.create16BitRGBImage;
 
 import ij.ImagePlus;
 import ij.ImageStack;
@@ -136,7 +137,6 @@ public class FilterService {
         int depth = image.getStack().size();
         ImagePlus result = Scaler.resize(
                 image, newWidth, newHeight, depth, "depth=%s interpolation=Bicubic create".formatted(depth));
-        // TODO: fix issue with loosing composite TIFF info, fix below does not work.
         ImageStack stack = result.getStack();
         short[] redPixels =
                 (short[]) stack.getProcessor(Constants.RED_LAYER_INDEX).getPixels();
@@ -146,7 +146,7 @@ public class FilterService {
                 (short[]) stack.getProcessor(Constants.BLUE_LAYER_INDEX).getPixels();
         LswImageLayers newLayers =
                 new LswImageLayers(newWidth, newHeight, new short[][] {redPixels, greenPixels, bluePixels});
-        return LswImageProcessingUtil.create16BitRGBImage("resized", newLayers, true, true, true);
+        return create16BitRGBImage("resized", newLayers, true, true, true);
 
     }
 
@@ -208,7 +208,7 @@ public class FilterService {
         }
         LswImageLayers newLayers =
                 new LswImageLayers(dimensionX, dimensionY, new short[][] {newRedPixels, newGreenPixels, newBluePixels});
-        return LswImageProcessingUtil.create16BitRGBImage("resized", newLayers, true, true, true);
+        return create16BitRGBImage("resized", newLayers, true, true, true);
     }
 
     private int determineBackgroundValue(short[] pixels, int width) {
@@ -291,7 +291,7 @@ public class FilterService {
                 newPixels[2][x + y * roiWidth] = ipBluePixels[xOrg + yOrg * imageWidth];
             }
         }
-        return LswImageProcessingUtil.create16BitRGBImage(
+        return create16BitRGBImage(
                 "crop", getLswImageLayers(newPixels, roiWidth, roiHeight), true, true, true);
     }
 

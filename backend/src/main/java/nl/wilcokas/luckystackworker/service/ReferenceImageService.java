@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Timer;
@@ -166,22 +167,26 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 LswImageProcessingUtil.setNonPersistentSettings(profile, scale, openImageMode, false);
                 profileService.updateProfile(new ProfileDTO(profile));
 
-                isLargeImage =
-                        openReferenceImage(selectedFilePath, profile, LswFileUtil.getObjectDateTime(selectedFilePath));
-
                 final String rootFolder = LswFileUtil.getFileDirectory(selectedFilePath);
-                SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
-                settingsDTO.setLargeImage(isLargeImage);
-                settingsDTO.setZoomFactor(zoomFactor);
-                byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
-                if (psfImage != null) {
-                    settingsDTO.setPsfImage(Base64.getEncoder().encodeToString(psfImage));
-                }
-                luckyStackWorkerContext.setSelectedProfile(profile.getName());
+                SettingsDTO settingsDTO = openReferenceImageAndUpdateSettings(selectedFilePath, rootFolder, profile);
                 return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
             }
         }
         return null;
+    }
+
+    private SettingsDTO openReferenceImageAndUpdateSettings(String selectedFilePath, String rootFolder, Profile profile) {
+        isLargeImage =
+                openReferenceImage(selectedFilePath, profile, LswFileUtil.getObjectDateTime(selectedFilePath));
+        SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
+        settingsDTO.setLargeImage(isLargeImage);
+        settingsDTO.setZoomFactor(zoomFactor);
+        byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
+        if (psfImage != null) {
+            settingsDTO.setPsfImage(Base64.getEncoder().encodeToString(psfImage));
+        }
+        luckyStackWorkerContext.setSelectedProfile(profile.getName());
+        return settingsDTO;
     }
 
     public byte[] updateProcessing(Profile profile, List<String> operationValues) {
@@ -600,6 +605,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 updateSettingsForRootFolder(rootFolder);
             }
         }
+        selectedImages.sort(Comparator.naturalOrder());
         return DeRotation.builder()
                 .images(selectedImages)
                 .anchorStrength(
@@ -624,7 +630,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 deRotation.getAnchorStrength(),
                                 getParentFrame());
                         if (deRotatedImagePath != null) {
-                            openImageAfterStacking(deRotatedImagePath);
+                            openImageAfterStacking(deRotatedImagePath,settingsService.getRootFolder());
                         }
                     } finally {
                         signalBatchFinished();
@@ -669,7 +675,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                                 .map(LswFileUtil::getIJFileFormat)
                                                 .toList(),
                                         getParentFrame());
-                                openImageAfterStacking(stackedImagePath);
+                                openImageAfterStacking(stackedImagePath,rootFolder);
                             } catch (IOException e) {
                                 log.error("Error stacking images : ", e);
                             } finally {
@@ -690,7 +696,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         luckyStackWorkerContext.setProfileBeingApplied(false);
     }
 
-    private void openImageAfterStacking(String imagePath) {
+    private void openImageAfterStacking(String imagePath, String rootFolder) {
         String profileName = LswFileUtil.deriveProfileFromImageName(imagePath);
         String selectedProfile = luckyStackWorkerContext.getSelectedProfile();
         if (profileName.equals(Constants.DEFAULT_PROFILE)
@@ -701,8 +707,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         Profile profile = profileService
                 .findByName(profileName)
                 .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
-        openReferenceImage(imagePath, profile, LswFileUtil.getObjectDateTime(imagePath));
-        luckyStackWorkerContext.setSelectedProfile(profileName);
+        openReferenceImageAndUpdateSettings(imagePath, rootFolder, profile);
     }
 
     private boolean confirmOverwrite() {
