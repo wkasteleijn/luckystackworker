@@ -558,6 +558,22 @@ public class LswImageProcessingUtil {
         return sum / pixels.length;
     }
 
+    public static float getAveragePixelValue(FloatProcessor p) {
+        float sum = 0;
+        float[] pixels = (float[]) p.getPixels();
+        for (float pixel : pixels) {
+            sum += pixel;
+        }
+        return sum / pixels.length;
+    }
+
+    public static void normalizeImage(FloatProcessor fp, float averageValueIn, float averageValueOut) {
+        float[] pixels = (float[]) fp.getPixels();
+        for (int i = 0; i < pixels.length; i++) {
+            pixels[i] *= (averageValueIn / averageValueOut);
+        }
+    }
+
     public static int[][] get16BitRGBHistogram(ImagePlus imp, int size) {
         int[][] histograms = new int[3][size];
         final int maxValue = 65536; // 16-bit max value + 1

@@ -227,8 +227,6 @@ public class WienerDeconvolutionFilter implements LSWFilter {
                 double appliedMaskFactor = (1d - deringStrength) + ((maskPixel / 65535d) * deringStrength);
                 // correction on output is needed given that is somehow always brighter than the original
                 // value
-
-                // TODO: Fix needed: this factor should be taken frmm the luminance, which needs to be calculated from G, G and B.
                 double newValue = (LswImageProcessingUtil.convertToUnsignedInt(outPixels[i])
                         * (averagePixelValueIn / averagePixelValueOut));
                 double originalValue = LswImageProcessingUtil.convertToUnsignedInt(pixels[i]);
@@ -297,7 +295,7 @@ public class WienerDeconvolutionFilter implements LSWFilter {
     }
 
     private short[] getDeconvolvedPixels(ImageProcessor ipInput, ImagePlus psf, int iterations) {
-        WPLOptions options = new WPLOptions(0, 1.0, 1.0, false, false, true, 0.01, false, false, false, 0);
+        WPLOptions options = new WPLOptions(0, 1.0, 1.0, true, false, true, 0.01, false, false, false, -1);
         LswWPLFloatIterativeDeconvolver2D deconv = new LswWPLFloatIterativeDeconvolver2D(
                 new ImagePlus(null, ipInput),
                 psf,
@@ -307,8 +305,7 @@ public class WienerDeconvolutionFilter implements LSWFilter {
                 options,
                 numberOfVirtualThreads);
         try {
-            ShortProcessor ipOutput = (ShortProcessor) deconv.deconvolve().getProcessor();
-            return (short[]) ipOutput.getPixels();
+            return deconv.deconvolve();
         } catch (Exception e) {
             log.error("Error during deconvolution: ", e);
             return (short[]) ipInput.getPixels();

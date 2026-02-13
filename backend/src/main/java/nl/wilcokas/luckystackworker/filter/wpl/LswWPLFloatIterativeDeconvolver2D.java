@@ -19,6 +19,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
+import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
+import org.apache.commons.lang3.tuple.Pair;
+
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.convertToShort;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getMinAndMaxValues;
 
 /**
  * Wiener Filter Preconditioned Landweber 2D. This is a nonnegatively constrained method.
@@ -105,6 +110,8 @@ public class LswWPLFloatIterativeDeconvolver2D {
     /** Number of virtual threads created for parallel processing. */
     private int numberOfThreads;
 
+    private FloatProcessor imageProcessor;
+
     /**
      * Creates a new instance of WPLFloatIterativeDeconvolver2D
      *
@@ -125,6 +132,7 @@ public class LswWPLFloatIterativeDeconvolver2D {
             int numberOfThreads) {
         log.info("WPL initialization...");
         ImageProcessor ipB = imB.getProcessor();
+        imageProcessor = (FloatProcessor) ipB.convertToFloat();
         cmY = ipB.getColorModel();
         bColumns = ipB.getWidth();
         bRows = ipB.getHeight();
@@ -182,7 +190,7 @@ public class LswWPLFloatIterativeDeconvolver2D {
      *
      * @return deconvolved image
      */
-    public ImagePlus deconvolve() throws ExecutionException, InterruptedException {
+    public short[] deconvolve() throws ExecutionException, InterruptedException {
         ((DenseFloatMatrix2D) PSF).dht2();
         FloatMatrix2D X;
         FloatMatrix2D AX = B.like();
@@ -215,7 +223,6 @@ public class LswWPLFloatIterativeDeconvolver2D {
         }
         ((DenseFloatMatrix2D) PSF).dht2();
         X = B.copy();
-        ImagePlus imX = null;
         FloatProcessor ip = new FloatProcessor(bColumns, bRows);
         for (int iter = 0; iter < iterations; iter++) {
             log.info("WPL iteration: " + (iter + 1) + "/" + iterations);
@@ -240,9 +247,12 @@ public class LswWPLFloatIterativeDeconvolver2D {
         } else {
             FloatCommon2D.assignPixelsToProcessorPadded(ip, X, bRows, bColumns, rOff, cOff, cmY, threshold);
         }
-        imX = new ImagePlus("(deblurred)", ip);
-        FloatCommon2D.convertImage(imX, OutputType.SHORT);
-        return imX;
+        float[] pixels = (float[]) ip.getPixels();
+        short[] shortPixels = new short[pixels.length];
+        for (int i = 0; i < pixels.length; i++) {
+            shortPixels[i] = convertToShort(ip.getf(i), 0, getMinAndMaxValues(ip).getRight());
+        }
+        return shortPixels;
     }
 
     private void convolveFD(final int rows, final int columns, FloatMatrix2D H1, FloatMatrix2D H2, FloatMatrix2D Result)
