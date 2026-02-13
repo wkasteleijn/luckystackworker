@@ -110,8 +110,6 @@ public class LswWPLFloatIterativeDeconvolver2D {
     /** Number of virtual threads created for parallel processing. */
     private int numberOfThreads;
 
-    private FloatProcessor imageProcessor;
-
     /**
      * Creates a new instance of WPLFloatIterativeDeconvolver2D
      *
@@ -132,7 +130,6 @@ public class LswWPLFloatIterativeDeconvolver2D {
             int numberOfThreads) {
         log.info("WPL initialization...");
         ImageProcessor ipB = imB.getProcessor();
-        imageProcessor = (FloatProcessor) ipB.convertToFloat();
         cmY = ipB.getColorModel();
         bColumns = ipB.getWidth();
         bRows = ipB.getHeight();
@@ -249,9 +246,9 @@ public class LswWPLFloatIterativeDeconvolver2D {
         }
         float[] pixels = (float[]) ip.getPixels();
         short[] shortPixels = new short[pixels.length];
-        float max = getMinAndMaxValues(ip).getRight();
         for (int i = 0; i < pixels.length; i++) {
-            shortPixels[i] = convertToShort(ip.getf(i), 0, max);
+            int intValue = Math.clamp((int) pixels[i], 0, 65535);
+            shortPixels[i] = convertToShort(intValue);
         }
         return shortPixels;
     }
