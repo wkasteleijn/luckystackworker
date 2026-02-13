@@ -175,9 +175,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return null;
     }
 
-    private SettingsDTO openReferenceImageAndUpdateSettings(String selectedFilePath, String rootFolder, Profile profile) {
-        isLargeImage =
-                openReferenceImage(selectedFilePath, profile, LswFileUtil.getObjectDateTime(selectedFilePath));
+    private SettingsDTO openReferenceImageAndUpdateSettings(
+            String selectedFilePath, String rootFolder, Profile profile) {
+        isLargeImage = openReferenceImage(selectedFilePath, profile, LswFileUtil.getObjectDateTime(selectedFilePath));
         SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
         settingsDTO.setLargeImage(isLargeImage);
         settingsDTO.setZoomFactor(zoomFactor);
@@ -630,7 +630,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 deRotation.getAnchorStrength(),
                                 getParentFrame());
                         if (deRotatedImagePath != null) {
-                            openImageAfterStacking(deRotatedImagePath,settingsService.getRootFolder());
+                            openImageAfterStacking(deRotatedImagePath, settingsService.getRootFolder());
                         }
                     } finally {
                         signalBatchFinished();
@@ -675,7 +675,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                                 .map(LswFileUtil::getIJFileFormat)
                                                 .toList(),
                                         getParentFrame());
-                                openImageAfterStacking(stackedImagePath,rootFolder);
+                                openImageAfterStacking(stackedImagePath, rootFolder);
                             } catch (IOException e) {
                                 log.error("Error stacking images : ", e);
                             } finally {

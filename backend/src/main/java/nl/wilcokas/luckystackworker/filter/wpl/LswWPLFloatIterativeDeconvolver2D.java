@@ -1,9 +1,10 @@
 package nl.wilcokas.luckystackworker.filter.wpl;
 
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.convertToShort;
+
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D;
 import cern.jet.math.tfloat.FloatFunctions;
-import edu.emory.mathcs.restoretools.Enums.OutputType;
 import edu.emory.mathcs.restoretools.iterative.FloatCommon2D;
 import edu.emory.mathcs.restoretools.iterative.IterativeEnums.BoundaryType;
 import edu.emory.mathcs.restoretools.iterative.IterativeEnums.PaddingType;
@@ -19,11 +20,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
-import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
-import org.apache.commons.lang3.tuple.Pair;
-
-import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.convertToShort;
-import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getMinAndMaxValues;
 
 /**
  * Wiener Filter Preconditioned Landweber 2D. This is a nonnegatively constrained method.

@@ -147,7 +147,6 @@ public class FilterService {
         LswImageLayers newLayers =
                 new LswImageLayers(newWidth, newHeight, new short[][] {redPixels, greenPixels, bluePixels});
         return create16BitRGBImage("resized", newLayers, true, true, true);
-
     }
 
     public ImagePlus resizeImageBackground(final ImagePlus image, int dimensionX, int dimensionY) {
@@ -291,8 +290,7 @@ public class FilterService {
                 newPixels[2][x + y * roiWidth] = ipBluePixels[xOrg + yOrg * imageWidth];
             }
         }
-        return create16BitRGBImage(
-                "crop", getLswImageLayers(newPixels, roiWidth, roiHeight), true, true, true);
+        return create16BitRGBImage("crop", getLswImageLayers(newPixels, roiWidth, roiHeight), true, true, true);
     }
 
     private void copyPixelsBackToImage(Roi roi, ImageStack tempCroppedStack, ImageStack stack) {
