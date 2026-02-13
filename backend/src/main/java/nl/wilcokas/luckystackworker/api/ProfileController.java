@@ -62,6 +62,10 @@ public class ProfileController {
                     .orElseThrow(() -> new ProfileNotFoundException(String.format("Unknown profile %s", profileName))));
         }
         SettingsDTO settings = new SettingsDTO(settingsService.getSettings());
+        byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
+        if (psfImage != null) {
+            settings.setPsfImage(Base64.getEncoder().encodeToString(psfImage));
+        }
         settings.setRootFolder(settingsService.getRootFolder());
         settings.setLargeImage(referenceImageService.isLargeImage());
         return new ResponseDTO(profile, settings);

@@ -697,6 +697,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     private void openImageAfterStacking(String imagePath, String rootFolder) {
+        luckyStackWorkerContext.setStatus("Stacking complete, now applying profile");
         String profileName = LswFileUtil.deriveProfileFromImageName(imagePath);
         String selectedProfile = luckyStackWorkerContext.getSelectedProfile();
         if (profileName.equals(Constants.DEFAULT_PROFILE)

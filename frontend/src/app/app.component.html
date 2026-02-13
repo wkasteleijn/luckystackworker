@@ -524,7 +524,7 @@
             }}"
             >Batch</span
           >
-          @if (openRefImageEnabled()) {
+          @if (openRefImageEnabled() && refImageSelected) {
             <button
               type="button"
               mat-button
@@ -540,7 +540,7 @@
               />
             </button>
           }
-          @if (!openRefImageEnabled()) {
+          @if (!openRefImageEnabled() || !refImageSelected) {
             <button
               type="button"
               mat-button
@@ -553,7 +553,7 @@
               />
             </button>
           }
-          @if (openRefImageEnabled()) {
+          @if (openRefImageEnabled() && refImageSelected) {
             <button
               type="button"
               mat-button
@@ -568,7 +568,7 @@
               <img src="assets/images/connect.png" class="genericButton" />
             </button>
           }
-          @if (!openRefImageEnabled()) {
+          @if (!openRefImageEnabled() || !refImageSelected) {
             <button
               type="button"
               mat-button
