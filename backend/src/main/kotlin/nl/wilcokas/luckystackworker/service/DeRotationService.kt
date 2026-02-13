@@ -112,7 +112,7 @@ class DeRotationService(
                 )
                 log.info("Done")
                 increaseProgressCounter("Stacked images")
-                return "${derotationWorkFolder}/STACK_$referenceImageFilename"
+                return "${derotationWorkFolder}/${LswFileUtil.getPathWithoutExtension(referenceImageFilename)}_STACK.tif"
             } catch (e: DeRotationException) {
                 log.info("DeRotation run ${run} unsuccessful, trying again with adjusted parameters...")
                 _anchorStrength = if (_anchorStrength > 1) _anchorStrength - 1 else 1

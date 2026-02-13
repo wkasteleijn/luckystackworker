@@ -249,8 +249,9 @@ public class LswWPLFloatIterativeDeconvolver2D {
         }
         float[] pixels = (float[]) ip.getPixels();
         short[] shortPixels = new short[pixels.length];
+        float max = getMinAndMaxValues(ip).getRight();
         for (int i = 0; i < pixels.length; i++) {
-            shortPixels[i] = convertToShort(ip.getf(i), 0, getMinAndMaxValues(ip).getRight());
+            shortPixels[i] = convertToShort(ip.getf(i), 0, max);
         }
         return shortPixels;
     }

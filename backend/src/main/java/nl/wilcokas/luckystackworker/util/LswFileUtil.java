@@ -549,7 +549,7 @@ public class LswFileUtil {
         // Attempt to derive from filename hopefully winjupos formatted (e.g. 2024-04-16-1857_6_...)
         String filename =
                 LswFileUtil.getFilenameFromPath(LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(filePath)));
-        String[] parts = filename.replaceFirst("STACK_", "").split("-");
+        String[] parts = filename.split("-");
         if (parts[0].length() == 4
                 && NumberUtils.isCreatable(parts[0])
                 && parts[3].length() >= 4
