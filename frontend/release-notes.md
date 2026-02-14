@@ -2,10 +2,9 @@
 
 ## 15/02/2026 minor release 7.1.0
 
-- De-rotation and stacking can now be applied without first needing to open a single image
-- Simplified de-rotation with only 1 slider left instead of 3: Detail anchor strength
+- De-rotation and stacking can now be applied without requiring to open a single image first
 - Improved de-rotation success rate: much less failure and more predictable outcome
-- Added de-rotation automatic retries with lower Detail achor strength
+- Added de-rotation automatic retries with adjusted parameters
 - Change the STACK\_ prefix for de-rotation and stacking result to a postfix
 - Fixed issue where saving the image would sometimes store it as a mono tif stack instead of an 16-bit color stack
 - New version notification popup now appears directly after splash screen
