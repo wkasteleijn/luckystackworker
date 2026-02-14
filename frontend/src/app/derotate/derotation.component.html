@@ -42,6 +42,24 @@
       [nightMode]="nightMode"
       (sliderValueChanged)="onAnchorStrengthChanged($event)"
     ></app-slider>
+    <app-slider
+      [sliderLabel]="'Noise robustness'"
+      [sliderValue]="deRotation.noiseRobustness"
+      [sliderStep]="1"
+      [sliderMinValue]="1"
+      [sliderMaxValue]="5"
+      [nightMode]="nightMode"
+      (sliderValueChanged)="onNoiseRobustnessChanged($event)"
+    ></app-slider>
+    <app-slider
+      [sliderLabel]="'Accuracy'"
+      [sliderValue]="deRotation.accurateness"
+      [sliderStep]="1"
+      [sliderMinValue]="1"
+      [sliderMaxValue]="4"
+      [nightMode]="nightMode"
+      (sliderValueChanged)="onAccuratenessChanged($event)"
+    ></app-slider>
   </div>
 
   <div class="buttonMargin"></div>

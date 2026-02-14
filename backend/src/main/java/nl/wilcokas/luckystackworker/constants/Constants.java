@@ -51,7 +51,7 @@ public class Constants {
     public static final int WAVELENGTH_NM_GREEN = 532;
     public static final int WAVELENGTH_NM_BLUE = 465;
     public static final int MAX_RELEASE_NOTES_SHOWN = 6;
-    public static final int DEFAULT_DEROTATION_ACCURATENESS = 3;
+    public static final int DEFAULT_DEROTATION_ACCURATENESS = 4;
     public static final int DEFAULT_DEROTATION_NOISE_ROBUSTNESS = 3;
     public static final int DEFAULT_DEROTATION_ANCHOR_STRENGTH = 3;
     public static final String DEFAULT_PROFILE = "unspecified";
