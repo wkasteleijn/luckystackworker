@@ -75,7 +75,7 @@ class DeRotationService(
         val derotationWorkFolder =
             LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation"
 
-        for (run in 1 until 4) {
+        for (run in 1 until 5) {
             LswFileUtil.createCleanDirectory(derotationWorkFolder)
             try {
                 val sharpenedImagePaths =
@@ -124,10 +124,12 @@ class DeRotationService(
                 return "${derotationWorkFolder}/${LswFileUtil.getPathWithoutExtension(referenceImageFilename)}_STACK.tif"
             } catch (e: DeRotationException) {
                 log.info("DeRotation run ${run} unsuccessful, trying again with adjusted parameters...")
-                _anchorStrength = if (_anchorStrength > 1) _anchorStrength - 1 else 1
                 _noiseRobustness = if (_noiseRobustness < 5) _noiseRobustness + 1 else 5
                 if (run > 2) {
-                    _accurateness = if (_accurateness > 1) _accurateness - 1 else 1
+                    _anchorStrength = if (_anchorStrength > 1) _anchorStrength - 1 else 1
+                }
+                if (run > 1 && _accurateness == 4) {
+                    _accurateness = 3
                 }
                 increaseProgressCounter("Run ${run} unsuccessful, trying with adjusted parameters")
                 luckyStackWorkerContext.filesProcessedCount = 0
@@ -139,7 +141,7 @@ class DeRotationService(
         if (parentFrame != null) {
             JOptionPane.showMessageDialog(
                 parentFrame,
-                "Derotation failed after 3 runs.\nChoose different values for Noise Robustness, Anchor Strength or Accuracy.",
+                "Derotation failed after 4 runs.\nChoose different values for Noise Robustness, Anchor Strength or Accuracy.",
             )
         }
         return null // last attempt failed
@@ -449,9 +451,9 @@ class DeRotationService(
         profile.bilateralIterations = noiseRobustness
         profile.bilateralIterationsGreen = noiseRobustness
         profile.bilateralIterationsBlue = noiseRobustness
-        profile.bilateralSigmaColor = 500
-        profile.bilateralSigmaColorGreen = 500
-        profile.bilateralSigmaColorBlue = 500
+        profile.bilateralSigmaColor = 1000
+        profile.bilateralSigmaColorGreen = 1000
+        profile.bilateralSigmaColorBlue = 1000
         profile.bilateralRadius = 2
         profile.bilateralRadiusGreen = 2
         profile.bilateralRadiusBlue = 2
