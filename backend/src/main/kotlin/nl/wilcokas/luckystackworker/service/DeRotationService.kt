@@ -108,8 +108,8 @@ class DeRotationService(
         )
 
         log.info("Stacking images")
-        stackService.stackImages(
-            derotationWorkFolder,
+        val resultFilePath = stackService.stackImages(
+            rootFolder,
             referenceImage.getWidth(),
             referenceImage.getHeight(),
             listOf("${rootFolder}/${referenceImageFilename}") +
@@ -118,10 +118,11 @@ class DeRotationService(
                     .map { f -> "${derotationWorkFolder}/D_${f}" }
                     .toList(),
             parentFrame,
+            true
         )
         log.info("Done")
         increaseProgressCounter("Stacked images")
-        return "${derotationWorkFolder}/${LswFileUtil.getPathWithoutExtension(referenceImageFilename)}_STACK.tif"
+        return resultFilePath;
       } catch (e: DeRotationException) {
         log.info("DeRotation run ${run} unsuccessful, trying again with adjusted parameters...")
         _noiseRobustness = if (_noiseRobustness < 5) _noiseRobustness + 1 else 5

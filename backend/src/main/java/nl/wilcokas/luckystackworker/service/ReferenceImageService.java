@@ -678,13 +678,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 createCleanDirectory(stackFolder);
                                 ImagePlus image = new Opener().openImage(selectedImages.getFirst());
                                 String stackedImagePath = stackService.stackImages(
-                                        stackFolder,
+                                        rootFolder,
                                         image.getWidth(),
                                         image.getHeight(),
                                         selectedImages.stream()
                                                 .map(LswFileUtil::getIJFileFormat)
                                                 .toList(),
-                                        getParentFrame());
+                                        getParentFrame(),
+                                        false);
                                 openImageAfterStacking(stackedImagePath, rootFolder);
                             } catch (IOException e) {
                                 log.error("Error stacking images : ", e);

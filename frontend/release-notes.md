@@ -6,12 +6,12 @@
 - Improved de-rotation success rate: much less failure and more predictable outcome
 - Added de-rotation automatic retries with adjusted parameters
 - Change the STACK\_ prefix for de-rotation and stacking result to a postfix
+- Fixed issue where deconvolution would change the tint of the image when the background wasn't completely dark.
 - Fixed issue where saving the image would sometimes store it as a mono tif stack instead of an 16-bit color stack
 - New version notification popup now appears directly after splash screen
 - Fixed hidden processing progess bar on the image panel
 - Fixed issue where attempting to de-rotate an already pre-processed image would show the error message about the image not being a 16-bit image
 - Fixed issue where order of image files would let the de-rotation fail
-- Fixed issue where deconvolution would change the tint of the image when the background wasn't completely dark.
 
 ## 02/01/2026 major release 7.0.0
 
