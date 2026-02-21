@@ -124,9 +124,9 @@
         [(ngModel)]="openImageMode"
         name="openAs"
         (change)="openImageModeChanged()"
-        matTooltip="Select channel for opening"
+        matTooltip="Select channel"
         class="{{
-          !refImageSelected || !openRefImageEnabled()
+          !openRefImageEnabled()
             ? 'channelDropdown dropdownMargin dropdown_disabled'
             : nightModeEnabled()
               ? 'channelDropdown dropdownMargin dropdown activeColorNight'
@@ -147,11 +147,11 @@
         [disabled]="shouldShowSpinner()"
         [(ngModel)]="scale"
         (change)="scaleChanged()"
-        matTooltip="Select scale used for opening"
+        matTooltip="Select scale"
         class="{{
           'dropdownMargin ' +
             (isRunningOnWindows() ? 'winScaleSelector ' : 'macScaleSelector ') +
-            (!refImageSelected || !openRefImageEnabled()
+            (!openRefImageEnabled()
               ? 'dropdown_disabled'
               : nightModeEnabled()
                 ? 'dropdown activeColorNight'

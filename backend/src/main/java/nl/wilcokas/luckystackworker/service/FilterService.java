@@ -89,15 +89,16 @@ public class FilterService {
     }
 
     public byte[] applyAllFilters(
-            ImagePlus image, LswImageViewer viewer, Profile profile, List<FilterEnum> filterParams, boolean isMono, boolean fromWorker) {
+            ImagePlus image,
+            LswImageViewer viewer,
+            Profile profile,
+            List<FilterEnum> filterParams,
+            boolean isMono,
+            boolean fromWorker) {
         updateProgress(viewer, 0, false);
 
-        // Sharpening filters
         byte[] psfImage = updatePSF(profile.getPsf(), filterParams, profile.getName(), isMono, fromWorker);
         List<FilterEnum> appliedFilters = new ArrayList<>(filterParams);
-        if (psfImage != null) {
-            appliedFilters.add(FilterEnum.WIENER_DECONV);
-        }
         int progressIncrease = 100 / this.filters.size();
         int progress = 0;
 
@@ -127,9 +128,6 @@ public class FilterService {
 
         resetProgress(viewer);
 
-        if (appliedFilters.contains(FilterEnum.WIENER_DECONV)) {
-            psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
-        }
         return psfImage;
     }
 
@@ -140,15 +138,15 @@ public class FilterService {
         ImagePlus result = Scaler.resize(
                 image, newWidth, newHeight, depth, "depth=%s interpolation=Bicubic create".formatted(depth));
         ImageStack stack = result.getStack();
-        short[] redPixels =
-                (short[]) stack.getProcessor(Constants.RED_LAYER_INDEX).getPixels();
-        short[] greenPixels =
-                (short[]) stack.getProcessor(Constants.GREEN_LAYER_INDEX).getPixels();
-        short[] bluePixels =
-                (short[]) stack.getProcessor(Constants.BLUE_LAYER_INDEX).getPixels();
+        short[] redPixels = (short[]) stack.getProcessor(Math.min(Constants.RED_LAYER_INDEX, stack.size()))
+                .getPixels();
+        short[] greenPixels = (short[]) stack.getProcessor(Math.min(Constants.GREEN_LAYER_INDEX, stack.size()))
+                .getPixels();
+        short[] bluePixels = (short[]) stack.getProcessor(Math.min(Constants.BLUE_LAYER_INDEX, stack.size()))
+                .getPixels();
         LswImageLayers newLayers =
-                new LswImageLayers(newWidth, newHeight, new short[][]{redPixels, greenPixels, bluePixels});
-        return create16BitRGBImage("resized", newLayers, true, true, true);
+                new LswImageLayers(newWidth, newHeight, new short[][] {redPixels, greenPixels, bluePixels});
+        return create16BitRGBImage("resized", newLayers);
     }
 
     public ImagePlus resizeImageBackground(final ImagePlus image, int dimensionX, int dimensionY) {
@@ -208,8 +206,8 @@ public class FilterService {
             }
         }
         LswImageLayers newLayers =
-                new LswImageLayers(dimensionX, dimensionY, new short[][]{newRedPixels, newGreenPixels, newBluePixels});
-        return create16BitRGBImage("resized", newLayers, true, true, true);
+                new LswImageLayers(dimensionX, dimensionY, new short[][] {newRedPixels, newGreenPixels, newBluePixels});
+        return create16BitRGBImage("resized", newLayers);
     }
 
     private int determineBackgroundValue(short[] pixels, int width) {
@@ -292,7 +290,7 @@ public class FilterService {
                 newPixels[2][x + y * roiWidth] = ipBluePixels[xOrg + yOrg * imageWidth];
             }
         }
-        return create16BitRGBImage("crop", getLswImageLayers(newPixels, roiWidth, roiHeight), true, true, true);
+        return create16BitRGBImage("crop", getLswImageLayers(newPixels, roiWidth, roiHeight));
     }
 
     private void copyPixelsBackToImage(Roi roi, ImageStack tempCroppedStack, ImageStack stack) {
@@ -360,7 +358,8 @@ public class FilterService {
         }
     }
 
-    private byte[] updatePSF(PSF psf, List<FilterEnum> operations, String profileName, boolean isMono, boolean fromWorker) {
+    private byte[] updatePSF(
+            PSF psf, List<FilterEnum> operations, String profileName, boolean isMono, boolean fromWorker) {
         if (psfReCreationRequired(psf, operations, fromWorker) || operations.contains(FilterEnum.PSF)) {
             try {
                 PsfDiskGenerator.generate16BitRGB(
@@ -379,8 +378,10 @@ public class FilterService {
     }
 
     private boolean psfReCreationRequired(PSF psf, List<FilterEnum> operations, boolean fromWorker) {
-        // If operations are empty it means the update request resulted either from opening an image, loading a profile or from the batch worker.
-        // We don't want to re-generate the PSF from the worker because it would mean re-generating the same PSF for every image in the batch.
+        // If operations are empty it means the update request resulted either from opening an image, loading a profile
+        // or from the batch worker.
+        // We don't want to re-generate the PSF from the worker because it would mean re-generating the same PSF for
+        // every image in the batch.
         return psf.getType() == PSFType.SYNTHETIC && operations.isEmpty() && !fromWorker;
     }
 }

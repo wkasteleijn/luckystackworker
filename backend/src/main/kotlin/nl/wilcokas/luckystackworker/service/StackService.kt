@@ -70,11 +70,7 @@ class StackService(private val luckyStackWorkerContext: LuckyStackWorkerContext)
             val stackedImage =
                 LswImageProcessingUtil.create16BitRGBImage(
                     stackedImagePathRootFolder,
-                    lswImageLayers,
-                    true,
-                    true,
-                    true,
-                )
+                    lswImageLayers)
             LswFileUtil.saveImage(stackedImage, null, stackedImagePathRootFolder, true, false, false, false)
             return stackedImagePathRootFolder
         } finally {

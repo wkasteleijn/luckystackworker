@@ -160,13 +160,13 @@ public class ReferenceController {
     }
 
     @PutMapping("/derotate")
-    public void deRotate(@RequestBody DeRotationDTO deRotationDTO) {
-        referenceImageService.derotate(new DeRotation(deRotationDTO));
+    public void deRotate(@RequestBody DeRotationDTO deRotationDTO, @RequestParam double scale, @RequestParam String openImageMode) {
+        referenceImageService.derotate(new DeRotation(deRotationDTO), scale, openImageMode);
     }
 
     @PutMapping("/stack")
-    public void stack() {
-        referenceImageService.stackImages();
+    public void stack(@RequestParam double scale, @RequestParam String openImageMode) {
+        referenceImageService.stackImages(scale, openImageMode);
     }
 
     private boolean asJpeg(File selectedFile) {

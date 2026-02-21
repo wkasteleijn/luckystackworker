@@ -203,7 +203,9 @@ export class AppComponent implements OnInit {
               data.settings.rootFolder,
             );
             this.zoomFactor = data.settings.zoomFactor;
-            this.psfImage = data.psfImage?.imageData;
+            if (data.psfImage) {
+              this.psfImage = data.psfImage.imageData;
+            }
             this.updateProfileSettings();
           }
           this.hideSpinner();
@@ -1479,7 +1481,9 @@ export class AppComponent implements OnInit {
       (data) => {
         if (data) {
           console.log(data);
-          this.psfImage = data.psfImage?.imageData;
+          if (data.psfImage) {
+            this.psfImage = data.psfImage.imageData;
+          }
           this.profile = data.profile;
           this.settings = data.settings;
           this.selectedProfile = this.profile.name;
@@ -1508,7 +1512,7 @@ export class AppComponent implements OnInit {
   psfSlidersChanged(event: any) {
     console.log('psfSlidersChanged called');
     this.profile.psf = Object.assign(new PSF(), event);
-    this.settings.operations = ['PSF'];
+    this.settings.operations = ['PSF', 'WIENER_DECONV'];
     this.updateProfile();
   }
 
@@ -1518,7 +1522,9 @@ export class AppComponent implements OnInit {
     this.luckyStackWorkerService.loadCustomPSF().subscribe(
       (data) => {
         if (data) {
-          this.psfImage = data.psfImage?.imageData;
+          if (data.psfImage) {
+            this.psfImage = data.psfImage.imageData;
+          }
           this.profile.psf.type = 'CUSTOM';
         }
         this.hideSpinner();
@@ -1630,7 +1636,9 @@ export class AppComponent implements OnInit {
       .subscribe(
         (data) => {
           if (data) {
-            this.psfImage = data.psfImage?.imageData;
+            if (data.psfImage) {
+              this.psfImage = data.psfImage.imageData;
+            }
             this.profile = data.profile;
           }
           if (this.slowProcessing) {
@@ -1681,7 +1689,9 @@ export class AppComponent implements OnInit {
           this.selectedProfile = this.profile.name;
           this.rootFolder = this.getRootFolderCapped(data.settings.rootFolder);
           this.zoomFactor = data.settings.zoomFactor;
-          this.psfImage = data.psfImage?.imageData;
+          if (data.psfImage) {
+            this.psfImage = data.psfImage.imageData;
+          }
           this.updateProfileSettings();
         }
       },
@@ -1991,19 +2001,21 @@ export class AppComponent implements OnInit {
     this.workerStatus = 'Working';
     this.workerProgress = 0;
     this.workerBusy = true;
-    this.luckyStackWorkerService.startDeRotation(this.deRotation).subscribe(
-      (data) => {
-        console.log(data);
-        this.waitForWorker(true);
-      },
-      (error) => {
-        console.log(error);
-        this.isProgressPanelVisible = false;
-        this.notificationText = 'The following error occured: ' + error;
-        this.isNotificationVisible = true;
-        this.workerBusy = false;
-      },
-    );
+    this.luckyStackWorkerService
+      .startDeRotation(this.deRotation, Number(this.scale), this.openImageMode)
+      .subscribe(
+        (data) => {
+          console.log(data);
+          this.waitForWorker(true);
+        },
+        (error) => {
+          console.log(error);
+          this.isProgressPanelVisible = false;
+          this.notificationText = 'The following error occured: ' + error;
+          this.isNotificationVisible = true;
+          this.workerBusy = false;
+        },
+      );
   }
 
   hideDeRotationPanel() {
@@ -2024,19 +2036,21 @@ export class AppComponent implements OnInit {
     this.workerStatus = 'Working';
     this.workerProgress = 0;
     this.workerBusy = true;
-    this.luckyStackWorkerService.stack().subscribe(
-      (data) => {
-        console.log(data);
-        this.waitForWorker(true);
-      },
-      (error) => {
-        console.log(error);
-        this.isProgressPanelVisible = false;
-        this.notificationText = 'The following error occured: ' + error;
-        this.isNotificationVisible = true;
-        this.workerBusy = false;
-      },
-    );
+    this.luckyStackWorkerService
+      .stack(Number(this.scale), this.openImageMode)
+      .subscribe(
+        (data) => {
+          console.log(data);
+          this.waitForWorker(true);
+        },
+        (error) => {
+          console.log(error);
+          this.isProgressPanelVisible = false;
+          this.notificationText = 'The following error occured: ' + error;
+          this.isNotificationVisible = true;
+          this.workerBusy = false;
+        },
+      );
   }
 
   private setSharpenOperationForDeringing() {

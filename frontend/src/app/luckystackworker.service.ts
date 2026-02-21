@@ -43,12 +43,22 @@ export class LuckyStackWorkerService {
     return this.http.put(`${this.baseUrl}/profiles/apply`, profile);
   }
 
-  startDeRotation(derotation: DeRotation): Observable<Object> {
-    return this.http.put(`${this.baseUrl}/reference/derotate`, derotation);
+  startDeRotation(
+    derotation: DeRotation,
+    scale: number,
+    openImageMode: string,
+  ): Observable<Object> {
+    return this.http.put(
+      `${this.baseUrl}/reference/derotate?scale=${scale}&openImageMode=${openImageMode}`,
+      derotation,
+    );
   }
 
-  stack(): Observable<Object> {
-    return this.http.put(`${this.baseUrl}/reference/stack`, null);
+  stack(scale: number, openImageMode: string): Observable<Object> {
+    return this.http.put(
+      `${this.baseUrl}/reference/stack?scale=${scale}&openImageMode=${openImageMode}`,
+      null,
+    );
   }
 
   exit(): Observable<Object> {
@@ -61,7 +71,7 @@ export class LuckyStackWorkerService {
 
   openReferenceImage(scale: number, openImageMode: string): Observable<any> {
     return this.http.get(
-      `${this.baseUrl}/reference/open?scale=${scale}&openImageMode=${openImageMode}`
+      `${this.baseUrl}/reference/open?scale=${scale}&openImageMode=${openImageMode}`,
     );
   }
 
@@ -104,7 +114,7 @@ export class LuckyStackWorkerService {
   nightModeChanged(nightMode: boolean): Observable<Object> {
     return this.http.put(
       `${this.baseUrl}/reference/night?on=${nightMode}`,
-      null
+      null,
     );
   }
 

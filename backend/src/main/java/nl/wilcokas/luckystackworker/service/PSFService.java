@@ -2,6 +2,7 @@ package nl.wilcokas.luckystackworker.service;
 
 import static java.util.Collections.*;
 import static nl.wilcokas.luckystackworker.constants.Constants.PSF_SIZE;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getPSFImageDto;
 
 import ij.ImagePlus;
 import ij.gui.Roi;
@@ -51,7 +52,7 @@ public class PSFService {
                 ImagePlus psf = new Opener().openImage(filePath);
                 if (psf.getStack().getSize() < 3) {
                     psf = LswImageProcessingUtil.create16BitRGBImage(
-                            filePath, LswImageProcessingUtil.getImageLayers(psf), true, true, true);
+                            filePath, LswImageProcessingUtil.getImageLayers(psf));
                 }
                 if (psf.getWidth() > PSF_SIZE && psf.getHeight() > PSF_SIZE) {
                     log.warn(
@@ -76,11 +77,7 @@ public class PSFService {
                 byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profileName);
                 profile.getPsf().setType(PSFType.CUSTOM);
                 referenceImageService.updateProcessing(profile, emptyList());
-                return ResponseDTO.builder()
-                        .psfImage(PSFImageDto.builder()
-                                .imageData(Base64.getEncoder().encodeToString(psfImage))
-                                .build())
-                        .build();
+                return ResponseDTO.builder().psfImage(getPSFImageDto(psfImage)).build();
             }
         }
         return null;

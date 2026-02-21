@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getPSFImageDto;
+
 @CrossOrigin(origins = {"http://localhost:4200"})
 @RequiredArgsConstructor
 @RestController
@@ -66,8 +68,7 @@ public class ProfileController {
         byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
         settings.setRootFolder(settingsService.getRootFolder());
         settings.setLargeImage(referenceImageService.isLargeImage());
-        PSFImageDto psfImageDto = getPsfImageDto(psfImage);
-        return new ResponseDTO(profile, settings, psfImageDto);
+        return new ResponseDTO(profile, settings, getPSFImageDto(psfImage));
     }
 
     @GetMapping("/{profile}")
@@ -124,19 +125,10 @@ public class ProfileController {
         } else {
             log.warn("Attempt to update image while another operation was in progress");
         }
-        PSFImageDto psfImageDto = getPsfImageDto(psfImage);
         return ResponseEntity.ok(ResponseDTO.builder()
-                .psfImage(psfImageDto)
+                .psfImage(getPSFImageDto(psfImage))
                 .profile(profile == null ? null : new ProfileDTO(profile))
                 .build());
-    }
-
-    private PSFImageDto getPsfImageDto(byte[] psfImage) {
-        return psfImage == null
-                ? null
-                : PSFImageDto.builder()
-                        .imageData(Base64.getEncoder().encodeToString(psfImage))
-                        .build();
     }
 
     @PutMapping("/apply")

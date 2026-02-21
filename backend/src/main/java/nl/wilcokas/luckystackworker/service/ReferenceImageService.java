@@ -5,6 +5,7 @@ import static nl.wilcokas.luckystackworker.constants.Constants.MAX_RELEASE_NOTES
 import static nl.wilcokas.luckystackworker.constants.Constants.STATUS_IDLE;
 import static nl.wilcokas.luckystackworker.util.LswFileUtil.createCleanDirectory;
 import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.get16BitRGBHistogram;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getPSFImageDto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -73,6 +74,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Service
@@ -171,11 +173,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 final String rootFolder = LswFileUtil.getFileDirectory(selectedFilePath);
                 SettingsDTO settingsDTO = openReferenceImageAndUpdateSettings(selectedFilePath, rootFolder, profile);
                 byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
-                PSFImageDto psfImageDto = null;
-                if (psfImage != null) {
-                    psfImageDto = PSFImageDto.builder().imageData(Base64.getEncoder().encodeToString(psfImage)).build();
-                }
-                return new ResponseDTO(new ProfileDTO(profile), settingsDTO, psfImageDto);
+                return new ResponseDTO(new ProfileDTO(profile), settingsDTO, getPSFImageDto(psfImage));
             }
         }
         return null;
@@ -627,7 +625,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     @SneakyThrows
-    public void derotate(DeRotation deRotation) {
+    public void derotate(DeRotation deRotation, double scale, String openImageMode) {
         luckyStackWorkerContext.setStatus(Constants.STATUS_WORKING);
         var executor = Executors.newVirtualThreadPerTaskExecutor();
         CompletableFuture.runAsync(
@@ -642,7 +640,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 deRotation.getAccurateness(),
                                 getParentFrame());
                         if (deRotatedImagePath != null) {
-                            openImageAfterStacking(deRotatedImagePath, settingsService.getRootFolder());
+                            openImageAfterStacking(deRotatedImagePath, settingsService.getRootFolder(), scale, openImageMode);
                         }
                     } finally {
                         signalBatchFinished();
@@ -651,7 +649,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 executor);
     }
 
-    public void stackImages() {
+    public void stackImages(Double scale, String openImageMode) {
         JFileChooser jfc =
                 getJFileChooser(settingsService.getRootFolder(), "Open images, use shift+click to select multiple");
         jfc.setMultiSelectionEnabled(true);
@@ -688,7 +686,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                                 .toList(),
                                         getParentFrame(),
                                         false);
-                                openImageAfterStacking(stackedImagePath, rootFolder);
+                                openImageAfterStacking(stackedImagePath, rootFolder, scale, openImageMode);
                             } catch (IOException e) {
                                 log.error("Error stacking images : ", e);
                             } finally {
@@ -709,7 +707,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         luckyStackWorkerContext.setProfileBeingApplied(false);
     }
 
-    private void openImageAfterStacking(String imagePath, String rootFolder) {
+    private void openImageAfterStacking(String imagePath, String rootFolder, double scale, String openImageMode) {
         luckyStackWorkerContext.setStatus("Stacking complete, now applying profile");
         String profileName = LswFileUtil.deriveProfileFromImageName(imagePath);
         String selectedProfile = luckyStackWorkerContext.getSelectedProfile();
@@ -721,6 +719,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         Profile profile = profileService
                 .findByName(profileName)
                 .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
+        LswImageProcessingUtil.setNonPersistentSettings(profile, scale, openImageMode, false);
+        profileService.updateProfile(new ProfileDTO(profile));
         openReferenceImageAndUpdateSettings(imagePath, rootFolder, profile);
     }
 

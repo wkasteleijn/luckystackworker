@@ -525,8 +525,7 @@ public class LswFileUtil {
                 || currentImage.getWidth() != newImage.getWidth()
                 || currentImage.getHeight() != newImage.getHeight()) {
             return Pair.of(
-                    LswImageProcessingUtil.create16BitRGBImage(
-                            filepath, unprocessedNewImageLayers, includeRed, includeGreen, includeBlue),
+                    LswImageProcessingUtil.create16BitRGBImage(filepath, unprocessedNewImageLayers),
                     newImage.getStackSize() != 3);
         } else {
             if (currentUnprocessedImageLayers != null) {
