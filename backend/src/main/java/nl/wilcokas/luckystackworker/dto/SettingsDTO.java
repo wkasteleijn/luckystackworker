@@ -29,5 +29,4 @@ public class SettingsDTO {
     private String operation;
     private boolean largeImage;
     private int zoomFactor;
-    private String psfImage;
 }

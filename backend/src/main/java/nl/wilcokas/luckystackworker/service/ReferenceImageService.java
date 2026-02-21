@@ -48,6 +48,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.dto.PSFImageDto;
 import nl.wilcokas.luckystackworker.dto.ProfileDTO;
 import nl.wilcokas.luckystackworker.dto.ResponseDTO;
 import nl.wilcokas.luckystackworker.dto.SettingsDTO;
@@ -136,7 +137,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
         settingsDTO.setLargeImage(this.isLargeImage);
         luckyStackWorkerContext.setSelectedProfile(profile.getName());
-        return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
+        return new ResponseDTO(new ProfileDTO(profile), settingsDTO, null);
     }
 
     public ResponseDTO selectReferenceImage(String filePath, double scale, String openImageMode) {
@@ -169,7 +170,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
                 final String rootFolder = LswFileUtil.getFileDirectory(selectedFilePath);
                 SettingsDTO settingsDTO = openReferenceImageAndUpdateSettings(selectedFilePath, rootFolder, profile);
-                return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
+                byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
+                PSFImageDto psfImageDto = null;
+                if (psfImage != null) {
+                    psfImageDto = PSFImageDto.builder().imageData(Base64.getEncoder().encodeToString(psfImage)).build();
+                }
+                return new ResponseDTO(new ProfileDTO(profile), settingsDTO, psfImageDto);
             }
         }
         return null;
@@ -181,10 +187,6 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
         settingsDTO.setLargeImage(isLargeImage);
         settingsDTO.setZoomFactor(zoomFactor);
-        byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
-        if (psfImage != null) {
-            settingsDTO.setPsfImage(Base64.getEncoder().encodeToString(psfImage));
-        }
         luckyStackWorkerContext.setSelectedProfile(profile.getName());
         return settingsDTO;
     }
@@ -204,7 +206,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             operations = emptyList();
             roiSwitched = false;
         }
-        byte[] psf = operationService.applyAllFilters(finalResultImage, displayedImage, profile, operations, isMono);
+        byte[] psf = operationService.applyAllFilters(finalResultImage, displayedImage, profile, operations, isMono, false);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(
                 LswImageProcessingUtil.getImageLayers(finalResultImage),

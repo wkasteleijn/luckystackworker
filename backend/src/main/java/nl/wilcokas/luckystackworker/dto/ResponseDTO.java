@@ -10,4 +10,5 @@ import lombok.Data;
 public class ResponseDTO {
     private ProfileDTO profile;
     private SettingsDTO settings;
+    private PSFImageDto psfImage;
 }

@@ -168,7 +168,7 @@ public class WorkerService {
                         imp = LswFileUtil.fixNonTiffOpeningSettings(imp);
                     }
                     operationService.correctExposure(imp);
-                    operationService.applyAllFilters(imp, null, profile, emptyList(), isMono);
+                    operationService.applyAllFilters(imp, null, profile, emptyList(), isMono, true);
                     imp.updateAndDraw();
                     if (luckyStackWorkerContext.isRoiActive()) {
                         imp.setRoi(luckyStackWorkerContext.getSelectedRoi());

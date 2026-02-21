@@ -203,7 +203,7 @@ export class AppComponent implements OnInit {
               data.settings.rootFolder,
             );
             this.zoomFactor = data.settings.zoomFactor;
-            this.psfImage = data.settings.psfImage;
+            this.psfImage = data.psfImage?.imageData;
             this.updateProfileSettings();
           }
           this.hideSpinner();
@@ -1479,6 +1479,7 @@ export class AppComponent implements OnInit {
       (data) => {
         if (data) {
           console.log(data);
+          this.psfImage = data.psfImage?.imageData;
           this.profile = data.profile;
           this.settings = data.settings;
           this.selectedProfile = this.profile.name;
@@ -1517,7 +1518,7 @@ export class AppComponent implements OnInit {
     this.luckyStackWorkerService.loadCustomPSF().subscribe(
       (data) => {
         if (data) {
-          this.psfImage = data.psfImage;
+          this.psfImage = data.psfImage?.imageData;
           this.profile.psf.type = 'CUSTOM';
         }
         this.hideSpinner();
@@ -1629,9 +1630,7 @@ export class AppComponent implements OnInit {
       .subscribe(
         (data) => {
           if (data) {
-            if (data.psfImage) {
-              this.psfImage = data.psfImage?.imageData;
-            }
+            this.psfImage = data.psfImage?.imageData;
             this.profile = data.profile;
           }
           if (this.slowProcessing) {
@@ -1682,7 +1681,7 @@ export class AppComponent implements OnInit {
           this.selectedProfile = this.profile.name;
           this.rootFolder = this.getRootFolderCapped(data.settings.rootFolder);
           this.zoomFactor = data.settings.zoomFactor;
-          this.psfImage = data.settings.psfImage;
+          this.psfImage = data.psfImage?.imageData;
           this.updateProfileSettings();
         }
       },

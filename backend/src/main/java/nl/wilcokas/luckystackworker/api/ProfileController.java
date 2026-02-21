@@ -22,6 +22,7 @@ import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import org.apache.velocity.exception.ResourceNotFoundException;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,12 +64,10 @@ public class ProfileController {
         }
         SettingsDTO settings = new SettingsDTO(settingsService.getSettings());
         byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
-        if (psfImage != null) {
-            settings.setPsfImage(Base64.getEncoder().encodeToString(psfImage));
-        }
         settings.setRootFolder(settingsService.getRootFolder());
         settings.setLargeImage(referenceImageService.isLargeImage());
-        return new ResponseDTO(profile, settings);
+        PSFImageDto psfImageDto = getPsfImageDto(psfImage);
+        return new ResponseDTO(profile, settings, psfImageDto);
     }
 
     @GetMapping("/{profile}")
@@ -81,7 +80,7 @@ public class ProfileController {
     }
 
     @GetMapping("/load")
-    public ResponseDTO loadProfile() {
+    public ResponseEntity<ResponseDTO> loadProfile() {
         log.info("loadProfile called");
         JFrame frame = referenceImageService.getParentFrame();
         JFileChooser jfc = referenceImageService.getJFileChooser(settingsService.getRootFolder(), "Open yaml file");
@@ -98,16 +97,17 @@ public class ProfileController {
                 settingsDTO.setLargeImage(referenceImageService.isLargeImage());
                 LswImageProcessingUtil.setNonPersistentSettings(profile);
                 ProfileDTO profileDTO = new ProfileDTO(profile);
-                updateProfile(profileDTO, null);
                 luckyStackWorkerContext.setSelectedProfile(profile.getName());
-                return new ResponseDTO(profileDTO, settingsDTO);
+                ResponseDTO response = updateProfile(profileDTO, null).getBody();
+                response.setSettings(settingsDTO);
+                return ResponseEntity.ok(response);
             }
         }
         return null;
     }
 
     @PutMapping
-    public ResponseEntity<UpdateProfileResponseDto> updateProfile(
+    public ResponseEntity<ResponseDTO> updateProfile(
             @RequestBody ProfileDTO profileDTO, @RequestParam(required = false) List<String> operations) {
         // Rate limiting added to prevent overloading whenever scroll keys are held down
         // or pressed very quickly.
@@ -124,15 +124,19 @@ public class ProfileController {
         } else {
             log.warn("Attempt to update image while another operation was in progress");
         }
-        PSFImageDto psfImageDto = psfImage == null
+        PSFImageDto psfImageDto = getPsfImageDto(psfImage);
+        return ResponseEntity.ok(ResponseDTO.builder()
+                .psfImage(psfImageDto)
+                .profile(profile == null ? null : new ProfileDTO(profile))
+                .build());
+    }
+
+    private PSFImageDto getPsfImageDto(byte[] psfImage) {
+        return psfImage == null
                 ? null
                 : PSFImageDto.builder()
                         .imageData(Base64.getEncoder().encodeToString(psfImage))
                         .build();
-        return ResponseEntity.ok(UpdateProfileResponseDto.builder()
-                .psfImage(psfImageDto)
-                .profile(profile == null ? null : new ProfileDTO(profile))
-                .build());
     }
 
     @PutMapping("/apply")
@@ -182,7 +186,7 @@ public class ProfileController {
     }
 
     @GetMapping("/custom-psf")
-    public SettingsDTO loadCustomPSF() throws IOException {
+    public ResponseDTO loadCustomPSF() throws IOException {
         log.info("loadCustomPSF called");
         return psfService.loadCustomPSF();
     }

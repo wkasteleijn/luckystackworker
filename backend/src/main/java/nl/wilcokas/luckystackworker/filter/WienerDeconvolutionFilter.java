@@ -190,9 +190,7 @@ public class WienerDeconvolutionFilter implements LSWFilter {
             float blendRawFactor) {
         log.info("Applying Wiener deconvolution to channel {}", ipInput.getSliceNumber());
         short[] pixels = (short[]) ipInput.getPixels();
-        double averagePixelValueIn = getAveragePixelValue(pixels);
         short[] outPixels = getDeconvolvedPixels(ipInput, psf, iterations);
-        double averagePixelValueOut = getAveragePixelValue(outPixels);
         ImageProcessor ipMask =
                 LswImageProcessingUtil.createDeringMaskProcessor(deringStrength, deringRadius, 4.0, ipInput);
         int maskStartX = 0;

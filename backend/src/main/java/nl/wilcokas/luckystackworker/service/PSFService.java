@@ -14,6 +14,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
+import nl.wilcokas.luckystackworker.dto.PSFImageDto;
+import nl.wilcokas.luckystackworker.dto.ResponseDTO;
 import nl.wilcokas.luckystackworker.dto.SettingsDTO;
 import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.model.Profile;
@@ -33,7 +35,7 @@ public class PSFService {
     private final ProfileRepository profileService;
     private final LuckyStackWorkerContext luckyStackWorkerContext;
 
-    public SettingsDTO loadCustomPSF() throws IOException {
+    public ResponseDTO loadCustomPSF() throws IOException {
         JFrame frame = referenceImageService.getParentFrame();
         JFileChooser jfc = referenceImageService.getJFileChooser(settingsService.getRootFolder(), "Select PSF file");
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIF, TIFF, PNG", "tif", "tiff", "png");
@@ -74,8 +76,10 @@ public class PSFService {
                 byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profileName);
                 profile.getPsf().setType(PSFType.CUSTOM);
                 referenceImageService.updateProcessing(profile, emptyList());
-                return SettingsDTO.builder()
-                        .psfImage(Base64.getEncoder().encodeToString(psfImage))
+                return ResponseDTO.builder()
+                        .psfImage(PSFImageDto.builder()
+                                .imageData(Base64.getEncoder().encodeToString(psfImage))
+                                .build())
                         .build();
             }
         }
