@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "nl.wilcokas"
-version = "7.1.0-beta"
+version = "7.1.0"
 description = "LuckyStackWorker"
 
 java {
