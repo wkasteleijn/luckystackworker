@@ -12,7 +12,6 @@ import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -363,9 +362,7 @@ public class LswImageProcessingUtil {
         }
     }
 
-    public static ImagePlus create16BitRGBImage(
-            String filepath,
-            LswImageLayers unprocessedImageLayers) {
+    public static ImagePlus create16BitRGBImage(String filepath, LswImageLayers unprocessedImageLayers) {
         short[] redPixels = unprocessedImageLayers.getLayers()[0];
         short[] greenPixels = unprocessedImageLayers.getLayers()[1];
         short[] bluePixels = unprocessedImageLayers.getLayers()[2];
@@ -614,7 +611,9 @@ public class LswImageProcessingUtil {
     public static PSFImageDto getPSFImageDto(byte[] psfImage) {
         PSFImageDto psfImageDto = null;
         if (psfImage != null) {
-            psfImageDto = PSFImageDto.builder().imageData(Base64.getEncoder().encodeToString(psfImage)).build();
+            psfImageDto = PSFImageDto.builder()
+                    .imageData(Base64.getEncoder().encodeToString(psfImage))
+                    .build();
         }
         return psfImageDto;
     }

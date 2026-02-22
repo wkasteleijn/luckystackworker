@@ -1,9 +1,10 @@
 package nl.wilcokas.luckystackworker.api;
 
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getPSFImageDto;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -22,7 +23,6 @@ import nl.wilcokas.luckystackworker.service.ReferenceImageService;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import org.apache.velocity.exception.ResourceNotFoundException;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,8 +32,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getPSFImageDto;
 
 @CrossOrigin(origins = {"http://localhost:4200"})
 @RequiredArgsConstructor

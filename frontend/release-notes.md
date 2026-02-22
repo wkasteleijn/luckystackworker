@@ -5,13 +5,18 @@
 - De-rotation and stacking can now be applied without requiring to open a single image first
 - Improved de-rotation success rate: much less failure and more predictable outcome
 - Added de-rotation automatic retries with adjusted parameters
+- De-rotation and stacking unprocessed result is now automatically saved in a file with a '\_LSW_DRTD.tif' or '\_LSW_STACK.tif' file
 - Change the STACK\_ prefix for de-rotation and stacking result to a postfix
+- Fixed issue with applying the old synthetic PSF when opening a new image instead of the synthetic PSF that is kept in the profile
 - Fixed issue where deconvolution would change the tint of the image when the background wasn't completely dark.
 - Fixed issue where saving the image would sometimes store it as a mono tif stack instead of an 16-bit color stack
 - New version notification popup now appears directly after splash screen
 - Fixed hidden processing progess bar on the image panel
 - Fixed issue where attempting to de-rotate an already pre-processed image would show the error message about the image not being a 16-bit image
 - Fixed issue where order of image files would let the de-rotation fail
+- Fixed issue when opening an image on a specific channel (red, green or blue) it would initially appear black
+- Fixed issue with image being opened scaled after de-rotation or stacking while scale was set to 1
+- Fixed Rotation button still showing as enabled after opening a new image while it should be disabled again.
 
 ## 02/01/2026 major release 7.0.0
 

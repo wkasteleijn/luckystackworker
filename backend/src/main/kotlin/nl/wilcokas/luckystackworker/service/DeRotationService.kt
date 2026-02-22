@@ -108,21 +108,22 @@ class DeRotationService(
         )
 
         log.info("Stacking images")
-        val resultFilePath = stackService.stackImages(
-            rootFolder,
-            referenceImage.getWidth(),
-            referenceImage.getHeight(),
-            listOf("${rootFolder}/${referenceImageFilename}") +
-                allImagesFilenames
-                    .filterNot { it == referenceImageFilename }
-                    .map { f -> "${derotationWorkFolder}/D_${f}" }
-                    .toList(),
-            parentFrame,
-            true
-        )
+        val resultFilePath =
+            stackService.stackImages(
+                rootFolder,
+                referenceImage.getWidth(),
+                referenceImage.getHeight(),
+                listOf("${rootFolder}/${referenceImageFilename}") +
+                    allImagesFilenames
+                        .filterNot { it == referenceImageFilename }
+                        .map { f -> "${derotationWorkFolder}/D_${f}" }
+                        .toList(),
+                parentFrame,
+                true,
+            )
         log.info("Done")
         increaseProgressCounter("Stacked images")
-        return resultFilePath;
+        return resultFilePath
       } catch (e: DeRotationException) {
         log.info("DeRotation run ${run} unsuccessful, trying again with adjusted parameters...")
         _noiseRobustness = if (_noiseRobustness < 5) _noiseRobustness + 1 else 5

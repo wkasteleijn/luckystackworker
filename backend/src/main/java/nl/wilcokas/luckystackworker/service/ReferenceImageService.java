@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +48,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.dto.PSFImageDto;
 import nl.wilcokas.luckystackworker.dto.ProfileDTO;
 import nl.wilcokas.luckystackworker.dto.ResponseDTO;
 import nl.wilcokas.luckystackworker.dto.SettingsDTO;
@@ -74,7 +72,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Service
@@ -204,7 +201,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             operations = emptyList();
             roiSwitched = false;
         }
-        byte[] psf = operationService.applyAllFilters(finalResultImage, displayedImage, profile, operations, isMono, false);
+        byte[] psf =
+                operationService.applyAllFilters(finalResultImage, displayedImage, profile, operations, isMono, false);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(
                 LswImageProcessingUtil.getImageLayers(finalResultImage),
@@ -640,7 +638,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 deRotation.getAccurateness(),
                                 getParentFrame());
                         if (deRotatedImagePath != null) {
-                            openImageAfterStacking(deRotatedImagePath, settingsService.getRootFolder(), scale, openImageMode);
+                            openImageAfterStacking(
+                                    deRotatedImagePath, settingsService.getRootFolder(), scale, openImageMode);
                         }
                     } finally {
                         signalBatchFinished();

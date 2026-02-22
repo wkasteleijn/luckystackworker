@@ -9,10 +9,8 @@ import ij.ImageStack;
 import ij.gui.Roi;
 import ij.plugin.Scaler;
 import jakarta.annotation.PostConstruct;
-
 import java.io.IOException;
 import java.util.*;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;

@@ -160,7 +160,8 @@ public class ReferenceController {
     }
 
     @PutMapping("/derotate")
-    public void deRotate(@RequestBody DeRotationDTO deRotationDTO, @RequestParam double scale, @RequestParam String openImageMode) {
+    public void deRotate(
+            @RequestBody DeRotationDTO deRotationDTO, @RequestParam double scale, @RequestParam String openImageMode) {
         referenceImageService.derotate(new DeRotation(deRotationDTO), scale, openImageMode);
     }
 

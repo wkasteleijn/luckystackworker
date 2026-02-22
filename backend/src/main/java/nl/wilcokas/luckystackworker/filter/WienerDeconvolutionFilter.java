@@ -1,7 +1,6 @@
 package nl.wilcokas.luckystackworker.filter;
 
 import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.convertToShort;
-import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getAveragePixelValue;
 
 import edu.emory.mathcs.restoretools.iterative.IterativeEnums;
 import edu.emory.mathcs.restoretools.iterative.wpl.WPLOptions;
