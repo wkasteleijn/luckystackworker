@@ -194,6 +194,7 @@ export class AppComponent implements OnInit {
         next: (data) => {
           console.log('Successfully opened the image: ', data);
           this.roi = false;
+          this.rotationAngle = 0;
           if (data && data.profile) {
             this.refImageSelected = true;
             this.profile = data.profile;
@@ -1684,6 +1685,7 @@ export class AppComponent implements OnInit {
         this.roi = false;
         if (data && data.profile) {
           this.refImageSelected = true;
+          this.rotationAngle = 0;
           this.profile = data.profile;
           this.settings = data.settings;
           this.selectedProfile = this.profile.name;
