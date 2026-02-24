@@ -1764,8 +1764,8 @@
       </div>
     </mat-tab>
 
-    <!-- Color & Dispersion panel -->
-    <mat-tab label="Color & Dispersion">
+    <!-- Color & Alignment panel -->
+    <mat-tab label="Color & Alignment">
       <div
         class="sliderRowCategoryTitle {{
           nightModeEnabled()
@@ -1931,7 +1931,7 @@
         </div>
       </div>
 
-      <!-- Dispersion corrector-->
+      <!-- RGB Alignment -->
       <div class="sliderRow">
         <div
           class="sliderRowCategoryTitle {{
@@ -1940,7 +1940,7 @@
               : 'sliderRowCategoryTitleColor'
           }}"
         >
-          Dispersion
+          Alignment
         </div>
         <div class="dispersionLeftButtons">
           <div class="dispersionPanelRow dispersionButton">
@@ -1954,7 +1954,7 @@
                     (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
                     (dispersionCorrectionEnabled ? 'Pressed' : '')
                 }}"
-                matTooltip="Dispersion Correction"
+                matTooltip="Align RGB"
               >
                 <img src="assets/images/dispersion.png" class="dispersionImg" />
               </button>
@@ -1965,7 +1965,7 @@
                 mat-button
                 disabled
                 class="buttonDisabledZoom"
-                matTooltip="Dispersion Correction"
+                matTooltip="Align RGB"
               >
                 <img src="assets/images/dispersion.png" class="dispersionImg" />
               </button>
