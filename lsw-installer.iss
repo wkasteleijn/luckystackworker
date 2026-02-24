@@ -5,7 +5,7 @@
 #define MyAppPublisher "Wilco Kasteleijn"
 #define MyAppURL "https://www.wilcokas.com/luckystackworker"
 #define MyAppExeName "LuckyStackWorker.exe"
-#define MyAppVersion "7.1.0-beta" ; IMPORTANT: UPDATE FOR EVERY RELEASE !!
+#define MyAppVersion "7.1.0" ; IMPORTANT: UPDATE FOR EVERY RELEASE !!
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
