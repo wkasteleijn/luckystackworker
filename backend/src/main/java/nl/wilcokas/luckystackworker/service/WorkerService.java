@@ -1,6 +1,7 @@
 package nl.wilcokas.luckystackworker.service;
 
 import static java.util.Collections.*;
+import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF;
 
 import ij.ImagePlus;
 import java.io.File;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
+import nl.wilcokas.luckystackworker.model.ImageOutputFormatType;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 import nl.wilcokas.luckystackworker.repository.SettingsRepository;
@@ -187,7 +189,7 @@ public class WorkerService {
                             getOutputFile(file),
                             LswFileUtil.isPngRgbStack(imp, filePath) || profile.getScale() > 1.0,
                             luckyStackWorkerContext.isRoiActive(),
-                            false,
+                            TIF,
                             true);
                     return true;
                 }

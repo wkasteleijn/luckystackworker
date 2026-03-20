@@ -7,6 +7,8 @@ import javax.swing.JOptionPane
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext
 import nl.wilcokas.luckystackworker.constants.Constants.STATUS_IDLE
 import nl.wilcokas.luckystackworker.exceptions.BatchStoppedException
+import nl.wilcokas.luckystackworker.model.ImageOutputFormatType
+import nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF
 import nl.wilcokas.luckystackworker.service.bean.LswImageLayers
 import nl.wilcokas.luckystackworker.util.LswFileUtil
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil
@@ -75,7 +77,7 @@ class StackService(private val luckyStackWorkerContext: LuckyStackWorkerContext)
           stackedImagePathRootFolder,
           true,
           false,
-          false,
+          TIF,
           false,
       )
       return stackedImagePathRootFolder

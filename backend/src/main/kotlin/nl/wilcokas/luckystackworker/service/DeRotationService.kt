@@ -20,6 +20,8 @@ import nl.wilcokas.luckystackworker.exceptions.DeRotationException
 import nl.wilcokas.luckystackworker.filter.BilateralDenoiseFilter
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode
+import nl.wilcokas.luckystackworker.model.ImageOutputFormatType
+import nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF
 import nl.wilcokas.luckystackworker.model.Profile
 import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum.RGB
 import nl.wilcokas.luckystackworker.util.LswFileUtil
@@ -207,7 +209,7 @@ class DeRotationService(
                     "${derotationWorkFolder}/D_${sourceImageFilename}",
                     true,
                     false,
-                    false,
+                    TIF,
                     false,
                 )
                 offset++
@@ -220,7 +222,7 @@ class DeRotationService(
                   "${derotationWorkFolder}/D_${sourceImageFilename}",
                   true,
                   false,
-                  false,
+                  TIF,
                   false,
               )
               try {
@@ -545,7 +547,7 @@ class DeRotationService(
         savedFilePath,
         LswFileUtil.isPngRgbStack(image, imagePath),
         false,
-        false,
+        TIF,
         false,
     )
     return savedFilePath
@@ -667,7 +669,7 @@ class DeRotationService(
         "${rootFolder}/OFFSET_${sourceImageFilename}",
         true,
         false,
-        false,
+        TIF,
         false,
     )
   }

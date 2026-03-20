@@ -59,6 +59,7 @@ import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.model.DeRotation;
 import nl.wilcokas.luckystackworker.model.FilterEnum;
+import nl.wilcokas.luckystackworker.model.ImageOutputFormatType;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
@@ -216,9 +217,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return psf;
     }
 
-    public void saveReferenceImage(String path, boolean asJpg, Profile profile) throws IOException {
+    public void saveReferenceImage(String path, ImageOutputFormatType outputFormatType, Profile profile) throws IOException {
         String pathNoExt = LswFileUtil.getPathWithoutExtension(path);
-        String savePath = pathNoExt + "." + (asJpg ? "jpg" : Constants.DEFAULT_OUTPUT_FORMAT);
+        String savePath = pathNoExt + "." + LswFileUtil.getOutputImageExtension(outputFormatType);
         log.info("Saving image to  {}", savePath);
         ImagePlus savedImage = finalResultImage;
         if (luckyStackWorkerContext.isRoiActive()) {
@@ -238,7 +239,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 savePath,
                 LswFileUtil.isPngRgbStack(savedImage, imageMetadata.getFilePath()) || profile.getScale() > 1.0,
                 luckyStackWorkerContext.isRoiActive(),
-                asJpg,
+                outputFormatType,
                 false);
         writeProfile(pathNoExt);
     }
