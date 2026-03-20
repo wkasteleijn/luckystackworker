@@ -509,8 +509,13 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
     }
 
-    public void nightMode(boolean on) {
-        displayedImage.getImageWindow().nightMode(on);
+    public void nightMode(boolean nightMode) {
+        Settings settings = settingsService.getSettings();
+        settings.setNightMode(nightMode);
+        settingsService.saveSettings(settings);
+        if (displayedImage != null) {
+            displayedImage.getImageWindow().nightMode(nightMode);
+        }
     }
 
     public void autoApplyProfile(boolean autoApply) {
@@ -867,6 +872,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         image.setBorderColor(Color.BLACK);
         image.show(imageMetadata.getFilePath());
         LswImageWindow window = (LswImageWindow) image.getWindow();
+        window.nightMode(settingsService.getSettings().isNightMode());
         window.setIconImage(iconImage);
         if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile)) {
             Taskbar.getTaskbar().setIconImage(iconImage);

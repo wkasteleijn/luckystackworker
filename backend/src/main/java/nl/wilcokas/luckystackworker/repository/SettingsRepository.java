@@ -69,6 +69,8 @@ public class SettingsRepository {
                 .latestKnownVersion(null)
                 .latestKnownVersionChecked(null)
                 .outputFormat("tif")
+                .nightMode(false)
+                .autoApply(false)
                 .rootFolder(Constants.SYSTEM_PROFILE_WINDOWS.equals(activeOs) ? "C:/" : "~")
                 .build();
     }
