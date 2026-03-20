@@ -18,6 +18,8 @@ public class SettingsDTO {
         this.defaultProfile = settings.getDefaultProfile();
         this.latestKnownVersion = settings.getLatestKnownVersion();
         this.latestKnownVersionChecked = settings.getLatestKnownVersionChecked();
+        this.autoApply = settings.isAutoApply();
+        this.nightMode = settings.isNightMode();
     }
 
     private String rootFolder;
@@ -29,4 +31,6 @@ public class SettingsDTO {
     private String operation;
     private boolean largeImage;
     private int zoomFactor;
+    private boolean autoApply;
+    private boolean nightMode;
 }

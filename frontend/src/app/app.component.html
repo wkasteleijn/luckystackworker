@@ -88,7 +88,7 @@
   </div>
 }
 @if (isSplashPanelVisible) {
-  <app-splash (close)="hideSplash()"></app-splash>
+  <app-splash (close)="hideSplash($event)"></app-splash>
 }
 <div
   class="{{
@@ -98,7 +98,7 @@
   }}"
 >
   <div class="button_container topButtonContainer">
-    @if (openRefImageEnabled()) {
+    @if (isNotBusy()) {
       <button
         type="button"
         mat-button
@@ -111,7 +111,7 @@
         <img src="assets/images/open.png" class="openButton zoomIcon" />
       </button>
     }
-    @if (!openRefImageEnabled()) {
+    @if (!isNotBusy()) {
       <button type="button" mat-button disabled class="button_disabled">
         <img src="assets/images/open.png" class="openButton zoomIcon" />
       </button>
@@ -126,7 +126,7 @@
         (change)="openImageModeChanged()"
         matTooltip="Select channel"
         class="{{
-          !openRefImageEnabled()
+          !isNotBusy()
             ? 'channelDropdown dropdownMargin dropdown_disabled'
             : nightModeEnabled()
               ? 'channelDropdown dropdownMargin dropdown activeColorNight'
@@ -151,7 +151,7 @@
         class="{{
           'dropdownMargin ' +
             (isRunningOnWindows() ? 'winScaleSelector ' : 'macScaleSelector ') +
-            (!openRefImageEnabled()
+            (!isNotBusy()
               ? 'dropdown_disabled'
               : nightModeEnabled()
                 ? 'dropdown activeColorNight'
@@ -165,7 +165,7 @@
       </select>
     </mat-form-field>
 
-    @if (openRefImageEnabled() && refImageSelected) {
+    @if (isNotBusy() && refImageSelected) {
       <button
         type="button"
         mat-button
@@ -180,7 +180,7 @@
         <img src="assets/images/rotate.png" class="rotate" />
       </button>
     }
-    @if (!openRefImageEnabled() || !refImageSelected) {
+    @if (!isNotBusy() || !refImageSelected) {
       <button
         type="button"
         mat-button
@@ -195,13 +195,13 @@
     <mat-form-field appearance="fill">
       <select
         matNativeControl
-        [disabled]="!openRefImageEnabled()"
+        [disabled]="!isNotBusy()"
         [(ngModel)]="selectedProfile"
         name="profile"
         (change)="profileSelectionChanged()"
         class="{{
           'dropdownMargin profileSelector ' +
-            (!openRefImageEnabled()
+            (!isNotBusy()
               ? ' dropdown_disabled'
               : nightModeEnabled()
                 ? ' dropdown activeColorNight'
@@ -217,7 +217,7 @@
       </select>
     </mat-form-field>
 
-    @if (openRefImageEnabled() && refImageSelected) {
+    @if (isNotBusy() && refImageSelected) {
       <button
         type="button"
         mat-button
@@ -230,7 +230,7 @@
         <img src="assets/images/loadprofile.png" class="genericButton" />
       </button>
     }
-    @if (!openRefImageEnabled() || !refImageSelected) {
+    @if (!isNotBusy() || !refImageSelected) {
       <button
         type="button"
         mat-button
@@ -241,7 +241,7 @@
         <img src="assets/images/loadprofile.png" class="genericButton" />
       </button>
     }
-    @if (openRefImageEnabled() && refImageSelected) {
+    @if (isNotBusy() && refImageSelected) {
       <button
         type="button"
         mat-button
@@ -256,7 +256,7 @@
         <img src="assets/images/roi.png" class="genericButton" />
       </button>
     }
-    @if (!openRefImageEnabled() || !refImageSelected) {
+    @if (!isNotBusy() || !refImageSelected) {
       <button
         type="button"
         mat-button
@@ -267,7 +267,7 @@
         <img src="assets/images/roi.png" class="genericButton" />
       </button>
     }
-    @if (openRefImageEnabled() && refImageSelected) {
+    @if (isNotBusy() && refImageSelected) {
       <button
         type="button"
         mat-button
@@ -283,7 +283,7 @@
         <img src="assets/images/maximize.png" class="genericButton" />
       </button>
     }
-    @if (!openRefImageEnabled() || !refImageSelected) {
+    @if (!isNotBusy() || !refImageSelected) {
       <button
         type="button"
         mat-button
@@ -297,7 +297,7 @@
 
   <!-- Floating buttons -->
   <div class="verticalSeparator"></div>
-  @if (openRefImageEnabled() && refImageSelected) {
+  @if (isNotBusy() && refImageSelected) {
     <button
       type="button"
       mat-button
@@ -322,7 +322,7 @@
       }
     </button>
   }
-  @if (!openRefImageEnabled() || !refImageSelected) {
+  @if (!isNotBusy() || !refImageSelected) {
     <button
       type="button"
       mat-button
@@ -344,7 +344,7 @@
       }
     </button>
   }
-  @if (openRefImageEnabled() && refImageSelected) {
+  @if (isNotBusy() && refImageSelected) {
     <button
       type="button"
       mat-button
@@ -359,7 +359,7 @@
       <img src="assets/images/zoomin.png" class="genericButton" />
     </button>
   }
-  @if (!openRefImageEnabled() || !refImageSelected) {
+  @if (!isNotBusy() || !refImageSelected) {
     <button
       type="button"
       mat-button
@@ -369,7 +369,7 @@
       <img src="assets/images/zoomin.png" class="genericButton" />
     </button>
   }
-  @if (openRefImageEnabled() && refImageSelected) {
+  @if (isNotBusy() && refImageSelected) {
     <button
       type="button"
       mat-button
@@ -385,7 +385,7 @@
       <img src="assets/images/zoomout.png" class="minZoomButton" />
     </button>
   }
-  @if (!openRefImageEnabled() || !refImageSelected) {
+  @if (!isNotBusy() || !refImageSelected) {
     <button
       type="button"
       mat-button
@@ -399,7 +399,7 @@
   <!-- End floating buttons -->
 
   <div class="button_container_top button_container">
-    @if (openRefImageEnabled() && refImageSelected) {
+    @if (isNotBusy() && refImageSelected) {
       <button
         type="button"
         mat-button
@@ -413,9 +413,36 @@
         <img src="assets/images/reset.png" class="revertImg" />
       </button>
     }
-    @if (!refImageSelected || !openRefImageEnabled()) {
+    @if (!refImageSelected || !isNotBusy()) {
       <button type="button" mat-button disabled class="buttonRevertDisabled">
         <img src="assets/images/reset.png" class="revertImg" />
+      </button>
+    }
+
+    @if (isNotBusy()) {
+      <button
+        type="button"
+        mat-button
+        (click)="autoApplyChanged()"
+        class="{{
+          'buttonRevert buttonMargin ' +
+            (nightModeEnabled() ? 'activeColorNight' : 'activeColor') +
+            (autoApplyEnabled() ? 'Pressed' : '')
+        }}"
+        matTooltip="Auto apply profile"
+      >
+        <img src="assets/images/auto-apply.png" class="revertImg" />
+      </button>
+    }
+    @if (!isNotBusy()) {
+      <button
+        type="button"
+        mat-button
+        disabled
+        class="buttonRevertDisabled buttonMargin"
+        matTooltip="Auto apply profile"
+      >
+        <img src="assets/images/auto-apply.png" class="revertImg" />
       </button>
     }
 
@@ -423,11 +450,11 @@
       <input
         matInput
         type="text"
-        [disabled]="!refImageSelected || !openRefImageEnabled()"
+        [disabled]="!refImageSelected || !isNotBusy()"
         [(ngModel)]="rootFolder"
         (click)="selectRootFolder()"
         class="{{
-          !refImageSelected || !openRefImageEnabled()
+          !refImageSelected || !isNotBusy()
             ? 'dropdown_disabled rootFolder'
             : nightModeEnabled()
               ? ' activeColorNight dropdown rootFolder'
@@ -438,7 +465,7 @@
     </mat-form-field>
 
     <!-- Info button -->
-    @if (openRefImageEnabled() && showVersionButton()) {
+    @if (isNotBusy() && showVersionButton()) {
       <button
         type="button"
         mat-button
@@ -458,7 +485,7 @@
         />
       </button>
     }
-    @if (!openRefImageEnabled() && showVersionButton()) {
+    @if (!isNotBusy() && showVersionButton()) {
       <button
         type="button"
         mat-button
@@ -478,7 +505,7 @@
         />
       </button>
     }
-    @if (openRefImageEnabled() && !showVersionButton()) {
+    @if (isNotBusy() && !showVersionButton()) {
       <button
         type="button"
         mat-button
@@ -494,7 +521,7 @@
         />
       </button>
     }
-    @if (!openRefImageEnabled() && !showVersionButton()) {
+    @if (!isNotBusy() && !showVersionButton()) {
       <button
         type="button"
         mat-button
@@ -524,7 +551,7 @@
             }}"
             >Batch</span
           >
-          @if (openRefImageEnabled() && refImageSelected) {
+          @if (isNotBusy() && refImageSelected) {
             <button
               type="button"
               mat-button
@@ -540,7 +567,7 @@
               />
             </button>
           }
-          @if (!openRefImageEnabled() || !refImageSelected) {
+          @if (!isNotBusy() || !refImageSelected) {
             <button
               type="button"
               mat-button
@@ -553,7 +580,7 @@
               />
             </button>
           }
-          @if (openRefImageEnabled() && refImageSelected) {
+          @if (isNotBusy() && refImageSelected) {
             <button
               type="button"
               mat-button
@@ -568,7 +595,7 @@
               <img src="assets/images/connect.png" class="genericButton" />
             </button>
           }
-          @if (!openRefImageEnabled() || !refImageSelected) {
+          @if (!isNotBusy() || !refImageSelected) {
             <button
               type="button"
               mat-button
@@ -579,7 +606,7 @@
               <img src="assets/images/connect.png" class="genericButton" />
             </button>
           }
-          @if (openRefImageEnabled()) {
+          @if (isNotBusy()) {
             <button
               type="button"
               mat-button
@@ -592,7 +619,7 @@
               <img src="assets/images/derotate.png" class="stopBatchButton" />
             </button>
           }
-          @if (!openRefImageEnabled()) {
+          @if (!isNotBusy()) {
             <button
               type="button"
               mat-button
@@ -602,7 +629,7 @@
               <img src="assets/images/derotate.png" class="stopBatchButton" />
             </button>
           }
-          @if (openRefImageEnabled()) {
+          @if (isNotBusy()) {
             <button
               type="button"
               mat-button
@@ -615,7 +642,7 @@
               <img src="assets/images/stack.png" class="stopBatchButton" />
             </button>
           }
-          @if (!openRefImageEnabled()) {
+          @if (!isNotBusy()) {
             <button
               type="button"
               mat-button
@@ -629,7 +656,7 @@
       </mat-card-content>
     </mat-card>
 
-    @if (openRefImageEnabled()) {
+    @if (isNotBusy()) {
       <button
         type="button"
         mat-button
@@ -644,7 +671,7 @@
         <img src="assets/images/nightmode.png" class="genericButton" />
       </button>
     }
-    @if (!openRefImageEnabled()) {
+    @if (!isNotBusy()) {
       <button
         type="button"
         mat-button
@@ -654,7 +681,7 @@
         <img src="assets/images/nightmode.png" class="genericButton" />
       </button>
     }
-    @if (openRefImageEnabled() && refImageSelected) {
+    @if (isNotBusy() && refImageSelected) {
       <button
         type="button"
         mat-button
@@ -669,7 +696,7 @@
         <img src="assets/images/resize.png" class="genericButton" />
       </button>
     }
-    @if (!refImageSelected || !openRefImageEnabled()) {
+    @if (!refImageSelected || !isNotBusy()) {
       <button
         type="button"
         mat-button
@@ -679,7 +706,7 @@
         <img src="assets/images/resize.png" class="genericButton" />
       </button>
     }
-    @if (openRefImageEnabled() && refImageSelected) {
+    @if (isNotBusy() && refImageSelected) {
       <button
         type="button"
         mat-button
@@ -692,7 +719,7 @@
         <img src="assets/images/save.png" class="saveButton zoomIcon" />
       </button>
     }
-    @if (!refImageSelected || !openRefImageEnabled()) {
+    @if (!refImageSelected || !isNotBusy()) {
       <button
         type="button"
         mat-button
@@ -702,7 +729,7 @@
         <img src="assets/images/save.png" class="saveButton zoomIcon" />
       </button>
     }
-    @if (openRefImageEnabled() && refImageSelected) {
+    @if (isNotBusy() && refImageSelected) {
       <button
         type="button"
         mat-button
@@ -717,7 +744,7 @@
         <img src="assets/images/highlight-clipped.png" class="genericButton" />
       </button>
     }
-    @if (!refImageSelected || !openRefImageEnabled()) {
+    @if (!refImageSelected || !isNotBusy()) {
       <button
         type="button"
         mat-button
@@ -819,11 +846,7 @@
         }
         <div class="methodsLabel">Methods</div>
         <div class="slider">
-          @if (
-            applyWienerDeconvolution &&
-            openRefImageEnabled() &&
-            refImageSelected
-          ) {
+          @if (applyWienerDeconvolution && isNotBusy() && refImageSelected) {
             <button
               type="button"
               mat-button
@@ -837,11 +860,7 @@
               <img src="assets/images/synth-psf.png" class="psfButtonImg" />
             </button>
           }
-          @if (
-            !applyWienerDeconvolution ||
-            !openRefImageEnabled() ||
-            !refImageSelected
-          ) {
+          @if (!applyWienerDeconvolution || !isNotBusy() || !refImageSelected) {
             <button
               type="button"
               mat-button
@@ -1830,7 +1849,7 @@
         </div>
 
         <div class="balanceButton">
-          @if (openRefImageEnabled() && refImageSelected) {
+          @if (isNotBusy() && refImageSelected) {
             <button
               type="button"
               mat-button
@@ -1844,7 +1863,7 @@
               <img src="assets/images/reset.png" class="balanceButtonImg" />
             </button>
           }
-          @if (!openRefImageEnabled() || !refImageSelected) {
+          @if (!isNotBusy() || !refImageSelected) {
             <button
               type="button"
               mat-button
@@ -1944,7 +1963,7 @@
         </div>
         <div class="dispersionLeftButtons">
           <div class="dispersionPanelRow dispersionButton">
-            @if (openRefImageEnabled() && refImageSelected) {
+            @if (isNotBusy() && refImageSelected) {
               <button
                 type="button"
                 mat-button
@@ -1959,7 +1978,7 @@
                 <img src="assets/images/dispersion.png" class="dispersionImg" />
               </button>
             }
-            @if (!openRefImageEnabled() || !refImageSelected) {
+            @if (!isNotBusy() || !refImageSelected) {
               <button
                 type="button"
                 mat-button
@@ -2476,7 +2495,7 @@
                 <div class="dispersionPanelColumn">
                   @if (
                     !dispersionCorrectionEnabled ||
-                    !openRefImageEnabled() ||
+                    !isNotBusy() ||
                     !refImageSelected
                   ) {
                     <button

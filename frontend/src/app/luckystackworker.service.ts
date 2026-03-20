@@ -118,6 +118,13 @@ export class LuckyStackWorkerService {
     );
   }
 
+  autoApplyChanged(autoApply: boolean): Observable<Object> {
+    return this.http.put(
+      `${this.baseUrl}/profiles/auto-apply?on=${autoApply}`,
+      null,
+    );
+  }
+
   blinkClippedAreasChanged(): Observable<Object> {
     return this.http.put(`${this.baseUrl}/reference/blink-clipped`, null);
   }

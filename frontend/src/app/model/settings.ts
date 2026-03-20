@@ -4,4 +4,6 @@ export class Settings {
   largeImage: boolean;
   gmicAvailable: boolean;
   zoomFactor: number;
+  nightMode: boolean;
+  autoApply: boolean;
 }

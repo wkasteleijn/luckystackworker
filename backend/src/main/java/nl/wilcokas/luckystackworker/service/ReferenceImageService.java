@@ -513,6 +513,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         displayedImage.getImageWindow().nightMode(on);
     }
 
+    public void autoApplyProfile(boolean autoApply) {
+        Settings settings = settingsService.getSettings();
+        settings.setAutoApply(autoApply);
+        settingsService.saveSettings(settings);
+    }
+
     public void showChannel(ChannelEnum channel) {
         boolean includeRed = channel == ChannelEnum.RGB || channel == ChannelEnum.R;
         boolean includeGreen = channel == ChannelEnum.RGB || channel == ChannelEnum.G;
@@ -719,7 +725,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 .findByName(profileName)
                 .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
         LswImageProcessingUtil.setNonPersistentSettings(profile, scale, openImageMode, false);
-        profileService.updateProfile(new ProfileDTO(profile));
+        if (settingsService.getSettings().isAutoApply()) {
+            profileService.updateProfile(new ProfileDTO(profile));
+        }
         openReferenceImageAndUpdateSettings(imagePath, rootFolder, profile);
     }
 
@@ -847,7 +855,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
             log.info("Opened reference image image with id {}", displayedImage.getID());
 
-            updateProcessing(profile, emptyList());
+            if (settingsService.getSettings().isAutoApply()) {
+                updateProcessing(profile, emptyList());
+            }
         }
         return largeImage;
     }

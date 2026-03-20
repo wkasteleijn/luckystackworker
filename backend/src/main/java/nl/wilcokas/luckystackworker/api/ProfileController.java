@@ -180,4 +180,10 @@ public class ProfileController {
         log.info("loadCustomPSF called");
         return psfService.loadCustomPSF();
     }
+
+    @PutMapping("/auto-apply")
+    public void nightMode(@RequestParam boolean on) {
+        referenceImageService.autoApplyProfile(on);
+    }
+
 }

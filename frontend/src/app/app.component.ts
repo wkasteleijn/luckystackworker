@@ -134,7 +134,6 @@ export class AppComponent implements OnInit {
   workerProgress: number;
   workerBusy: boolean = false;
   refImageSelected: boolean = false;
-  nightMode: boolean = false;
   blinkClippedAreas: boolean = false;
   roi: boolean = false;
   didChangesWhileRoiEnabled: boolean = false;
@@ -1725,7 +1724,7 @@ export class AppComponent implements OnInit {
     return this.workerBusy && !this._showSpinner;
   }
 
-  openRefImageEnabled() {
+  isNotBusy() {
     return !this.workerBusy && !this._showSpinner;
   }
 
@@ -1783,13 +1782,17 @@ export class AppComponent implements OnInit {
   }
 
   nightModeEnabled(): boolean {
-    return this.nightMode;
+    return this.settings?.nightMode;
+  }
+
+  autoApplyEnabled(): boolean {
+    return this.settings?.autoApply;
   }
 
   nightModeChanged() {
     console.log('nightModeChanged called');
-    this.nightMode = !this.nightMode;
-    if (this.nightMode) {
+    this.settings.nightMode = !this.settings.nightMode;
+    if (this.settings.nightMode) {
       document.body.style.backgroundColor = '#000000';
       document.documentElement.style.setProperty('--lsw-tab-color', 'orange');
     } else {
@@ -1799,12 +1802,27 @@ export class AppComponent implements OnInit {
         'lightgreen',
       );
     }
-    this.luckyStackWorkerService.nightModeChanged(this.nightMode).subscribe(
-      (data) => {
-        console.log('Response');
-      },
-      (error) => console.log(error),
-    );
+    this.luckyStackWorkerService
+      .nightModeChanged(this.settings.nightMode)
+      .subscribe(
+        (data) => {
+          console.log('Response');
+        },
+        (error) => console.log(error),
+      );
+  }
+
+  autoApplyChanged() {
+    console.log('autoApplyChanged called');
+    this.settings.autoApply = !this.settings.autoApply;
+    this.luckyStackWorkerService
+      .autoApplyChanged(this.settings.autoApply)
+      .subscribe(
+        (data) => {
+          console.log('Response');
+        },
+        (error) => console.log(error),
+      );
   }
 
   blinkClippedAreasChanged() {
@@ -1875,7 +1893,9 @@ export class AppComponent implements OnInit {
   }
 
   colorTheme() {
-    return this.nightMode ? this.componentColorNight : this.componentColor;
+    return this.settings?.nightMode
+      ? this.componentColorNight
+      : this.componentColor;
   }
 
   dispersionIndicatorRedColor(): string {
@@ -2028,8 +2048,9 @@ export class AppComponent implements OnInit {
     this.isNotificationVisible = false;
   }
 
-  hideSplash() {
+  hideSplash(event: any) {
     this.isSplashPanelVisible = false;
+    this.settings = event;
     this.checkLatestVersion();
   }
 
