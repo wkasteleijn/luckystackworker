@@ -206,7 +206,11 @@ export class AppComponent implements OnInit {
             if (data.psfImage) {
               this.psfImage = data.psfImage.imageData;
             }
-            this.updateProfileSettings();
+            if (this.settings.autoApply) {
+              this.updateProfileSettings();
+            } else {
+              this.resetToRaw();
+            }
           }
           this.hideSpinner();
           this.workerProgress = 0;
@@ -1976,6 +1980,7 @@ export class AppComponent implements OnInit {
     dialogRef.afterClosed().subscribe((dialogResult) => {
       if (dialogResult) {
         this.resetToRaw();
+        this.updateProfile();
       }
     });
   }
@@ -2187,7 +2192,6 @@ export class AppComponent implements OnInit {
     this.selectedProfile = this.profile.name;
     this.settings.operations = [];
     this.updateProfileSettings();
-    this.updateProfile();
   }
 
   private showSpinner() {
