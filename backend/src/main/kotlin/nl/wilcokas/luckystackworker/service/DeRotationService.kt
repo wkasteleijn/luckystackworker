@@ -54,7 +54,7 @@ class DeRotationService(
 
   fun derotate(
       rootFolder: String,
-      referenceImageFilename: String,
+      referenceImageFilenameParam: String?,
       allImagesFilenames: List<String>,
       initialAnchorStrength: Int,
       initialNoiseRobustness: Int,
@@ -76,7 +76,7 @@ class DeRotationService(
 
       val referenceImageFilenames = determineReferenceImageFilenames(allImagesFilenames, referenceImageFilenameParam, referenceTime)
 
-    val referenceImagePath = "${rootFolder}/${referenceImageFilename}"
+    val referenceImagePath = "${rootFolder}/${referenceImageFilenameParam}"
     val referenceImage = openImage(referenceImagePath, parentFrame)
     val derotationWorkFolder =
         LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation"
@@ -113,20 +113,19 @@ class DeRotationService(
             rootFolder,
             imagesWithTransformation,
             allImagesFilenames,
-            referenceImageFilename,
+              referenceImageFilenameParam!!,
             parentFrame,
         )
 
         log.info("Stacking images")
         val resultFilePath =
             stackService.stackImages(
-                derotationWorkFolder,
                 rootFolder,
                 referenceImage.getWidth(),
                 referenceImage.getHeight(),
-                listOf("${rootFolder}/${referenceImageFilename}") +
+                listOf("${rootFolder}/${referenceImageFilenameParam}") +
                     allImagesFilenames
-                        .filterNot { it == referenceImageFilename }
+                        .filterNot { it == referenceImageFilenameParam }
                         .map { f -> "${derotationWorkFolder}/D_${f}" }
                         .toList(),
                 parentFrame,
@@ -250,7 +249,7 @@ class DeRotationService(
                 val targetImage =
                     if (targetImageFilename == referenceImageFilename) referenceImage
                     else openImage("${rootFolder}/${targetImageFilename}", parentFrame)
-                applyTransformation(sourceImage, targetImage, transformationFile)
+                applyTransformation(sourceImage, transformationFile)
                 if (!validateTransformationResult(sourceImage, targetImage)) {
                   warpingFailed.set(true)
                   break
@@ -352,24 +351,21 @@ class DeRotationService(
     return true
   }
 
-  private fun applyTransformation(
-      sourceImage: ImagePlus,
-      targetImage: ImagePlus,
-      transformationFile: String,
-  ) {
-    for (layer in 1..sourceImage.stack.size) {
-      val sourceProcessor = sourceImage.getStack().getProcessor(layer).toFloat(1, null)
-      val targetProcessor = targetImage.getStack().getProcessor(layer).toFloat(1, null)
-      val sourceLayerImage = ImagePlus("Layer ${layer}", sourceProcessor)
-      bUnwarpJ_.applyTransformToSource(
-          transformationFile,
-          ImagePlus("Layer ${layer}", targetProcessor),
-          sourceLayerImage,
-          sourceLayerImage,
-      )
-      copyPixelsFromTo(sourceLayerImage, sourceImage, layer)
+    private fun applyTransformation(
+        sourceImage: ImagePlus,
+        transformationFile: String,
+    ) {
+        for (layer in 1..sourceImage.stack.size) {
+            val sourceProcessor = sourceImage.getStack().getProcessor(layer).toFloat(1, null)
+            val sourceLayerImage = ImagePlus("Layer ${layer}", sourceProcessor)
+            bUnwarpJ_.applyTransformToSource(
+                transformationFile,
+                sourceLayerImage,
+                sourceLayerImage,
+            )
+            copyPixelsFromTo(sourceLayerImage, sourceImage, layer)
+        }
     }
-  }
 
   private fun copyPixelsFromTo(fromImage: ImagePlus, toImage: ImagePlus, layer: Int) {
     val fromProcessor = fromImage.getProcessor() as FloatProcessor
@@ -380,6 +376,7 @@ class DeRotationService(
     private fun createTransformationFiles(
         sharpenedImagePaths: List<String>,
         derotationWorkFolder: String,
+        accurateness: Int,
         allImagesFilenames: List<String>,
         referenceImageFilenames: Pair<String, String>,
         referenceInterpolationFactors: Pair<Double, Double>?,
@@ -419,6 +416,7 @@ class DeRotationService(
                         derotationWorkFolder,
                         source,
                         target,
+                        accurateness,
                         imagesWithTransformation,
                         originalSource,
                         factor
@@ -718,7 +716,7 @@ class DeRotationService(
             "${rootFolder}/OFFSET_${sourceImageFilename}",
             true,
             false,
-            false,
+            TIF,
             false,
         )
     }
@@ -795,6 +793,8 @@ fun main(args: Array<String>) {
                 arguments[1],
                 arguments[2],
                 arguments.subList(3, arguments.size),
+                4,
+                2,
                 4,
                 null,
                 null

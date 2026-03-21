@@ -16,6 +16,7 @@ import nl.wilcokas.luckystackworker.util.LswFileUtil;
 public class DeRotation {
     private List<String> images;
     private String referenceImage;
+    private int noiseRobustness;
     private LocalDateTime referenceTime;
     private int anchorStrength;
     private int accurateness;
@@ -32,5 +33,7 @@ public class DeRotation {
                 ? null
                 : LswFileUtil.getObjectDateTime(deRotation.getReferenceTime());
         this.anchorStrength = deRotation.getAnchorStrength();
+        this.noiseRobustness = deRotation.getNoiseRobustness();
+        this.accurateness = deRotation.getAccurateness();
     }
 }
