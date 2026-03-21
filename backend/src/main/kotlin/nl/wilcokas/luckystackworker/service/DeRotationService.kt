@@ -22,7 +22,6 @@ import nl.wilcokas.luckystackworker.exceptions.DeRotationException
 import nl.wilcokas.luckystackworker.filter.BilateralDenoiseFilter
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode
-import nl.wilcokas.luckystackworker.model.ImageOutputFormatType
 import nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF
 import nl.wilcokas.luckystackworker.model.Profile
 import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum.RGB
@@ -131,11 +130,13 @@ class DeRotationService(
                     )
 
                 log.info("Stacking images")
+                val width = if (referenceImage == null) null else referenceImage.width
+                val height = if (referenceImage == null) null else referenceImage.height
                 val resultFilePath =
                     stackService.stackImages(
                         rootFolder,
-                        referenceImage.getWidth(),
-                        referenceImage.getHeight(),
+                        width,
+                        height,
                         listOf("${rootFolder}/${referenceImageFilenameParam}") +
                                 allImagesFilenames
                                     .filterNot { it == referenceImageFilenameParam }
@@ -239,7 +240,7 @@ class DeRotationService(
         referenceImageFilenames: Pair<String, String>,
         parentFrame: JFrame?,
         referenceTime: LocalDateTime?
-    ): ImagePlus {
+    ): ImagePlus? {
         log.info("Create warped images based on the transformation files")
 
         // Scenario where no reference time is provided
@@ -247,19 +248,14 @@ class DeRotationService(
         var allImagesFilenames = allImagesFilenamesParam.toMutableList()
 
         // Scenario where a reference time is provided,  we need to add the interpolated reference image to the list of images at the correct position
+        var referenceImage: ImagePlus? = null
         if (referenceTime != null) {
-            val result = addInterpolatedReferenceImage(
-                allImagesFilenamesParam,
-                referenceImageFilenames,
-                imagesWithTransformation,
-                rootFolder,
-                referenceTime
-            )
-            referenceImageFilename = result.second
-            allImagesFilenames = result.first
+            allImagesFilenames = addInterpolatedReferenceImageFilename(allImagesFilenamesParam, referenceTime)
+            referenceImageFilename = referenceTime.toString()
+        } else {
+            // Scenario where no reference time is provided
+            referenceImage = openImage("${rootFolder}/${referenceImageFilename}", parentFrame)
         }
-
-        val referenceImage = openImage("${rootFolder}/${referenceImageFilename}", parentFrame)
 
         val threads = mutableListOf<Thread>()
         val warpingFailed = AtomicBoolean(false)
@@ -294,7 +290,8 @@ class DeRotationService(
                             if (targetImageFilename == referenceImageFilename) referenceImage
                             else openImage("${rootFolder}/${targetImageFilename}", parentFrame)
                         applyTransformation(sourceImage, transformationFile)
-                        if (!validateTransformationResult(sourceImage, targetImage)) {
+                        // targetImage is null when time based de-rotation is applied since we don't actually have a reference image in that case
+                        if (targetImage != null && !validateTransformationResult(sourceImage, targetImage)) {
                             warpingFailed.set(true)
                             break
                         }
@@ -341,40 +338,23 @@ class DeRotationService(
         return referenceImage
     }
 
-    private fun addInterpolatedReferenceImage(
+    private fun addInterpolatedReferenceImageFilename(
         allImagesFilenamesParam: List<String>,
-        referenceImageFilenames: Pair<String, String>,
-        imagesWithTransformation: Map<String, String>,
-        rootFolder: String,
         referenceTime: LocalDateTime
-    ): Pair<MutableList<String>, String> {
-        val referenceImageFilename =
-            createInterpolatedReferenceImage(referenceTime, referenceImageFilenames, imagesWithTransformation, rootFolder)
+    ): MutableList<String> {
         val allImagesFilenames = ArrayList<String>()
         var referenceAdded = false
         for (imageFilename in allImagesFilenamesParam) {
             val imageTime = LswFileUtil.getObjectDateTime(imageFilename)
             if (!referenceAdded && imageTime.isAfter(referenceTime)) {
-                allImagesFilenames.add(referenceImageFilename)
+                allImagesFilenames.add(referenceTime.toString()) // Add reference time as fake filename, we only need it for comparison
                 referenceAdded = true
             }
             allImagesFilenames.add(imageFilename)
         }
-        return allImagesFilenames to referenceImageFilename
+        return allImagesFilenames
     }
 
-    /**
-     * The reference image is interpolated here as a stack from the interpolated transformation
-     * results of the images surrounding the reference time.
-     */
-    private fun createInterpolatedReferenceImage(
-        referenceTime: LocalDateTime,
-        referenceImageFilenames: Pair<String, String>,
-        imagesWithTransformation: Map<String, String>,
-        rootFolder: String,
-    ): String {
-        throw BatchStoppedException("Implement createInterpolatedReferenceImage")
-    }
 
     private fun isSourceBeforeReference(
         sourceImageFilename: String,
