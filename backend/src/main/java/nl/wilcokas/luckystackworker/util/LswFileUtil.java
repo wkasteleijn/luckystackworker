@@ -27,6 +27,7 @@ import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.exceptions.NotARawImageException;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
+import nl.wilcokas.luckystackworker.model.ImageOutputFormatType;
 import nl.wilcokas.luckystackworker.model.PSF;
 import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.model.Profile;
@@ -37,10 +38,15 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.inspector.TagInspector;
+
+import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.JPG;
+import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.PNG;
+import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF;
 
 @Slf4j
 public class LswFileUtil {
@@ -154,7 +160,7 @@ public class LswFileUtil {
             String path,
             boolean fixRgbStack,
             boolean crop,
-            boolean asJpg,
+            ImageOutputFormatType outputFormatType,
             boolean fromWorker)
             throws IOException {
         if (crop) {
@@ -168,14 +174,13 @@ public class LswFileUtil {
                 path = newFolder + "/" + getFilenameFromPath(getIJFileFormat(path));
             }
         }
-        if (asJpg) {
-            LswImageViewer singleLayerColorImage =
-                    new LswImageViewer(StringUtils.EMPTY, new ColorProcessor(image.getWidth(), image.getHeight()));
-            LswImageProcessingUtil.convertLayersToColorImage(
-                    LswImageProcessingUtil.getImageLayers(image).getLayers(), singleLayerColorImage);
-            LSWFileSaver saver = new LSWFileSaver(singleLayerColorImage);
+        if (outputFormatType == JPG) {
+            LSWFileSaver saver = new LSWFileSaver(createSingleLayerColorImage(image));
             saver.setJpegQuality(100);
             saver.saveAsJpeg(path);
+        } else if (outputFormatType == PNG) {
+            LSWFileSaver saver = new LSWFileSaver(createSingleLayerColorImage(image));
+            saver.saveAsPng(path);
         } else {
             if (fixRgbStack) {
                 image.setActiveChannels("111");
@@ -188,6 +193,15 @@ public class LswFileUtil {
             }
             saver.saveAsTiff(path);
         }
+    }
+
+    @NotNull
+    private static LswImageViewer createSingleLayerColorImage(ImagePlus image) {
+        LswImageViewer singleLayerColorImage =
+                new LswImageViewer(StringUtils.EMPTY, new ColorProcessor(image.getWidth(), image.getHeight()));
+        LswImageProcessingUtil.convertLayersToColorImage(
+                LswImageProcessingUtil.getImageLayers(image).getLayers(), singleLayerColorImage);
+        return singleLayerColorImage;
     }
 
     public static ImagePlus fixNonTiffOpeningSettings(ImagePlus image) {
@@ -526,8 +540,7 @@ public class LswFileUtil {
                 || currentImage.getWidth() != newImage.getWidth()
                 || currentImage.getHeight() != newImage.getHeight()) {
             return Pair.of(
-                    LswImageProcessingUtil.create16BitRGBImage(
-                            filepath, unprocessedNewImageLayers, includeRed, includeGreen, includeBlue),
+                    LswImageProcessingUtil.create16BitRGBImage(filepath, unprocessedNewImageLayers),
                     newImage.getStackSize() != 3);
         } else {
             if (currentUnprocessedImageLayers != null) {
@@ -550,7 +563,7 @@ public class LswFileUtil {
         // Attempt to derive from filename hopefully winjupos formatted (e.g. 2024-04-16-1857_6_...)
         String filename =
                 LswFileUtil.getFilenameFromPath(LswFileUtil.getImageName(LswFileUtil.getIJFileFormat(filePath)));
-        String[] parts = filename.replaceFirst("STACK_", "").split("-");
+        String[] parts = filename.split("-");
         if (parts[0].length() == 4
                 && NumberUtils.isCreatable(parts[0])
                 && parts[3].length() >= 4
@@ -597,8 +610,8 @@ public class LswFileUtil {
 
     public static void savePSF(ImagePlus image, String profileName) throws IOException {
         String dataFolder = LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile());
-        saveImage(image, null, dataFolder + "/psf_%s.tif".formatted(profileName), false, false, false, false);
-        saveImage(image, null, dataFolder + "/psf_%s.jpg".formatted(profileName), false, false, true, false);
+        saveImage(image, null, dataFolder + "/psf_%s.tif".formatted(profileName), false, false, TIF, false);
+        saveImage(image, null, dataFolder + "/psf_%s.jpg".formatted(profileName), false, false, JPG, false);
     }
 
     public static void createCleanDirectory(String path) throws IOException {
@@ -612,6 +625,14 @@ public class LswFileUtil {
 
     public static String toWinjuposTimestamp(LocalDateTime dateTime) {
         return String.format("%s:%d", dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), dateTime.getSecond() / 6);
+    }
+
+    public static String getOutputImageExtension(ImageOutputFormatType outputFormatType) {
+        return switch (outputFormatType) {
+            case JPG -> "jpg";
+            case PNG -> "png";
+            default -> Constants.DEFAULT_OUTPUT_FORMAT;
+        };
     }
 
     private static void hackIncorrectPngFileInfo(LSWFileSaver saver) {

@@ -2,19 +2,19 @@ package nl.wilcokas.luckystackworker.service;
 
 import static java.util.Collections.*;
 import static nl.wilcokas.luckystackworker.constants.Constants.PSF_SIZE;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getPSFImageDto;
 
 import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.io.Opener;
 import java.io.File;
 import java.io.IOException;
-import java.util.Base64;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
-import nl.wilcokas.luckystackworker.dto.SettingsDTO;
+import nl.wilcokas.luckystackworker.dto.ResponseDTO;
 import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
@@ -33,7 +33,7 @@ public class PSFService {
     private final ProfileRepository profileService;
     private final LuckyStackWorkerContext luckyStackWorkerContext;
 
-    public SettingsDTO loadCustomPSF() throws IOException {
+    public ResponseDTO loadCustomPSF() throws IOException {
         JFrame frame = referenceImageService.getParentFrame();
         JFileChooser jfc = referenceImageService.getJFileChooser(settingsService.getRootFolder(), "Select PSF file");
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIF, TIFF, PNG", "tif", "tiff", "png");
@@ -49,7 +49,7 @@ public class PSFService {
                 ImagePlus psf = new Opener().openImage(filePath);
                 if (psf.getStack().getSize() < 3) {
                     psf = LswImageProcessingUtil.create16BitRGBImage(
-                            filePath, LswImageProcessingUtil.getImageLayers(psf), true, true, true);
+                            filePath, LswImageProcessingUtil.getImageLayers(psf));
                 }
                 if (psf.getWidth() > PSF_SIZE && psf.getHeight() > PSF_SIZE) {
                     log.warn(
@@ -74,9 +74,7 @@ public class PSFService {
                 byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profileName);
                 profile.getPsf().setType(PSFType.CUSTOM);
                 referenceImageService.updateProcessing(profile, emptyList());
-                return SettingsDTO.builder()
-                        .psfImage(Base64.getEncoder().encodeToString(psfImage))
-                        .build();
+                return ResponseDTO.builder().psfImage(getPSFImageDto(psfImage)).build();
             }
         }
         return null;

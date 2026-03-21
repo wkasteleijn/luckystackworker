@@ -18,4 +18,6 @@ public class Settings {
     private String defaultProfile;
     private String latestKnownVersion;
     private LocalDateTime latestKnownVersionChecked;
+    private boolean autoApply;
+    private boolean nightMode;
 }

@@ -415,7 +415,7 @@ public class LswImageWindow extends ImageWindow implements MouseMotionListener {
         }
         g.fillRect(
                 0,
-                HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT + 6,
+                HISTOGRAM_MARGIN_TOP + OFFSET_TOP + HISTOGRAM_HEIGHT - 1,
                 (int) (image.getWidth() * (progressPercentage / 100D)),
                 4);
     }

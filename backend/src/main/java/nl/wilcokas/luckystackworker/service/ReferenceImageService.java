@@ -5,6 +5,7 @@ import static nl.wilcokas.luckystackworker.constants.Constants.MAX_RELEASE_NOTES
 import static nl.wilcokas.luckystackworker.constants.Constants.STATUS_IDLE;
 import static nl.wilcokas.luckystackworker.util.LswFileUtil.createCleanDirectory;
 import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.get16BitRGBHistogram;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getPSFImageDto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Base64;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Timer;
@@ -58,6 +59,7 @@ import nl.wilcokas.luckystackworker.ij.histogram.LswImageMetadata;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.model.DeRotation;
 import nl.wilcokas.luckystackworker.model.FilterEnum;
+import nl.wilcokas.luckystackworker.model.ImageOutputFormatType;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
@@ -135,7 +137,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         SettingsDTO settingsDTO = new SettingsDTO(settingsService.getSettings());
         settingsDTO.setLargeImage(this.isLargeImage);
         luckyStackWorkerContext.setSelectedProfile(profile.getName());
-        return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
+        return new ResponseDTO(new ProfileDTO(profile), settingsDTO, null);
     }
 
     public ResponseDTO selectReferenceImage(String filePath, double scale, String openImageMode) {
@@ -166,22 +168,23 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 LswImageProcessingUtil.setNonPersistentSettings(profile, scale, openImageMode, false);
                 profileService.updateProfile(new ProfileDTO(profile));
 
-                isLargeImage =
-                        openReferenceImage(selectedFilePath, profile, LswFileUtil.getObjectDateTime(selectedFilePath));
-
                 final String rootFolder = LswFileUtil.getFileDirectory(selectedFilePath);
-                SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
-                settingsDTO.setLargeImage(isLargeImage);
-                settingsDTO.setZoomFactor(zoomFactor);
+                SettingsDTO settingsDTO = openReferenceImageAndUpdateSettings(selectedFilePath, rootFolder, profile);
                 byte[] psfImage = LswFileUtil.getWienerDeconvolutionPSFImage(profile.getName());
-                if (psfImage != null) {
-                    settingsDTO.setPsfImage(Base64.getEncoder().encodeToString(psfImage));
-                }
-                luckyStackWorkerContext.setSelectedProfile(profile.getName());
-                return new ResponseDTO(new ProfileDTO(profile), settingsDTO);
+                return new ResponseDTO(new ProfileDTO(profile), settingsDTO, getPSFImageDto(psfImage));
             }
         }
         return null;
+    }
+
+    private SettingsDTO openReferenceImageAndUpdateSettings(
+            String selectedFilePath, String rootFolder, Profile profile) {
+        isLargeImage = openReferenceImage(selectedFilePath, profile, LswFileUtil.getObjectDateTime(selectedFilePath));
+        SettingsDTO settingsDTO = new SettingsDTO(updateSettingsForRootFolder(rootFolder));
+        settingsDTO.setLargeImage(isLargeImage);
+        settingsDTO.setZoomFactor(zoomFactor);
+        luckyStackWorkerContext.setSelectedProfile(profile.getName());
+        return settingsDTO;
     }
 
     public byte[] updateProcessing(Profile profile, List<String> operationValues) {
@@ -199,7 +202,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             operations = emptyList();
             roiSwitched = false;
         }
-        byte[] psf = operationService.applyAllFilters(finalResultImage, displayedImage, profile, operations, isMono);
+        byte[] psf =
+                operationService.applyAllFilters(finalResultImage, displayedImage, profile, operations, isMono, false);
         finalResultImage.updateAndDraw();
         LswImageProcessingUtil.copyLayers(
                 LswImageProcessingUtil.getImageLayers(finalResultImage),
@@ -213,9 +217,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return psf;
     }
 
-    public void saveReferenceImage(String path, boolean asJpg, Profile profile) throws IOException {
+    public void saveReferenceImage(String path, ImageOutputFormatType outputFormatType, Profile profile) throws IOException {
         String pathNoExt = LswFileUtil.getPathWithoutExtension(path);
-        String savePath = pathNoExt + "." + (asJpg ? "jpg" : Constants.DEFAULT_OUTPUT_FORMAT);
+        String savePath = pathNoExt + "." + LswFileUtil.getOutputImageExtension(outputFormatType);
         log.info("Saving image to  {}", savePath);
         ImagePlus savedImage = finalResultImage;
         if (luckyStackWorkerContext.isRoiActive()) {
@@ -235,7 +239,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                 savePath,
                 LswFileUtil.isPngRgbStack(savedImage, imageMetadata.getFilePath()) || profile.getScale() > 1.0,
                 luckyStackWorkerContext.isRoiActive(),
-                asJpg,
+                outputFormatType,
                 false);
         writeProfile(pathNoExt);
     }
@@ -502,11 +506,23 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         imageMetadata.setLuminance((redPercentage + greenPercentage + bluePercentage) / 3);
         if (profile != null) {
             imageMetadata.setAngle(profile.getRotationAngle());
+            imageMetadata.setName(LswUtil.getFullObjectName(profile.getName()));
         }
     }
 
-    public void nightMode(boolean on) {
-        displayedImage.getImageWindow().nightMode(on);
+    public void nightMode(boolean nightMode) {
+        Settings settings = settingsService.getSettings();
+        settings.setNightMode(nightMode);
+        settingsService.saveSettings(settings);
+        if (displayedImage != null) {
+            displayedImage.getImageWindow().nightMode(nightMode);
+        }
+    }
+
+    public void autoApplyProfile(boolean autoApply) {
+        Settings settings = settingsService.getSettings();
+        settings.setAutoApply(autoApply);
+        settingsService.saveSettings(settings);
     }
 
     public void showChannel(ChannelEnum channel) {
@@ -585,51 +601,67 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         JFrame frame = getParentFrame();
         List<String> selectedImages = new ArrayList<>();
         int returnValue = getFilenameFromDialog(frame, jfc, false);
+        String rootFolder = settingsService.getSettings().getRootFolder();
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File[] selectedFiles = jfc.getSelectedFiles();
-            for (File selectedFile : selectedFiles) {
-                String selectedFilePath = selectedFile.getAbsolutePath();
-                if (validateSelectedFile(selectedFilePath)) {
-                    selectedImages.add(selectedFile.getName());
+            if (selectedFiles.length > 0) {
+                for (File selectedFile : selectedFiles) {
+                    String selectedFilePath = selectedFile.getAbsolutePath();
+                    if (validateSelectedFile(selectedFilePath)) {
+                        selectedImages.add(selectedFile.getName());
+                    }
                 }
+                rootFolder = LswFileUtil.getFileDirectory(selectedFiles[0].getAbsolutePath());
+                updateSettingsForRootFolder(rootFolder);
             }
         }
+        selectedImages.sort(Comparator.naturalOrder());
         return DeRotation.builder()
                 .images(selectedImages)
+                .accurateness(
+                        deRotationService.getAccurateness() == 0
+                                ? Constants.DEFAULT_DEROTATION_ACCURATENESS
+                                : deRotationService.getAccurateness())
+                .noiseRobustness(
+                        deRotationService.getNoiseRobustness() == 0
+                                ? Constants.DEFAULT_DEROTATION_NOISE_ROBUSTNESS
+                                : deRotationService.getNoiseRobustness())
                 .anchorStrength(
                         deRotationService.getAnchorStrength() == 0
                                 ? Constants.DEFAULT_DEROTATION_ANCHOR_STRENGTH
                                 : deRotationService.getAnchorStrength())
+                .rootFolder(rootFolder)
                 .build();
     }
 
     @SneakyThrows
-    public void derotate(DeRotation deRotation) {
+    public void derotate(DeRotation deRotation, double scale, String openImageMode) {
         luckyStackWorkerContext.setStatus(Constants.STATUS_WORKING);
         var executor = Executors.newVirtualThreadPerTaskExecutor();
         CompletableFuture.runAsync(
                 () -> {
-                    String deRotatedImagePath = deRotationService.derotate(
-                            settingsService.getRootFolder(),
-                            deRotation.getReferenceImage(),
-                            deRotation.getImages(),
-                            deRotation.getAnchorStrength(),
-                            deRotation.getReferenceTime(),
-                            getParentFrame());
-                    if (deRotatedImagePath != null) {
-                        String profileName = LswFileUtil.deriveProfileFromImageName(deRotatedImagePath);
-                        Profile profile = profileService
-                                .findByName(profileName)
-                                .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
-                        openReferenceImage(
-                                deRotatedImagePath, profile, LswFileUtil.getObjectDateTime(deRotatedImagePath));
-                        luckyStackWorkerContext.setSelectedProfile(profile.getName());
+                    try {
+                        String deRotatedImagePath = deRotationService.derotate(
+                                settingsService.getRootFolder(),
+                                deRotation.getReferenceImage(),
+                                deRotation.getImages(),
+                                deRotation.getAnchorStrength(),
+                                deRotation.getNoiseRobustness(),
+                                deRotation.getAccurateness(),
+                                deRotation.getReferenceTime(),
+                                getParentFrame());
+                        if (deRotatedImagePath != null) {
+                            openImageAfterStacking(
+                                    deRotatedImagePath, settingsService.getRootFolder(), scale, openImageMode);
+                        }
+                    } finally {
+                        signalBatchFinished();
                     }
                 },
                 executor);
     }
 
-    public void stackImages() {
+    public void stackImages(Double scale, String openImageMode) {
         JFileChooser jfc =
                 getJFileChooser(settingsService.getRootFolder(), "Open images, use shift+click to select multiple");
         jfc.setMultiSelectionEnabled(true);
@@ -647,6 +679,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                         selectedImages.add(selectedFile.getAbsolutePath());
                     }
                 }
+                String rootFolder = LswFileUtil.getFileDirectory(selectedFiles[0].getAbsolutePath());
+                updateSettingsForRootFolder(rootFolder);
                 var executor = Executors.newVirtualThreadPerTaskExecutor();
                 CompletableFuture.runAsync(
                         () -> {
@@ -656,30 +690,52 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 createCleanDirectory(stackFolder);
                                 ImagePlus image = new Opener().openImage(selectedImages.getFirst());
                                 String stackedImagePath = stackService.stackImages(
-                                        stackFolder,
+                                        rootFolder,
                                         image.getWidth(),
                                         image.getHeight(),
                                         selectedImages.stream()
                                                 .map(LswFileUtil::getIJFileFormat)
                                                 .toList(),
-                                        getParentFrame());
-                                String profileName = LswFileUtil.deriveProfileFromImageName(stackedImagePath);
-                                Profile profile = profileService
-                                        .findByName(profileName)
-                                        .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
-                                openReferenceImage(stackedImagePath, profile, LocalDateTime.now());
+                                        getParentFrame(),
+                                        false);
+                                openImageAfterStacking(stackedImagePath, rootFolder, scale, openImageMode);
                             } catch (IOException e) {
                                 log.error("Error stacking images : ", e);
+                            } finally {
+                                signalBatchFinished();
                             }
                         },
                         executor);
             }
         } else {
-            luckyStackWorkerContext.setStatus(STATUS_IDLE);
-            luckyStackWorkerContext.setFilesProcessedCount(0);
-            luckyStackWorkerContext.setTotalFilesCount(0);
-            luckyStackWorkerContext.setProfileBeingApplied(false);
+            signalBatchFinished();
         }
+    }
+
+    private void signalBatchFinished() {
+        luckyStackWorkerContext.setStatus(STATUS_IDLE);
+        luckyStackWorkerContext.setFilesProcessedCount(0);
+        luckyStackWorkerContext.setTotalFilesCount(0);
+        luckyStackWorkerContext.setProfileBeingApplied(false);
+    }
+
+    private void openImageAfterStacking(String imagePath, String rootFolder, double scale, String openImageMode) {
+        luckyStackWorkerContext.setStatus("Stacking complete, now applying profile");
+        String profileName = LswFileUtil.deriveProfileFromImageName(imagePath);
+        String selectedProfile = luckyStackWorkerContext.getSelectedProfile();
+        if (profileName.equals(Constants.DEFAULT_PROFILE)
+                && selectedProfile != null
+                && !selectedProfile.equals(Constants.DEFAULT_PROFILE)) {
+            profileName = selectedProfile;
+        }
+        Profile profile = profileService
+                .findByName(profileName)
+                .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
+        LswImageProcessingUtil.setNonPersistentSettings(profile, scale, openImageMode, false);
+        if (settingsService.getSettings().isAutoApply()) {
+            profileService.updateProfile(new ProfileDTO(profile));
+        }
+        openReferenceImageAndUpdateSettings(imagePath, rootFolder, profile);
     }
 
     private boolean confirmOverwrite() {
@@ -806,7 +862,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
             log.info("Opened reference image image with id {}", displayedImage.getID());
 
-            updateProcessing(profile, emptyList());
+            if (settingsService.getSettings().isAutoApply()) {
+                updateProcessing(profile, emptyList());
+            }
         }
         return largeImage;
     }
@@ -816,6 +874,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         image.setBorderColor(Color.BLACK);
         image.show(imageMetadata.getFilePath());
         LswImageWindow window = (LswImageWindow) image.getWindow();
+        window.nightMode(settingsService.getSettings().isNightMode());
         window.setIconImage(iconImage);
         if (Constants.SYSTEM_PROFILE_MAC.equals(activeOSProfile)) {
             Taskbar.getTaskbar().setIconImage(iconImage);

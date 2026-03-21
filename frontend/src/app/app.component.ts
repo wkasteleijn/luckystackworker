@@ -134,7 +134,6 @@ export class AppComponent implements OnInit {
   workerProgress: number;
   workerBusy: boolean = false;
   refImageSelected: boolean = false;
-  nightMode: boolean = false;
   blinkClippedAreas: boolean = false;
   roi: boolean = false;
   didChangesWhileRoiEnabled: boolean = false;
@@ -194,6 +193,7 @@ export class AppComponent implements OnInit {
         next: (data) => {
           console.log('Successfully opened the image: ', data);
           this.roi = false;
+          this.rotationAngle = 0;
           if (data && data.profile) {
             this.refImageSelected = true;
             this.profile = data.profile;
@@ -203,9 +203,14 @@ export class AppComponent implements OnInit {
               data.settings.rootFolder,
             );
             this.zoomFactor = data.settings.zoomFactor;
-            this.psfImage = data.settings.psfImage;
-            this.checkLatestVersion();
-            this.updateProfileSettings();
+            if (data.psfImage) {
+              this.psfImage = data.psfImage.imageData;
+            }
+            if (this.settings.autoApply) {
+              this.updateProfileSettings();
+            } else {
+              this.resetToRaw();
+            }
           }
           this.hideSpinner();
           this.workerProgress = 0;
@@ -245,7 +250,7 @@ export class AppComponent implements OnInit {
     this.luckyStackWorkerService.applyProfileBatch(this.profile).subscribe(
       (data) => {
         console.log(data);
-        this.waitForWorker();
+        this.waitForWorker(false);
       },
       (error) => {
         console.log(error);
@@ -1480,6 +1485,9 @@ export class AppComponent implements OnInit {
       (data) => {
         if (data) {
           console.log(data);
+          if (data.psfImage) {
+            this.psfImage = data.psfImage.imageData;
+          }
           this.profile = data.profile;
           this.settings = data.settings;
           this.selectedProfile = this.profile.name;
@@ -1508,7 +1516,7 @@ export class AppComponent implements OnInit {
   psfSlidersChanged(event: any) {
     console.log('psfSlidersChanged called');
     this.profile.psf = Object.assign(new PSF(), event);
-    this.settings.operations = ['PSF'];
+    this.settings.operations = ['PSF', 'WIENER_DECONV'];
     this.updateProfile();
   }
 
@@ -1518,7 +1526,9 @@ export class AppComponent implements OnInit {
     this.luckyStackWorkerService.loadCustomPSF().subscribe(
       (data) => {
         if (data) {
-          this.psfImage = data.psfImage;
+          if (data.psfImage) {
+            this.psfImage = data.psfImage.imageData;
+          }
           this.profile.psf.type = 'CUSTOM';
         }
         this.hideSpinner();
@@ -1631,7 +1641,7 @@ export class AppComponent implements OnInit {
         (data) => {
           if (data) {
             if (data.psfImage) {
-              this.psfImage = data.psfImage?.imageData;
+              this.psfImage = data.psfImage.imageData;
             }
             this.profile = data.profile;
           }
@@ -1648,11 +1658,14 @@ export class AppComponent implements OnInit {
       );
   }
 
-  private waitForWorker() {
+  private waitForWorker(isDeRotationOrStacking: boolean) {
     this.getStatusUpdate();
     if (this.workerBusy && 'Idle' !== this.workerStatus) {
       console.log(this.workerStatus);
-      setTimeout(() => this.waitForWorker(), SERVICE_POLL_DELAY_MS);
+      setTimeout(
+        () => this.waitForWorker(isDeRotationOrStacking),
+        SERVICE_POLL_DELAY_MS,
+      );
     } else {
       console.log('Worker is done!');
       this.workerProgress = 100;
@@ -1662,7 +1675,38 @@ export class AppComponent implements OnInit {
         this.notificationText = 'Done!';
         this.isNotificationVisible = true;
       }
+      if (isDeRotationOrStacking) {
+        this.handleStackedResult();
+      }
     }
+  }
+
+  private handleStackedResult() {
+    this.luckyStackWorkerService.getSelectedProfile().subscribe({
+      next: (data) => {
+        console.log('Successfully stacked the images: ', data);
+        this.roi = false;
+        if (data && data.profile) {
+          this.refImageSelected = true;
+          this.rotationAngle = 0;
+          this.profile = data.profile;
+          this.settings = data.settings;
+          this.selectedProfile = this.profile.name;
+          this.rootFolder = this.getRootFolderCapped(data.settings.rootFolder);
+          this.zoomFactor = data.settings.zoomFactor;
+          if (data.psfImage) {
+            this.psfImage = data.psfImage.imageData;
+          }
+          this.updateProfileSettings();
+        }
+      },
+      error: (error) => {
+        console.log('Eror getting the selected profile and settings: ' + error);
+      },
+      complete: () => {
+        console.log('Request completed successfully');
+      },
+    });
   }
 
   private getStatusUpdate() {
@@ -1684,7 +1728,7 @@ export class AppComponent implements OnInit {
     return this.workerBusy && !this._showSpinner;
   }
 
-  openRefImageEnabled() {
+  isNotBusy() {
     return !this.workerBusy && !this._showSpinner;
   }
 
@@ -1742,13 +1786,17 @@ export class AppComponent implements OnInit {
   }
 
   nightModeEnabled(): boolean {
-    return this.nightMode;
+    return this.settings?.nightMode;
+  }
+
+  autoApplyEnabled(): boolean {
+    return this.settings?.autoApply;
   }
 
   nightModeChanged() {
     console.log('nightModeChanged called');
-    this.nightMode = !this.nightMode;
-    if (this.nightMode) {
+    this.settings.nightMode = !this.settings.nightMode;
+    if (this.settings.nightMode) {
       document.body.style.backgroundColor = '#000000';
       document.documentElement.style.setProperty('--lsw-tab-color', 'orange');
     } else {
@@ -1758,12 +1806,27 @@ export class AppComponent implements OnInit {
         'lightgreen',
       );
     }
-    this.luckyStackWorkerService.nightModeChanged(this.nightMode).subscribe(
-      (data) => {
-        console.log('Response');
-      },
-      (error) => console.log(error),
-    );
+    this.luckyStackWorkerService
+      .nightModeChanged(this.settings.nightMode)
+      .subscribe(
+        (data) => {
+          console.log('Response');
+        },
+        (error) => console.log(error),
+      );
+  }
+
+  autoApplyChanged() {
+    console.log('autoApplyChanged called');
+    this.settings.autoApply = !this.settings.autoApply;
+    this.luckyStackWorkerService
+      .autoApplyChanged(this.settings.autoApply)
+      .subscribe(
+        (data) => {
+          console.log('Response');
+        },
+        (error) => console.log(error),
+      );
   }
 
   blinkClippedAreasChanged() {
@@ -1834,7 +1897,9 @@ export class AppComponent implements OnInit {
   }
 
   colorTheme() {
-    return this.nightMode ? this.componentColorNight : this.componentColor;
+    return this.settings?.nightMode
+      ? this.componentColorNight
+      : this.componentColor;
   }
 
   dispersionIndicatorRedColor(): string {
@@ -1915,6 +1980,7 @@ export class AppComponent implements OnInit {
     dialogRef.afterClosed().subscribe((dialogResult) => {
       if (dialogResult) {
         this.resetToRaw();
+        this.updateProfile();
       }
     });
   }
@@ -1946,6 +2012,9 @@ export class AppComponent implements OnInit {
           console.log(data);
           this.deRotation = data;
           this.isDerotationPanelVisible = true;
+          this.rootFolder = this.rootFolder = this.getRootFolderCapped(
+            this.deRotation.rootFolder,
+          );
         }
         this.hideSpinner();
       },
@@ -1959,19 +2028,21 @@ export class AppComponent implements OnInit {
     this.workerStatus = 'Working';
     this.workerProgress = 0;
     this.workerBusy = true;
-    this.luckyStackWorkerService.startDeRotation(this.deRotation).subscribe(
-      (data) => {
-        console.log(data);
-        this.waitForWorker();
-      },
-      (error) => {
-        console.log(error);
-        this.isProgressPanelVisible = false;
-        this.notificationText = 'The following error occured: ' + error;
-        this.isNotificationVisible = true;
-        this.workerBusy = false;
-      },
-    );
+    this.luckyStackWorkerService
+      .startDeRotation(this.deRotation, Number(this.scale), this.openImageMode)
+      .subscribe(
+        (data) => {
+          console.log(data);
+          this.waitForWorker(true);
+        },
+        (error) => {
+          console.log(error);
+          this.isProgressPanelVisible = false;
+          this.notificationText = 'The following error occured: ' + error;
+          this.isNotificationVisible = true;
+          this.workerBusy = false;
+        },
+      );
   }
 
   hideDeRotationPanel() {
@@ -1982,8 +2053,10 @@ export class AppComponent implements OnInit {
     this.isNotificationVisible = false;
   }
 
-  hideSplash() {
+  hideSplash(event: any) {
     this.isSplashPanelVisible = false;
+    this.settings = event;
+    this.checkLatestVersion();
   }
 
   stackImages() {
@@ -1991,19 +2064,21 @@ export class AppComponent implements OnInit {
     this.workerStatus = 'Working';
     this.workerProgress = 0;
     this.workerBusy = true;
-    this.luckyStackWorkerService.stack().subscribe(
-      (data) => {
-        console.log(data);
-        this.waitForWorker();
-      },
-      (error) => {
-        console.log(error);
-        this.isProgressPanelVisible = false;
-        this.notificationText = 'The following error occured: ' + error;
-        this.isNotificationVisible = true;
-        this.workerBusy = false;
-      },
-    );
+    this.luckyStackWorkerService
+      .stack(Number(this.scale), this.openImageMode)
+      .subscribe(
+        (data) => {
+          console.log(data);
+          this.waitForWorker(true);
+        },
+        (error) => {
+          console.log(error);
+          this.isProgressPanelVisible = false;
+          this.notificationText = 'The following error occured: ' + error;
+          this.isNotificationVisible = true;
+          this.workerBusy = false;
+        },
+      );
   }
 
   private setSharpenOperationForDeringing() {
@@ -2117,7 +2192,6 @@ export class AppComponent implements OnInit {
     this.selectedProfile = this.profile.name;
     this.settings.operations = [];
     this.updateProfileSettings();
-    this.updateProfile();
   }
 
   private showSpinner() {

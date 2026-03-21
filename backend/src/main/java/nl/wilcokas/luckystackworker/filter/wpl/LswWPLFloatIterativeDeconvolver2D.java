@@ -1,9 +1,10 @@
 package nl.wilcokas.luckystackworker.filter.wpl;
 
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.convertToShort;
+
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D;
 import cern.jet.math.tfloat.FloatFunctions;
-import edu.emory.mathcs.restoretools.Enums.OutputType;
 import edu.emory.mathcs.restoretools.iterative.FloatCommon2D;
 import edu.emory.mathcs.restoretools.iterative.IterativeEnums.BoundaryType;
 import edu.emory.mathcs.restoretools.iterative.IterativeEnums.PaddingType;
@@ -182,7 +183,7 @@ public class LswWPLFloatIterativeDeconvolver2D {
      *
      * @return deconvolved image
      */
-    public ImagePlus deconvolve() throws ExecutionException, InterruptedException {
+    public short[] deconvolve() throws ExecutionException, InterruptedException {
         ((DenseFloatMatrix2D) PSF).dht2();
         FloatMatrix2D X;
         FloatMatrix2D AX = B.like();
@@ -215,7 +216,6 @@ public class LswWPLFloatIterativeDeconvolver2D {
         }
         ((DenseFloatMatrix2D) PSF).dht2();
         X = B.copy();
-        ImagePlus imX = null;
         FloatProcessor ip = new FloatProcessor(bColumns, bRows);
         for (int iter = 0; iter < iterations; iter++) {
             log.info("WPL iteration: " + (iter + 1) + "/" + iterations);
@@ -240,9 +240,13 @@ public class LswWPLFloatIterativeDeconvolver2D {
         } else {
             FloatCommon2D.assignPixelsToProcessorPadded(ip, X, bRows, bColumns, rOff, cOff, cmY, threshold);
         }
-        imX = new ImagePlus("(deblurred)", ip);
-        FloatCommon2D.convertImage(imX, OutputType.SHORT);
-        return imX;
+        float[] pixels = (float[]) ip.getPixels();
+        short[] shortPixels = new short[pixels.length];
+        for (int i = 0; i < pixels.length; i++) {
+            int intValue = Math.clamp((int) pixels[i], 0, 65535);
+            shortPixels[i] = convertToShort(intValue);
+        }
+        return shortPixels;
     }
 
     private void convolveFD(final int rows, final int columns, FloatMatrix2D H1, FloatMatrix2D H2, FloatMatrix2D Result)

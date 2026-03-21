@@ -74,7 +74,7 @@ public class PsfDiskGenerator {
 
         LswImageLayers layers =
                 getLswImageLayers(new short[][] {redPixels, greenPixels, bluePixels}, PSF_SIZE, PSF_SIZE);
-        ImagePlus image = LswImageProcessingUtil.create16BitRGBImage(null, layers, true, true, true);
+        ImagePlus image = LswImageProcessingUtil.create16BitRGBImage(null, layers);
         LswFileUtil.savePSF(image, profileName);
         return image;
     }

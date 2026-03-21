@@ -12,13 +12,14 @@ import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.dto.PSFImageDto;
 import nl.wilcokas.luckystackworker.exceptions.FilterException;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.model.Profile;
@@ -361,32 +362,10 @@ public class LswImageProcessingUtil {
         }
     }
 
-    public static ImagePlus create16BitRGBImage(
-            String filepath,
-            LswImageLayers unprocessedImageLayers,
-            boolean includeRed,
-            boolean includeGreen,
-            boolean includeBlue) {
-        short[] redPixels;
-        short[] emptyPixels = new short[unprocessedImageLayers.getWidth() * unprocessedImageLayers.getHeight()];
-        Arrays.fill(emptyPixels, (short) 0);
-        if (includeRed) {
-            redPixels = unprocessedImageLayers.getLayers()[0];
-        } else {
-            redPixels = Arrays.copyOf(emptyPixels, emptyPixels.length);
-        }
-        short[] greenPixels;
-        if (includeGreen) {
-            greenPixels = unprocessedImageLayers.getLayers()[1];
-        } else {
-            greenPixels = Arrays.copyOf(emptyPixels, emptyPixels.length);
-        }
-        short[] bluePixels;
-        if (includeBlue) {
-            bluePixels = unprocessedImageLayers.getLayers()[2];
-        } else {
-            bluePixels = Arrays.copyOf(emptyPixels, emptyPixels.length);
-        }
+    public static ImagePlus create16BitRGBImage(String filepath, LswImageLayers unprocessedImageLayers) {
+        short[] redPixels = unprocessedImageLayers.getLayers()[0];
+        short[] greenPixels = unprocessedImageLayers.getLayers()[1];
+        short[] bluePixels = unprocessedImageLayers.getLayers()[2];
 
         ImageStack stack = new ImageStack(unprocessedImageLayers.getWidth(), unprocessedImageLayers.getHeight());
         stack.addSlice("Red", redPixels);
@@ -395,12 +374,10 @@ public class LswImageProcessingUtil {
 
         ImagePlus imp = new ImagePlus(filepath, stack);
         imp.setDimensions(3, 1, 1);
-        // imp.setFileInfo(fi);
         int mode = IJ.COMPOSITE;
         imp = new CompositeImage(imp, mode);
         for (int c = 1; c <= 3; c++) {
             imp.setPosition(c, 1, 1);
-            // imp.setDisplayRange(minValue, maxValue);
         }
         imp.setPosition(1, 1, 1);
         return imp;
@@ -437,7 +414,7 @@ public class LswImageProcessingUtil {
             }
         }
         LswImageLayers layersDto = getLswImageLayers(pixels, width, height);
-        return create16BitRGBImage("psf", layersDto, true, true, true);
+        return create16BitRGBImage("psf", layersDto);
     }
 
     public static ImagePlus crop(ImagePlus image, Roi roi, String filepath) {
@@ -481,7 +458,7 @@ public class LswImageProcessingUtil {
             throw new FilterException(e.getMessage());
         }
 
-        return create16BitRGBImage(filepath, getLswImageLayers(newPixels, width, height), true, true, true);
+        return create16BitRGBImage(filepath, getLswImageLayers(newPixels, width, height));
     }
 
     public static LswImageLayers getLswImageLayers(short[][] pixels, int width, int height) {
@@ -558,6 +535,22 @@ public class LswImageProcessingUtil {
         return sum / pixels.length;
     }
 
+    public static float getAveragePixelValue(FloatProcessor p) {
+        float sum = 0;
+        float[] pixels = (float[]) p.getPixels();
+        for (float pixel : pixels) {
+            sum += pixel;
+        }
+        return sum / pixels.length;
+    }
+
+    public static void normalizeImage(FloatProcessor fp, float averageValueIn, float averageValueOut) {
+        float[] pixels = (float[]) fp.getPixels();
+        for (int i = 0; i < pixels.length; i++) {
+            pixels[i] *= (averageValueIn / averageValueOut);
+        }
+    }
+
     public static int[][] get16BitRGBHistogram(ImagePlus imp, int size) {
         int[][] histograms = new int[3][size];
         final int maxValue = 65536; // 16-bit max value + 1
@@ -613,5 +606,15 @@ public class LswImageProcessingUtil {
 
     public static int getLuminanceValue(int r, int g, int b) {
         return (int) (0.299 * r + 0.587 * g + 0.114 * b);
+    }
+
+    public static PSFImageDto getPSFImageDto(byte[] psfImage) {
+        PSFImageDto psfImageDto = null;
+        if (psfImage != null) {
+            psfImageDto = PSFImageDto.builder()
+                    .imageData(Base64.getEncoder().encodeToString(psfImage))
+                    .build();
+        }
+        return psfImageDto;
     }
 }

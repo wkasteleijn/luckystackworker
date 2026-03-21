@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "nl.wilcokas"
-version = "7.0.0"
+version = "7.1.0"
 description = "LuckyStackWorker"
 
 java {
@@ -38,6 +38,7 @@ repositories {
 dependencies {
     implementation(libs.org.springframework.boot.spring.boot.starter)
     implementation(libs.org.springframework.boot.spring.boot.starter.web)
+    implementation(libs.org.apache.httpcomponents.core5.httpcore5)
     implementation(libs.commons.io.commons.io)
     implementation(libs.org.apache.velocity.velocity.engine.core)
     implementation(libs.org.apache.commons.commons.text)

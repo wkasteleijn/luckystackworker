@@ -7,6 +7,8 @@ import javax.swing.JOptionPane
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext
 import nl.wilcokas.luckystackworker.constants.Constants.STATUS_IDLE
 import nl.wilcokas.luckystackworker.exceptions.BatchStoppedException
+import nl.wilcokas.luckystackworker.model.ImageOutputFormatType
+import nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF
 import nl.wilcokas.luckystackworker.service.bean.LswImageLayers
 import nl.wilcokas.luckystackworker.util.LswFileUtil
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil
@@ -19,11 +21,12 @@ class StackService(private val luckyStackWorkerContext: LuckyStackWorkerContext)
   private val log by logger()
 
   fun stackImages(
-      workFolder: String,
+      rootFolder: String,
       width: Int,
       height: Int,
       imagesFilePaths: List<String>,
       parentFrame: JFrame?,
+      isDerotation: Boolean,
   ): String {
     try {
       luckyStackWorkerContext.totalFilesCount = imagesFilePaths.size
@@ -63,17 +66,21 @@ class StackService(private val luckyStackWorkerContext: LuckyStackWorkerContext)
       val layers = arrayOf(redPixelsAverages, greenPixelsAverages, bluePixelsAverages)
       val lswImageLayers = LswImageLayers(width, height, layers)
       val referenceImageFilename = LswFileUtil.getFilenameFromPath(imagesFilePaths[0])
+      val postfix = "LSW_" + (if (isDerotation) "DRTD" else "STACK")
+      val stackedImagePathRootFolder =
+          "${rootFolder}/${LswFileUtil.getPathWithoutExtension(referenceImageFilename)}_${postfix}.tif"
       val stackedImage =
-          LswImageProcessingUtil.create16BitRGBImage(
-              "${workFolder}/STACK_${referenceImageFilename}",
-              lswImageLayers,
-              true,
-              true,
-              true,
-          )
-      val stackedImagePath = "${workFolder}/STACK_${referenceImageFilename}"
-      LswFileUtil.saveImage(stackedImage, null, stackedImagePath, true, false, false, false)
-      return stackedImagePath
+          LswImageProcessingUtil.create16BitRGBImage(stackedImagePathRootFolder, lswImageLayers)
+      LswFileUtil.saveImage(
+          stackedImage,
+          null,
+          stackedImagePathRootFolder,
+          true,
+          false,
+          TIF,
+          false,
+      )
+      return stackedImagePathRootFolder
     } finally {
       luckyStackWorkerContext.status = STATUS_IDLE
       luckyStackWorkerContext.filesProcessedCount = 0

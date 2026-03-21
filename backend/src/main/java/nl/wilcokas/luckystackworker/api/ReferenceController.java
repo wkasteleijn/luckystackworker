@@ -1,10 +1,5 @@
 package nl.wilcokas.luckystackworker.api;
 
-import java.io.File;
-import java.io.IOException;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
@@ -16,6 +11,7 @@ import nl.wilcokas.luckystackworker.dto.SettingsDTO;
 import nl.wilcokas.luckystackworker.exceptions.LswNotReadyException;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.model.DeRotation;
+import nl.wilcokas.luckystackworker.model.ImageOutputFormatType;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
@@ -29,6 +25,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
+import java.io.IOException;
 
 @CrossOrigin(origins = {"http://localhost:4200", "https://www.wilcokas.com"})
 @RestController
@@ -69,7 +70,7 @@ public class ReferenceController {
         JFrame frame = referenceImageService.getParentFrame();
         JFileChooser jfc = referenceImageService.getJFileChooser(
                 settingsService.getRootFolder(), "Specify location and file name");
-        jfc.setFileFilter(new FileNameExtensionFilter("TIFF, JPG", "tif", "tiff", "jpg", "jpeg"));
+        jfc.setFileFilter(new FileNameExtensionFilter("TIFF, JPG, PNG", "tif", "tiff", "jpg", "jpeg", "png"));
         String fileNameNoExt = LswFileUtil.getFilename(referenceImageService.getFilePath());
         jfc.setSelectedFile(
                 new File(fileNameNoExt + Constants.OUTPUT_POSTFIX_SAVE + "." + Constants.DEFAULT_OUTPUT_FORMAT));
@@ -79,7 +80,7 @@ public class ReferenceController {
             File selectedFile = jfc.getSelectedFile();
             profileRepository.updateProfile(profileDTO);
             referenceImageService.saveReferenceImage(
-                    selectedFile.getAbsolutePath(), asJpeg(selectedFile), new Profile(profileDTO));
+                    selectedFile.getAbsolutePath(), getImageOutputFormat(selectedFile), new Profile(profileDTO));
         }
     }
 
@@ -160,18 +161,23 @@ public class ReferenceController {
     }
 
     @PutMapping("/derotate")
-    public void deRotate(@RequestBody DeRotationDTO deRotationDTO) {
-        referenceImageService.derotate(new DeRotation(deRotationDTO));
+    public void deRotate(
+            @RequestBody DeRotationDTO deRotationDTO, @RequestParam double scale, @RequestParam String openImageMode) {
+        referenceImageService.derotate(new DeRotation(deRotationDTO), scale, openImageMode);
     }
 
     @PutMapping("/stack")
-    public void stack() {
-        referenceImageService.stackImages();
+    public void stack(@RequestParam double scale, @RequestParam String openImageMode) {
+        referenceImageService.stackImages(scale, openImageMode);
     }
 
-    private boolean asJpeg(File selectedFile) {
+    private ImageOutputFormatType getImageOutputFormat(File selectedFile) {
         String fileExtension = LswFileUtil.getFilenameExtension(selectedFile).toLowerCase();
-        return "jpg".equals(fileExtension) || "jpeg".equals(fileExtension);
+        return switch (fileExtension) {
+            case "jpg" -> ImageOutputFormatType.JPG;
+            case "png" -> ImageOutputFormatType.PNG;
+            default -> ImageOutputFormatType.TIF;
+        };
     }
 
     @PutMapping("/blink-clipped")

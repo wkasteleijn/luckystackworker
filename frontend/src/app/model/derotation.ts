@@ -4,4 +4,5 @@ export class DeRotation {
   noiseRobustness: number;
   anchorStrength: number;
   accurateness: number;
+  rootFolder: string;
 }

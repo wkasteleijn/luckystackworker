@@ -6,6 +6,8 @@ import java.util.function.UnaryOperator
 import kotlin.math.roundToInt
 import nl.wilcokas.luckystackworker.model.ChannelEnum
 import nl.wilcokas.luckystackworker.model.ChannelEnum.*
+import nl.wilcokas.luckystackworker.model.ImageOutputFormatType
+import nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF
 import nl.wilcokas.luckystackworker.model.Profile
 import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum
 import nl.wilcokas.luckystackworker.util.LswFileUtil
@@ -166,7 +168,7 @@ class DispersionCorrectionFilter : LSWFilter {
   ): String {
     val sourceImagePath = "${alignmentWorkFolder}/C${channel.name}.tif"
     val sourceImage = ImagePlus("Layer ${channel.name}", ip)
-    LswFileUtil.saveImage(sourceImage, null, sourceImagePath, false, false, false, false)
+    LswFileUtil.saveImage(sourceImage, null, sourceImagePath, false, false, TIF, false)
     return sourceImagePath
   }
 }
@@ -189,7 +191,7 @@ fun main(args: Array<String>) {
 
     DispersionCorrectionFilter().determineCorrectionAutomatically(image, Profile())
 
-    LswFileUtil.saveImage(image, null, args[1], false, false, false, false)
+    LswFileUtil.saveImage(image, null, args[1], false, false, TIF, false)
   } catch (e: Exception) {
     e.printStackTrace()
   }

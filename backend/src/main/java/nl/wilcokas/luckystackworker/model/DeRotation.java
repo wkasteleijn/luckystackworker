@@ -18,6 +18,8 @@ public class DeRotation {
     private String referenceImage;
     private LocalDateTime referenceTime;
     private int anchorStrength;
+    private int accurateness;
+    private String rootFolder;
 
     public DeRotation(DeRotationDTO deRotation) {
         mapFromDTO(deRotation);
