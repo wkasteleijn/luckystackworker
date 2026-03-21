@@ -217,7 +217,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return psf;
     }
 
-    public void saveReferenceImage(String path, ImageOutputFormatType outputFormatType, Profile profile) throws IOException {
+    public void saveReferenceImage(String path, ImageOutputFormatType outputFormatType, Profile profile)
+            throws IOException {
         String pathNoExt = LswFileUtil.getPathWithoutExtension(path);
         String savePath = pathNoExt + "." + LswFileUtil.getOutputImageExtension(outputFormatType);
         log.info("Saving image to  {}", savePath);

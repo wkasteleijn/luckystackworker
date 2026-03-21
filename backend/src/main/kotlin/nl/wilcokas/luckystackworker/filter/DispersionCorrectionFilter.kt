@@ -6,7 +6,6 @@ import java.util.function.UnaryOperator
 import kotlin.math.roundToInt
 import nl.wilcokas.luckystackworker.model.ChannelEnum
 import nl.wilcokas.luckystackworker.model.ChannelEnum.*
-import nl.wilcokas.luckystackworker.model.ImageOutputFormatType
 import nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF
 import nl.wilcokas.luckystackworker.model.Profile
 import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum

@@ -1,7 +1,6 @@
 package nl.wilcokas.luckystackworker.dto;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +20,6 @@ public class DeRotationDTO {
     private int anchorStrength;
     private int noiseRobustness;
     private int accurateness;
-
 
     public DeRotationDTO(DeRotation deRotation) {
         this.images = deRotation.getImages();

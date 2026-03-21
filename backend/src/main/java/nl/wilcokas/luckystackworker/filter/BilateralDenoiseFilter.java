@@ -1,5 +1,7 @@
 package nl.wilcokas.luckystackworker.filter;
 
+import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF;
+
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.process.ShortProcessor;
@@ -9,15 +11,12 @@ import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.exceptions.FilterException;
-import nl.wilcokas.luckystackworker.model.ImageOutputFormatType;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
 import org.springframework.stereotype.Component;
-
-import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF;
 
 @Slf4j
 @Component
