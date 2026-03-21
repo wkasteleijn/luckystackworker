@@ -132,12 +132,14 @@ class DeRotationService(
                 log.info("Stacking images")
                 val width = if (referenceImage == null) null else referenceImage.width
                 val height = if (referenceImage == null) null else referenceImage.height
+                val referenceImagesToStack =
+                    if (referenceTime == null) listOf("${rootFolder}/${referenceImageFilenameParam}") else emptyList()
                 val resultFilePath =
                     stackService.stackImages(
                         rootFolder,
                         width,
                         height,
-                        listOf("${rootFolder}/${referenceImageFilenameParam}") +
+                        referenceImagesToStack +
                                 allImagesFilenames
                                     .filterNot { it == referenceImageFilenameParam }
                                     .map { f -> "${derotationWorkFolder}/D_${f}" }
