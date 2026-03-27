@@ -20,6 +20,7 @@ turboreg = "2.0.1-SNAPSHOT"
 kotlin = "2.3.10"
 ktfmt = "0.61"
 httpcore5 = "5.4.1"
+darklaf = "3.1.0"
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
@@ -49,3 +50,4 @@ sc-fiji-turboreg = { module = "sc.fiji:TurboReg_", version.ref = "turboreg" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 org-apache-httpcomponents-core5-httpcore5 = { module = "org.apache.httpcomponents.core5:httpcore5", version.ref = "httpcore5" }
+com-github-weisj-darklaf-core = { module="com.github.weisj:darklaf-core" , version.ref = "darklaf" }

@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.sc.fiji.turboreg)
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.reflect)
+    implementation(libs.com.github.weisj.darklaf.core)
 
     compileOnly(libs.org.projectlombok.lombok)
     annotationProcessor(libs.org.projectlombok.lombok)
