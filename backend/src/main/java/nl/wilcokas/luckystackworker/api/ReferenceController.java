@@ -156,7 +156,7 @@ public class ReferenceController {
     }
 
     @GetMapping("/open-for-derotation")
-    public DeRotationDTO openDeRotationImages() {
+    public DeRotationDTO openDeRotationImages() throws IOException  {
         return new DeRotationDTO(referenceImageService.selectDerotationImages());
     }
 

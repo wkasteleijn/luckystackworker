@@ -27,8 +27,12 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +40,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -68,6 +73,7 @@ import nl.wilcokas.luckystackworker.service.bean.GithubRelease;
 import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
 import nl.wilcokas.luckystackworker.service.client.GithubClientService;
 import nl.wilcokas.luckystackworker.util.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
@@ -217,7 +223,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         return psf;
     }
 
-    public void saveReferenceImage(String path, ImageOutputFormatType outputFormatType, Profile profile) throws IOException {
+    public void saveReferenceImage(String path, ImageOutputFormatType outputFormatType, Profile profile)
+            throws IOException {
         String pathNoExt = LswFileUtil.getPathWithoutExtension(path);
         String savePath = pathNoExt + "." + LswFileUtil.getOutputImageExtension(outputFormatType);
         log.info("Saving image to  {}", savePath);
@@ -592,16 +599,18 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
     }
 
-    public DeRotation selectDerotationImages() {
-        JFileChooser jfc =
-                getJFileChooser(settingsService.getRootFolder(), "Open images, use shift+click to select multiple");
+    public DeRotation selectDerotationImages() throws IOException {
+        String rootFolder = settingsService.getSettings().getRootFolder();
+        JFileChooser jfc = getJFileChooser(rootFolder, "Open images, use shift+click to select multiple");
         jfc.setMultiSelectionEnabled(true);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
         jfc.setFileFilter(filter);
         JFrame frame = getParentFrame();
         List<String> selectedImages = new ArrayList<>();
+        List<String> earlierSelectedImages = readLatestDerotationFile(rootFolder);
+        jfc.setCurrentDirectory(new File(rootFolder));
+        jfc.setSelectedFiles(earlierSelectedImages.stream().map(File::new).toArray(File[]::new));
         int returnValue = getFilenameFromDialog(frame, jfc, false);
-        String rootFolder = settingsService.getSettings().getRootFolder();
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File[] selectedFiles = jfc.getSelectedFiles();
             if (selectedFiles.length > 0) {
@@ -616,6 +625,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             }
         }
         selectedImages.sort(Comparator.naturalOrder());
+        if (!selectedImages.isEmpty()) {
+            writeDerotationFile(rootFolder, selectedImages);
+        }
         return DeRotation.builder()
                 .images(selectedImages)
                 .accurateness(
@@ -632,6 +644,33 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 : deRotationService.getAnchorStrength())
                 .rootFolder(rootFolder)
                 .build();
+    }
+
+    private void writeDerotationFile(String rootFolder, List<String> selectedImages) throws IOException {
+        String selectedProfile = luckyStackWorkerContext.getSelectedProfile();
+        if (selectedProfile == null) {
+            selectedProfile = Constants.DEFAULT_PROFILE;
+        }
+        Files.writeString(
+                Paths.get(rootFolder + "/%s_LSW_DRTD.txt".formatted(selectedProfile)),
+                selectedImages.stream().map(String::trim).collect(Collectors.joining("\n")));
+    }
+
+    private List<String> readLatestDerotationFile(String rootFolder) throws IOException {
+        Collection<File> files = FileUtils.listFiles(
+                Paths.get(rootFolder).toFile(), List.of("txt").toArray(String[]::new), false);
+        Optional<File> latestFile = files.stream().max(Comparator.comparingLong(File::lastModified));
+        if (latestFile.isPresent()) {
+            Path path = latestFile.get().toPath();
+            if (Files.exists(path)) {
+                return Files.readAllLines(path).stream()
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .map(s-> rootFolder+"/"+s)
+                        .toList();
+            }
+        }
+        return emptyList();
     }
 
     @SneakyThrows
