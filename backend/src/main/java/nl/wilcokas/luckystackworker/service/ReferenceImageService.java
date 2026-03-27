@@ -410,11 +410,14 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, boolean isSaveDialog) {
-        return getFilenameFromDialog(frame, jfc, null, isSaveDialog);
+        return getFilenameFromDialog(frame, jfc, null, null, isSaveDialog);
     }
 
-    public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, String title, boolean isSaveDialog) {
+    public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, String title, List<String> preSelectedFiles, boolean isSaveDialog) {
         LswUtil.delayMacOS();
+        if (preSelectedFiles != null) {
+            jfc.setSelectedFiles(preSelectedFiles.stream().map(File::new).toArray(File[]::new));
+        }
         int returnValue = 0;
         if (isSaveDialog) {
             boolean confirmed = false;
@@ -609,8 +612,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         List<String> selectedImages = new ArrayList<>();
         List<String> earlierSelectedImages = readLatestDerotationFile(rootFolder);
         jfc.setCurrentDirectory(new File(rootFolder));
-        jfc.setSelectedFiles(earlierSelectedImages.stream().map(File::new).toArray(File[]::new));
-        int returnValue = getFilenameFromDialog(frame, jfc, false);
+        int returnValue = getFilenameFromDialog(frame, jfc,null, earlierSelectedImages, false);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File[] selectedFiles = jfc.getSelectedFiles();
             if (selectedFiles.length > 0) {

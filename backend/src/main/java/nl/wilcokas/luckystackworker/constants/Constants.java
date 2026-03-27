@@ -1,10 +1,11 @@
 package nl.wilcokas.luckystackworker.constants;
 
+import java.awt.*;
 import java.math.BigDecimal;
 
 public class Constants {
 
-    private Constants() {}
+    public Constants() {}
 
     public static final String OUTPUT_POSTFIX = "_LSW";
     public static final String OUTPUT_POSTFIX_SAVE = "_REF";
@@ -55,4 +56,10 @@ public class Constants {
     public static final int DEFAULT_DEROTATION_NOISE_ROBUSTNESS = 4;
     public static final int DEFAULT_DEROTATION_ANCHOR_STRENGTH = 3;
     public static final String DEFAULT_PROFILE = "unspecified";
+
+    public static final Color TITLEBAR_COLOR = new Color(32, 32, 32);
+    public static final Color TITLE_COLOR = new Color(101, 100, 99);
+    public static final Color BORDER_COLOR = new Color(64, 64, 64);
+    public static final Color BACKGROUND_COLOR = new Color(25, 25, 25);
+    
 }
