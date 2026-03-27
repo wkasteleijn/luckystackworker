@@ -1644,6 +1644,8 @@ export class AppComponent implements OnInit {
               this.psfImage = data.psfImage.imageData;
             }
             this.profile = data.profile;
+            this.profile.applySharpenToChannel = this.applySharpenToChannel;
+            this.profile.applyDenoiseToChannel = this.applyDenoiseToChannel;
           }
           if (this.slowProcessing) {
             this.hideSpinner();
