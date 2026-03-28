@@ -46,7 +46,6 @@ export class Profile {
   wienerIterationsBlue: number;
 
   sharpenMode: string;
-  applySharpenToChannel: string;
   applyUnsharpMask: boolean;
   applyWienerDeconvolution: boolean;
 
@@ -106,8 +105,6 @@ export class Profile {
   denoise2RadiusBlue: number;
   denoise2IterationsBlue: number;
 
-  applyDenoiseToChannel: string;
-
   // light & contrast
   gamma: number;
   contrast: number;
@@ -139,6 +136,7 @@ export class Profile {
   saveScale: number;
   saveDimensionX: number;
   saveDimensionY: number;
+  applyToChannel: string;
 
   psf: PSF;
 }

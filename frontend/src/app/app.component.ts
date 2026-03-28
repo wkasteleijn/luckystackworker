@@ -151,8 +151,6 @@ export class AppComponent implements OnInit {
   rotationAngle: number = 0;
   openImageMode: string = 'RGB';
   visibleChannel: string = 'RGB';
-  applySharpenToChannel: string = 'RGB';
-  applyDenoiseToChannel: string = 'RGB';
   isPsfPanelVisible: boolean = false;
   isRotationPanelVisible: boolean = false;
   isSaveScaledPanelVisible: boolean = false;
@@ -308,7 +306,7 @@ export class AppComponent implements OnInit {
   }
 
   wienerIterationsChanged(event: any, update: boolean) {
-    switch (this.applySharpenToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.wienerIterationsGreen = event.value;
         break;
@@ -410,7 +408,7 @@ export class AppComponent implements OnInit {
   }
 
   radiusChanged(event: any, update: boolean) {
-    switch (this.applySharpenToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.radiusGreen = event.value;
         break;
@@ -435,7 +433,7 @@ export class AppComponent implements OnInit {
   }
 
   amountChanged(event: any, update: boolean) {
-    switch (this.applySharpenToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.amountGreen = event.value;
         break;
@@ -460,7 +458,7 @@ export class AppComponent implements OnInit {
   }
 
   iterationsChanged(event: any, update: boolean) {
-    switch (this.applySharpenToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.iterationsGreen = event.value;
         break;
@@ -485,7 +483,7 @@ export class AppComponent implements OnInit {
   }
 
   blendRawChanged(event: any, update: boolean) {
-    switch (this.applySharpenToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.blendRawGreen = event.value;
         break;
@@ -510,7 +508,7 @@ export class AppComponent implements OnInit {
   }
 
   clippingStrengthChanged(event: any, update: boolean) {
-    switch (this.applySharpenToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.clippingStrengthGreen = event.value;
         break;
@@ -535,7 +533,7 @@ export class AppComponent implements OnInit {
   }
 
   clippingRangeChanged(event: any, update: boolean) {
-    switch (this.applySharpenToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.clippingRangeGreen = event.value;
         break;
@@ -560,7 +558,7 @@ export class AppComponent implements OnInit {
   }
 
   deringRadiusChanged(event: any, update: boolean) {
-    switch (this.applySharpenToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.deringRadiusGreen = event.value;
         break;
@@ -585,7 +583,7 @@ export class AppComponent implements OnInit {
   }
 
   deringStrengthChanged(event: any, update: boolean) {
-    switch (this.applySharpenToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.deringStrengthGreen = event.value;
         break;
@@ -688,129 +686,9 @@ export class AppComponent implements OnInit {
     this.updateProfile();
   }
 
-  applySharpenToChannelChanged(event: any) {
-    console.log('applySharpenToChannelChanged called: ' + event.value);
-    this.settings.operations = ['SHARPEN'];
-    this.profile.applySharpenToChannel = this.applySharpenToChannel;
-    switch (this.applySharpenToChannel) {
-      case 'G':
-        this.radius = this.profile.radiusGreen;
-        this.amount = this.profile.amountGreen;
-        this.iterations = this.profile.iterationsGreen;
-        this.blendRaw = this.profile.blendRawGreen;
-        this.clippingStrength = this.profile.clippingStrengthGreen;
-        this.clippingRange = this.profile.clippingRangeGreen;
-        this.deringRadius = this.profile.deringRadiusGreen;
-        this.deringStrength = this.profile.deringStrengthGreen;
-        this.wienerIterations = this.profile.wienerIterationsGreen;
-        break;
-      case 'B':
-        this.radius = this.profile.radiusBlue;
-        this.amount = this.profile.amountBlue;
-        this.iterations = this.profile.iterationsBlue;
-        this.blendRaw = this.profile.blendRawBlue;
-        this.clippingStrength = this.profile.clippingStrengthBlue;
-        this.clippingRange = this.profile.clippingRangeBlue;
-        this.deringRadius = this.profile.deringRadiusBlue;
-        this.deringStrength = this.profile.deringStrengthBlue;
-        this.wienerIterations = this.profile.wienerIterationsBlue;
-        break;
-      default:
-        this.radius = this.profile.radius;
-        this.amount = this.profile.amount;
-        this.iterations = this.profile.iterations;
-        this.blendRaw = this.profile.blendRaw;
-        this.clippingStrength = this.profile.clippingStrength;
-        this.clippingRange = this.profile.clippingRange;
-        this.deringRadius = this.profile.deringRadius;
-        this.deringStrength = this.profile.deringStrength;
-        this.wienerIterations = this.profile.wienerIterations;
-    }
-    this.visibleChannel = this.applySharpenToChannel;
-    this.luckyStackWorkerService.channelChanged(this.visibleChannel).subscribe(
-      (data) => {
-        console.log('Response');
-      },
-      (error) => console.log(error),
-    );
-  }
-
-  applyDenoiseToChannelChanged(event: any) {
-    console.log('applyDenoiseToChannelChanged called: ' + event.value);
-    this.settings.operations = ['SIGMA_DENOISE_1'];
-    this.profile.applyDenoiseToChannel = this.applyDenoiseToChannel;
-    switch (this.applyDenoiseToChannel) {
-      case 'G':
-        this.denoise1Amount = this.profile.denoise1AmountGreen;
-        this.denoise1Radius = this.profile.denoise1RadiusGreen;
-        this.denoise1Iterations = this.profile.denoise1IterationsGreen;
-        this.savitzkyGolaySize = this.profile.savitzkyGolaySizeGreen
-          ? this.profile.savitzkyGolaySizeGreen.toString()
-          : '0';
-        this.savitzkyGolayAmount = this.profile.savitzkyGolayAmountGreen;
-        this.savitzkyGolayIterations =
-          this.profile.savitzkyGolayIterationsGreen;
-        this.denoise2Radius = this.profile.denoise2RadiusGreen;
-        this.denoise2Iterations = this.profile.denoise2IterationsGreen;
-        this.rofTheta = this.profile.rofThetaGreen;
-        this.rofIterations = this.profile.rofIterationsGreen;
-        this.bilateralSigmaColor = this.profile.bilateralSigmaColorGreen;
-        this.bilateralSigmaSpace = this.profile.bilateralSigmaSpaceGreen;
-        this.bilateralRadius = this.profile.bilateralRadiusGreen;
-        this.bilateralIterations = this.profile.bilateralIterationsGreen;
-
-        break;
-      case 'B':
-        this.denoise1Amount = this.profile.denoise1AmountBlue;
-        this.denoise1Radius = this.profile.denoise1RadiusBlue;
-        this.denoise1Iterations = this.profile.denoise1IterationsBlue;
-        this.savitzkyGolaySize = this.profile.savitzkyGolaySizeBlue
-          ? this.profile.savitzkyGolaySizeBlue.toString()
-          : '0';
-        this.savitzkyGolayAmount = this.profile.savitzkyGolayAmountBlue;
-        this.savitzkyGolayIterations = this.profile.savitzkyGolayIterationsBlue;
-        this.denoise2Radius = this.profile.denoise2RadiusBlue;
-        this.denoise2Iterations = this.profile.denoise2IterationsBlue;
-        this.rofTheta = this.profile.rofThetaBlue;
-        this.rofIterations = this.profile.rofIterationsBlue;
-        this.bilateralSigmaColor = this.profile.bilateralSigmaColorBlue;
-        this.bilateralSigmaSpace = this.profile.bilateralSigmaSpaceBlue;
-        this.bilateralRadius = this.profile.bilateralRadiusBlue;
-        this.bilateralIterations = this.profile.bilateralIterationsBlue;
-        break;
-      default:
-        this.denoiseAlgorithm1 = this.profile.denoiseAlgorithm1;
-        this.denoise1Amount = this.profile.denoise1Amount;
-        this.denoise1Radius = this.profile.denoise1Radius;
-        this.denoise1Iterations = this.profile.denoise1Iterations;
-        this.denoiseAlgorithm2 = this.profile.denoiseAlgorithm2;
-        this.savitzkyGolaySize = this.profile.savitzkyGolaySize
-          ? this.profile.savitzkyGolaySize.toString()
-          : '0';
-        this.savitzkyGolayAmount = this.profile.savitzkyGolayAmount;
-        this.savitzkyGolayIterations = this.profile.savitzkyGolayIterations;
-        this.denoise2Radius = this.profile.denoise2Radius;
-        this.denoise2Iterations = this.profile.denoise2Iterations;
-        this.rofTheta = this.profile.rofTheta;
-        this.rofIterations = this.profile.rofIterations;
-        this.rofIterations = this.profile.rofIterationsBlue;
-        this.bilateralSigmaColor = this.profile.bilateralSigmaColor;
-        this.bilateralSigmaSpace = this.profile.bilateralSigmaSpace;
-        this.bilateralRadius = this.profile.bilateralRadius;
-        this.bilateralIterations = this.profile.bilateralIterations;
-    }
-    this.visibleChannel = this.applyDenoiseToChannel;
-    this.luckyStackWorkerService.channelChanged(this.visibleChannel).subscribe(
-      (data) => {
-        console.log('Response');
-      },
-      (error) => console.log(error),
-    );
-  }
-
   denoise1AmountChanged(event: any, update: boolean) {
     this.denoise1Amount = event.value;
-    switch (this.applyDenoiseToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.denoise1AmountGreen = event.value;
         break;
@@ -836,7 +714,7 @@ export class AppComponent implements OnInit {
   denoise1RadiusChanged(event: any, update: boolean) {
     this.denoise1Radius = event.value;
     this.settings.operations = ['SIGMA_DENOISE_1'];
-    switch (this.applyDenoiseToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.denoise1RadiusGreen = event.value;
         break;
@@ -861,7 +739,7 @@ export class AppComponent implements OnInit {
   denoise1IterationsChanged(event: any, update: boolean) {
     this.denoise1Iterations = event.value;
     this.settings.operations = ['SIGMA_DENOISE_1'];
-    switch (this.applyDenoiseToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.denoise1IterationsGreen = event.value;
         break;
@@ -888,7 +766,7 @@ export class AppComponent implements OnInit {
   bilateralIterationsChanged(event: any, update: boolean) {
     this.bilateralIterations = event.value;
     this.settings.operations = ['BILATERAL_DENOISE'];
-    switch (this.applyDenoiseToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.bilateralIterationsGreen = event.value;
         break;
@@ -915,7 +793,7 @@ export class AppComponent implements OnInit {
   bilateralSigmaColorChanged(event: any, update: boolean) {
     this.bilateralSigmaColor = event.value;
     this.settings.operations = ['BILATERAL_DENOISE'];
-    switch (this.applyDenoiseToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.bilateralSigmaColorGreen = event.value;
         break;
@@ -942,7 +820,7 @@ export class AppComponent implements OnInit {
   bilateralRadiusChanged(event: any, update: boolean) {
     this.bilateralRadius = event.value;
     this.settings.operations = ['BILATERAL_DENOISE'];
-    switch (this.applyDenoiseToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.bilateralRadiusGreen = event.value;
         break;
@@ -970,7 +848,7 @@ export class AppComponent implements OnInit {
     this.denoise2Radius = event.value;
     this.settings.operations = ['SIGMA_DENOISE_2'];
     console.log('denoise2RadiusChanged called: ' + this.profile.denoise2Radius);
-    switch (this.applyDenoiseToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.denoise2RadiusGreen = event.value;
         break;
@@ -997,7 +875,7 @@ export class AppComponent implements OnInit {
     console.log(
       'denoise2IterationsChanged called: ' + this.profile.denoise2Iterations,
     );
-    switch (this.applyDenoiseToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.denoise2IterationsGreen = event.value;
         break;
@@ -1171,7 +1049,7 @@ export class AppComponent implements OnInit {
       'savitzkyGolayIterationsChanged called: ' +
         this.profile.savitzkyGolayIterations,
     );
-    switch (this.applyDenoiseToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.savitzkyGolayIterationsGreen = event.value;
         break;
@@ -1198,7 +1076,7 @@ export class AppComponent implements OnInit {
     console.log(
       'savitzkyGolayAmountChanged called: ' + this.profile.savitzkyGolayAmount,
     );
-    switch (this.applyDenoiseToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.savitzkyGolayAmountGreen = event.value;
         break;
@@ -1225,7 +1103,7 @@ export class AppComponent implements OnInit {
     console.log(
       'savitzkyGolaySizeChanged called: ' + this.profile.savitzkyGolaySize,
     );
-    switch (this.applyDenoiseToChannel) {
+    switch (this.visibleChannel) {
       case 'G':
         this.profile.savitzkyGolaySizeGreen = event.value;
         break;
@@ -1647,8 +1525,7 @@ export class AppComponent implements OnInit {
               this.psfImage = data.psfImage.imageData;
             }
             this.profile = data.profile;
-            this.profile.applySharpenToChannel = this.applySharpenToChannel;
-            this.profile.applyDenoiseToChannel = this.applyDenoiseToChannel;
+            this.profile.applyToChannel = this.visibleChannel;
           }
           if (this.slowProcessing) {
             this.hideSpinner();
@@ -1862,7 +1739,6 @@ export class AppComponent implements OnInit {
   }
 
   channelChanged() {
-    console.log('channel called');
     switch (this.visibleChannel) {
       case 'RGB':
         this.visibleChannel = 'R';
@@ -1879,6 +1755,104 @@ export class AppComponent implements OnInit {
       default:
         this.visibleChannel = 'RGB';
     }
+
+    this.profile.applyToChannel = this.visibleChannel;
+    switch (this.visibleChannel) {
+      case 'G':
+        this.radius = this.profile.radiusGreen;
+        this.amount = this.profile.amountGreen;
+        this.iterations = this.profile.iterationsGreen;
+        this.blendRaw = this.profile.blendRawGreen;
+        this.clippingStrength = this.profile.clippingStrengthGreen;
+        this.clippingRange = this.profile.clippingRangeGreen;
+        this.deringRadius = this.profile.deringRadiusGreen;
+        this.deringStrength = this.profile.deringStrengthGreen;
+        this.wienerIterations = this.profile.wienerIterationsGreen;
+        break;
+      case 'B':
+        this.radius = this.profile.radiusBlue;
+        this.amount = this.profile.amountBlue;
+        this.iterations = this.profile.iterationsBlue;
+        this.blendRaw = this.profile.blendRawBlue;
+        this.clippingStrength = this.profile.clippingStrengthBlue;
+        this.clippingRange = this.profile.clippingRangeBlue;
+        this.deringRadius = this.profile.deringRadiusBlue;
+        this.deringStrength = this.profile.deringStrengthBlue;
+        this.wienerIterations = this.profile.wienerIterationsBlue;
+        break;
+      default:
+        this.radius = this.profile.radius;
+        this.amount = this.profile.amount;
+        this.iterations = this.profile.iterations;
+        this.blendRaw = this.profile.blendRaw;
+        this.clippingStrength = this.profile.clippingStrength;
+        this.clippingRange = this.profile.clippingRange;
+        this.deringRadius = this.profile.deringRadius;
+        this.deringStrength = this.profile.deringStrength;
+        this.wienerIterations = this.profile.wienerIterations;
+    }
+
+    switch (this.visibleChannel) {
+      case 'G':
+        this.denoise1Amount = this.profile.denoise1AmountGreen;
+        this.denoise1Radius = this.profile.denoise1RadiusGreen;
+        this.denoise1Iterations = this.profile.denoise1IterationsGreen;
+        this.savitzkyGolaySize = this.profile.savitzkyGolaySizeGreen
+          ? this.profile.savitzkyGolaySizeGreen.toString()
+          : '0';
+        this.savitzkyGolayAmount = this.profile.savitzkyGolayAmountGreen;
+        this.savitzkyGolayIterations =
+          this.profile.savitzkyGolayIterationsGreen;
+        this.denoise2Radius = this.profile.denoise2RadiusGreen;
+        this.denoise2Iterations = this.profile.denoise2IterationsGreen;
+        this.rofTheta = this.profile.rofThetaGreen;
+        this.rofIterations = this.profile.rofIterationsGreen;
+        this.bilateralSigmaColor = this.profile.bilateralSigmaColorGreen;
+        this.bilateralSigmaSpace = this.profile.bilateralSigmaSpaceGreen;
+        this.bilateralRadius = this.profile.bilateralRadiusGreen;
+        this.bilateralIterations = this.profile.bilateralIterationsGreen;
+
+        break;
+      case 'B':
+        this.denoise1Amount = this.profile.denoise1AmountBlue;
+        this.denoise1Radius = this.profile.denoise1RadiusBlue;
+        this.denoise1Iterations = this.profile.denoise1IterationsBlue;
+        this.savitzkyGolaySize = this.profile.savitzkyGolaySizeBlue
+          ? this.profile.savitzkyGolaySizeBlue.toString()
+          : '0';
+        this.savitzkyGolayAmount = this.profile.savitzkyGolayAmountBlue;
+        this.savitzkyGolayIterations = this.profile.savitzkyGolayIterationsBlue;
+        this.denoise2Radius = this.profile.denoise2RadiusBlue;
+        this.denoise2Iterations = this.profile.denoise2IterationsBlue;
+        this.rofTheta = this.profile.rofThetaBlue;
+        this.rofIterations = this.profile.rofIterationsBlue;
+        this.bilateralSigmaColor = this.profile.bilateralSigmaColorBlue;
+        this.bilateralSigmaSpace = this.profile.bilateralSigmaSpaceBlue;
+        this.bilateralRadius = this.profile.bilateralRadiusBlue;
+        this.bilateralIterations = this.profile.bilateralIterationsBlue;
+        break;
+      default:
+        this.denoiseAlgorithm1 = this.profile.denoiseAlgorithm1;
+        this.denoise1Amount = this.profile.denoise1Amount;
+        this.denoise1Radius = this.profile.denoise1Radius;
+        this.denoise1Iterations = this.profile.denoise1Iterations;
+        this.denoiseAlgorithm2 = this.profile.denoiseAlgorithm2;
+        this.savitzkyGolaySize = this.profile.savitzkyGolaySize
+          ? this.profile.savitzkyGolaySize.toString()
+          : '0';
+        this.savitzkyGolayAmount = this.profile.savitzkyGolayAmount;
+        this.savitzkyGolayIterations = this.profile.savitzkyGolayIterations;
+        this.denoise2Radius = this.profile.denoise2Radius;
+        this.denoise2Iterations = this.profile.denoise2Iterations;
+        this.rofTheta = this.profile.rofTheta;
+        this.rofIterations = this.profile.rofIterations;
+        this.rofIterations = this.profile.rofIterationsBlue;
+        this.bilateralSigmaColor = this.profile.bilateralSigmaColor;
+        this.bilateralSigmaSpace = this.profile.bilateralSigmaSpace;
+        this.bilateralRadius = this.profile.bilateralRadius;
+        this.bilateralIterations = this.profile.bilateralIterations;
+    }
+
     this.luckyStackWorkerService.channelChanged(this.visibleChannel).subscribe(
       (data) => {
         console.log('Response');
