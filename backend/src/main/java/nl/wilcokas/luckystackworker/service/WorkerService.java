@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.exceptions.ProfileNotFoundException;
-import nl.wilcokas.luckystackworker.model.ImageOutputFormatType;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
 import nl.wilcokas.luckystackworker.repository.SettingsRepository;

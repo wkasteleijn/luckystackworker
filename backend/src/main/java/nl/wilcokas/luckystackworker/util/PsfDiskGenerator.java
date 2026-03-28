@@ -12,6 +12,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.exceptions.FilterException;
+import nl.wilcokas.luckystackworker.model.PSF;
+import nl.wilcokas.luckystackworker.model.PSFType;
 import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -23,18 +25,17 @@ public class PsfDiskGenerator {
         double airyDiskRadius = 16; // Radius of Airy disk in pixels
         double seeingIndex = 0.0; // Atmospheric seeing index (0.0 = no distortion, 1.0 = maximum distortion)
         float diffractionIntensity = 20.0f; // Diffraction intensity (default: 20.0, min = 0, max = 1000)
-        generate16BitRGB(airyDiskRadius, seeingIndex, diffractionIntensity, "jup", false);
+        PSF psf = new PSF(airyDiskRadius, seeingIndex, diffractionIntensity, PSFType.SYNTHETIC);
+        generate16BitRGB(psf, "jup", false);
     }
 
-    public static ImagePlus generate16BitRGB(
-            double airyDiskRadius, double seeingIndex, double diffractionIntensity, String profileName, boolean isMono)
-            throws IOException {
+    public static ImagePlus generate16BitRGB(PSF psf, String profileName, boolean isMono) throws IOException {
 
         short[] redPixels = new short[(int) Math.pow(PSF_SIZE, 2)];
         short[] greenPixels = new short[(int) Math.pow(PSF_SIZE, 2)];
         short[] bluePixels = new short[(int) Math.pow(PSF_SIZE, 2)];
 
-        double seeingIndexConverted = (4.0 - (seeingIndex - 1.0)) / 8.0;
+        double seeingIndexConverted = (4.0 - (psf.getSeeingIndex() - 1.0)) / 8.0;
 
         try {
             try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
@@ -42,27 +43,27 @@ public class PsfDiskGenerator {
                 futures[0] = CompletableFuture.runAsync(
                         () -> generate16BitForChannel(
                                 redPixels,
-                                airyDiskRadius,
+                                psf.getAiryDiskRadius(),
                                 seeingIndexConverted,
-                                diffractionIntensity,
+                                psf.getDiffractionIntensity(),
                                 PSF_SIZE,
                                 isMono ? WAVELENGTH_NM_GREEN : WAVELENGTH_NM_RED),
                         executor);
                 futures[1] = CompletableFuture.runAsync(
                         () -> generate16BitForChannel(
                                 greenPixels,
-                                airyDiskRadius,
+                                psf.getAiryDiskRadius(),
                                 seeingIndexConverted,
-                                diffractionIntensity,
+                                psf.getDiffractionIntensity(),
                                 PSF_SIZE,
                                 WAVELENGTH_NM_GREEN),
                         executor);
                 futures[2] = CompletableFuture.runAsync(
                         () -> generate16BitForChannel(
                                 bluePixels,
-                                airyDiskRadius,
+                                psf.getAiryDiskRadius(),
                                 seeingIndexConverted,
-                                diffractionIntensity,
+                                psf.getDiffractionIntensity(),
                                 PSF_SIZE,
                                 isMono ? WAVELENGTH_NM_GREEN : WAVELENGTH_NM_BLUE),
                         executor);

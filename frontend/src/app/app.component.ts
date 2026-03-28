@@ -702,6 +702,7 @@ export class AppComponent implements OnInit {
         this.clippingRange = this.profile.clippingRangeGreen;
         this.deringRadius = this.profile.deringRadiusGreen;
         this.deringStrength = this.profile.deringStrengthGreen;
+        this.wienerIterations = this.profile.wienerIterationsGreen;
         break;
       case 'B':
         this.radius = this.profile.radiusBlue;
@@ -712,6 +713,7 @@ export class AppComponent implements OnInit {
         this.clippingRange = this.profile.clippingRangeBlue;
         this.deringRadius = this.profile.deringRadiusBlue;
         this.deringStrength = this.profile.deringStrengthBlue;
+        this.wienerIterations = this.profile.wienerIterationsBlue;
         break;
       default:
         this.radius = this.profile.radius;
@@ -722,6 +724,7 @@ export class AppComponent implements OnInit {
         this.clippingRange = this.profile.clippingRange;
         this.deringRadius = this.profile.deringRadius;
         this.deringStrength = this.profile.deringStrength;
+        this.wienerIterations = this.profile.wienerIterations;
     }
     this.visibleChannel = this.applySharpenToChannel;
     this.luckyStackWorkerService.channelChanged(this.visibleChannel).subscribe(

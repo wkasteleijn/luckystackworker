@@ -1,5 +1,9 @@
 package nl.wilcokas.luckystackworker.util;
 
+import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.JPG;
+import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.PNG;
+import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF;
+
 import ij.CompositeImage;
 import ij.IJ;
 import ij.ImagePlus;
@@ -42,10 +46,6 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.inspector.TagInspector;
-
-import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.JPG;
-import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.PNG;
-import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF;
 
 @Slf4j
 public class LswFileUtil {

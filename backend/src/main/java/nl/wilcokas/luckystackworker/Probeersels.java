@@ -1,15 +1,14 @@
 package nl.wilcokas.luckystackworker;
 
+import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF;
+
 import ij.ImagePlus;
 import ij.io.Opener;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.filter.WienerDeconvolutionFilter;
-import nl.wilcokas.luckystackworker.model.ImageOutputFormatType;
 import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum;
 import nl.wilcokas.luckystackworker.util.LswFileUtil;
 import nl.wilcokas.luckystackworker.util.LswUtil;
-
-import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF;
 
 @Slf4j
 public class Probeersels {

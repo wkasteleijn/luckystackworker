@@ -185,5 +185,4 @@ public class ProfileController {
     public void nightMode(@RequestParam boolean on) {
         referenceImageService.autoApplyProfile(on);
     }
-
 }

@@ -61,5 +61,4 @@ public class Constants {
     public static final Color TITLE_COLOR = new Color(100, 100, 100);
     public static final Color BORDER_COLOR = new Color(64, 64, 64);
     public static final Color BACKGROUND_COLOR = new Color(25, 25, 25);
-    
 }

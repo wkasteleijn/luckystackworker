@@ -20,7 +20,6 @@ import nl.wilcokas.luckystackworker.exceptions.DeRotationException
 import nl.wilcokas.luckystackworker.filter.BilateralDenoiseFilter
 import nl.wilcokas.luckystackworker.filter.LSWSharpenFilter
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode
-import nl.wilcokas.luckystackworker.model.ImageOutputFormatType
 import nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF
 import nl.wilcokas.luckystackworker.model.Profile
 import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum.RGB
