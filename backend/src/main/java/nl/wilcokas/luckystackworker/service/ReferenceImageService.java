@@ -4,6 +4,9 @@ import static java.util.Collections.emptyList;
 import static nl.wilcokas.luckystackworker.constants.Constants.MAX_RELEASE_NOTES_SHOWN;
 import static nl.wilcokas.luckystackworker.constants.Constants.STATUS_IDLE;
 import static nl.wilcokas.luckystackworker.util.LswFileUtil.createCleanDirectory;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.getFilenameExtension;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.getImageOutputFormat;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.getPathWithoutExtension;
 import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.get16BitRGBHistogram;
 import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getPSFImageDto;
 
@@ -151,7 +154,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             String selectedFilePath = selectedFile.getAbsolutePath();
             if (validateSelectedFile(selectedFilePath)) {
                 log.info("Image selected {} ", selectedFilePath);
-                String fileNameNoExt = LswFileUtil.getPathWithoutExtension(selectedFilePath);
+                String fileNameNoExt = getPathWithoutExtension(selectedFilePath);
                 Profile profile = LswFileUtil.readProfile(fileNameNoExt);
                 if (profile == null) {
                     String profileName = LswFileUtil.deriveProfileFromImageName(selectedFilePath);
@@ -219,7 +222,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     public void saveReferenceImage(String path, ImageOutputFormatType outputFormatType, Profile profile)
             throws IOException {
-        String pathNoExt = LswFileUtil.getPathWithoutExtension(path);
+        String pathNoExt = getPathWithoutExtension(path);
         String savePath = pathNoExt + "." + LswFileUtil.getOutputImageExtension(outputFormatType);
         log.info("Saving image to  {}", savePath);
         ImagePlus savedImage = finalResultImage;
@@ -347,7 +350,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void writeProfile() throws IOException {
-        String fileNameNoExt = LswFileUtil.getPathWithoutExtension(imageMetadata.getFilePath());
+        String fileNameNoExt = getPathWithoutExtension(imageMetadata.getFilePath());
         writeProfile(fileNameNoExt);
     }
 
@@ -423,8 +426,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             do {
                 returnValue = jfc.showSaveDialog(frame);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    File fileToSave = jfc.getSelectedFile();
-                    if (fileToSave.exists()) {
+                    String absolutePath = jfc.getSelectedFile().getAbsolutePath();
+                    String fileToSave = getPathWithoutExtension(absolutePath) + "."
+                            + getImageOutputFormat(getFilenameExtension(absolutePath), jfc.getFileFilter())
+                                    .toString()
+                                    .toLowerCase();
+                    if (Files.exists(Paths.get(fileToSave))) {
                         if (confirmOverwrite()) {
                             confirmed = true;
                         }
@@ -959,7 +966,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     private boolean validateSelectedFile(String path) {
-        String extension = LswFileUtil.getFilenameExtension(path);
+        String extension = getFilenameExtension(path);
         if (!settingsService.getSettings().getExtensions().contains(extension)) {
             JOptionPane.showMessageDialog(
                     getParentFrame(),

@@ -3,6 +3,7 @@ package nl.wilcokas.luckystackworker.api;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import static nl.wilcokas.luckystackworker.constants.Constants.COMPRESSED_TIF_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.FITS_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.JPG_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.PNG_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.TIFF_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.getImageOutputFormat;
 
 @CrossOrigin(origins = {"http://localhost:4200", "https://www.wilcokas.com"})
 @RestController
@@ -69,17 +77,29 @@ public class ReferenceController {
         JFrame frame = referenceImageService.getParentFrame();
         JFileChooser jfc = referenceImageService.getJFileChooser(
                 settingsService.getRootFolder(), "Specify location and file name");
-        jfc.setFileFilter(new FileNameExtensionFilter("TIFF, JPG, PNG", "tif", "tiff", "jpg", "jpeg", "png"));
+        FileNameExtensionFilter tiffFilter = new FileNameExtensionFilter(TIFF_OUTPUTFORMAT, "tif", "tiff");
+        FileNameExtensionFilter ctiffFilter = new FileNameExtensionFilter(COMPRESSED_TIF_OUTPUTFORMAT, "tif", "tiff");
+        FileNameExtensionFilter pngFilter = new FileNameExtensionFilter(PNG_OUTPUTFORMAT, "png");
+        FileNameExtensionFilter jpgFilter = new FileNameExtensionFilter(JPG_OUTPUTFORMAT, "jpg", "jpeg");
+        FileNameExtensionFilter fitsFilter = new FileNameExtensionFilter(FITS_OUTPUTFORMAT, "fit");
+        jfc.addChoosableFileFilter(tiffFilter);
+        jfc.addChoosableFileFilter(ctiffFilter);
+        jfc.addChoosableFileFilter(pngFilter);
+        jfc.addChoosableFileFilter(jpgFilter);
+        jfc.addChoosableFileFilter(fitsFilter);
+        jfc.setFileFilter(tiffFilter);
+
         String fileNameNoExt = LswFileUtil.getFilename(referenceImageService.getFilePath());
-        jfc.setSelectedFile(
-                new File(fileNameNoExt + Constants.OUTPUT_POSTFIX_SAVE + "." + Constants.DEFAULT_OUTPUT_FORMAT));
+        jfc.setSelectedFile(new File(fileNameNoExt + Constants.OUTPUT_POSTFIX_SAVE));
         int returnValue = referenceImageService.getFilenameFromDialog(frame, jfc, "Save reference image", null, true);
         frame.dispose();
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
             profileRepository.updateProfile(profileDTO);
             referenceImageService.saveReferenceImage(
-                    selectedFile.getAbsolutePath(), getImageOutputFormat(selectedFile), new Profile(profileDTO));
+                    selectedFile.getAbsolutePath(),
+                    getImageOutputFormat(LswFileUtil.getFilenameExtension(selectedFile), jfc.getFileFilter()),
+                    new Profile(profileDTO));
         }
     }
 
@@ -168,15 +188,6 @@ public class ReferenceController {
     @PutMapping("/stack")
     public void stack(@RequestParam double scale, @RequestParam String openImageMode) {
         referenceImageService.stackImages(scale, openImageMode);
-    }
-
-    private ImageOutputFormatType getImageOutputFormat(File selectedFile) {
-        String fileExtension = LswFileUtil.getFilenameExtension(selectedFile).toLowerCase();
-        return switch (fileExtension) {
-            case "jpg" -> ImageOutputFormatType.JPG;
-            case "png" -> ImageOutputFormatType.PNG;
-            default -> ImageOutputFormatType.TIF;
-        };
     }
 
     @PutMapping("/blink-clipped")

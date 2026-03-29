@@ -1,5 +1,6 @@
 package nl.wilcokas.luckystackworker.constants;
 
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.math.BigDecimal;
 
@@ -12,7 +13,14 @@ public class Constants {
     public static final String WORKER_FOLDER_POSTFIX = "_lsw";
     public static final String STATUS_IDLE = "Idle";
     public static final String STATUS_WORKING = "Working";
+
     public static final String DEFAULT_OUTPUT_FORMAT = "tif";
+    public static final String TIFF_OUTPUTFORMAT = "48-bit Uncompressed TIFF Image";
+    public static final String COMPRESSED_TIF_OUTPUTFORMAT = "48-bit Compressed TIFF Image";
+    public static final String PNG_OUTPUTFORMAT = "48-bit PNG Image";
+    public static final String JPG_OUTPUTFORMAT = "100% Quality JPEG Image";
+    public static final String FITS_OUTPUTFORMAT = "48-bit FITS";
+
     public static final int LARGE_WINDOW_SIZE = 250000;
     public static final BigDecimal DEFAULT_DENOISE_RADIUS = BigDecimal.valueOf(1);
     public static final BigDecimal DEFAULT_DENOISE_SIGMA = BigDecimal.valueOf(2);
