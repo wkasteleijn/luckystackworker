@@ -15,11 +15,12 @@ public class Constants {
     public static final String STATUS_WORKING = "Working";
 
     public static final String DEFAULT_OUTPUT_FORMAT = "tif";
-    public static final String TIFF_OUTPUTFORMAT = "48-bit Uncompressed TIFF Image";
-    public static final String COMPRESSED_TIF_OUTPUTFORMAT = "48-bit Compressed TIFF Image";
-    public static final String PNG_OUTPUTFORMAT = "48-bit PNG Image";
+    public static final String TIFF_OUTPUTFORMAT = "16-bit Uncompressed TIFF Image";
+    public static final String COMPRESSED_TIF_OUTPUTFORMAT = "16-bit Compressed TIFF Image";
+    public static final String PNG_OUTPUTFORMAT = "16-bit PNG Image";
+    public static final String PNG8_OUTPUTFORMAT = "8-bit PNG Image";
     public static final String JPG_OUTPUTFORMAT = "100% Quality JPEG Image";
-    public static final String FITS_OUTPUTFORMAT = "48-bit FITS";
+    public static final String WEBP_OUTPUTFORMAT = "8-bit Lossless WebP Image";
 
     public static final int LARGE_WINDOW_SIZE = 250000;
     public static final BigDecimal DEFAULT_DENOISE_RADIUS = BigDecimal.valueOf(1);

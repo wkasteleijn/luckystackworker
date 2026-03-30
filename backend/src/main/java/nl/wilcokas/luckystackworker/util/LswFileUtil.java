@@ -1,14 +1,17 @@
 package nl.wilcokas.luckystackworker.util;
 
 import static nl.wilcokas.luckystackworker.constants.Constants.COMPRESSED_TIF_OUTPUTFORMAT;
-import static nl.wilcokas.luckystackworker.constants.Constants.FITS_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.constants.Constants.JPG_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.constants.Constants.PNG_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.WEBP_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.CTIF;
 import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.JPG;
 import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.PNG;
 import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF;
+import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.WEBP;
 
+import com.luciad.imageio.webp.CompressionType;
+import com.luciad.imageio.webp.WebPWriteParam;
 import ij.CompositeImage;
 import ij.IJ;
 import ij.ImagePlus;
@@ -46,12 +49,16 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.spi.IIORegistry;
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
+import nl.wilcokas.luckystackworker.exceptions.LswNotReadyException;
 import nl.wilcokas.luckystackworker.exceptions.NotARawImageException;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
@@ -206,6 +213,8 @@ public class LswFileUtil {
             saveAs48BitPngNative(image, path);
         } else if (outputFormatType == CTIF) {
             saveAs48BitTiffCompressed(image, path);
+        } else if (outputFormatType == WEBP) {
+            save8BitLosslessWebp(image, path);
         } else {
             if (fixRgbStack) {
                 image.setActiveChannels("111");
@@ -285,6 +294,32 @@ public class LswFileUtil {
 
             // 6. Execute the Write
             writer.write(null, new IIOImage(bi, null, metadata), param);
+        } finally {
+            writer.dispose();
+        }
+    }
+
+    public static void save8BitLosslessWebp(ImagePlus image, String outputFilePath) throws IOException {
+        Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType("image/webp");
+        if (!writers.hasNext()) {
+            throw new IllegalStateException("No WebP writer found!");
+        }
+        ImageWriter writer = writers.next();
+
+        // 2. Configure encoding parameters
+        // We cast to WebPWriteParam to access specific WebP features
+        WebPWriteParam writeParam = (WebPWriteParam) writer.getDefaultWriteParam();
+
+        // Kotlin's .apply { ... } block converted to standard setters
+        writeParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+        writeParam.setCompressionType(CompressionType.Lossless);
+
+        // 3. Configure the output
+        try (FileImageOutputStream output = new FileImageOutputStream(new File(outputFilePath))) {
+            writer.setOutput(output);
+
+            // 4. Encode and Write
+            writer.write(null, new IIOImage(image.getBufferedImage(), null, null), writeParam);
         } finally {
             writer.dispose();
         }
@@ -721,6 +756,7 @@ public class LswFileUtil {
         return switch (outputFormatType) {
             case JPG -> "jpg";
             case PNG -> "png";
+            case WEBP -> "webp";
             default -> Constants.DEFAULT_OUTPUT_FORMAT;
         };
     }
@@ -730,6 +766,7 @@ public class LswFileUtil {
             return switch (extension.toLowerCase()) {
                 case "jpg", "jpeg" -> JPG;
                 case "png" -> PNG;
+                case "webp" -> WEBP;
                 default -> TIF;
             };
         }
@@ -737,6 +774,7 @@ public class LswFileUtil {
             case PNG_OUTPUTFORMAT -> PNG;
             case JPG_OUTPUTFORMAT -> JPG;
             case COMPRESSED_TIF_OUTPUTFORMAT -> CTIF;
+            case WEBP_OUTPUTFORMAT -> WEBP;
             default -> TIF;
         };
     }

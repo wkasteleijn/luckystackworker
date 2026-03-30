@@ -1,10 +1,5 @@
 package nl.wilcokas.luckystackworker.api;
 
-import java.io.File;
-import java.io.IOException;
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
@@ -16,7 +11,6 @@ import nl.wilcokas.luckystackworker.dto.SettingsDTO;
 import nl.wilcokas.luckystackworker.exceptions.LswNotReadyException;
 import nl.wilcokas.luckystackworker.model.ChannelEnum;
 import nl.wilcokas.luckystackworker.model.DeRotation;
-import nl.wilcokas.luckystackworker.model.ImageOutputFormatType;
 import nl.wilcokas.luckystackworker.model.Profile;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.repository.ProfileRepository;
@@ -31,11 +25,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
+import java.io.IOException;
+
 import static nl.wilcokas.luckystackworker.constants.Constants.COMPRESSED_TIF_OUTPUTFORMAT;
-import static nl.wilcokas.luckystackworker.constants.Constants.FITS_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.constants.Constants.JPG_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.constants.Constants.PNG_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.constants.Constants.TIFF_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.WEBP_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.util.LswFileUtil.getImageOutputFormat;
 
 @CrossOrigin(origins = {"http://localhost:4200", "https://www.wilcokas.com"})
@@ -81,12 +80,12 @@ public class ReferenceController {
         FileNameExtensionFilter ctiffFilter = new FileNameExtensionFilter(COMPRESSED_TIF_OUTPUTFORMAT, "tif", "tiff");
         FileNameExtensionFilter pngFilter = new FileNameExtensionFilter(PNG_OUTPUTFORMAT, "png");
         FileNameExtensionFilter jpgFilter = new FileNameExtensionFilter(JPG_OUTPUTFORMAT, "jpg", "jpeg");
-        FileNameExtensionFilter fitsFilter = new FileNameExtensionFilter(FITS_OUTPUTFORMAT, "fit");
+        FileNameExtensionFilter webpFilter = new FileNameExtensionFilter(WEBP_OUTPUTFORMAT, "webp");
         jfc.addChoosableFileFilter(tiffFilter);
         jfc.addChoosableFileFilter(ctiffFilter);
         jfc.addChoosableFileFilter(pngFilter);
         jfc.addChoosableFileFilter(jpgFilter);
-        jfc.addChoosableFileFilter(fitsFilter);
+        jfc.addChoosableFileFilter(webpFilter);
         jfc.setFileFilter(tiffFilter);
 
         String fileNameNoExt = LswFileUtil.getFilename(referenceImageService.getFilePath());

@@ -21,6 +21,7 @@ kotlin = "2.3.10"
 ktfmt = "0.61"
 httpcore5 = "5.4.1"
 darklaf = "3.1.0"
+webp = "0.10.2"
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
@@ -51,3 +52,4 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref =
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 org-apache-httpcomponents-core5-httpcore5 = { module = "org.apache.httpcomponents.core5:httpcore5", version.ref = "httpcore5" }
 com-github-weisj-darklaf-core = { module="com.github.weisj:darklaf-core" , version.ref = "darklaf" }
+com-github-usefulness-webp-imageio = { module = "com.github.usefulness:webp-imageio", version.ref = "webp" }

@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.reflect)
     implementation(libs.com.github.weisj.darklaf.core)
+    implementation(libs.com.github.usefulness.webp.imageio)
 
     compileOnly(libs.org.projectlombok.lombok)
     annotationProcessor(libs.org.projectlombok.lombok)
