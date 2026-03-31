@@ -9,6 +9,8 @@ import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 import org.springframework.stereotype.Component;
 
+import javax.swing.*;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -27,6 +29,7 @@ public class Initializer {
         System.setProperty("apple.awt.graphics.UseQuartz", "true");
         System.setProperty("darklaf.allowNativeCode", "false");
         LafManager.install(new DarculaTheme());
+        UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 
         Settings settings = settingsService.getSettings();
         settingsService.saveSettings(settings);

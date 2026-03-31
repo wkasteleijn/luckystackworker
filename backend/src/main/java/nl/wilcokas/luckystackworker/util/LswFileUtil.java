@@ -2,11 +2,13 @@ package nl.wilcokas.luckystackworker.util;
 
 import static nl.wilcokas.luckystackworker.constants.Constants.COMPRESSED_TIF_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.constants.Constants.JPG_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.PNG8_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.constants.Constants.PNG_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.constants.Constants.WEBP_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.CTIF;
 import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.JPG;
 import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.PNG;
+import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.PNG8;
 import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF;
 import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.WEBP;
 
@@ -211,6 +213,9 @@ public class LswFileUtil {
             saver.saveAsJpeg(path);
         } else if (outputFormatType == PNG) {
             saveAs48BitPngNative(image, path);
+        } else if (outputFormatType == PNG8) {
+            LSWFileSaver saver = new LSWFileSaver(createSingleLayerColorImage(image));
+            saver.saveAsPng(path);
         } else if (outputFormatType == CTIF) {
             saveAs48BitTiffCompressed(image, path);
         } else if (outputFormatType == WEBP) {
@@ -752,15 +757,6 @@ public class LswFileUtil {
         }
     }
 
-    public static String getOutputImageExtension(ImageOutputFormatType outputFormatType) {
-        return switch (outputFormatType) {
-            case JPG -> "jpg";
-            case PNG -> "png";
-            case WEBP -> "webp";
-            default -> Constants.DEFAULT_OUTPUT_FORMAT;
-        };
-    }
-
     public static ImageOutputFormatType getImageOutputFormat(String extension, FileFilter selectedFormat) {
         if (!StringUtils.isEmpty(extension)) {
             return switch (extension.toLowerCase()) {
@@ -775,7 +771,17 @@ public class LswFileUtil {
             case JPG_OUTPUTFORMAT -> JPG;
             case COMPRESSED_TIF_OUTPUTFORMAT -> CTIF;
             case WEBP_OUTPUTFORMAT -> WEBP;
+            case PNG8_OUTPUTFORMAT -> PNG8;
             default -> TIF;
+        };
+    }
+
+    public static String getImageOutputExtensionForFormat(ImageOutputFormatType type) {
+        return switch (type) {
+            case PNG,PNG8 -> "png";
+            case JPG -> "jpg";
+            case WEBP -> "webp";
+            default -> "tif";
         };
     }
 

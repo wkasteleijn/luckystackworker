@@ -32,6 +32,7 @@ import java.io.IOException;
 
 import static nl.wilcokas.luckystackworker.constants.Constants.COMPRESSED_TIF_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.constants.Constants.JPG_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.PNG8_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.constants.Constants.PNG_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.constants.Constants.TIFF_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.constants.Constants.WEBP_OUTPUTFORMAT;
@@ -79,13 +80,15 @@ public class ReferenceController {
         FileNameExtensionFilter tiffFilter = new FileNameExtensionFilter(TIFF_OUTPUTFORMAT, "tif", "tiff");
         FileNameExtensionFilter ctiffFilter = new FileNameExtensionFilter(COMPRESSED_TIF_OUTPUTFORMAT, "tif", "tiff");
         FileNameExtensionFilter pngFilter = new FileNameExtensionFilter(PNG_OUTPUTFORMAT, "png");
-        FileNameExtensionFilter jpgFilter = new FileNameExtensionFilter(JPG_OUTPUTFORMAT, "jpg", "jpeg");
         FileNameExtensionFilter webpFilter = new FileNameExtensionFilter(WEBP_OUTPUTFORMAT, "webp");
+        FileNameExtensionFilter png8Filter = new FileNameExtensionFilter(PNG8_OUTPUTFORMAT, "png");
+        FileNameExtensionFilter jpgFilter = new FileNameExtensionFilter(JPG_OUTPUTFORMAT, "jpg", "jpeg");
         jfc.addChoosableFileFilter(tiffFilter);
         jfc.addChoosableFileFilter(ctiffFilter);
         jfc.addChoosableFileFilter(pngFilter);
-        jfc.addChoosableFileFilter(jpgFilter);
         jfc.addChoosableFileFilter(webpFilter);
+        jfc.addChoosableFileFilter(png8Filter);
+        jfc.addChoosableFileFilter(jpgFilter);
         jfc.setFileFilter(tiffFilter);
 
         String fileNameNoExt = LswFileUtil.getFilename(referenceImageService.getFilePath());

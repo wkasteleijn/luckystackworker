@@ -4,6 +4,7 @@ public enum ImageOutputFormatType {
     TIF,
     JPG,
     PNG,
+    PNG8,
     CTIF,
     WEBP
 }
