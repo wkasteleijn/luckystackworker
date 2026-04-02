@@ -50,19 +50,25 @@ class DeRotationService(
   val accurateness: Int
     get() = _accurateness
 
-  fun derotate(
+    private var _lowSNRData: Boolean = false
+    val lowSNRData: Boolean
+        get() = _lowSNRData
+
+    fun derotate(
       rootFolder: String,
       referenceImageFilename: String,
       allImagesFilenames: List<String>,
       initialAnchorStrength: Int,
       initialNoiseRobustness: Int,
       initialAccurateness: Int,
+      lowSNRData: Boolean,
       parentFrame: JFrame?,
   ): String? {
 
     this._anchorStrength = initialAnchorStrength
     this._noiseRobustness = initialNoiseRobustness
     this._accurateness = initialAccurateness
+        this._lowSNRData = lowSNRData
 
     luckyStackWorkerContext.totalFilesCount =
         allImagesFilenames.size * 3 +
@@ -701,7 +707,8 @@ fun main(args: Array<String>) {
           4,
           2,
           4,
-          null,
+          false,
+          null
       )
     } else if (arguments[0].equals("-transform")) {
       service.transformFromTo(

@@ -18,6 +18,7 @@ public class DeRotation {
     private int anchorStrength;
     private int accurateness;
     private String rootFolder;
+    private boolean lowSNRData;
 
     public DeRotation(DeRotationDTO deRotation) {
         mapFromDTO(deRotation);
@@ -29,5 +30,6 @@ public class DeRotation {
         this.noiseRobustness = deRotation.getNoiseRobustness();
         this.anchorStrength = deRotation.getAnchorStrength();
         this.accurateness = deRotation.getAccurateness();
+        this.lowSNRData = deRotation.isLowSNRData();
     }
 }

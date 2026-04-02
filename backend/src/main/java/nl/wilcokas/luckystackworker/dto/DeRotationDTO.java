@@ -17,11 +17,13 @@ public class DeRotationDTO {
     private int noiseRobustness;
     private int anchorStrength;
     private int accurateness;
+    private boolean lowSNRData;
 
     public DeRotationDTO(DeRotation deRotation) {
         this.images = deRotation.getImages();
         this.anchorStrength = deRotation.getAnchorStrength();
         this.noiseRobustness = deRotation.getNoiseRobustness();
         this.accurateness = deRotation.getAccurateness();
+        this.lowSNRData = deRotation.isLowSNRData();
     }
 }

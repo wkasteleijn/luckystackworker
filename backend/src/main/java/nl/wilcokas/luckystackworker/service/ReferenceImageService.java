@@ -696,6 +696,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 deRotation.getAnchorStrength(),
                                 deRotation.getNoiseRobustness(),
                                 deRotation.getAccurateness(),
+                                deRotation.isLowSNRData(),
                                 getParentFrame());
                         if (deRotatedImagePath != null) {
                             openImageAfterStacking(
