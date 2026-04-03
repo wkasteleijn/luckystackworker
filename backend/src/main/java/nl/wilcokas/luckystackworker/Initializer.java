@@ -1,7 +1,6 @@
 package nl.wilcokas.luckystackworker;
 
-import com.github.weisj.darklaf.LafManager;
-import com.github.weisj.darklaf.theme.DarculaTheme;
+import com.formdev.flatlaf.FlatDarculaLaf;
 import jakarta.annotation.PostConstruct;
 import javax.swing.*;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,7 @@ public class Initializer {
     private final SettingsRepository settingsService;
 
     @PostConstruct
-    public void init() {
+    public void init() throws UnsupportedLookAndFeelException {
         log.warn("Java home is {}", System.getProperty("java.home"));
         log.warn("Java vendor is {}", System.getProperty("java.vendor"));
         log.warn("Java version is {}", System.getProperty("java.version"));
@@ -26,8 +25,9 @@ public class Initializer {
         log.warn("User home folder is {}", System.getProperty("user.home"));
 
         System.setProperty("apple.awt.graphics.UseQuartz", "true");
-        System.setProperty("darklaf.allowNativeCode", "false");
-        LafManager.install(new DarculaTheme());
+
+        UIManager.setLookAndFeel(new FlatDarculaLaf());
+
         UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 
         Settings settings = settingsService.getSettings();

@@ -20,7 +20,7 @@ turboreg = "2.0.1-SNAPSHOT"
 kotlin = "2.3.10"
 ktfmt = "0.61"
 httpcore5 = "5.4.1"
-darklaf = "3.1.0"
+flatlaf = "3.7.1"
 webp = "0.10.2"
 
 [plugins]
@@ -51,5 +51,5 @@ sc-fiji-turboreg = { module = "sc.fiji:TurboReg_", version.ref = "turboreg" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 org-apache-httpcomponents-core5-httpcore5 = { module = "org.apache.httpcomponents.core5:httpcore5", version.ref = "httpcore5" }
-com-github-weisj-darklaf-core = { module="com.github.weisj:darklaf-core" , version.ref = "darklaf" }
+com-formdev-flatlaf = { module="com.formdev:flatlaf" , version.ref = "flatlaf" }
 com-github-usefulness-webp-imageio = { module = "com.github.usefulness:webp-imageio", version.ref = "webp" }

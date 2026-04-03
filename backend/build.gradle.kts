@@ -54,7 +54,7 @@ dependencies {
     implementation(libs.sc.fiji.turboreg)
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.reflect)
-    implementation(libs.com.github.weisj.darklaf.core)
+    implementation(libs.com.formdev.flatlaf)
     implementation(libs.com.github.usefulness.webp.imageio)
 
     compileOnly(libs.org.projectlombok.lombok)
