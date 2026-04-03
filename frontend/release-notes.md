@@ -1,5 +1,25 @@
 # LuckyStackWorker - RELEASE NOTES
 
+## XX/04/2026 minor release 7.2.0
+- Added new "Low signal to noise ratio data" checkbox to de-rotation for certain images such as CH4-band that tend to be very noisy
+- Automatically applying a profile after opening an image, de-rotation or stacking is now optional. Added button "Auto apply profile" By default it is off
+- Turned on buttons such as Auto apply profile and Night mode are now persistent accross multiple sessions
+- Besides 16-bit uncompressed TIFF and 100% JPG now also 8 and 16-bit PNG, 16-bit compressed TIFF and lossless WEBP are supported as output format.
+- De-rotation will now pre-select earlier selected images to simplify re-tries. The files selected for de-rotation are stored in a <profile>_DRTD.txt file so it is easy to see what was selected earlier.
+- Deconvolution, sharpening and denoising per individual channel can now be done by using the "Switch channel" button
+- Improved the file opening and saving dialog with better and modern dark mode layout
+- Removed prior buttons for deconvolution, sharpening and denoising individual channels
+- Fixed broken deconvolution, sharpening and denoising individual channels 
+### Not yet in current beta release:
+- Added de-rotation to a specifically defined point in time that falls between the time of the first and last selected file
+- Personalized de-rotation parameter settings are now persistent over multiple sessions
+- Batch process using a multiple file selection instead of processing all files in the root folder belonging to the currently selected profile
+- Added support for opening 16-bit compressed TIFF images
+- Fixed bug with zoom sometimes not wanting to zoom out any further
+- Switched off hardware accelaration that caused UI flickering problems for some users with certain video cards
+- Fixed bug in Sigma 1 iterations slider showing the value for radius
+- Fixed Night mode not rendering correctly when switched on for multiple sessions.
+
 ## 15/02/2026 minor release 7.1.0
 
 - De-rotation and stacking can now be applied without the need to open a single image first
