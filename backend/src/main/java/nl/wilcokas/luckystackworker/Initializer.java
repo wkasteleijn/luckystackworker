@@ -3,13 +3,12 @@ package nl.wilcokas.luckystackworker;
 import com.github.weisj.darklaf.LafManager;
 import com.github.weisj.darklaf.theme.DarculaTheme;
 import jakarta.annotation.PostConstruct;
+import javax.swing.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.model.Settings;
 import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 import org.springframework.stereotype.Component;
-
-import javax.swing.*;
 
 @Slf4j
 @RequiredArgsConstructor

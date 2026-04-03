@@ -1,5 +1,16 @@
 package nl.wilcokas.luckystackworker.service;
 
+import static java.util.Collections.emptyList;
+import static nl.wilcokas.luckystackworker.constants.Constants.MAX_RELEASE_NOTES_SHOWN;
+import static nl.wilcokas.luckystackworker.constants.Constants.STATUS_IDLE;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.createCleanDirectory;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.getFilenameExtension;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.getImageOutputExtensionForFormat;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.getImageOutputFormat;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.getPathWithoutExtension;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.get16BitRGBHistogram;
+import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getPSFImageDto;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ij.ImagePlus;
@@ -9,6 +20,29 @@ import ij.gui.RoiListener;
 import ij.gui.Toolbar;
 import ij.io.Opener;
 import ij.process.ColorProcessor;
+import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -43,41 +77,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-
-import static java.util.Collections.emptyList;
-import static nl.wilcokas.luckystackworker.constants.Constants.MAX_RELEASE_NOTES_SHOWN;
-import static nl.wilcokas.luckystackworker.constants.Constants.STATUS_IDLE;
-import static nl.wilcokas.luckystackworker.util.LswFileUtil.createCleanDirectory;
-import static nl.wilcokas.luckystackworker.util.LswFileUtil.getFilenameExtension;
-import static nl.wilcokas.luckystackworker.util.LswFileUtil.getImageOutputExtensionForFormat;
-import static nl.wilcokas.luckystackworker.util.LswFileUtil.getImageOutputFormat;
-import static nl.wilcokas.luckystackworker.util.LswFileUtil.getPathWithoutExtension;
-import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.get16BitRGBHistogram;
-import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getPSFImageDto;
 
 @Slf4j
 @Service
@@ -651,6 +650,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                         deRotationService.getAnchorStrength() == 0
                                 ? Constants.DEFAULT_DEROTATION_ANCHOR_STRENGTH
                                 : deRotationService.getAnchorStrength())
+                .lowSNRData(deRotationService.getLowSNRData())
                 .rootFolder(rootFolder)
                 .build();
     }

@@ -50,25 +50,25 @@ class DeRotationService(
   val accurateness: Int
     get() = _accurateness
 
-    private var _lowSNRData: Boolean = false
-    val lowSNRData: Boolean
-        get() = _lowSNRData
+  private var _lowSNRData: Boolean = false
+  val lowSNRData: Boolean
+    get() = _lowSNRData
 
-    fun derotate(
+  fun derotate(
       rootFolder: String,
       referenceImageFilename: String,
       allImagesFilenames: List<String>,
       initialAnchorStrength: Int,
       initialNoiseRobustness: Int,
       initialAccurateness: Int,
-      lowSNRData: Boolean,
+      initiallowSNRData: Boolean,
       parentFrame: JFrame?,
   ): String? {
 
     this._anchorStrength = initialAnchorStrength
     this._noiseRobustness = initialNoiseRobustness
     this._accurateness = initialAccurateness
-        this._lowSNRData = lowSNRData
+    this._lowSNRData = initiallowSNRData
 
     luckyStackWorkerContext.totalFilesCount =
         allImagesFilenames.size * 3 +
@@ -92,6 +92,7 @@ class DeRotationService(
                 allImagesFilenames,
                 anchorStrength,
                 noiseRobustness,
+                lowSNRData,
                 parentFrame,
             )
 
@@ -409,6 +410,7 @@ class DeRotationService(
       allImagesFilenames: List<String>,
       anchorStrength: Int,
       noiseRobustness: Int,
+      lowSNRData: Boolean,
       parentFrame: JFrame?,
   ): MutableList<String> {
     log.info("Create pre-sharpened luminance copies...")
@@ -422,7 +424,7 @@ class DeRotationService(
             val imagePath = "${rootFolder}/${imageFilename}"
             val image = openImage(imagePath, parentFrame)
             imageDimensions.add(image.dimensions)
-            sharpenAsLuminanceImage(image, anchorStrength.toDouble())
+            sharpenAsLuminanceImage(image, anchorStrength.toDouble(), lowSNRData)
             val denoiseProfile = createDenoiseProfile(noiseRobustness)
             bilateralDenoiseFilter.apply(image, denoiseProfile, false, null)
             val toBeDeRotatedImageFilenameNoExt = LswFileUtil.getFilename(imageFilename)
@@ -582,7 +584,7 @@ class DeRotationService(
     return true
   }
 
-  private fun sharpenAsLuminanceImage(image: ImagePlus, radius: Double) {
+  private fun sharpenAsLuminanceImage(image: ImagePlus, radius: Double, lowSNRData: Boolean) {
     val stack = image.getStack()
     val ipRed = stack.getProcessor(1)
     val fpRed = ipRed.toFloat(1, null)
@@ -611,7 +613,11 @@ class DeRotationService(
     }
     fpLum = FloatProcessor(image.getWidth(), image.getHeight(), pixelsLum)
     fpLum.snapshot()
-    lswSharpenFilter.doUnsharpMask(radius, 0.990f, 0f, fpLum)
+    var amount = 0.990f
+    if (lowSNRData) {
+      amount = 0.945f
+    }
+    lswSharpenFilter.doUnsharpMask(radius, amount, 0f, fpLum)
     ipGreen.setPixels(2, fpLum)
     ipBlue.setPixels(3, fpLum)
     ipRed.setPixels(1, fpLum)
@@ -708,7 +714,7 @@ fun main(args: Array<String>) {
           2,
           4,
           false,
-          null
+          null,
       )
     } else if (arguments[0].equals("-transform")) {
       service.transformFromTo(

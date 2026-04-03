@@ -1,5 +1,17 @@
 package nl.wilcokas.luckystackworker.api;
 
+import static nl.wilcokas.luckystackworker.constants.Constants.COMPRESSED_TIF_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.JPG_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.PNG8_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.PNG_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.TIFF_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.WEBP_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.getImageOutputFormat;
+
+import java.io.File;
+import java.io.IOException;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext;
@@ -24,19 +36,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import java.io.File;
-import java.io.IOException;
-
-import static nl.wilcokas.luckystackworker.constants.Constants.COMPRESSED_TIF_OUTPUTFORMAT;
-import static nl.wilcokas.luckystackworker.constants.Constants.JPG_OUTPUTFORMAT;
-import static nl.wilcokas.luckystackworker.constants.Constants.PNG8_OUTPUTFORMAT;
-import static nl.wilcokas.luckystackworker.constants.Constants.PNG_OUTPUTFORMAT;
-import static nl.wilcokas.luckystackworker.constants.Constants.TIFF_OUTPUTFORMAT;
-import static nl.wilcokas.luckystackworker.constants.Constants.WEBP_OUTPUTFORMAT;
-import static nl.wilcokas.luckystackworker.util.LswFileUtil.getImageOutputFormat;
 
 @CrossOrigin(origins = {"http://localhost:4200", "https://www.wilcokas.com"})
 @RestController

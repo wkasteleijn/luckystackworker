@@ -24,7 +24,6 @@ import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
-
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.BandedSampleModel;
@@ -51,16 +50,12 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.spi.IIORegistry;
 import javax.imageio.stream.FileImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
-
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
-import nl.wilcokas.luckystackworker.exceptions.LswNotReadyException;
 import nl.wilcokas.luckystackworker.exceptions.NotARawImageException;
 import nl.wilcokas.luckystackworker.filter.settings.LSWSharpenMode;
 import nl.wilcokas.luckystackworker.ij.LswImageViewer;
@@ -241,12 +236,11 @@ public class LswFileUtil {
         short[] r = (short[]) stack.getProcessor(1).getPixels();
         short[] g = (short[]) stack.getProcessor(2).getPixels();
         short[] b = (short[]) stack.getProcessor(3).getPixels();
-        DataBufferUShort db = new DataBufferUShort(new short[][]{r, g, b}, r.length);
+        DataBufferUShort db = new DataBufferUShort(new short[][] {r, g, b}, r.length);
         ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_sRGB);
         int[] bits = {16, 16, 16};
-        ComponentColorModel cm = new ComponentColorModel(cs, bits, false, false,
-                Transparency.OPAQUE,
-                DataBuffer.TYPE_USHORT);
+        ComponentColorModel cm =
+                new ComponentColorModel(cs, bits, false, false, Transparency.OPAQUE, DataBuffer.TYPE_USHORT);
         BandedSampleModel sm = new BandedSampleModel(DataBuffer.TYPE_USHORT, width, height, 3);
         WritableRaster raster = Raster.createWritableRaster(sm, db, null);
         BufferedImage bi = new BufferedImage(cm, raster, false, null);
@@ -262,14 +256,13 @@ public class LswFileUtil {
         short[] r = (short[]) stack.getPixels(1);
         short[] g = (short[]) stack.getPixels(2);
         short[] b = (short[]) stack.getPixels(3);
-        DataBufferUShort db = new DataBufferUShort(new short[][]{r, g, b}, r.length);
+        DataBufferUShort db = new DataBufferUShort(new short[][] {r, g, b}, r.length);
 
         // 2. Build the ColorModel and SampleModel
         ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_sRGB);
         int[] bits = {16, 16, 16};
-        ComponentColorModel cm = new ComponentColorModel(cs, bits, false, false,
-                Transparency.OPAQUE,
-                DataBuffer.TYPE_USHORT);
+        ComponentColorModel cm =
+                new ComponentColorModel(cs, bits, false, false, Transparency.OPAQUE, DataBuffer.TYPE_USHORT);
         BandedSampleModel sm = new BandedSampleModel(DataBuffer.TYPE_USHORT, width, height, 3);
 
         WritableRaster raster = Raster.createWritableRaster(sm, db, null);
@@ -778,7 +771,7 @@ public class LswFileUtil {
 
     public static String getImageOutputExtensionForFormat(ImageOutputFormatType type) {
         return switch (type) {
-            case PNG,PNG8 -> "png";
+            case PNG, PNG8 -> "png";
             case JPG -> "jpg";
             case WEBP -> "webp";
             default -> "tif";

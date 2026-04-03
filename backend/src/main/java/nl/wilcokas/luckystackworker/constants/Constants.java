@@ -1,6 +1,5 @@
 package nl.wilcokas.luckystackworker.constants;
 
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.math.BigDecimal;
 
