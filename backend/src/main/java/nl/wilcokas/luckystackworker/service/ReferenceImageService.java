@@ -420,7 +420,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         LswUtil.delayMacOS();
         if (preSelectedFiles != null) {
             jfc.setSelectedFiles(preSelectedFiles.stream().map(File::new).toArray(File[]::new));
-            //jfc.updateUI();
+            // jfc.updateUI();
         }
         int returnValue = 0;
         if (isSaveDialog) {
