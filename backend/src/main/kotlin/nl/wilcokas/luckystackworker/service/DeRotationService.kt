@@ -6,6 +6,7 @@ import ij.ImagePlus
 import ij.io.Opener
 import ij.process.FloatProcessor
 import ij.process.ShortProcessor
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
@@ -64,7 +65,7 @@ class DeRotationService(
       initialAnchorStrength: Int,
       initialNoiseRobustness: Int,
       initialAccurateness: Int,
-      referenceTime: LocalTime?,
+      initialReferenceTime: LocalTime?,
       initiallowSNRData: Boolean,
       parentFrame: JFrame?,
   ): String? {
@@ -81,12 +82,14 @@ class DeRotationService(
     // count as a single step).
     luckyStackWorkerContext.filesProcessedCount = 0
 
-    val referenceImageFilenames =
+    val result =
         determineReferenceImageFilenames(
             allImagesFilenames,
             referenceImageFilenameParam,
-            referenceTime,
+            initialReferenceTime,
         )
+    val referenceImageFilenames = result.first
+    val referenceTime = result.second
 
     val derotationWorkFolder =
         LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation"
@@ -190,24 +193,39 @@ class DeRotationService(
       allImagesFilenames: List<String>,
       referenceImageFilenameParam: String?,
       referenceTime: LocalTime?,
-  ): Pair<String, String> {
+  ): Pair<Pair<String, String>, LocalDateTime?> {
     if (referenceTime == null) {
       // If this is not time de-rotation then there is only one reference image.
-      return Pair(referenceImageFilenameParam!!, referenceImageFilenameParam)
+      return Pair(Pair(referenceImageFilenameParam!!, referenceImageFilenameParam), null)
     } else {
       for (i in allImagesFilenames.indices) {
         val imageTime = LswFileUtil.getObjectDateTime(allImagesFilenames[i])
-        if (imageTime.isAfter(LocalDateTime.of(imageTime.toLocalDate(), referenceTime))) {
+        val referenceDateTime = determineReferenceDateTime(imageTime, referenceTime)
+        if (imageTime.isAfter(referenceDateTime)) {
           if (i == 0) {
             throw BatchStoppedException(
                 "The provided reference time is before the first image timestamp"
             )
           }
-          return Pair(allImagesFilenames[i - 1], allImagesFilenames[i])
+          return Pair(Pair(allImagesFilenames[i - 1], allImagesFilenames[i]), referenceDateTime)
         }
       }
       throw BatchStoppedException("The provided reference time is after the last image timestamp")
     }
+  }
+
+  private fun determineReferenceDateTime(
+      imageTime: LocalDateTime,
+      referenceTime: LocalTime,
+  ): LocalDateTime {
+    val referenceDate = imageTime.toLocalDate()
+    val refDateTimeSameDay = LocalDateTime.of(referenceDate, referenceTime)
+    val refDateTimeNextDay = refDateTimeSameDay.plusDays(1)
+    val diffSameDay = Duration.between(imageTime, refDateTimeSameDay).abs()
+    val diffNextDay = Duration.between(imageTime, refDateTimeNextDay).abs()
+    val referenceDateTime =
+        if (diffSameDay < diffNextDay) refDateTimeSameDay else refDateTimeNextDay
+    return referenceDateTime
   }
 
   /*
@@ -219,7 +237,7 @@ class DeRotationService(
   private fun calculateReferenceInterpolationFactors(
       referenceImageFilenames: Pair<String, String>,
       allImagesFilenames: List<String>,
-      referenceTime: LocalTime,
+      referenceTime: LocalDateTime,
   ): Pair<Double, Double> {
     var previousImage: String? = null
     for (i in allImagesFilenames.indices) {
@@ -248,7 +266,7 @@ class DeRotationService(
       allImagesFilenamesParam: List<String>,
       referenceImageFilenames: Pair<String, String>,
       parentFrame: JFrame?,
-      referenceTime: LocalTime?,
+      referenceTime: LocalDateTime?,
   ): ImagePlus? {
     log.info("Create warped images based on the transformation files")
 
@@ -358,16 +376,13 @@ class DeRotationService(
 
   private fun addInterpolatedReferenceImageFilename(
       allImagesFilenamesParam: List<String>,
-      referenceTime: LocalTime,
+      referenceTime: LocalDateTime,
   ): MutableList<String> {
     val allImagesFilenames = ArrayList<String>()
     var referenceAdded = false
     for (imageFilename in allImagesFilenamesParam) {
       val imageTime = LswFileUtil.getObjectDateTime(imageFilename)
-      if (
-          !referenceAdded &&
-              imageTime.isAfter(LocalDateTime.of(imageTime.toLocalDate(), referenceTime))
-      ) {
+      if (!referenceAdded && imageTime.isAfter(referenceTime)) {
         allImagesFilenames.add(
             referenceTime.toString()
         ) // Add reference time as fake filename, we only need it for comparison

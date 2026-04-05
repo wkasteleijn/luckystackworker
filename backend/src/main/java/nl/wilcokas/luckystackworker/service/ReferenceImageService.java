@@ -704,6 +704,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                             openImageAfterStacking(
                                     deRotatedImagePath, settingsService.getRootFolder(), scale, openImageMode);
                         }
+                    } catch (Exception e) {
+                        log.error("Error during derotation", e);
                     } finally {
                         signalBatchFinished();
                     }
