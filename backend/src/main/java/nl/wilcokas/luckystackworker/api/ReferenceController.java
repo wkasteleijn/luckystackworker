@@ -1,9 +1,5 @@
 package nl.wilcokas.luckystackworker.api;
 
-import java.io.File;
-import java.io.IOException;
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import static nl.wilcokas.luckystackworker.constants.Constants.COMPRESSED_TIF_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.constants.Constants.JPG_OUTPUTFORMAT;
 import static nl.wilcokas.luckystackworker.constants.Constants.PNG8_OUTPUTFORMAT;

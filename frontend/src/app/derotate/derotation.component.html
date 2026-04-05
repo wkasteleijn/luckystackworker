@@ -5,11 +5,16 @@
   </button>
 
   @if (showWarning()) {
-    <div class="warning {{ nightMode ? 'titleNight' : 'title' }}">
-      You must select a reference image first!
+    <div class="{{ nightMode ? 'titleNight' : 'title' }}">
+      Select either a reference image or enter a reference time.
     </div>
   }
-  @if (!showWarning()) {
+  @if (showInvalidTimeWarning()) {
+    <div class="{{ nightMode ? 'titleNight' : 'title' }}">
+      Enter a valid reference time.
+    </div>
+  }
+  @if (!showWarning() && !showInvalidTimeWarning()) {
     <div class="slidersStartMargin"></div>
   }
 
@@ -26,6 +31,7 @@
         }}"
         (change)="onRefImageChanged()"
       >
+        <option [value]=""></option>
         @for (image of deRotation.images; track image) {
           <option [value]="image">
             {{ image }}
@@ -33,6 +39,39 @@
         }
       </select>
     </div>
+    <div class="referenceTimeInput">
+      <label class="sliderLabel">Reference time</label>
+      <div>
+        H
+        <input
+          matInput
+          type="number"
+          min="0"
+          max="23"
+          [(ngModel)]="referenceHour"
+          class="timeInput"
+        />
+        : M
+        <input
+          matInput
+          type="number"
+          min="0"
+          max="59"
+          [(ngModel)]="referenceMinute"
+          class="timeInput"
+        />
+        : S
+        <input
+          matInput
+          type="number"
+          min="0"
+          max="59"
+          [(ngModel)]="referenceSecond"
+          class="timeInput"
+        />
+      </div>
+    </div>
+
     <app-slider
       [sliderLabel]="'Detail anchor strength'"
       [sliderValue]="deRotation.anchorStrength"
@@ -67,17 +106,17 @@
       class="lowSNRData"
       >Low signal-to-noise ratio data</mat-checkbox
     >
+
+    <button
+      type="button"
+      mat-button
+      (click)="onStart()"
+      class="button startButton {{
+        nightMode ? 'activeColorNight' : 'activeColor'
+      }}"
+      matTooltip="Start de-rotating the selected images."
+    >
+      <img src="assets/images/startbatch.png" class="startButtonImg" />
+    </button>
   </div>
-
-  <div class="buttonMargin"></div>
-
-  <button
-    type="button"
-    mat-button
-    (click)="onStart()"
-    class="button {{ nightMode ? 'activeColorNight' : 'activeColor' }}"
-    matTooltip="Start de-rotating the selected images."
-  >
-    <img src="assets/images/startbatch.png" class="startButton" />
-  </button>
 </div>

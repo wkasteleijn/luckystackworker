@@ -42,8 +42,8 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Iterator;
 import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
 import java.util.function.UnaryOperator;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -757,8 +757,6 @@ public class LswFileUtil {
                 "%s:%d", dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), dateTime.getSecond() / 6);
     }
 
-    public static String getOutputImageExtension(ImageOutputFormatType outputFormatType) {
-        return switch (outputFormatType) {
     public static ImageOutputFormatType getImageOutputFormat(String extension, FileFilter selectedFormat) {
         if (!StringUtils.isEmpty(extension)) {
             return switch (extension.toLowerCase()) {

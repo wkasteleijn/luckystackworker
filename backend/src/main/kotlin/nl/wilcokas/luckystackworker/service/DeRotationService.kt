@@ -7,6 +7,7 @@ import ij.io.Opener
 import ij.process.FloatProcessor
 import ij.process.ShortProcessor
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -63,7 +64,7 @@ class DeRotationService(
       initialAnchorStrength: Int,
       initialNoiseRobustness: Int,
       initialAccurateness: Int,
-      referenceTime: LocalDateTime?,
+      referenceTime: LocalTime?,
       initiallowSNRData: Boolean,
       parentFrame: JFrame?,
   ): String? {
@@ -87,8 +88,6 @@ class DeRotationService(
             referenceTime,
         )
 
-    val referenceImagePath = "${rootFolder}/${referenceImageFilenameParam}"
-    val referenceImage = openImage(referenceImagePath, parentFrame)
     val derotationWorkFolder =
         LswFileUtil.getDataFolder(LswUtil.getActiveOSProfile()) + "/derotation"
 
@@ -190,7 +189,7 @@ class DeRotationService(
   private fun determineReferenceImageFilenames(
       allImagesFilenames: List<String>,
       referenceImageFilenameParam: String?,
-      referenceTime: LocalDateTime?,
+      referenceTime: LocalTime?,
   ): Pair<String, String> {
     if (referenceTime == null) {
       // If this is not time de-rotation then there is only one reference image.
@@ -198,7 +197,7 @@ class DeRotationService(
     } else {
       for (i in allImagesFilenames.indices) {
         val imageTime = LswFileUtil.getObjectDateTime(allImagesFilenames[i])
-        if (imageTime.isAfter(referenceTime)) {
+        if (imageTime.isAfter(LocalDateTime.of(imageTime.toLocalDate(), referenceTime))) {
           if (i == 0) {
             throw BatchStoppedException(
                 "The provided reference time is before the first image timestamp"
@@ -220,7 +219,7 @@ class DeRotationService(
   private fun calculateReferenceInterpolationFactors(
       referenceImageFilenames: Pair<String, String>,
       allImagesFilenames: List<String>,
-      referenceTime: LocalDateTime,
+      referenceTime: LocalTime,
   ): Pair<Double, Double> {
     var previousImage: String? = null
     for (i in allImagesFilenames.indices) {
@@ -249,7 +248,7 @@ class DeRotationService(
       allImagesFilenamesParam: List<String>,
       referenceImageFilenames: Pair<String, String>,
       parentFrame: JFrame?,
-      referenceTime: LocalDateTime?,
+      referenceTime: LocalTime?,
   ): ImagePlus? {
     log.info("Create warped images based on the transformation files")
 
@@ -359,13 +358,16 @@ class DeRotationService(
 
   private fun addInterpolatedReferenceImageFilename(
       allImagesFilenamesParam: List<String>,
-      referenceTime: LocalDateTime,
+      referenceTime: LocalTime,
   ): MutableList<String> {
     val allImagesFilenames = ArrayList<String>()
     var referenceAdded = false
     for (imageFilename in allImagesFilenamesParam) {
       val imageTime = LswFileUtil.getObjectDateTime(imageFilename)
-      if (!referenceAdded && imageTime.isAfter(referenceTime)) {
+      if (
+          !referenceAdded &&
+              imageTime.isAfter(LocalDateTime.of(imageTime.toLocalDate(), referenceTime))
+      ) {
         allImagesFilenames.add(
             referenceTime.toString()
         ) // Add reference time as fake filename, we only need it for comparison
@@ -883,8 +885,8 @@ fun main(args: Array<String>) {
           4,
           2,
           4,
+          LocalTime.now(),
           false,
-          null,
           null,
       )
     } else if (arguments[0] == "-transform") {

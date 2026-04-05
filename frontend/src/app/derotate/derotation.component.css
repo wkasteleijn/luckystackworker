@@ -8,12 +8,14 @@
   border: 1px solid rgb(168, 168, 168);
   padding: 20px;
   width: 400px;
-  height: 300px;
+  height: 346px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
 }
 
 .sliderContainer {
+  position: absolute;
+  top: 96px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -22,11 +24,23 @@
 }
 
 .sliderGroupFileSelector {
+  margin-top: 4px;
+  margin-bottom: 12px;
   display: grid;
   grid-template-columns: 128px 218px;
   align-items: center;
-  height: 16px;
+  height: 12px;
   column-gap: 8px;
+}
+
+.referenceTimeInput {
+  margin-top: 4px;
+  display: grid;
+  grid-template-columns: 128px 218px;
+  align-items: center;
+  height: 12px;
+  column-gap: 8px;
+  margin-bottom: -8px;
 }
 
 .sliderLabel {
@@ -39,7 +53,7 @@
 }
 
 .slidersStartMargin {
-  margin-top: 48px;
+  margin-top: 32px;
 }
 
 .closeButton {
@@ -48,10 +62,10 @@
   right: 24px;
   border-style: hidden;
   padding-left: 11px;
+  height: 40px;
 }
 
 button {
-  height: 40px;
   width: 42px;
   font-size: 12px;
   border: 0px;
@@ -64,6 +78,7 @@ button {
   padding-top: 2px;
   padding-bottom: 0px;
 }
+
 button:hover {
   color: rgb(168, 168, 168);
   background-color: #505050;
@@ -92,6 +107,12 @@ h2 {
 }
 
 .startButton {
+  height: 42px;
+  width: 44px;
+  margin-top: -8px;
+}
+
+.startButtonImg {
   width: 13px;
   transform: scale(2.5);
   margin-top: 2px;
@@ -103,8 +124,7 @@ h2 {
 }
 
 .warning {
-  margin-top: 12px;
-  margin-bottom: 12px;
+  margin-top: 32px;
 }
 
 .derotationDropdown {
@@ -113,4 +133,11 @@ h2 {
 
 .lowSNRData {
   margin-top: 8px;
+}
+
+.timeInput {
+  width: 38px;
+  color: rgb(168, 168, 168);
+  border: 1px solid rgb(168, 168, 168);
+  background-color: #191919;
 }

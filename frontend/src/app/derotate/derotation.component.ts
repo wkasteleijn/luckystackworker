@@ -17,6 +17,9 @@ export class DeRotationComponent {
 
   referenceImage: string;
   startPressed: boolean = false;
+  referenceHour: number;
+  referenceMinute: number;
+  referenceSecond: number;
 
   componentColor: ThemePalette = 'primary';
   componentColorNight: ThemePalette = 'warn';
@@ -30,7 +33,13 @@ export class DeRotationComponent {
   onStart() {
     console.log('onStart called');
     this.startPressed = true;
-    if (this.referenceImage !== undefined) {
+    if (
+      this.isReferenceImageSelected() ||
+      (this.isCompleteTimeEntered() && !this.isInvalidReferenceTime())
+    ) {
+      this.deRotation.referenceHour = this.referenceHour;
+      this.deRotation.referenceMinute = this.referenceMinute;
+      this.deRotation.referenceSecond = this.referenceSecond;
       this.start.emit(this.deRotation);
     }
   }
@@ -40,7 +49,15 @@ export class DeRotationComponent {
   }
 
   showWarning(): boolean {
-    return this.startPressed && this.referenceImage === undefined;
+    return (
+      this.startPressed &&
+      ((!this.isReferenceImageSelected() && !this.isCompleteTimeEntered()) ||
+        (this.isReferenceImageSelected() && this.isCompleteTimeEntered()))
+    );
+  }
+
+  showInvalidTimeWarning(): boolean {
+    return this.startPressed && this.isInvalidReferenceTime();
   }
 
   onRefImageChanged() {
@@ -60,5 +77,42 @@ export class DeRotationComponent {
   }
   onLowSNRDataChanged(event: any) {
     this.deRotation.lowSNRData = event.checked;
+  }
+
+  private parseInt(input: string): number {
+    if (input === null || input.trim() === '') {
+      return -1;
+    }
+    const num = Number(input);
+    if (Number.isInteger(num)) {
+      return num;
+    }
+    return -2;
+  }
+
+  private isInvalidReferenceTime(): boolean {
+    return (
+      this.referenceHour < 0 ||
+      this.referenceHour > 23 ||
+      this.referenceMinute < 0 ||
+      this.referenceMinute > 59 ||
+      this.referenceSecond < 0 ||
+      this.referenceSecond > 59
+    );
+  }
+
+  private isCompleteTimeEntered(): boolean {
+    return (
+      this.referenceHour !== undefined &&
+      this.referenceMinute !== undefined &&
+      this.referenceSecond !== undefined &&
+      this.referenceHour !== null &&
+      this.referenceMinute !== null &&
+      this.referenceSecond !== null
+    );
+  }
+
+  private isReferenceImageSelected(): boolean {
+    return this.referenceImage !== undefined && this.referenceImage.length > 0;
   }
 }
