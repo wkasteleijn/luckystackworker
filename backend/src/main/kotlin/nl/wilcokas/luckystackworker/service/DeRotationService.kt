@@ -485,12 +485,15 @@ class DeRotationService(
       val target = LswFileUtil.getFilenameFromPath(targetFullPath)
       var factor: Double? = null
       val actualReferenceImageFilename =
-          if (referenceEncountered) referenceImageFilenames.second
-          else referenceImageFilenames.first
-      if (targetFullPath == actualReferenceImageFilename && referenceInterpolationFactors != null) {
+          if (referenceEncountered) referenceImageFilenames.first
+          else referenceImageFilenames.second
+      if (
+          target.replace("_sharpened", "") == actualReferenceImageFilename &&
+              referenceInterpolationFactors != null
+      ) {
         factor =
-            if (referenceEncountered) referenceInterpolationFactors.second
-            else referenceInterpolationFactors.first
+            if (referenceEncountered) referenceInterpolationFactors.first
+            else referenceInterpolationFactors.second
       }
       val isTimeDeRotation = referenceImageFilenames.first != referenceImageFilenames.second
       if (isTimeDeRotation || referenceImageFilenames.first != originalSource) {
