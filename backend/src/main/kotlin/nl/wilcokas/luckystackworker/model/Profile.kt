@@ -190,7 +190,7 @@ data class Profile(
     this.wienerIterations = profile.wienerIterations
     this.wienerRepetitions = profile.wienerRepetitions
 
-    if (profile.applySharpenToChannel == ChannelEnum.RGB) {
+    if (profile.applyToChannel == ChannelEnum.RGB) {
       this.radiusGreen = profile.radius
       this.amountGreen = profile.amount
       this.iterationsGreen = profile.iterations
@@ -260,7 +260,7 @@ data class Profile(
     this.bilateralSigmaSpace = profile.bilateralSigmaSpace
     this.bilateralIterations = profile.bilateralIterations
 
-    if (profile.applyDenoiseToChannel == ChannelEnum.RGB) {
+    if (profile.applyToChannel == ChannelEnum.RGB) {
       this.denoise1AmountGreen = profile.denoise1Amount
       this.denoise1RadiusGreen = profile.denoise1Radius
       this.denoise1IterationsGreen = profile.denoise1Iterations

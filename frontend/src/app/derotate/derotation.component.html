@@ -60,6 +60,13 @@
       [nightMode]="nightMode"
       (sliderValueChanged)="onAccuratenessChanged($event)"
     ></app-slider>
+    <mat-checkbox
+      [(ngModel)]="deRotation.lowSNRData"
+      (change)="onLowSNRDataChanged($event)"
+      [color]="colorTheme()"
+      class="lowSNRData"
+      >Low signal-to-noise ratio data</mat-checkbox
+    >
   </div>
 
   <div class="buttonMargin"></div>

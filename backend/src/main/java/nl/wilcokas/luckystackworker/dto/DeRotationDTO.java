@@ -20,12 +20,14 @@ public class DeRotationDTO {
     private int anchorStrength;
     private int noiseRobustness;
     private int accurateness;
+    private boolean lowSNRData;
 
     public DeRotationDTO(DeRotation deRotation) {
         this.images = deRotation.getImages();
         this.anchorStrength = deRotation.getAnchorStrength();
         this.noiseRobustness = deRotation.getNoiseRobustness();
         this.accurateness = deRotation.getAccurateness();
+        this.lowSNRData = deRotation.isLowSNRData();
         LocalDateTime localDateTime = deRotation.getReferenceTime();
         if (localDateTime != null) {
             this.referenceTime = LswFileUtil.toWinjuposTimestamp(localDateTime);

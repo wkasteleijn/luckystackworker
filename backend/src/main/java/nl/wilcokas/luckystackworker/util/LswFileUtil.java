@@ -1,19 +1,39 @@
 package nl.wilcokas.luckystackworker.util;
 
+import static nl.wilcokas.luckystackworker.constants.Constants.COMPRESSED_TIF_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.JPG_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.PNG8_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.PNG_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.constants.Constants.WEBP_OUTPUTFORMAT;
+import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.CTIF;
 import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.JPG;
 import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.PNG;
+import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.PNG8;
 import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF;
+import static nl.wilcokas.luckystackworker.model.ImageOutputFormatType.WEBP;
 
+import com.luciad.imageio.webp.CompressionType;
+import com.luciad.imageio.webp.WebPWriteParam;
 import ij.CompositeImage;
 import ij.IJ;
 import ij.ImagePlus;
+import ij.ImageStack;
 import ij.io.FileInfo;
 import ij.io.Opener;
 import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
+import java.awt.*;
+import java.awt.color.ColorSpace;
+import java.awt.image.BandedSampleModel;
+import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferUShort;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.FileAlreadyExistsException;
@@ -22,10 +42,19 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Iterator;
 import java.time.format.DateTimeFormatter;
 import java.util.function.UnaryOperator;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.stream.FileImageOutputStream;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 import lombok.extern.slf4j.Slf4j;
 import nl.wilcokas.luckystackworker.constants.Constants;
 import nl.wilcokas.luckystackworker.exceptions.NotARawImageException;
@@ -179,8 +208,14 @@ public class LswFileUtil {
             saver.setJpegQuality(100);
             saver.saveAsJpeg(path);
         } else if (outputFormatType == PNG) {
+            saveAs48BitPngNative(image, path);
+        } else if (outputFormatType == PNG8) {
             LSWFileSaver saver = new LSWFileSaver(createSingleLayerColorImage(image));
             saver.saveAsPng(path);
+        } else if (outputFormatType == CTIF) {
+            saveAs48BitTiffCompressed(image, path);
+        } else if (outputFormatType == WEBP) {
+            save8BitLosslessWebp(image, path);
         } else {
             if (fixRgbStack) {
                 image.setActiveChannels("111");
@@ -192,6 +227,100 @@ public class LswFileUtil {
                 hackIncorrectPngFileInfo(saver);
             }
             saver.saveAsTiff(path);
+        }
+    }
+
+    private static void saveAs48BitPngNative(ImagePlus imp, String outputPath) throws IOException {
+        int width = imp.getWidth();
+        int height = imp.getHeight();
+        ImageStack stack = imp.getStack();
+        short[] r = (short[]) stack.getProcessor(1).getPixels();
+        short[] g = (short[]) stack.getProcessor(2).getPixels();
+        short[] b = (short[]) stack.getProcessor(3).getPixels();
+        DataBufferUShort db = new DataBufferUShort(new short[][] {r, g, b}, r.length);
+        ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_sRGB);
+        int[] bits = {16, 16, 16};
+        ComponentColorModel cm =
+                new ComponentColorModel(cs, bits, false, false, Transparency.OPAQUE, DataBuffer.TYPE_USHORT);
+        BandedSampleModel sm = new BandedSampleModel(DataBuffer.TYPE_USHORT, width, height, 3);
+        WritableRaster raster = Raster.createWritableRaster(sm, db, null);
+        BufferedImage bi = new BufferedImage(cm, raster, false, null);
+        ImageIO.write(bi, "PNG", new File(outputPath));
+    }
+
+    public static void saveAs48BitTiffCompressed(ImagePlus imp, String outputPath) throws IOException {
+        int width = imp.getWidth();
+        int height = imp.getHeight();
+        ImageStack stack = imp.getStack();
+
+        // 1. Prepare the 16-bit 3-bank DataBuffer (Red, Green, Blue)
+        short[] r = (short[]) stack.getPixels(1);
+        short[] g = (short[]) stack.getPixels(2);
+        short[] b = (short[]) stack.getPixels(3);
+        DataBufferUShort db = new DataBufferUShort(new short[][] {r, g, b}, r.length);
+
+        // 2. Build the ColorModel and SampleModel
+        ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_sRGB);
+        int[] bits = {16, 16, 16};
+        ComponentColorModel cm =
+                new ComponentColorModel(cs, bits, false, false, Transparency.OPAQUE, DataBuffer.TYPE_USHORT);
+        BandedSampleModel sm = new BandedSampleModel(DataBuffer.TYPE_USHORT, width, height, 3);
+
+        WritableRaster raster = Raster.createWritableRaster(sm, db, null);
+        BufferedImage bi = new BufferedImage(cm, raster, false, null);
+
+        // 3. Initialize the TIFF Writer
+        Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("TIFF");
+        if (!writers.hasNext()) throw new RuntimeException("No TIFF writer found!");
+        ImageWriter writer = writers.next();
+
+        File outputFile = new File(outputPath);
+        try (var ios = ImageIO.createImageOutputStream(outputFile)) {
+            writer.setOutput(ios);
+
+            // 4. SET COMPRESSION PARAMETERS HERE
+            ImageWriteParam param = writer.getDefaultWriteParam();
+            if (param.canWriteCompressed()) {
+                param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                // "LZW" is the most common lossless compression for 16-bit TIFFs
+                // Other options include "PackBits" or "ZLib" (Deflate)
+                param.setCompressionType("LZW");
+            }
+
+            // 5. Setup Metadata (ensures the 16-bit tags are correctly written)
+            ImageTypeSpecifier typeSpecifier = ImageTypeSpecifier.createFromRenderedImage(bi);
+            IIOMetadata metadata = writer.getDefaultImageMetadata(typeSpecifier, param);
+
+            // 6. Execute the Write
+            writer.write(null, new IIOImage(bi, null, metadata), param);
+        } finally {
+            writer.dispose();
+        }
+    }
+
+    public static void save8BitLosslessWebp(ImagePlus image, String outputFilePath) throws IOException {
+        Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType("image/webp");
+        if (!writers.hasNext()) {
+            throw new IllegalStateException("No WebP writer found!");
+        }
+        ImageWriter writer = writers.next();
+
+        // 2. Configure encoding parameters
+        // We cast to WebPWriteParam to access specific WebP features
+        WebPWriteParam writeParam = (WebPWriteParam) writer.getDefaultWriteParam();
+
+        // Kotlin's .apply { ... } block converted to standard setters
+        writeParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+        writeParam.setCompressionType(CompressionType.Lossless);
+
+        // 3. Configure the output
+        try (FileImageOutputStream output = new FileImageOutputStream(new File(outputFilePath))) {
+            writer.setOutput(output);
+
+            // 4. Encode and Write
+            writer.write(null, new IIOImage(image.getBufferedImage(), null, null), writeParam);
+        } finally {
+            writer.dispose();
         }
     }
 
@@ -630,9 +759,31 @@ public class LswFileUtil {
 
     public static String getOutputImageExtension(ImageOutputFormatType outputFormatType) {
         return switch (outputFormatType) {
+    public static ImageOutputFormatType getImageOutputFormat(String extension, FileFilter selectedFormat) {
+        if (!StringUtils.isEmpty(extension)) {
+            return switch (extension.toLowerCase()) {
+                case "jpg", "jpeg" -> JPG;
+                case "png" -> PNG;
+                case "webp" -> WEBP;
+                default -> TIF;
+            };
+        }
+        return switch (selectedFormat.getDescription()) {
+            case PNG_OUTPUTFORMAT -> PNG;
+            case JPG_OUTPUTFORMAT -> JPG;
+            case COMPRESSED_TIF_OUTPUTFORMAT -> CTIF;
+            case WEBP_OUTPUTFORMAT -> WEBP;
+            case PNG8_OUTPUTFORMAT -> PNG8;
+            default -> TIF;
+        };
+    }
+
+    public static String getImageOutputExtensionForFormat(ImageOutputFormatType type) {
+        return switch (type) {
+            case PNG, PNG8 -> "png";
             case JPG -> "jpg";
-            case PNG -> "png";
-            default -> Constants.DEFAULT_OUTPUT_FORMAT;
+            case WEBP -> "webp";
+            default -> "tif";
         };
     }
 

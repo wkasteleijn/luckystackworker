@@ -95,12 +95,7 @@ public class WienerDeconvolutionFilter implements LSWFilter {
                 PSF psf = profile.getPsf();
                 psf.setType(PSFType.SYNTHETIC);
                 try {
-                    psfImage = PsfDiskGenerator.generate16BitRGB(
-                            psf.getAiryDiskRadius(),
-                            psf.getSeeingIndex(),
-                            psf.getDiffractionIntensity(),
-                            profile.getName(),
-                            isMono);
+                    psfImage = PsfDiskGenerator.generate16BitRGB(psf, profile.getName(), isMono);
                 } catch (IOException e) {
                     throw new FilterException(e.getMessage());
                 }

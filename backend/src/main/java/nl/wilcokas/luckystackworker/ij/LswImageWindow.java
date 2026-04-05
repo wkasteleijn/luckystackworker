@@ -1,5 +1,9 @@
 package nl.wilcokas.luckystackworker.ij;
 
+import static nl.wilcokas.luckystackworker.constants.Constants.BACKGROUND_COLOR;
+import static nl.wilcokas.luckystackworker.constants.Constants.BORDER_COLOR;
+import static nl.wilcokas.luckystackworker.constants.Constants.TITLEBAR_COLOR;
+import static nl.wilcokas.luckystackworker.constants.Constants.TITLE_COLOR;
 import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.get8BitColorHistogram;
 
 import ij.*;
@@ -25,13 +29,9 @@ import org.springframework.util.ReflectionUtils;
 public class LswImageWindow extends ImageWindow implements MouseMotionListener {
 
     private static final double SCALE = Prefs.getGuiScale();
-    private static final Color TITLEBAR_COLOR = new Color(32, 32, 32);
-    private static final Color TITLE_COLOR = new Color(100, 100, 100);
     private static final Color HISTOGRAM_COLOR_DAY = new Color(0x4c, 0xaf, 0x50);
     private static final Color HISTOGRAM_COLOR_NIGHT = new Color(0x9f, 0x58, 0x00);
     private static final Color HISTOGRAM_COLOR_WARN = new Color(174, 80, 80);
-    private static final Color BORDER_COLOR = new Color(64, 64, 64);
-    private static final Color BACKGROUND_COLOR = new Color(25, 25, 25);
     private static final int OFFSET_TOP = 32;
     private static final int HISTOGRAM_MARGIN_LEFT = 0;
     private static final int HISTOGRAM_MARGIN_TOP = 0;

@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "nl.wilcokas"
-version = "7.1.0"
+version = "7.2.0-beta"
 description = "LuckyStackWorker"
 
 java {
@@ -54,6 +54,8 @@ dependencies {
     implementation(libs.sc.fiji.turboreg)
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.reflect)
+    implementation(libs.com.formdev.flatlaf)
+    implementation(libs.com.github.usefulness.webp.imageio)
 
     compileOnly(libs.org.projectlombok.lombok)
     annotationProcessor(libs.org.projectlombok.lombok)

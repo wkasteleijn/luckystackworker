@@ -58,4 +58,7 @@ export class DeRotationComponent {
   onAccuratenessChanged(event: any) {
     this.deRotation.accurateness = event;
   }
+  onLowSNRDataChanged(event: any) {
+    this.deRotation.lowSNRData = event.checked;
+  }
 }

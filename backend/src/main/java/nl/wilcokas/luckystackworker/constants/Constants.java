@@ -1,17 +1,26 @@
 package nl.wilcokas.luckystackworker.constants;
 
+import java.awt.*;
 import java.math.BigDecimal;
 
 public class Constants {
 
-    private Constants() {}
+    public Constants() {}
 
     public static final String OUTPUT_POSTFIX = "_LSW";
     public static final String OUTPUT_POSTFIX_SAVE = "_REF";
     public static final String WORKER_FOLDER_POSTFIX = "_lsw";
     public static final String STATUS_IDLE = "Idle";
     public static final String STATUS_WORKING = "Working";
+
     public static final String DEFAULT_OUTPUT_FORMAT = "tif";
+    public static final String TIFF_OUTPUTFORMAT = "16-bit Uncompressed TIFF";
+    public static final String COMPRESSED_TIF_OUTPUTFORMAT = "16-bit Compressed TIFF";
+    public static final String PNG_OUTPUTFORMAT = "16-bit PNG";
+    public static final String PNG8_OUTPUTFORMAT = "8-bit PNG (lossless)";
+    public static final String WEBP_OUTPUTFORMAT = "8-bit WebP (lossless)";
+    public static final String JPG_OUTPUTFORMAT = "100% Quality JPEG";
+
     public static final int LARGE_WINDOW_SIZE = 250000;
     public static final BigDecimal DEFAULT_DENOISE_RADIUS = BigDecimal.valueOf(1);
     public static final BigDecimal DEFAULT_DENOISE_SIGMA = BigDecimal.valueOf(2);
@@ -55,4 +64,9 @@ public class Constants {
     public static final int DEFAULT_DEROTATION_NOISE_ROBUSTNESS = 4;
     public static final int DEFAULT_DEROTATION_ANCHOR_STRENGTH = 3;
     public static final String DEFAULT_PROFILE = "unspecified";
+
+    public static final Color TITLEBAR_COLOR = new Color(32, 32, 32);
+    public static final Color TITLE_COLOR = new Color(100, 100, 100);
+    public static final Color BORDER_COLOR = new Color(64, 64, 64);
+    public static final Color BACKGROUND_COLOR = new Color(25, 25, 25);
 }

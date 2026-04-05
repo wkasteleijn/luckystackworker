@@ -5,4 +5,5 @@ export class DeRotation {
   anchorStrength: number;
   accurateness: number;
   rootFolder: string;
+  lowSNRData: boolean;
 }

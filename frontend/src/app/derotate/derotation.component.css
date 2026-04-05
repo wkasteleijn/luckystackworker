@@ -8,7 +8,7 @@
   border: 1px solid rgb(168, 168, 168);
   padding: 20px;
   width: 400px;
-  height: 250px;
+  height: 300px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
 }
@@ -47,6 +47,7 @@
   top: 24px;
   right: 24px;
   border-style: hidden;
+  padding-left: 11px;
 }
 
 button {
@@ -57,11 +58,15 @@ button {
   color: rgb(168, 168, 168);
   background-color: #404040;
   border-radius: 24px;
-  padding-left: 11px;
+  padding-left: 12px;
   padding-right: 11px;
   border-radius: 20px;
   padding-top: 2px;
   padding-bottom: 0px;
+}
+button:hover {
+  color: rgb(168, 168, 168);
+  background-color: #505050;
 }
 
 .buttonImg {
@@ -94,7 +99,7 @@ h2 {
 }
 
 .buttonMargin {
-  margin-top: 24px;
+  margin-top: 16px;
 }
 
 .warning {
@@ -104,4 +109,8 @@ h2 {
 
 .derotationDropdown {
   width: 263px;
+}
+
+.lowSNRData {
+  margin-top: 8px;
 }

@@ -360,12 +360,7 @@ public class FilterService {
             PSF psf, List<FilterEnum> operations, String profileName, boolean isMono, boolean fromWorker) {
         if (psfReCreationRequired(psf, operations, fromWorker) || operations.contains(FilterEnum.PSF)) {
             try {
-                PsfDiskGenerator.generate16BitRGB(
-                        psf.getAiryDiskRadius(),
-                        psf.getSeeingIndex(),
-                        psf.getDiffractionIntensity(),
-                        profileName,
-                        isMono);
+                PsfDiskGenerator.generate16BitRGB(psf, profileName, isMono);
             } catch (IOException e) {
                 throw new FilterException(e.getMessage());
             }

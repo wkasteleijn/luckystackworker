@@ -42,7 +42,6 @@ data class ProfileDTO(
     var blendRawBlue: Int = 0,
     var wienerIterationsBlue: Int = 0,
     var sharpenMode: String? = null,
-    var applySharpenToChannel: ChannelEnum? = null,
     var applyUnsharpMask: Boolean = false,
     var applyWienerDeconvolution: Boolean = false,
 
@@ -57,7 +56,6 @@ data class ProfileDTO(
     var savitzkyGolayIterations: Int = 0,
     var denoise2Radius: BigDecimal? = null,
     var denoise2Iterations: Int = 0,
-    var applyDenoiseToChannel: ChannelEnum? = null,
     var bilateralSigmaColor: Int = 0,
     var bilateralSigmaSpace: Int = 0,
     var bilateralRadius: Int = 0,
@@ -132,13 +130,14 @@ data class ProfileDTO(
     var saveScale: Double = 100.0,
     var saveDimensionX: Int = 0,
     var saveDimensionY: Int = 0,
+    var applyToChannel: ChannelEnum? = null,
 ) {
   // Secondary constructor for mapping from domain Profile
   constructor(profile: Profile) : this() {
     this.name = profile.name
 
     // sharpen
-    this.applySharpenToChannel = ChannelEnum.RGB
+    this.applyToChannel = ChannelEnum.RGB
     this.radius = profile.radius
     this.amount = profile.amount
     this.iterations = profile.iterations

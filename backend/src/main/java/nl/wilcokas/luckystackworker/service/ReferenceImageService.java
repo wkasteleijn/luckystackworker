@@ -1,34 +1,38 @@
 package nl.wilcokas.luckystackworker.service;
 
-import static java.util.Collections.*;
+import static java.util.Collections.emptyList;
 import static nl.wilcokas.luckystackworker.constants.Constants.MAX_RELEASE_NOTES_SHOWN;
 import static nl.wilcokas.luckystackworker.constants.Constants.STATUS_IDLE;
 import static nl.wilcokas.luckystackworker.util.LswFileUtil.createCleanDirectory;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.getFilenameExtension;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.getImageOutputExtensionForFormat;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.getImageOutputFormat;
+import static nl.wilcokas.luckystackworker.util.LswFileUtil.getPathWithoutExtension;
 import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.get16BitRGBHistogram;
 import static nl.wilcokas.luckystackworker.util.LswImageProcessingUtil.getPSFImageDto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ij.ImagePlus;
-import ij.gui.*;
+import ij.gui.ImageCanvas;
+import ij.gui.Roi;
+import ij.gui.RoiListener;
+import ij.gui.Toolbar;
 import ij.io.Opener;
 import ij.process.ColorProcessor;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.HeadlessException;
-import java.awt.Image;
-import java.awt.Taskbar;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -36,11 +40,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import java.util.stream.Collectors;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +68,10 @@ import nl.wilcokas.luckystackworker.repository.SettingsRepository;
 import nl.wilcokas.luckystackworker.service.bean.GithubRelease;
 import nl.wilcokas.luckystackworker.service.bean.LswImageLayers;
 import nl.wilcokas.luckystackworker.service.client.GithubClientService;
-import nl.wilcokas.luckystackworker.util.*;
+import nl.wilcokas.luckystackworker.util.LswFileUtil;
+import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil;
+import nl.wilcokas.luckystackworker.util.LswUtil;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
@@ -151,7 +155,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             String selectedFilePath = selectedFile.getAbsolutePath();
             if (validateSelectedFile(selectedFilePath)) {
                 log.info("Image selected {} ", selectedFilePath);
-                String fileNameNoExt = LswFileUtil.getPathWithoutExtension(selectedFilePath);
+                String fileNameNoExt = getPathWithoutExtension(selectedFilePath);
                 Profile profile = LswFileUtil.readProfile(fileNameNoExt);
                 if (profile == null) {
                     String profileName = LswFileUtil.deriveProfileFromImageName(selectedFilePath);
@@ -219,8 +223,8 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
 
     public void saveReferenceImage(String path, ImageOutputFormatType outputFormatType, Profile profile)
             throws IOException {
-        String pathNoExt = LswFileUtil.getPathWithoutExtension(path);
-        String savePath = pathNoExt + "." + LswFileUtil.getOutputImageExtension(outputFormatType);
+        String pathNoExt = getPathWithoutExtension(path);
+        String savePath = pathNoExt + "." + getImageOutputExtensionForFormat(outputFormatType);
         log.info("Saving image to  {}", savePath);
         ImagePlus savedImage = finalResultImage;
         if (luckyStackWorkerContext.isRoiActive()) {
@@ -347,7 +351,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public void writeProfile() throws IOException {
-        String fileNameNoExt = LswFileUtil.getPathWithoutExtension(imageMetadata.getFilePath());
+        String fileNameNoExt = getPathWithoutExtension(imageMetadata.getFilePath());
         writeProfile(fileNameNoExt);
     }
 
@@ -404,19 +408,31 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, boolean isSaveDialog) {
-        return getFilenameFromDialog(frame, jfc, null, isSaveDialog);
+        return getFilenameFromDialog(frame, jfc, null, null, isSaveDialog);
     }
 
-    public int getFilenameFromDialog(final JFrame frame, final JFileChooser jfc, String title, boolean isSaveDialog) {
+    public int getFilenameFromDialog(
+            final JFrame frame,
+            final JFileChooser jfc,
+            String title,
+            List<String> preSelectedFiles,
+            boolean isSaveDialog) {
         LswUtil.delayMacOS();
+        if (preSelectedFiles != null) {
+            jfc.setSelectedFiles(preSelectedFiles.stream().map(File::new).toArray(File[]::new));
+            // jfc.updateUI();
+        }
         int returnValue = 0;
         if (isSaveDialog) {
             boolean confirmed = false;
             do {
                 returnValue = jfc.showSaveDialog(frame);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    File fileToSave = jfc.getSelectedFile();
-                    if (fileToSave.exists()) {
+                    String absolutePath = jfc.getSelectedFile().getAbsolutePath();
+                    String fileToSave = getPathWithoutExtension(absolutePath) + "."
+                            + getImageOutputExtensionForFormat(
+                                    getImageOutputFormat(getFilenameExtension(absolutePath), jfc.getFileFilter()));
+                    if (Files.exists(Paths.get(fileToSave))) {
                         if (confirmOverwrite()) {
                             confirmed = true;
                         }
@@ -593,16 +609,17 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         }
     }
 
-    public DeRotation selectDerotationImages() {
-        JFileChooser jfc =
-                getJFileChooser(settingsService.getRootFolder(), "Open images, use shift+click to select multiple");
+    public DeRotation selectDerotationImages() throws IOException {
+        String rootFolder = settingsService.getSettings().getRootFolder();
+        JFileChooser jfc = getJFileChooser(rootFolder, "Open images, use shift+click to select multiple");
         jfc.setMultiSelectionEnabled(true);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TIFF, PNG", "tif", "tiff", "png");
         jfc.setFileFilter(filter);
         JFrame frame = getParentFrame();
         List<String> selectedImages = new ArrayList<>();
-        int returnValue = getFilenameFromDialog(frame, jfc, false);
-        String rootFolder = settingsService.getSettings().getRootFolder();
+        List<String> earlierSelectedImages = readLatestDerotationFile(rootFolder);
+        jfc.setCurrentDirectory(new File(rootFolder));
+        int returnValue = getFilenameFromDialog(frame, jfc, null, earlierSelectedImages, false);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File[] selectedFiles = jfc.getSelectedFiles();
             if (selectedFiles.length > 0) {
@@ -617,6 +634,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             }
         }
         selectedImages.sort(Comparator.naturalOrder());
+        if (!selectedImages.isEmpty()) {
+            writeDerotationFile(rootFolder, selectedImages);
+        }
         return DeRotation.builder()
                 .images(selectedImages)
                 .accurateness(
@@ -631,8 +651,36 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                         deRotationService.getAnchorStrength() == 0
                                 ? Constants.DEFAULT_DEROTATION_ANCHOR_STRENGTH
                                 : deRotationService.getAnchorStrength())
+                .lowSNRData(deRotationService.getLowSNRData())
                 .rootFolder(rootFolder)
                 .build();
+    }
+
+    private void writeDerotationFile(String rootFolder, List<String> selectedImages) throws IOException {
+        String selectedProfile = luckyStackWorkerContext.getSelectedProfile();
+        if (selectedProfile == null) {
+            selectedProfile = Constants.DEFAULT_PROFILE;
+        }
+        Files.writeString(
+                Paths.get(rootFolder + "/%s_LSW_DRTD.txt".formatted(selectedProfile)),
+                selectedImages.stream().map(String::trim).collect(Collectors.joining("\n")));
+    }
+
+    private List<String> readLatestDerotationFile(String rootFolder) throws IOException {
+        Collection<File> files = FileUtils.listFiles(
+                Paths.get(rootFolder).toFile(), List.of("txt").toArray(String[]::new), false);
+        Optional<File> latestFile = files.stream().max(Comparator.comparingLong(File::lastModified));
+        if (latestFile.isPresent()) {
+            Path path = latestFile.get().toPath();
+            if (Files.exists(path)) {
+                return Files.readAllLines(path).stream()
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .map(s -> rootFolder + "/" + s)
+                        .toList();
+            }
+        }
+        return emptyList();
     }
 
     @SneakyThrows
@@ -650,6 +698,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 deRotation.getNoiseRobustness(),
                                 deRotation.getAccurateness(),
                                 deRotation.getReferenceTime(),
+                                deRotation.isLowSNRData(),
                                 getParentFrame());
                         if (deRotatedImagePath != null) {
                             openImageAfterStacking(
@@ -921,7 +970,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
     }
 
     private boolean validateSelectedFile(String path) {
-        String extension = LswFileUtil.getFilenameExtension(path);
+        String extension = getFilenameExtension(path);
         if (!settingsService.getSettings().getExtensions().contains(extension)) {
             JOptionPane.showMessageDialog(
                     getParentFrame(),
@@ -971,7 +1020,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         @Override
         protected JDialog createDialog(Component parent) throws HeadlessException {
             JDialog dlg = super.createDialog(parent);
-            dlg.setLocation(controllerLastKnownPositionX + 8, controllerLastKnownPositionY + 36);
+            dlg.setLocation(controllerLastKnownPositionX + 22, controllerLastKnownPositionY + 36);
             dlg.setTitle(title);
             return dlg;
         }
