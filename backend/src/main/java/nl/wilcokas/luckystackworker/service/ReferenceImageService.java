@@ -690,6 +690,10 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         CompletableFuture.runAsync(
                 () -> {
                     try {
+                        String profileName = getProfileName(
+                                deRotation.getReferenceImage() == null
+                                        ? deRotation.getImages().getFirst()
+                                        : deRotation.getReferenceImage());
                         String deRotatedImagePath = deRotationService.derotate(
                                 settingsService.getRootFolder(),
                                 deRotation.getReferenceImage(),
@@ -699,10 +703,15 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 deRotation.getAccurateness(),
                                 deRotation.getReferenceTime(),
                                 deRotation.isLowSNRData(),
-                                getParentFrame());
+                                getParentFrame(),
+                                profileName);
                         if (deRotatedImagePath != null) {
                             openImageAfterStacking(
-                                    deRotatedImagePath, settingsService.getRootFolder(), scale, openImageMode);
+                                    deRotatedImagePath,
+                                    settingsService.getRootFolder(),
+                                    scale,
+                                    openImageMode,
+                                    profileName);
                         }
                     } catch (Exception e) {
                         log.error("Error during derotation", e);
@@ -743,6 +752,7 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                 ImagePlus image = new Opener().openImage(selectedImages.getFirst());
                                 String stackedImagePath = stackService.stackImages(
                                         rootFolder,
+                                        selectedImages.getFirst(),
                                         image.getWidth(),
                                         image.getHeight(),
                                         selectedImages.stream()
@@ -750,7 +760,12 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
                                                 .toList(),
                                         getParentFrame(),
                                         false);
-                                openImageAfterStacking(stackedImagePath, rootFolder, scale, openImageMode);
+                                openImageAfterStacking(
+                                        stackedImagePath,
+                                        rootFolder,
+                                        scale,
+                                        openImageMode,
+                                        getProfileName(stackedImagePath));
                             } catch (IOException e) {
                                 log.error("Error stacking images : ", e);
                             } finally {
@@ -771,15 +786,9 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
         luckyStackWorkerContext.setProfileBeingApplied(false);
     }
 
-    private void openImageAfterStacking(String imagePath, String rootFolder, double scale, String openImageMode) {
+    private void openImageAfterStacking(
+            String imagePath, String rootFolder, double scale, String openImageMode, String profileName) {
         luckyStackWorkerContext.setStatus("Stacking complete, now applying profile");
-        String profileName = LswFileUtil.deriveProfileFromImageName(imagePath);
-        String selectedProfile = luckyStackWorkerContext.getSelectedProfile();
-        if (profileName.equals(Constants.DEFAULT_PROFILE)
-                && selectedProfile != null
-                && !selectedProfile.equals(Constants.DEFAULT_PROFILE)) {
-            profileName = selectedProfile;
-        }
         Profile profile = profileService
                 .findByName(profileName)
                 .orElseThrow(() -> new ProfileNotFoundException("Unknown profile!"));
@@ -788,6 +797,17 @@ public class ReferenceImageService implements RoiListener, WindowListener, Compo
             profileService.updateProfile(new ProfileDTO(profile));
         }
         openReferenceImageAndUpdateSettings(imagePath, rootFolder, profile);
+    }
+
+    private String getProfileName(String imagePath) {
+        String profileName = LswFileUtil.deriveProfileFromImageName(imagePath);
+        String selectedProfile = luckyStackWorkerContext.getSelectedProfile();
+        if (profileName.equals(Constants.DEFAULT_PROFILE)
+                && selectedProfile != null
+                && !selectedProfile.equals(Constants.DEFAULT_PROFILE)) {
+            profileName = selectedProfile;
+        }
+        return profileName;
     }
 
     private boolean confirmOverwrite() {

@@ -21,6 +21,7 @@ class StackService(private val luckyStackWorkerContext: LuckyStackWorkerContext)
 
   fun stackImages(
       rootFolder: String,
+      resultFilename: String,
       widthParam: Int?,
       heightParam: Int?,
       imagesFilePaths: List<String>,
@@ -71,7 +72,7 @@ class StackService(private val luckyStackWorkerContext: LuckyStackWorkerContext)
       }
       val layers = arrayOf(redPixelsAverages, greenPixelsAverages, bluePixelsAverages)
       val lswImageLayers = LswImageLayers(width, height, layers)
-      val referenceImageFilename = LswFileUtil.getFilenameFromPath(imagesFilePaths[0])
+      val referenceImageFilename = LswFileUtil.getFilenameFromPath(resultFilename)
       val postfix = "LSW_" + (if (isDerotation) "DRTD" else "STACK")
       val stackedImagePathRootFolder =
           "${rootFolder}/${LswFileUtil.getPathWithoutExtension(referenceImageFilename)}_${postfix}.tif"

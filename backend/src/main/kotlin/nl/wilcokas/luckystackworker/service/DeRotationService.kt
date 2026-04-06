@@ -19,6 +19,7 @@ import javax.swing.JOptionPane
 import kotlin.math.abs
 import nl.wilcokas.luckystackworker.LuckyStackWorkerContext
 import nl.wilcokas.luckystackworker.constants.Constants
+import nl.wilcokas.luckystackworker.constants.Constants.DEFAULT_PROFILE
 import nl.wilcokas.luckystackworker.exceptions.BatchStoppedException
 import nl.wilcokas.luckystackworker.exceptions.DeRotationException
 import nl.wilcokas.luckystackworker.filter.BilateralDenoiseFilter
@@ -28,6 +29,7 @@ import nl.wilcokas.luckystackworker.model.ImageOutputFormatType.TIF
 import nl.wilcokas.luckystackworker.model.Profile
 import nl.wilcokas.luckystackworker.service.bean.OpenImageModeEnum.RGB
 import nl.wilcokas.luckystackworker.util.LswFileUtil
+import nl.wilcokas.luckystackworker.util.LswFileUtil.toWinjuposTimestamp
 import nl.wilcokas.luckystackworker.util.LswImageProcessingUtil
 import nl.wilcokas.luckystackworker.util.LswUtil
 import nl.wilcokas.luckystackworker.util.logger
@@ -68,6 +70,7 @@ class DeRotationService(
       initialReferenceTime: LocalTime?,
       initiallowSNRData: Boolean,
       parentFrame: JFrame?,
+      profileName: String,
   ): String? {
 
     this._anchorStrength = initialAnchorStrength
@@ -141,12 +144,16 @@ class DeRotationService(
         log.info("Stacking images")
         val width = if (referenceImage == null) null else referenceImage.width
         val height = if (referenceImage == null) null else referenceImage.height
-        val referenceImagesToStack =
-            if (referenceTime == null) listOf("${rootFolder}/${referenceImageFilenameParam}")
-            else emptyList()
+        var resultFilename = "${rootFolder}/${referenceImageFilenameParam}"
+        var referenceImagesToStack = listOf(resultFilename)
+        if (referenceTime != null) {
+          resultFilename = "${rootFolder}/${toWinjuposTimestamp(referenceTime)}-${profileName}.tif"
+          referenceImagesToStack = emptyList()
+        }
         val resultFilePath =
             stackService.stackImages(
                 rootFolder,
+                resultFilename,
                 width,
                 height,
                 referenceImagesToStack +
@@ -896,6 +903,7 @@ fun main(args: Array<String>) {
           LocalTime.now(),
           false,
           null,
+          DEFAULT_PROFILE,
       )
     } else if (arguments[0] == "-transform") {
       service.transformFromTo(

@@ -754,7 +754,7 @@ public class LswFileUtil {
 
     public static String toWinjuposTimestamp(LocalDateTime dateTime) {
         return String.format(
-                "%s:%d", dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), dateTime.getSecond() / 6);
+                "%s_%d", dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm")), dateTime.getSecond() / 6);
     }
 
     public static ImageOutputFormatType getImageOutputFormat(String extension, FileFilter selectedFormat) {
