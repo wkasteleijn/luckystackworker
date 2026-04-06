@@ -499,8 +499,8 @@ class DeRotationService(
               referenceInterpolationFactors != null
       ) {
         factor =
-            if (referenceEncountered) referenceInterpolationFactors.first
-            else referenceInterpolationFactors.second
+            if (referenceEncountered) referenceInterpolationFactors.second
+            else referenceInterpolationFactors.first
       }
       val isTimeDeRotation = referenceImageFilenames.first != referenceImageFilenames.second
       if (isTimeDeRotation || referenceImageFilenames.first != originalSource) {
