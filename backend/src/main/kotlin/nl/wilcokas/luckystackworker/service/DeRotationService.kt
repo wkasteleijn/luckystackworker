@@ -476,7 +476,7 @@ class DeRotationService(
       val sourceFullPath = sharpenedImagePaths[i]
       val source = LswFileUtil.getFilenameFromPath(sourceFullPath)
       val originalSource = allImagesFilenames[i]
-      if (!referenceEncountered && referenceImageFilenames.first == originalSource) {
+      if (!referenceEncountered && referenceImageFilenames.second == originalSource) {
         referenceEncountered = true
       }
 
@@ -836,43 +836,33 @@ class DeRotationService(
       factor: Double,
   ): String {
     val intervals = MiscTools.numberOfIntervalsOfTransformation("$rootFolder/$transformationFile")
-    val cx = Array<DoubleArray?>(intervals + 3) { DoubleArray(intervals + 3) }
-    val cy = Array<DoubleArray?>(intervals + 3) { DoubleArray(intervals + 3) }
-    MiscTools.loadTransformation("${rootFolder}/${transformationFile}", cx, cy)
+    val targetCx = Array(intervals + 3) { DoubleArray(intervals + 3) }
+    val targetCy = Array(intervals + 3) { DoubleArray(intervals + 3) }
+    MiscTools.loadTransformation("$rootFolder/$transformationFile", targetCx, targetCy)
 
-    val initialCx = Array<DoubleArray?>(intervals + 3) { DoubleArray(intervals + 3) }
-    val initialCy = Array<DoubleArray?>(intervals + 3) { DoubleArray(intervals + 3) }
+    val idCx = Array(intervals + 3) { DoubleArray(intervals + 3) }
+    val idCy = Array(intervals + 3) { DoubleArray(intervals + 3) }
 
-    // Manually calculate the initial control point positions
-    val xSpacing = imageWidth.toDouble() / intervals
-    val ySpacing = imageHeight.toDouble() / intervals
     for (i in 0 until intervals + 3) {
       for (j in 0 until intervals + 3) {
-        initialCx[i]!![j] = (j - 1) * xSpacing
-        initialCy[i]!![j] = (i - 1) * ySpacing
+        idCx[i][j] = j.toDouble() * imageWidth / intervals - imageWidth / intervals
+        idCy[i][j] = i.toDouble() * imageHeight / intervals - imageHeight / intervals
       }
     }
 
-    for (i in cx.indices) {
-      for (j in cx[i]!!.indices) {
-        // Calculate displacement from the initial control point positions
-        val dx = cx[i]!![j] - initialCx[i]!![j]
-        val dy = cy[i]!![j] - initialCy[i]!![j]
+    val resCx = Array(intervals + 3) { DoubleArray(intervals + 3) }
+    val resCy = Array(intervals + 3) { DoubleArray(intervals + 3) }
 
-        // Apply factor to the displacement and add it back to the initial position
-        cx[i]!![j] = initialCx[i]!![j] + dx * factor
-        cy[i]!![j] = initialCy[i]!![j] + dy * factor
+    for (i in 0 until intervals + 3) {
+      for (j in 0 until intervals + 3) {
+        resCx[i][j] = (1.0 - factor) * idCx[i][j] + factor * targetCx[i][j]
+        resCy[i][j] = (1.0 - factor) * idCy[i][j] + factor * targetCy[i][j]
       }
     }
 
-    val interpolatedTransformationPath = "${rootFolder}/OFFSET_${transformationFile}"
-    MiscTools.saveElasticTransformation(
-        intervals,
-        cx,
-        cy,
-        interpolatedTransformationPath,
-    )
-    return interpolatedTransformationPath
+    val interpolatedPath = "${rootFolder}/OFFSET_${transformationFile}"
+    MiscTools.saveElasticTransformation(intervals, resCx, resCy, interpolatedPath)
+    return "OFFSET_${transformationFile}"
   }
 }
 
