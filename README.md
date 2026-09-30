@@ -14,6 +14,3 @@ Go to [www.wilcokas.com/luckystackworker](https://www.wilcokas.com/luckystackwor
 
 ![screenshot_lsw_7 0 0](https://github.com/wkasteleijn/luckystackworker/blob/main/graphics/screenshot_lsw_7.0.0.jpg)
 
-## Contributing
-
-Please [contact me](https://www.wilcokas.com/contact) if you like to contribute to this project. 
