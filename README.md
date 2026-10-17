@@ -6,10 +6,6 @@ LuckyStackWorker is a desktop application that aims to simplify and speed up pos
 
 Go to [www.wilcokas.com/luckystackworker](https://www.wilcokas.com/luckystackworker) to see all the information, including sample images and instruction video's.
 
-## User manual
-
-[Here](https://github.com/wkasteleijn/luckystackworker/releases/download/Manual/LuckyStackWorker_User_Manual.pdf) you can find the downloadable user manual in PDF format.
-
 ## Screenshot
 
 ![screenshot_lsw_7 0 0](https://github.com/wkasteleijn/luckystackworker/blob/main/graphics/screenshot_lsw_7.0.0.jpg)
