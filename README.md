@@ -1,6 +1,7 @@
 # <img width="128" alt="luckystackworker_icon" src="https://github.com/wkasteleijn/luckystackworker/blob/v7.0.0-beta/graphics/luckystackworker_icon.png" /> LuckyStackWorker
 
 LuckyStackWorker is a desktop application that aims to simplify and speed up post-processing of planetary, lunar and solar image stacks that are the result of popular stacking software like AutoStakkert by automating the post-processing process. It provides quick bulk post-processing of Solar System Object image stacks captured with the so-called Lucky Imaging technique by using a Telescope and an Astronomy camera. The recordings are typically done using software such as Firecapture  or Shapcap and afterwards stacked to single images. The application allows you to immediately apply the same operations to all your stacked images in one mouse-click.
+Note: As of version 7.2.0 the application no longer uses this repo for the sources. 
 
 ## Website
 
